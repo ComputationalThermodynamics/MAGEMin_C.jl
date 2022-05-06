@@ -1,7 +1,7 @@
 #
 # START OF PROLOGUE
 #
-using MAGEMin, MAGEMin_jll
+using MAGEMin_C, MAGEMin_jll
 const HASH_JEN = 0;
 
 
