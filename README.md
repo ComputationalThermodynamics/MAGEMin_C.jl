@@ -30,7 +30,7 @@ julia> test = 0;
 julia> bulk_rock   = get_bulk_rock(gv, test);	 
 julia> gv.verbose  = -1; 							
 julia> P_kbar, T_C = 8.0, 1300.0;		
-julia> out         = point_wise_minimization("mol",P_kbar,T_C, bulk_rock, gv, DB)
+julia> out         = point_wise_minimization(P_kbar,T_C, bulk_rock, gv, DB)
 Pressure          : 8.0      [kbar]
 Temperature       : 1300.0    [Celcius]
      Stable phase | Fraction (mol 1 atom basis) 
