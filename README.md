@@ -30,15 +30,20 @@ julia> test = 0;
 julia> bulk_rock   = get_bulk_rock(gv, test);	 
 julia> gv.verbose  = -1; 							
 julia> P_kbar, T_C = 8.0, 1300.0;		
-julia> out         = point_wise_minimization(P_kbar,T_C, bulk_rock, gv, DB)  
+julia> out         = point_wise_minimization("mol",P_kbar,T_C, bulk_rock, gv, DB)
 Pressure          : 8.0      [kbar]
 Temperature       : 1300.0    [Celcius]
-     Stable phase | Fraction 
-              opx   0.22201 
+     Stable phase | Fraction (mol 1 atom basis) 
+              liq   0.14216 
               cpx   0.01321 
-              liq   0.14214 
-               ol   0.62263 
-Gibbs free energy : -856.885052  (71 iterations; 116.82 ms)
+              opx   0.22202 
+               ol   0.6226 
+     Stable phase | Fraction (wt fraction) 
+              liq   0.14736 
+              cpx   0.01356 
+              opx   0.22014 
+               ol   0.61895 
+Gibbs free energy : -856.885051  (67 iterations; 118.47 ms)
 ```  
 After the calculation is finished, the structure `out` holds all the information about the stable assemblage, including seismic velocities, melt content, melt chemistry, densities etc.
 You can show a full overview of that with
