@@ -5,8 +5,7 @@ include("../gen/magemin_library.jl")
 export LibMAGEMin
 
 # Load julia-style wrappers 
-include("MAGEMin_wrappers.jl")
-
+include("../julia/MAGEMin_wrappers.jl")
 
 
 end # module
