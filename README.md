@@ -1,6 +1,6 @@
 # MAGEMin_C.jl
 
-[![Build Status](https://github.com/JuliaGeodynamics/GeoParams.jl/workflows/CI/badge.svg)](https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/actions)
+[![Build Status](https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/workflows/CI/badge.svg)](https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/actions)
 
 
 Julia interface to the MAGEMin C package, which performs thermodynamic equilibrium calculations.
