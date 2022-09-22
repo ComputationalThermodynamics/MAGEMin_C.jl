@@ -27,23 +27,25 @@ julia> using MAGEMin_C
 Using libMAGEMin.dylib from MAGEMin_jll
 julia> gv, DB = init_MAGEMin();	# initialize database
 julia> test = 0;
+julia> sys_in      = "mol"     # mol or wt
 julia> bulk_rock   = get_bulk_rock(gv, test);
 julia> gv.verbose  = -1;
 julia> P_kbar, T_C = 8.0, 1300.0;	
-julia> out         = point_wise_minimization(P_kbar,T_C, bulk_rock, gv, DB)
+julia> out         = point_wise_minimization(P,T, bulk_rock, gv, DB, sys_in);
 Pressure          : 8.0      [kbar]
-Temperature       : 1300.0    [Celcius]
+Temperature       : 800.0    [Celcius]
      Stable phase | Fraction (mol 1 atom basis) 
-              liq   0.14216 
-              cpx   0.01321 
-              opx   0.22202 
-               ol   0.6226 
+              opx   0.24229 
+              cpx   0.14165 
+               ol   0.58808 
+              spn   0.02798 
      Stable phase | Fraction (wt fraction) 
-              liq   0.14736 
-              cpx   0.01356 
-              opx   0.22014 
-               ol   0.61895 
-Gibbs free energy : -856.885051  (67 iterations; 118.47 ms)
+              opx   0.23908 
+              cpx   0.14583 
+               ol   0.58674 
+              spn   0.02846 
+Gibbs free energy : -797.749184  (25 iterations; 121.92 ms)
+Oxygen fugacity   : 9.64082690628766e-12
 ```
 After the calculation is finished, the structure `out` holds all the information about the stable assemblage, including seismic velocities, melt content, melt chemistry, densities etc.
 You can show a full overview of that with
