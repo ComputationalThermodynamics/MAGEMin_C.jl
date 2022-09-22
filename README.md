@@ -45,7 +45,6 @@ Temperature       : 800.0    [Celcius]
                ol   0.58674 
               spn   0.02846 
 Gibbs free energy : -797.749184  (25 iterations; 121.92 ms)
-Oxygen fugacity   : 9.64082690628766e-12
 ```
 After the calculation is finished, the structure `out` holds all the information about the stable assemblage, including seismic velocities, melt content, melt chemistry, densities etc.
 You can show a full overview of that with
