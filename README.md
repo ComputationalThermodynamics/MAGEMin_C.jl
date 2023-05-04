@@ -6,7 +6,7 @@
 Julia interface to the MAGEMin C package, which performs thermodynamic equilibrium calculations.
 See the [MAGEMin](https://github.com/ComputationalThermodynamics/MAGEMin) page for more details on the package & how to use it.
 
-### Using the julia interface 
+## Using the julia interface 
 First install julia. We recommend downloading the official binary from the [julia](julialang.org) webpage. 
 
 Next, install the `MAGEMin_C` package with: 
@@ -22,7 +22,7 @@ pkg> test MAGEMin_C
 By pushing `backspace` you return from the package manager to the main julia terminal. This will download a compiled version of the library as well as some wrapper functions to your system.
 
 Next, you can do calculations with
-# Example 1
+### Example 1
 
 This is an example of how to use it for a predefined bulk rock composition:
 ```julia
@@ -50,7 +50,7 @@ Gibbs free energy : -797.749183  (26 iterations; 94.95 ms)
 Oxygen fugacity          : 9.645393319147175e-12
 ```
 
-# Example 2
+### Example 2
 And here a case in which you specify your own bulk rock composition. 
 We convert that in the correct format, using the `convertBulk4MAGEMin` function. 
 ```julia
@@ -97,4 +97,62 @@ Once you are done with all calculations, release the memory with
 julia> finalize_MAGEMin(gv,DB)
 ```
 
+
+
+
+## Installing it on HPC systems
+
+Essentially all high-performance computer systems currently available use MPI versions that are specifically compiled for that system. As a result, you typically have to recompile your code using those MPI libraries for it to work. In the case of `MAGEMin`, this involves compiling `NLopt` and using the correct `BLAS/LAPACK` libraries as well, which can be sometimes cumbersome.
+
+Luckily there is a solution thanks to the great work of `@eschnett` and colleagues, who developed [MPITrampoline](https://github.com/eschnett/MPItrampoline) which is an intermediate layer between the HPC-system-specific MPI libraries and the precompiled `MAGEMin` binaries. 
+
+It essentially consists of two steps: 1) compile a small package ([MPIwrapper](https://github.com/eschnett/MPIwrapper)), and 2) make sure that you download the version of `MAGEMin` that was compiled versus `MPItrampoline`.
+
+Here step-by-step instructions (for linux, as that is what essentially all HPC systems use):
+
+1) Download [MPIwrapper](https://github.com/eschnett/MPIwrapper): 
+```bash
+$git clone https://github.com/eschnett/MPIwrapper.git 
+```
+
+2) Install it after making sure that `mpiexec` points to the one you want (you may have to load some modules, depending on your system):
+```bash
+cmake -S . -B build -DMPIEXEC_EXECUTABLE=mpiexec -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=$HOME/mpiwrapper
+cmake --build build
+cmake --install build
+```
+At this stage, `MPItrampoline` is installed in `$HOME/mpiwrapper`
+
+3) Set the correct wrapper:
+```
+export MPITRAMPOLINE_LIB=$HOME/mpiwrapper/lib/libmpiwrapper.so
+```
+
+4) Start julia and install the `MPI` and `MPIPreferences` packages:
+```julia
+$julia
+julia> ]
+pkg>add MPI, MPIPreferences
+```
+
+5) Set the preference to use `MPItrampoline`
+```julia
+julia> using MPIPreferences; MPIPreferences.use_jll_binary("MPItrampoline_jll")
+┌ Info: MPIPreferences unchanged
+└   binary = "MPItrampoline_jll"
+```
+
+6) Load `MPI` and verify it is the correct one
+```julia
+julia> using MPI
+julia> MPI.Get_library_version()
+"MPIwrapper 2.10.3, using MPIABI 2.9.0, wrapping:\nOpen MPI v4.1.4, package: Open MPI boris@Pluton Distribution, ident: 4.1.4, repo rev: v4.1.4, May 26, 2022"
+```
+
+7) Now load `MAGEMin_jll` and check that it uses the `mpitrampoline` version:
+```julia
+julia> using MAGEMin_jll
+julia> MAGEMin_jll.host_platform
+Linux x86_64 {cxxstring_abi=cxx11, julia_version=1.8.1, libc=glibc, libgfortran_version=5.0.0, mpi=mpitrampoline}
+```
 
