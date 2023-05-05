@@ -113,6 +113,7 @@ Here step-by-step instructions (for linux, as that is what essentially all HPC s
 1) Download [MPIwrapper](https://github.com/eschnett/MPIwrapper): 
 ```bash
 $git clone https://github.com/eschnett/MPIwrapper.git 
+$cd MPIwrapper
 ```
 
 2) Install it after making sure that `mpiexec` points to the one you want (you may have to load some modules, depending on your system):
@@ -125,8 +126,9 @@ At this stage, `MPItrampoline` is installed in `$HOME/mpiwrapper`
 
 3) Set the correct wrapper:
 ```
-export MPITRAMPOLINE_LIB=$HOME/mpiwrapper/lib/libmpiwrapper.so
+$export MPITRAMPOLINE_LIB=$HOME/mpiwrapper/lib64/libmpiwrapper.so
 ```
+Depending on the system it may be called `lib` instead of `lib64` (check!).
 
 4) Start julia and install the `MPI` and `MPIPreferences` packages:
 ```julia
@@ -148,6 +150,7 @@ julia> using MPI
 julia> MPI.Get_library_version()
 "MPIwrapper 2.10.3, using MPIABI 2.9.0, wrapping:\nOpen MPI v4.1.4, package: Open MPI boris@Pluton Distribution, ident: 4.1.4, repo rev: v4.1.4, May 26, 2022"
 ```
+After this, restart julia.
 
 7) Now load `MAGEMin_jll` and check that it uses the `mpitrampoline` version:
 ```julia
@@ -155,4 +158,4 @@ julia> using MAGEMin_jll
 julia> MAGEMin_jll.host_platform
 Linux x86_64 {cxxstring_abi=cxx11, julia_version=1.8.1, libc=glibc, libgfortran_version=5.0.0, mpi=mpitrampoline}
 ```
-
+And you are all set!
