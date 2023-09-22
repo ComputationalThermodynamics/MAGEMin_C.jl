@@ -46,7 +46,7 @@ function Initialize_MAGEMin(db = "ig"; verbose = true)
         list_splx_data[id] = splx_data
     end
 
-    return DataBase_DATA(db, list_gv, list_z_b, list_DB, list_splx_data)
+    return MAGEMin_Data(db, list_gv, list_z_b, list_DB, list_splx_data)
 end
 
 
@@ -195,7 +195,7 @@ end
 
 
 """
-    bulk_rock = use_predefined_bulk_rock(gv, test=-1)
+    bulk_rock = use_predefined_bulk_rock(gv, test=-1, db="ig")
 
 Returns the pre-defined bulk rock composition of a given test
 """
@@ -215,6 +215,19 @@ function use_predefined_bulk_rock(gv, test=0, db="ig")
 
     return gv
 end
+
+"""
+    DAT = use_predefined_bulk_rock(DAT::MAGEMin_Data, test=0)
+Returns the pre-defined bulk rock composition of a given test
+"""
+function use_predefined_bulk_rock(DAT::MAGEMin_Data, test=0)
+    nt = Threads.nthreads()
+    for id in 1:nt
+        DAT.gv[id] =  use_predefined_bulk_rock(DAT.gv[id], test, DAT.db)
+    end
+    return DAT
+end
+
 
 function define_bulk_rock(gv, bulk_in, bulk_in_ox, sys_in,db)
 
@@ -362,7 +375,7 @@ julia> finalize_MAGEMin(gv,DB)
 ```
 
 """
-function point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data, sys_in::String="mol")
+function point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data)
     
     input_data      =   LibMAGEMin.io_data();                           # zero (not used actually)
 
@@ -401,7 +414,11 @@ function point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data, 
     return out
 end
 
-point_wise_minimization(P::Number,T::Number, gv, z_b, DB, splx_data, sys_in::String="mol") = point_wise_minimization(Float64(P),Float64(T), gv, z_b, DB, splx_data, sys_in)
+point_wise_minimization(P::Number,T::Number, gv, z_b, DB, splx_data) = point_wise_minimization(Float64(P),Float64(T), gv, z_b, DB, splx_data)
+
+
+point_wise_minimization(P::Number,T::Number, DAT::MAGEMin_Data) = point_wise_minimization(P,T, DAT.gv[1], DAT.z_b[1], DAT.DB[1], DAT.splx_data[1]) 
+
 
 
 """

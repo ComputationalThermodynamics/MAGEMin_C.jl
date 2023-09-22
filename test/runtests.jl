@@ -9,19 +9,18 @@ end
 using MAGEMin_C         # load MAGEMin (needs to be loaded from main directory to pick up correct library in case it is locally compiled)
 
 # Initialize database 
-db          = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-gv, z_b, DB, splx_data      = init_MAGEMin(db);
+db          =   "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
+DAT         =   Initialize_MAGEMin(db, verbose=true);
 
-
-sys_in      = "mol"     #default is mol, if wt is provided conversion will be done internally (MAGEMin works on mol basis)
-test        = 0         #KLB1
-gv          = use_predefined_bulk_rock(gv, test, db);
+sys_in      =   "mol"     #default is mol, if wt is provided conversion will be done internally (MAGEMin works on mol basis)
+test        =   0         #KLB1
+DAT         =   use_predefined_bulk_rock(DAT, test);
 
 # Call optimization routine for given P & T & bulk_rock
-P           = 8.0
-T           = 800.0
-gv.verbose  = -1        # switch off any verbose
-out         = point_wise_minimization(P,T, gv, z_b, DB, splx_data, sys_in);
+P           =   8.0
+T           =   800.0
+out         =   point_wise_minimization(P,T, DAT);
+
 @show out
 
 @test out.G_system ≈ -797.7491824683576
@@ -58,7 +57,7 @@ finalize_MAGEMin(gv,DB)
     gv         = define_bulk_rock(gv, bulk_in, bulk_in_ox, sys_in, db);
     P,T        = 10.0, 1100.0;
     gv.verbose = -1;        # switch off any verbose
-    out        = point_wise_minimization(P,T, gv, z_b, DB, splx_data, sys_in)
+    out        = point_wise_minimization(P,T, gv, z_b, DB, splx_data)
     finalize_MAGEMin(gv,DB)
 
     @test abs(out.G_system + 907.2788704076264)/abs(907.2788704076264) < 2e-4
