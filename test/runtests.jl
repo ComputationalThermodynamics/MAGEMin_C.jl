@@ -53,6 +53,7 @@ finalize_MAGEMin(gv,DB)
     n       =   100;
     P       =   fill(8.0,n)
     T       =   fill(800.0,n)
+    db      =   "ig" 
     DAT     =   Initialize_MAGEMin(db, verbose=false);
     out     =   multi_point_minimization(P, T, DAT, test=0);
     @test out[end].G_system ≈ -797.7491824683576
@@ -64,7 +65,10 @@ end
 
 @testset "specify bulk rock" begin
     
+
     DAT = Initialize_MAGEMin("ig", verbose=false);
+    
+    # One bulk rock for all points
     n   = 1
     P,T = fill(10.0,n),fill(1100.0,n)
 
@@ -72,8 +76,24 @@ end
     X = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
     sys_in = "wt"    
     out = multi_point_minimization(P, T, DAT, X=X, Xoxides=Xoxides, sys_in=sys_in)
-    Finalize_MAGEMin(DAT)
+
     @test abs(out[end].G_system + 907.2788704076264)/abs(907.2788704076264) < 2e-4
+
+
+    # different bulk rock per point
+    P = [10.0, 10.0]
+    T = [1100.0, 1100.0]
+    Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
+    X1 = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
+    X2 = [49.43; 14.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
+    X = [X1,X2]
+    sys_in = "wt"    
+    out = multi_point_minimization(P, T, DAT, X=X, Xoxides=Xoxides, sys_in=sys_in)
+    
+    @test out[1].G_system ≈ -907.2788704076264 rtol=2e-4
+    @test out[2].G_system ≈ -903.2391213191867 rtol=2e-4
+
+    Finalize_MAGEMin(DAT)
 end
 
 @testset "convert bulk rock" begin
@@ -90,6 +110,7 @@ end
 
     @test bulk_rock ≈ [76.19220995201881, 8.870954242440064, 2.0746602851534823, 2.8217776479950456, 4.610760310300608, 1.8212574300716888, 2.5559196842000387, 0.6583148666016386, 0.3292810992118903, 0.06486448200674054, 0.0]
 end
+
 
 @testset "test Seismic velocities & modulus" begin
     # Call optimization routine for given P & T & bulk_rock
@@ -127,62 +148,74 @@ end
 
 print_error_msg(i,out) = println("ERROR for point $i with test=$(out.test); P=$(out.P); T=$(out.T); stable phases=$(out.ph), fractions=$(out.ph_frac)")
 
+
 # Automatic testing of all points
-function TestPoints(list, gv, z_b, DB, splx_data)
+function TestPoints(list, DAT::MAGEMin_Data)
 
-    for i=1:size(list,1)
-        db          = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-        gv          = use_predefined_bulk_rock(gv, list[i].test, db)
-        out         = point_wise_minimization(list[i].P,list[i].T, gv, z_b, DB, splx_data, sys_in)
+    # Compute all points
+    P = [ l.P for l in list]
+    T = [ l.T for l in list]
+    test = [ l.test for l in list]
+    out_vec = multi_point_minimization(P, T, DAT, test = test[1]);
 
-        # We need to sort the phases (sometimes they are ordered differently)
-        ind_sol = sortperm(list[i].ph)
-        ind_out = sortperm(out.ph)
-        
-        result1 = @test out.G_system  ≈ list[i].G     rtol=1e-3
-        result2 = @test out.ph[ind_out]        == list[i].ph[ind_sol]
-        result3 = @test out.ph_frac[ind_out] ≈ list[i].ph_frac[ind_sol] atol=5e-2       # ok, this is really large (needs fixing for test6!)
-        
-        # print more info about the point if one of the tests above fails
-        if isa(result1,Test.Fail) || isa(result2,Test.Fail) || isa(result3,Test.Fail)
-            print_error_msg(i,list[i])
-        end
-
+    # Check if the points this fit
+    for (i,out) in enumerate(out_vec)
+        VerifyPoint(out, list[i], i)
     end
+    return nothing
+end
+
+# This checks whether a single point agrees with precomputed values & prints a message if not
+function VerifyPoint(out, list, i)
+
+     # We need to sort the phases (sometimes they are ordered differently)
+     ind_sol = sortperm(list.ph)
+     ind_out = sortperm(out.ph)
+     
+     result1 = @test out.G_system  ≈ list.G     rtol=1e-3
+     result2 = @test out.ph[ind_out]        == list.ph[ind_sol]
+     result3 = @test out.ph_frac[ind_out] ≈ list.ph_frac[ind_sol] atol=5e-2       # ok, this is really large (needs fixing for test6!)
+     
+     # print more info about the point if one of the tests above fails
+     if isa(result1,Test.Fail) || isa(result2,Test.Fail) || isa(result3,Test.Fail)
+         print_error_msg(i,list)
+     end
+     
+     return nothing
 end
 
 # load reference for built-in tests
 println("Testing points from the reference diagrams:")
 @testset verbose = true "Total tests" begin
     println("  Starting KLB-1 peridotite tests")
-    db          = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-    gv, z_b, DB, splx_data      = init_MAGEMin(db);
+    db  = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
+    DAT = Initialize_MAGEMin(db, verbose=false);
+   
     gv.verbose=-1;
     @testset "KLB-1 peridotite tests" begin
         include("test_diagram_test0.jl")
-        TestPoints(list, gv, z_b, DB, splx_data)
+        TestPoints(list, DAT)
     end
-    finalize_MAGEMin(gv,DB)
+    Finalize_MAGEMin(DAT)
 
     println("  Starting RE-46 icelandic basalt tests")
     db          = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-    gv, z_b, DB, splx_data      = init_MAGEMin(db);
+    DAT = Initialize_MAGEMin(db, verbose=false);
     gv.verbose=-1;
     @testset "RE-46 icelandic basalt tests" begin
         include("test_diagram_test1.jl")
-        TestPoints(list, gv, z_b, DB, splx_data)
+        TestPoints(list, DAT)
     end
-    finalize_MAGEMin(gv,DB)
+   
 
     println("  Starting Wet MORB tests")
     db          = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-    gv, z_b, DB, splx_data      = init_MAGEMin(db);
-    gv.verbose=-1;
+    DAT = Initialize_MAGEMin(db, verbose=false);
     @testset "Wet MORB tests" begin
         include("test_diagram_test6.jl")
-        TestPoints(list, gv, z_b, DB, splx_data)
+        TestPoints(list, DAT)
     end
-    finalize_MAGEMin(gv,DB)
+    Finalize_MAGEMin(DAT)
 end
 
 

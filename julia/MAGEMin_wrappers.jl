@@ -23,8 +23,7 @@ end
 """
     Dat = Initialize_MAGEMin(db = "ig"; verbose::Union{Bool, Int64} = true)
 
-This initialize the MAGEMin databases on every thread, which has to be done once per simulation, or when you change the database.
-You can surpress all output with `verbose=false`. `verbose=true` will give a brief summary of the result, whereas `verbose=1` will give more details about the computations.
+Initializes MAGEMin on one or more threads, for the database `db`. You can surpress all output with `verbose=false`. `verbose=true` will give a brief summary of the result, whereas `verbose=1` will give more details about the computations.
 """
 function Initialize_MAGEMin(db = "ig"; verbose::Union{Bool, Int64} = true)
     gv, z_b, DB, splx_data = init_MAGEMin(db);
@@ -52,6 +51,7 @@ end
 
 
 """
+    Finalize_MAGEMin(dat::MAGEMin_Data)
 Finalizes MAGEMin and clears variables
 """
 function Finalize_MAGEMin(dat::MAGEMin_Data)
@@ -70,11 +70,7 @@ function Finalize_MAGEMin(dat::MAGEMin_Data)
 end
 
 
-"""
-    gv, DB = init_MAGEMin(db="ig")
-
-Initializes MAGEMin (including setting global options) and loads the Database.
-"""
+# Left for backwards compatibility
 function  init_MAGEMin(db="ig")
 
     z_b         = LibMAGEMin.bulk_infos()
@@ -101,35 +97,12 @@ function  init_MAGEMin(db="ig")
     return gv, z_b, DB, splx_data
 end
 
+# left here for backwards compatibility
 function finalize_MAGEMin(gv,DB)
     LibMAGEMin.FreeDatabases(gv,DB)
     return nothing
 end
 
-#=
-=#
-
-#=
-
-
-
-
-Activate julia and multithreading 
-====
-
-Performs a MAGEMin optimization for a list of points using the (multi-threading) parallel capabilities of julia. To take advantage of this, 
-you need to start julia with:
-```
-$julia -t auto
-```
-which will automatically invoke all threads on your machine. Alternatively, use `julia -t 4` to start it on 4 threads.
-If you are interested to see what you can do on your machine machine is capable off type:
-```
-julia> versioninfo()
-``` 
-
-
-=#
 
 """
     Out_PT = multi_point_minimization(P:Vector{_T}, T::Vector, MAGEMin_db::MAGEMin_Data; sys_in="mol", test=0, X::Union{Nothing, Vector, Vector{Vector}}=nothing)
@@ -164,6 +137,33 @@ julia> out = multi_point_minimization(P, T, DAT, X=X, Xoxides=Xoxides, sys_in=sy
 julia> Finalize_MAGEMin(DAT)
 ```
 
+Example 3 - Different bulk rock composition for different points
+===
+```julia
+julia> DAT = Initialize_MAGEMin("ig", verbose=false);
+julia> P = [10.0, 20.0]
+julia> T = [1100.0, 1200]
+julia> Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
+julia> X1 = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
+julia> X2 = [49.43; 14.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
+julia> X = [X1,X2]
+julia> sys_in = "wt"    
+julia> out = multi_point_minimization(P, T, DAT, X=X, Xoxides=Xoxides, sys_in=sys_in)
+julia> Finalize_MAGEMin(DAT)
+```
+
+Activating multithreading on julia
+===
+
+To take advantage of multithreading, you need to start julia from the terminal with:
+```julia
+\$julia -t auto
+```
+which will automatically use all threads on your machine. Alternatively, use `julia -t 4` to start it on 4 threads.
+If you are interested to see what you can do on your machine type:
+```
+julia> versioninfo()
+``` 
 
 """
 function multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMin_db::MAGEMin_Data;  
@@ -227,7 +227,7 @@ function multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMi
 
         if CompositionType==2
             # different bulk-rock composition for every point - specify it here
-            gv = define_bulk_rock(gv, X[i], Xoxides, sys_in, DB);
+            gv = define_bulk_rock(gv, X[i], Xoxides, sys_in, MAGEMin_db.db);
         end
 
         # compute a new point using a ccall
