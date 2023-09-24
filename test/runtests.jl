@@ -62,21 +62,18 @@ finalize_MAGEMin(gv,DB)
     Finalize_MAGEMin(DAT)
 end
 
-
 @testset "specify bulk rock" begin
+    
+    DAT = Initialize_MAGEMin("ig", verbose=false);
+    n   = 1
+    P,T = fill(10.0,n),fill(1100.0,n)
 
-    db          = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-    gv, z_b, DB, splx_data      = init_MAGEMin(db);
-    bulk_in_ox = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
-    bulk_in    = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
-    sys_in     = "wt"
-    gv         = define_bulk_rock(gv, bulk_in, bulk_in_ox, sys_in, db);
-    P,T        = 10.0, 1100.0;
-    gv.verbose = -1;        # switch off any verbose
-    out        = point_wise_minimization(P,T, gv, z_b, DB, splx_data)
-    finalize_MAGEMin(gv,DB)
-
-    @test abs(out.G_system + 907.2788704076264)/abs(907.2788704076264) < 2e-4
+    Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
+    X = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
+    sys_in = "wt"    
+    out = multi_point_minimization(P, T, DAT, X=X, Xoxides=Xoxides, sys_in=sys_in)
+    Finalize_MAGEMin(DAT)
+    @test abs(out[end].G_system + 907.2788704076264)/abs(907.2788704076264) < 2e-4
 end
 
 @testset "convert bulk rock" begin
@@ -94,20 +91,15 @@ end
     @test bulk_rock ≈ [76.19220995201881, 8.870954242440064, 2.0746602851534823, 2.8217776479950456, 4.610760310300608, 1.8212574300716888, 2.5559196842000387, 0.6583148666016386, 0.3292810992118903, 0.06486448200674054, 0.0]
 end
 
-
 @testset "test Seismic velocities & modulus" begin
     # Call optimization routine for given P & T & bulk_rock
-    db          = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-    gv, z_b, DB, splx_data      = init_MAGEMin(db);
+    DAT         = Initialize_MAGEMin("ig", verbose=false);
     test        = 0;
-    sys_in      = "mol"     #default is mol, if wt is provided conversion will be done internally (MAGEMin works on mol basis)
-
-    gv          = use_predefined_bulk_rock(gv, test, db)
+    DAT         = use_predefined_bulk_rock(DAT, test)
     P           = 8.0
     T           = 1200.0
-    gv.verbose  = -1        # switch off any verbose
-    out         = point_wise_minimization(P,T, gv, z_b, DB, splx_data, sys_in)
-    
+    out         = point_wise_minimization(P,T, DAT)
+
     tol = 5e-2;
     @test abs(out.bulkMod - 95.35222421341481           < tol)
     @test abs(out.shearMod - 29.907907390690557         < tol)
@@ -119,9 +111,8 @@ end
     @test abs(out.bulkModulus_S - 95.74343528580735     < tol)
     @test abs(out.shearModulus_S - 59.4665150508297     < tol)
 
-    finalize_MAGEMin(gv,DB)
+    Finalize_MAGEMin(DAT)
 end
-
 
 # Stores data of tests
 mutable struct outP{ _T  } 

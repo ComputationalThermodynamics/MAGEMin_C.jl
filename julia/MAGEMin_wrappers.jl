@@ -149,6 +149,21 @@ julia> out = multi_point_minimization(P, T, DAT, test=0)
 julia> Finalize_MAGEMin(DAT)
 ```
 
+Example 2 - Specify constant bulk rock composition
+===
+```julia
+julia> DAT = Initialize_MAGEMin("ig", verbose=false);
+julia> n = 10
+julia> P = fill(10.0,n)
+julia> T = fill(1100.0,n)
+julia> Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
+julia> X = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
+julia> sys_in = "wt"    
+julia> out = multi_point_minimization(P, T, DAT, X=X, Xoxides=Xoxides, sys_in=sys_in)
+julia> Finalize_MAGEMin(DAT)
+```
+
+
 """
 function multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMin_db::MAGEMin_Data;  
     test=0, # if using a build-in test case
@@ -172,7 +187,7 @@ function multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMi
 
             # Set the bulk rock composition for all points
             for i in 1:Threads.nthreads()
-                MAGEMin_db.gv[i] = define_bulk_rock(MAGEMin_db.gv[i], X, Xoxides, sys_in, MAGEMin_db.DB[i]);
+                MAGEMin_db.gv[i] = define_bulk_rock(MAGEMin_db.gv[i], X, Xoxides, sys_in, MAGEMin_db.db);
             end
             CompositionType = 1;    # specified bulk composition for all points
         else
