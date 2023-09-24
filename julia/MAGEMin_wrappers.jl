@@ -134,28 +134,53 @@ julia> versioninfo()
     Out_PT = multi_point_minimization(P:Vector{_T}, T::Vector, MAGEMin_db::MAGEMin_Data; sys_in="mol", test=0, X::Union{Nothing, Vector, Vector{Vector}}=nothing)
 
 Perform (parallel) MAGEMin calculations for a range of points as a function of pressure `P`, temperature `T` and/or composition `X`. The database `MAGEMin_db` must be initialised before calling the routine.
-The composition can either be set to be one of the pre-defined build-in test cases, or can 
+The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xodides` and 
 
+Below a few examples:
+
+Example 1 - build-in test vs. pressure and temperature
+===
+```julia
+julia> DAT = Initialize_MAGEMin("ig", verbose=false);
+julia> n = 10
+julia> P = rand(8:40.0,n)
+julia> T = rand(800:1500.0,n)
+julia> out = multi_point_minimization(P, T, DAT, test=0)
+julia> Finalize_MAGEMin(DAT)
+```
 
 """
-function multi_point_minimization(P::Vector{_T}, T::Vector{_T}, MAGEMin_db::MAGEMin_Data; sys_in="mol", test=0, X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}}=nothing, Xoxides = Vector{String}) where _T <: Float64
-
+function multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMin_db::MAGEMin_Data;  
+    test=0, # if using a build-in test case
+    X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}}=nothing, Xoxides = Vector{String}, sys_in     = "wt") where _T <: Float64
 
     # Set the compositional info 
+    CompositionType::Int64 = 0;
     if isnothing(X)
-        # We use one of the build-in tests 
+        # Use one of the build-in tests 
 
         # Create thread-local data
         for i in 1:Threads.nthreads()
             MAGEMin_db.gv[i] = use_predefined_bulk_rock(MAGEMin_db.gv[i], test, MAGEMin_db.db)
         end
 
+        CompositionType = 0;    # build-in tests
     else
-        
+        if isa(X,Vector{Float64})
+            # same bulk rock composition for the full diagram
+            @assert length(X) == length(Xoxides)
+
+            # Set the bulk rock composition for all points
+            for i in 1:Threads.nthreads()
+                MAGEMin_db.gv[i] = define_bulk_rock(MAGEMin_db.gv[i], X, Xoxides, sys_in, MAGEMin_db.DB[i]);
+            end
+            CompositionType = 1;    # specified bulk composition for all points
+        else
+            @assert length(X) == length(P)
+            CompositionType = 2;    # different bulk rock composition for every point
+        end
 
     end
-
-
 
     # initialize vectors
     Out_PT = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef, length(P))
@@ -174,7 +199,7 @@ function multi_point_minimization(P::Vector{_T}, T::Vector{_T}, MAGEMin_db::MAGE
     end
 
     # main loop
-    @threads :static for i in eachindex(Pvec)
+    @threads :static for i in eachindex(P)
         # Get thread-local buffers. As of Julia v1.9, a dynamic scheduling of
         # the threads is the default setting. To avoid task migration and the
         # resulting concurrency issues, we restrict the loop to static scheduling.
@@ -184,8 +209,13 @@ function multi_point_minimization(P::Vector{_T}, T::Vector{_T}, MAGEMin_db::MAGE
         DB = MAGEMin_db.DB[id]
         splx_data = MAGEMin_db.splx_data[id]
 
+        if CompositionType==2
+            # different bulk-rock composition for every point - specify it here
+            gv = define_bulk_rock(gv, X[i], Xoxides, sys_in, DB);
+        end
+
         # compute a new point using a ccall
-        out = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data, sys_in)
+        out = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data)
         Out_PT[i] = out
     end
 
@@ -417,6 +447,13 @@ end
 point_wise_minimization(P::Number,T::Number, gv, z_b, DB, splx_data) = point_wise_minimization(Float64(P),Float64(T), gv, z_b, DB, splx_data)
 
 
+point_wise_minimization(P::Number,T::Number, gv::MAGEMin_C.LibMAGEMin.global_variables, z_b::MAGEMin_C.LibMAGEMin.bulk_infos, DB::MAGEMin_C.LibMAGEMin.Database, splx_data::MAGEMin_C.LibMAGEMin.simplex_datas, sys_in::String) = point_wise_minimization(P,T, gv, z_b, DB, splx_data)
+
+"""
+    out = point_wise_minimization(P::Number,T::Number, DAT::MAGEMin_Data)
+
+Performs a point-wise optimization for a given pressure `P` and temperature `T` foir the data specified in the MAGEMin database `MAGEMin_Data` (where also compoition is specified)
+"""
 point_wise_minimization(P::Number,T::Number, DAT::MAGEMin_Data) = point_wise_minimization(P,T, DAT.gv[1], DAT.z_b[1], DAT.DB[1], DAT.splx_data[1]) 
 
 

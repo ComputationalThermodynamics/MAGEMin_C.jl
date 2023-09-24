@@ -8,7 +8,7 @@ if  cur_dir[end-3:end]=="test"
 end
 using MAGEMin_C         # load MAGEMin (needs to be loaded from main directory to pick up correct library in case it is locally compiled)
 
-# Initialize database 
+# Initialize database  - new way
 db          =   "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
 DAT         =   Initialize_MAGEMin(db, verbose=true);
 
@@ -29,26 +29,42 @@ out         =   point_wise_minimization(P,T, DAT);
 
 # print more detailed info about this point:
 print_info(out)
+Finalize_MAGEMin(DAT)
 
-@testset "pointwise tests  " begin
 
-    for i=1:100
-        # same but with int
-        P           = 8
-        T           = 800
-        gv.verbose  = -1        # switch off any verbose
-        out         = point_wise_minimization(P,T, gv, z_b, DB, splx_data, sys_in)
 
-        @test out.G_system ≈ -797.7491824683576
-        @test out.ph == ["opx", "ol", "cpx", "spn"]
-        @test all(abs.(out.ph_frac - [ 0.24226960158631541, 0.5880694152724345, 0.1416697366114075,  0.027991246529842587])  .< 1e-4)
-    end
-end
+# previous way we defined this (left here for backwards compatibility)
+gv, z_b, DB, splx_data  = init_MAGEMin(db);
+sys_in      =   "mol"     #default is mol, if wt is provided conversion will be done internally (MAGEMin works on mol basis)
+test        =   0         #KLB1
+gv                      =   use_predefined_bulk_rock(gv, test, db);
+gv.verbose=-1
+P           =   8.0
+T           =   800.0
+out         =   point_wise_minimization(P,T, gv, z_b, DB, splx_data, sys_in);
+@test out.G_system ≈ -797.7491824683576
+@test out.ph == ["opx", "ol", "cpx", "spn"]
+@test all(abs.(out.ph_frac - [ 0.24226960158631541, 0.5880694152724345, 0.1416697366114075,  0.027991246529842587])  .< 1e-4)
 finalize_MAGEMin(gv,DB)
 
 
+@testset "pointwise tests  " begin
+
+    n       =   100;
+    P       =   fill(8.0,n)
+    T       =   fill(800.0,n)
+    DAT     =   Initialize_MAGEMin(db, verbose=false);
+    out     =   multi_point_minimization(P, T, DAT, test=0);
+    @test out[end].G_system ≈ -797.7491824683576
+    @test out[end].ph == ["opx", "ol", "cpx", "spn"]
+    @test all(abs.(out[end].ph_frac - [ 0.24226960158631541, 0.5880694152724345, 0.1416697366114075,  0.027991246529842587])  .< 1e-4)
+
+    Finalize_MAGEMin(DAT)
+end
+
+
 @testset "specify bulk rock" begin
-    using MAGEMin_C
+
     db          = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
     gv, z_b, DB, splx_data      = init_MAGEMin(db);
     bulk_in_ox = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
