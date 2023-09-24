@@ -21,11 +21,12 @@ struct MAGEMin_Data{TypeGV, TypeZB, TypeDB, TypeSplxData}
 end
 
 """
-    Dat = Initialize_MAGEMin(db = "ig"; verbose = true)
+    Dat = Initialize_MAGEMin(db = "ig"; verbose::Union{Bool, Int64} = true)
 
 This initialize the MAGEMin databases on every thread, which has to be done once per simulation, or when you change the database.
+You can surpress all output with `verbose=false`. `verbose=true` will give a brief summary of the result, whereas `verbose=1` will give more details about the computations.
 """
-function Initialize_MAGEMin(db = "ig"; verbose = true)
+function Initialize_MAGEMin(db = "ig"; verbose::Union{Bool, Int64} = true)
     gv, z_b, DB, splx_data = init_MAGEMin(db);
 
     nt = Threads.nthreads()
@@ -149,7 +150,7 @@ julia> out = multi_point_minimization(P, T, DAT, test=0)
 julia> Finalize_MAGEMin(DAT)
 ```
 
-Example 2 - Specify constant bulk rock composition
+Example 2 - Specify constant bulk rock composition for all points:
 ===
 ```julia
 julia> DAT = Initialize_MAGEMin("ig", verbose=false);
@@ -231,7 +232,7 @@ function multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMi
 
         # compute a new point using a ccall
         out = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data)
-        Out_PT[i] = out
+        Out_PT[i] = deepcopy(out)  
     end
 
     return Out_PT
