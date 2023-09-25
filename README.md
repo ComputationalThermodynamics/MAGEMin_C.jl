@@ -108,6 +108,8 @@ By default, this will show a progressbar (which you can deactivate with the `pro
 
 You can also specify a custom bulk rock for all points (see above), or a custom bulk rock for every point.
 
+
+
 ### Running it in parallel
 Julia can be run in parallel using multi-threading. To take advantage of this, you need to start julia from the terminal with:
 ```bash
@@ -115,7 +117,7 @@ $julia -t auto
 ```
 which will automatically use all threads on your machine. Alternatively, use `julia -t 4` to start it on 4 threads.
 If you are interested to see what you can do on your machine, type:
-```
+```julia
 julia> versioninfo()
 Julia Version 1.9.0
 Commit 8e630552924 (2023-05-07 11:25 UTC)
