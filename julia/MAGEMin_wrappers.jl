@@ -26,7 +26,7 @@ end
 
 Initializes MAGEMin on one or more threads, for the database `db`. You can surpress all output with `verbose=false`. `verbose=true` will give a brief summary of the result, whereas `verbose=1` will give more details about the computations.
 """
-function Initialize_MAGEMin(db = "ig"; verbose::Union{Bool, Int64} = true)
+function Initialize_MAGEMin(db = "ig"; verbose::Union{Int64,Bool} = 0)
     gv, z_b, DB, splx_data = init_MAGEMin(db);
 
     nt = Threads.nthreads()
@@ -35,12 +35,17 @@ function Initialize_MAGEMin(db = "ig"; verbose::Union{Bool, Int64} = true)
     list_DB = Vector{typeof(DB)}(undef, nt)
     list_splx_data = Vector{typeof(splx_data)}(undef, nt)
 
+    if isa(verbose,Bool)
+        if verbose
+            verbose=0
+        else
+            verbose=-1
+        end
+    end
+
     for id in 1:nt
         gv, z_b, DB, splx_data = init_MAGEMin(db)
-        if !verbose
-            # deactivate verbose output such as printing the result of each `pointwise_miminimzation`
-            gv.verbose = -1
-        end
+        gv.verbose = verbose
         list_gv[id] = gv
         list_z_b[id] = z_b
         list_DB[id] = DB
