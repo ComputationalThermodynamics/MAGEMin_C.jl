@@ -2,6 +2,7 @@
 # Yet, the routines here make it more convenient to use this from julia
 import Base.show
 using Base.Threads: @threads 
+using ProgressMeter
 
 export  init_MAGEMin, finalize_MAGEMin, point_wise_minimization, convertBulk4MAGEMin, use_predefined_bulk_rock, define_bulk_rock, create_output,
         print_info, create_gmin_struct,
@@ -105,10 +106,10 @@ end
 
 
 """
-    Out_PT = multi_point_minimization(P:Vector{_T}, T::Vector, MAGEMin_db::MAGEMin_Data; sys_in="mol", test=0, X::Union{Nothing, Vector, Vector{Vector}}=nothing)
+    Out_PT = multi_point_minimization(P:Vector{_T}, T::Vector, MAGEMin_db::MAGEMin_Data; sys_in="mol", test=0, X::Union{Nothing, Vector, Vector{Vector}}=nothing, progressbar=true)
 
 Perform (parallel) MAGEMin calculations for a range of points as a function of pressure `P`, temperature `T` and/or composition `X`. The database `MAGEMin_db` must be initialised before calling the routine.
-The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xodides` and 
+The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xodides` and `sys_in` (that specifies whether the input is in "mol" or "wt").
 
 Below a few examples:
 
@@ -168,7 +169,9 @@ julia> versioninfo()
 """
 function multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMin_db::MAGEMin_Data;  
     test=0, # if using a build-in test case
-    X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}}=nothing, Xoxides = Vector{String}, sys_in     = "wt") where _T <: Float64
+    X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}}=nothing, Xoxides = Vector{String}, sys_in     = "wt",
+    progressbar=true        # show a progress bar or not?
+    ) where _T <: Float64
 
     # Set the compositional info 
     CompositionType::Int64 = 0;
@@ -215,6 +218,9 @@ function multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMi
     end
 
     # main loop
+    if progressbar
+        progr = Progress(length(P), desc="Computing $(length(P)) points...") # progress meter
+    end
     @threads :static for i in eachindex(P)
         # Get thread-local buffers. As of Julia v1.9, a dynamic scheduling of
         # the threads is the default setting. To avoid task migration and the
@@ -233,8 +239,14 @@ function multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMi
         # compute a new point using a ccall
         out = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data)
         Out_PT[i] = deepcopy(out)  
-    end
 
+        if progressbar
+            next!(progr)
+        end
+    end
+    if progressbar
+        finish!(progr)
+    end
     return Out_PT
 end
 
