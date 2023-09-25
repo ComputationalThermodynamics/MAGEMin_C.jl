@@ -9,17 +9,14 @@ end
 using MAGEMin_C         # load MAGEMin (needs to be loaded from main directory to pick up correct library in case it is locally compiled)
 
 # Initialize database  - new way
-db          =   "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-DAT         =   Initialize_MAGEMin(db, verbose=true);
-
-sys_in      =   "mol"     #default is mol, if wt is provided conversion will be done internally (MAGEMin works on mol basis)
+data        =   Initialize_MAGEMin("ig", verbose=true);
 test        =   0         #KLB1
-DAT         =   use_predefined_bulk_rock(DAT, test);
+data        =   use_predefined_bulk_rock(data, test);
 
 # Call optimization routine for given P & T & bulk_rock
 P           =   8.0
 T           =   800.0
-out         =   point_wise_minimization(P,T, DAT);
+out         =   point_wise_minimization(P,T, data);
 
 @show out
 
@@ -29,15 +26,16 @@ out         =   point_wise_minimization(P,T, DAT);
 
 # print more detailed info about this point:
 print_info(out)
-Finalize_MAGEMin(DAT)
+Finalize_MAGEMin(data)
 
 
 
 # previous way we defined this (left here for backwards compatibility)
+db          = "ig"
 gv, z_b, DB, splx_data  = init_MAGEMin(db);
 sys_in      =   "mol"     #default is mol, if wt is provided conversion will be done internally (MAGEMin works on mol basis)
 test        =   0         #KLB1
-gv                      =   use_predefined_bulk_rock(gv, test, db);
+gv          =   use_predefined_bulk_rock(gv, test, db);
 gv.verbose=-1
 P           =   8.0
 T           =   800.0
@@ -49,51 +47,48 @@ finalize_MAGEMin(gv,DB)
 
 
 @testset "pointwise tests  " begin
-
     n       =   100;
     P       =   fill(8.0,n)
     T       =   fill(800.0,n)
     db      =   "ig" 
-    DAT     =   Initialize_MAGEMin(db, verbose=false);
-    out     =   multi_point_minimization(P, T, DAT, test=0);
+    data    =   Initialize_MAGEMin(db, verbose=false);
+    out     =   multi_point_minimization(P, T, data, test=0);
     @test out[end].G_system ≈ -797.7491824683576
     @test out[end].ph == ["opx", "ol", "cpx", "spn"]
     @test all(abs.(out[end].ph_frac - [ 0.24226960158631541, 0.5880694152724345, 0.1416697366114075,  0.027991246529842587])  .< 1e-4)
 
-    Finalize_MAGEMin(DAT)
+    Finalize_MAGEMin(data)
 end
 
 @testset "specify bulk rock" begin
     
 
-    DAT = Initialize_MAGEMin("ig", verbose=false);
+    data    = Initialize_MAGEMin("ig", verbose=false);
     
     # One bulk rock for all points
-    n   = 1
-    P,T = fill(10.0,n),fill(1100.0,n)
-
+    P,T     = 10.0, 1100.0
     Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
-    X = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
-    sys_in = "wt"    
-    out = multi_point_minimization(P, T, DAT, X=X, Xoxides=Xoxides, sys_in=sys_in)
+    X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
+    sys_in  = "wt"    
+    out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 
-    @test abs(out[end].G_system + 907.2788704076264)/abs(907.2788704076264) < 2e-4
+    @test abs(out.G_system + 907.2788704076264)/abs(907.2788704076264) < 2e-4
 
 
     # different bulk rock per point
-    P = [10.0, 10.0]
-    T = [1100.0, 1100.0]
+    P       = [10.0, 10.0]
+    T       = [1100.0, 1100.0]
     Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
-    X1 = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
-    X2 = [49.43; 14.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
-    X = [X1,X2]
-    sys_in = "wt"    
-    out = multi_point_minimization(P, T, DAT, X=X, Xoxides=Xoxides, sys_in=sys_in)
+    X1      = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
+    X2      = [49.43; 14.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
+    X       = [X1,X2]
+    sys_in  = "wt"    
+    out     = multi_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
     
     @test out[1].G_system ≈ -907.2788704076264 rtol=2e-4
     @test out[2].G_system ≈ -903.2391213191867 rtol=2e-4
 
-    Finalize_MAGEMin(DAT)
+    Finalize_MAGEMin(data)
 end
 
 @testset "convert bulk rock" begin
@@ -114,12 +109,12 @@ end
 
 @testset "test Seismic velocities & modulus" begin
     # Call optimization routine for given P & T & bulk_rock
-    DAT         = Initialize_MAGEMin("ig", verbose=false);
+    data         = Initialize_MAGEMin("ig", verbose=false);
     test        = 0;
-    DAT         = use_predefined_bulk_rock(DAT, test)
+    data         = use_predefined_bulk_rock(data, test)
     P           = 8.0
     T           = 1200.0
-    out         = point_wise_minimization(P,T, DAT)
+    out         = point_wise_minimization(P,T, data)
 
     tol = 5e-2;
     @test abs(out.bulkMod - 95.35222421341481           < tol)
@@ -132,7 +127,7 @@ end
     @test abs(out.bulkModulus_S - 95.74343528580735     < tol)
     @test abs(out.shearModulus_S - 59.4665150508297     < tol)
 
-    Finalize_MAGEMin(DAT)
+    Finalize_MAGEMin(data)
 end
 
 # Stores data of tests
@@ -150,13 +145,13 @@ print_error_msg(i,out) = println("ERROR for point $i with test=$(out.test); P=$(
 
 
 # Automatic testing of all points
-function TestPoints(list, DAT::MAGEMin_Data)
+function TestPoints(list, data::MAGEMin_Data)
 
     # Compute all points
     P = [ l.P for l in list]
     T = [ l.T for l in list]
     test = [ l.test for l in list]
-    out_vec = multi_point_minimization(P, T, DAT, test = test[1]);
+    out_vec = multi_point_minimization(P, T, data, test = test[1]);
 
     # Check if the points this fit
     for (i,out) in enumerate(out_vec)
@@ -189,33 +184,33 @@ println("Testing points from the reference diagrams:")
 @testset verbose = true "Total tests" begin
     println("  Starting KLB-1 peridotite tests")
     db  = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-    DAT = Initialize_MAGEMin(db, verbose=false);
+    data = Initialize_MAGEMin(db, verbose=false);
    
     gv.verbose=-1;
     @testset "KLB-1 peridotite tests" begin
         include("test_diagram_test0.jl")
-        TestPoints(list, DAT)
+        TestPoints(list, data)
     end
-    Finalize_MAGEMin(DAT)
+    Finalize_MAGEMin(data)
 
     println("  Starting RE-46 icelandic basalt tests")
     db          = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-    DAT = Initialize_MAGEMin(db, verbose=false);
+    data = Initialize_MAGEMin(db, verbose=false);
     gv.verbose=-1;
     @testset "RE-46 icelandic basalt tests" begin
         include("test_diagram_test1.jl")
-        TestPoints(list, DAT)
+        TestPoints(list, data)
     end
    
 
     println("  Starting Wet MORB tests")
     db          = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-    DAT = Initialize_MAGEMin(db, verbose=false);
+    data = Initialize_MAGEMin(db, verbose=false);
     @testset "Wet MORB tests" begin
         include("test_diagram_test6.jl")
-        TestPoints(list, DAT)
+        TestPoints(list, data)
     end
-    Finalize_MAGEMin(DAT)
+    Finalize_MAGEMin(data)
 end
 
 
