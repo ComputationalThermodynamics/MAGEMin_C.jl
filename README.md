@@ -94,6 +94,7 @@ julia> Finalize_MAGEMin(DAT)
 ### Example 3 - many points
 
 ```julia
+julia> using MAGEMin_C
 julia> db   = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
 julia> DAT  = Initialize_MAGEMin(db, verbose=false);
 julia> test = 0         #KLB1
@@ -101,6 +102,7 @@ julia> n    = 1000
 julia> P    = rand(8.0:40,n);
 julia> T    = rand(800.0:2000.0, n);
 julia> out  = multi_point_minimization(P,T, DAT, test=test);
+julia> Finalize_MAGEMin(DAT)
 ```
 By default, this will show a progressbar (which you can deactivate with the `progressbar=false` option).
 
