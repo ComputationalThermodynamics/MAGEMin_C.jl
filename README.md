@@ -26,12 +26,12 @@ Next, you can do calculations with:
 This is an example of how to use it for a predefined bulk rock composition:
 ```julia
 julia> db   = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-julia> DAT  = Initialize_MAGEMin(db, verbose=true);
+julia> data = Initialize_MAGEMin(db, verbose=true);
 julia> test = 0         #KLB1
-julia> DAT  = use_predefined_bulk_rock(DAT, test);
+julia> data = use_predefined_bulk_rock(data, test);
 julia> P    = 8.0;
 julia> T    = 800.0;
-julia> out  = point_wise_minimization(P,T, DAT);
+julia> out  = point_wise_minimization(P,T, data);
  Status             :            0 
  Mass residual      : +8.03033e-06
  Rank               :            0 
@@ -50,13 +50,13 @@ julia> out  = point_wise_minimization(P,T, DAT);
 And here a case in which you specify your own bulk rock composition. 
 ```julia
 julia> using MAGEMin_C
-julia> DAT     = Initialize_MAGEMin("ig", verbose=false);
+julia> data     = Initialize_MAGEMin("ig", verbose=false);
 julia> n       = 1
 julia> P,T     = fill(10.0,n),fill(1100.0,n)
 julia> Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
 julia> X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
 julia> sys_in  = "wt"    
-julia> out     = multi_point_minimization(P, T, DAT, X=X, Xoxides=Xoxides, sys_in=sys_in)
+julia> out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 1-element Vector{MAGEMin_C.gmin_struct{Float64, Int64}}:
  Pressure          : 10.0      [kbar]
 Temperature       : 1100.0    [Celcius]
@@ -71,7 +71,7 @@ Temperature       : 1100.0    [Celcius]
 Gibbs free energy : -907.383224  (24 iterations; 36.74 ms)
 Oxygen fugacity          : 2.8850338669861964e-9
 ```
-Note that we here employ the function `multi_point_minimization`, which will run in parallel if you do it for a large number of points (see below). It will require to pass `P`,`T` as vectors and returns a vector with results.
+Note that we here employ the function `single_point_minimization`, which will run in parallel if you do it for a large number of points (see below). It will require to pass `P`,`T` as vectors and returns a vector with results.
 
 After the calculation is finished, the structure `out` holds all the information about the stable assemblage, including seismic velocities, melt content, melt chemistry, densities etc.
 You can show a full overview of that with
@@ -87,7 +87,7 @@ julia> out[1].Vp
 ```
 Once you are done with all calculations, release the memory with
 ```julia
-julia> Finalize_MAGEMin(DAT)
+julia> Finalize_MAGEMin(data)
 ```
 
 
@@ -96,13 +96,13 @@ julia> Finalize_MAGEMin(DAT)
 ```julia
 julia> using MAGEMin_C
 julia> db   = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-julia> DAT  = Initialize_MAGEMin(db, verbose=false);
+julia> data  = Initialize_MAGEMin(db, verbose=false);
 julia> test = 0         #KLB1
 julia> n    = 1000 
 julia> P    = rand(8.0:40,n);
 julia> T    = rand(800.0:2000.0, n);
-julia> out  = multi_point_minimization(P,T, DAT, test=test);
-julia> Finalize_MAGEMin(DAT)
+julia> out  = single_point_minimization(P,T, data, test=test);
+julia> Finalize_MAGEMin(data)
 ```
 By default, this will show a progressbar (which you can deactivate with the `progressbar=false` option).
 
@@ -129,4 +129,4 @@ Platform Info:
   LLVM: libLLVM-14.0.6 (ORCJIT, apple-m1)
   Threads: 8 on 8 virtual cores
 ``` 
-The function `multi_point_minimization` will automatically utilize parallelization if you run it on >1 threads.
+The function `single_point_minimization` will automatically utilize parallelization if you run it on >1 threads.

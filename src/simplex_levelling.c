@@ -52,6 +52,8 @@ void SS_ig_objective_init_function(	obj_type 			*SS_objective,
 
 		if      (strcmp( gv.SS_list[iss], "bi")  == 0 ){
 			SS_objective[iss]  = obj_ig_bi; 		}
+		else if (strcmp( gv.SS_list[iss], "fper")  == 0){
+			SS_objective[iss]  = obj_ig_fper; 		}
 		else if (strcmp( gv.SS_list[iss], "cd")  == 0){
 			SS_objective[iss]  = obj_ig_cd; 		}
 		else if (strcmp( gv.SS_list[iss], "cpx") == 0){
@@ -272,6 +274,7 @@ void update_global_gamma_LU( 				bulk_info 			z_b,
 	dgetrf(&d->n_Ox, &d->n_Ox, d->Alu, &d->n_Ox, ipiv, &info);
 
 	char T = 'T';
+
 	dgetrs(						&T,
 								&d->n_Ox, 
 								&nrhs, 
