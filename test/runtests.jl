@@ -25,7 +25,7 @@ end
     if Threads.nthreads() == 1
         # We exlicitly disable code coverage tracking with multiple threads since
         # this is expensive, see https://github.com/JuliaLang/julia/issues/36142
-        run(`$(Base.julia_cmd()) --threads=2--check-bounds=yes --code-coverage=none $(abspath(joinpath(@__DIR__, "tests.jl")))`)
+        run(`$(Base.julia_cmd()) --threads=2 --check-bounds=yes --code-coverage=none $(abspath(joinpath(@__DIR__, "tests.jl")))`)
     end
 end
 
