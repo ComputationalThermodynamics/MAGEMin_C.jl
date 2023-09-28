@@ -25,6 +25,7 @@ Next, you can do calculations with:
 ### Example 1 - predefined compositions
 This is an example of how to use it for a predefined bulk rock composition:
 ```julia
+julia> using MAGEMin_C
 julia> db   = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
 julia> data = Initialize_MAGEMin(db, verbose=true);
 julia> test = 0         #KLB1
@@ -69,14 +70,13 @@ Temperature       : 1100.0    [Celsius]
 Gibbs free energy : -907.392253  (22 iterations; 62.25 ms)
 Oxygen fugacity          : 3.400537515666476e-9
 ```
-Note that we here employ the function `single_point_minimization`, which will run in parallel if you do it for a large number of points (see below). It will require to pass `P`,`T` as vectors and returns a vector with results.
 
 After the calculation is finished, the structure `out` holds all the information about the stable assemblage, including seismic velocities, melt content, melt chemistry, densities etc.
 You can show a full overview of that with
 ```julia
 julia> print_info(out[1])
 ```
-If you are interested in the density or seismic velocity at the point,  access it with
+If you are interested in the density or seismic velocity at the point, access it with
 ```julia
 julia> out[1].rho
 3144.282577840362
@@ -88,9 +88,7 @@ Once you are done with all calculations, release the memory with
 julia> Finalize_MAGEMin(data)
 ```
 
-
 ### Example 3 - many points
-
 ```julia
 julia> using MAGEMin_C
 julia> db   = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
