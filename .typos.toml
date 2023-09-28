@@ -1,0 +1,10 @@
+[default.extend-words]
+# single words that shall be ignored
+AGS = "AGS"
+datas = "datas" # no plural - but used in API
+informations = "informations" # no plural - but used in API
+outter = "outter" # used in API
+
+[files]
+# Just check Julia files - not C files
+extend-exclude = ["src/*.h", "src/*.c"]
