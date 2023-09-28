@@ -50,26 +50,24 @@ julia> out  = point_wise_minimization(P,T, data);
 And here a case in which you specify your own bulk rock composition.
 ```julia
 julia> using MAGEMin_C
-julia> data     = Initialize_MAGEMin("ig", verbose=false);
-julia> n       = 1
-julia> P,T     = fill(10.0,n),fill(1100.0,n)
+julia> data    = Initialize_MAGEMin("ig", verbose=false);
+julia> P,T     = 10.0, 1100.0
 julia> Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
 julia> X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
 julia> sys_in  = "wt"
 julia> out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
-1-element Vector{MAGEMin_C.gmin_struct{Float64, Int64}}:
- Pressure          : 10.0      [kbar]
-Temperature       : 1100.0    [Celsius]
-     Stable phase | Fraction (mol 1 atom basis)
-              liq   0.74181
-              cpx   0.17388
-             pl4T   0.05116
-     Stable phase | Fraction (wt fraction)
-              liq   0.71562
-              cpx   0.19051
-             pl4T   0.05365
-Gibbs free energy : -907.383224  (24 iterations; 36.74 ms)
-Oxygen fugacity          : 2.8850338669861964e-9
+Pressure          : 10.0      [kbar]
+Temperature       : 1100.0    [Celcius]
+     Stable phase | Fraction (mol 1 atom basis) 
+              liq   0.73698 
+              cpx   0.17241 
+             pl4T   0.04846 
+     Stable phase | Fraction (wt fraction) 
+              liq   0.70765 
+              cpx   0.18894 
+             pl4T   0.05083 
+Gibbs free energy : -907.392253  (22 iterations; 62.25 ms)
+Oxygen fugacity          : 3.400537515666476e-9
 ```
 Note that we here employ the function `single_point_minimization`, which will run in parallel if you do it for a large number of points (see below). It will require to pass `P`,`T` as vectors and returns a vector with results.
 
