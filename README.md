@@ -57,7 +57,7 @@ julia> X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0;
 julia> sys_in  = "wt"
 julia> out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 Pressure          : 10.0      [kbar]
-Temperature       : 1100.0    [Celcius]
+Temperature       : 1100.0    [Celsius]
      Stable phase | Fraction (mol 1 atom basis) 
               liq   0.73698 
               cpx   0.17241 
@@ -99,7 +99,7 @@ julia> test = 0         #KLB1
 julia> n    = 1000
 julia> P    = rand(8.0:40,n);
 julia> T    = rand(800.0:2000.0, n);
-julia> out  = single_point_minimization(P,T, data, test=test);
+julia> out  = multi_point_minimization(P,T, data, test=test);
 julia> Finalize_MAGEMin(data)
 ```
 By default, this will show a progressbar (which you can deactivate with the `progressbar=false` option).
@@ -127,4 +127,4 @@ Platform Info:
   LLVM: libLLVM-14.0.6 (ORCJIT, apple-m1)
   Threads: 8 on 8 virtual cores
 ```
-The function `single_point_minimization` will automatically utilize parallelization if you run it on >1 threads.
+The function `multi_point_minimization` will automatically utilize parallelization if you run it on >1 threads.
