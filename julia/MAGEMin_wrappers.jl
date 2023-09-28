@@ -5,10 +5,7 @@ using Base.Threads: @threads
 using ProgressMeter
 
 export  init_MAGEMin, finalize_MAGEMin, point_wise_minimization, convertBulk4MAGEMin, use_predefined_bulk_rock, define_bulk_rock, create_output,
-        print_info, create_gmin_struct,
-        single_point_minimization,
-        multi_point_minimization, MAGEMin_Data,
-        Initialize_MAGEMin, Finalize_MAGEMin
+        print_info, create_gmin_struct, single_point_minimization, multi_point_minimization, MAGEMin_Data, Initialize_MAGEMin, Finalize_MAGEMin
 
 
 """
