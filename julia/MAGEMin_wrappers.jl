@@ -352,17 +352,25 @@ receives bulk-rock composition in [mol,wt] fraction and associated oxide list an
 """
 function convertBulk4MAGEMin(bulk_in::Vector{Float64},bulk_in_ox::Vector{String},sys_in::String,db::String);
 
-	ref_ox          = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "MnO"; "H2O"];
-	ref_MolarMass   = [60.08; 101.96; 56.08; 40.30; 71.85; 159.69; 94.2; 61.98; 79.88; 16.0; 151.99; 70.937; 18.015];      #Molar mass of oxides
+	ref_ox          = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "MnO"; "H2O"; "S"];
+	ref_MolarMass   = [60.08; 101.96; 56.08; 40.30; 71.85; 159.69; 94.2; 61.98; 79.88; 16.0; 151.99; 70.937; 18.015; 32.06];      #Molar mass of oxides
 
     if db == "ig"
 	    MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];
+    elseif db == "igd"
+        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];      
+    elseif db == "alk"
+        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];    
+    elseif db == "mb"
+        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "H2O"];     
+    elseif db == "um"
+        MAGEMin_ox      = ["SiO2"; "Al2O3"; "MgO" ;"FeO"; "O"; "H2O"; "S"];
     elseif db == "mp"
         MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "MnO"; "H2O"];
     else
         print("Database not implemented...\n")
     end
-
+    
 	MAGEMin_bulk    = zeros(11);
     bulk            = zeros(11);
 	# convert to mol, if system unit = wt
@@ -371,8 +379,11 @@ function convertBulk4MAGEMin(bulk_in::Vector{Float64},bulk_in_ox::Vector{String}
             id = findall(ref_ox .== bulk_in_ox[i]);
 			bulk[i] = bulk_in[i]/ref_MolarMass[id[1]];
 		end
+    else
+        bulk .= bulk_in;
 	end
-	bulk = normalize(bulk);
+
+	bulk = normalize(bulk); 
 
 	for i=1:length(MAGEMin_ox)
         id = findall(bulk_in_ox .== MAGEMin_ox[i]);
@@ -401,6 +412,7 @@ function convertBulk4MAGEMin(bulk_in::Vector{Float64},bulk_in_ox::Vector{String}
 
     MAGEMin_bulk .= normalize(MAGEMin_bulk)*100.0;
 
+    # print("MAGEMin_bulk $MAGEMin_bulk\n")
     return MAGEMin_bulk;
 end
 
