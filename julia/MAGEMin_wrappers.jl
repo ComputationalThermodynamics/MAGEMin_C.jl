@@ -371,8 +371,8 @@ function convertBulk4MAGEMin(bulk_in::Vector{Float64},bulk_in_ox::Vector{String}
         print("Database not implemented...\n")
     end
     
-	MAGEMin_bulk    = zeros(11);
-    bulk            = zeros(11);
+	MAGEMin_bulk    = zeros(length(MAGEMin_ox));
+    bulk            = zeros(length(MAGEMin_ox));
 	# convert to mol, if system unit = wt
 	if sys_in == "wt"
 		for i=1:length(bulk_in_ox)
