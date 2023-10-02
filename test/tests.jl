@@ -57,8 +57,19 @@ finalize_MAGEMin(gv,DB)
     Finalize_MAGEMin(data)
 end
 
-@testset "specify bulk rock" begin
 
+@testset "ultramafic database" begin
+    P,T     = 10.0, 500.0
+    data    = Initialize_MAGEMin("um", verbose=false);
+    out     = single_point_minimization(P, T, data)
+    @test abs(out.G_system + 556.243321)/abs(556.243321) < 2e-4
+    @test all(abs.(out.ph_frac - [0.5753192548298169, 0.024582756340200455, 0.024184726745689656, 0.0554904375970385, 0.0016172391886508995, 0.3184197873654363, 0.0003857953985807551])  .< 1e-4)
+    @test out.ph == ["atg", "ol", "spi", "chl", "po", "fluid", "pyr"]
+
+end
+
+
+@testset "specify bulk rock" begin
 
     data    = Initialize_MAGEMin("ig", verbose=false);
 
@@ -104,7 +115,7 @@ end
 end
 
 
-@testset "test Seismic velocities & modulus" begin
+@testset "Seismic velocities & modulus" begin
     # Call optimization routine for given P & T & bulk_rock
     data         = Initialize_MAGEMin("ig", verbose=false);
     test        = 0;

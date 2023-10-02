@@ -5,13 +5,12 @@ export MAGEMin_jll
 
 using CEnum
 
-# using Libdl: dlext
-
 #
 # START OF PROLOGUE
 #
 using MAGEMin_C, MAGEMin_jll
 const HASH_JEN = 0;
+
 
 function __init__()
     if isfile("libMAGEMin.dylib")
@@ -22,18 +21,6 @@ function __init__()
         println("Using libMAGEMin.dylib from MAGEMin_jll")
     end
 end
-
-# function __init__()
-#     libname = "libMAGEMin." * dlext
-#     if isfile(libname)
-#         global libMAGEMin = joinpath(pwd(), libname)
-#         println("Using locally compiled version of $(libname)")
-#     else
-#         global libMAGEMin = MAGEMin_jll.libMAGEMin
-#         libname = basename(libMAGEMin)
-#         println("Using $(libname) from MAGEMin_jll")
-#     end
-# end
 
 #
 # END OF PROLOGUE
@@ -2130,7 +2117,7 @@ end
 
 
 
-function Base.convert(::Type{SS_data}, a::stb_SS_phases)
+function Base.convert(::Type{SS_data}, a::stb_SS_phases) 
     return SS_data(a.f, a.G, a.deltaG, a.V, a.alpha, a.entropy, a.enthalpy, a.cp, a.rho, a.bulkMod, a.shearMod, a.Vp, a.Vs,
                                     unsafe_wrap( Vector{Cdouble},        a.Comp,             a.nOx),
                                     unsafe_wrap( Vector{Cdouble},        a.Comp_wt,             a.nOx),
@@ -2161,7 +2148,7 @@ struct PP_data
     Comp_wt::Vector{Cdouble}
 end
 
-function Base.convert(::Type{PP_data}, a::stb_PP_phases)
+function Base.convert(::Type{PP_data}, a::stb_PP_phases) 
     return PP_data(a.f, a.G, a.deltaG, a.V, a.alpha, a.entropy, a.enthalpy, a.cp, a.rho, a.bulkMod, a.shearMod, a.Vp, a.Vs,
                     unsafe_wrap(Vector{Cdouble},a.Comp, a.nOx),
                     unsafe_wrap(Vector{Cdouble},a.Comp_wt, a.nOx))
