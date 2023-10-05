@@ -258,6 +258,16 @@ function multi_point_minimization(  P::Vector{Float64},
     if progressbar
         progr = Progress(length(P), desc="Computing $(length(P)) points...") # progress meter
     end
+
+    # The following loop allocates quite a bit. In particular, the garbage
+    # collector (GC) is triggered from time to time. This interferes badly
+    # in some weird way with (libsc, p4est, t8code) when multiple threads are
+    # used - in particular on Linux and Windows where we get segfaults.
+    # To avoid this, we run the GC now and disable GC during the loop. After
+    # the loop, we reset the GC settings to the previous value.
+    GC.gc()
+    gc_value = GC.enable(false)
+
     @threads :static for i in eachindex(P)
         # Get thread-local buffers. As of Julia v1.9, a dynamic scheduling of
         # the threads is the default setting. To avoid task migration and the
@@ -281,6 +291,10 @@ function multi_point_minimization(  P::Vector{Float64},
             next!(progr)
         end
     end
+
+    # Reset the GC (see above)
+    GC.enable(gc_value)
+
     if progressbar
         finish!(progr)
     end
@@ -358,11 +372,11 @@ function convertBulk4MAGEMin(bulk_in::Vector{Float64},bulk_in_ox::Vector{String}
     if db == "ig"
 	    MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];
     elseif db == "igd"
-        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];      
+        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];
     elseif db == "alk"
-        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];    
+        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];
     elseif db == "mb"
-        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "H2O"];     
+        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "H2O"];
     elseif db == "um"
         MAGEMin_ox      = ["SiO2"; "Al2O3"; "MgO" ;"FeO"; "O"; "H2O"; "S"];
     elseif db == "mp"
@@ -370,7 +384,7 @@ function convertBulk4MAGEMin(bulk_in::Vector{Float64},bulk_in_ox::Vector{String}
     else
         print("Database not implemented...\n")
     end
-    
+
 	MAGEMin_bulk    = zeros(length(MAGEMin_ox));
     bulk            = zeros(length(MAGEMin_ox));
 	# convert to mol, if system unit = wt
@@ -383,7 +397,7 @@ function convertBulk4MAGEMin(bulk_in::Vector{Float64},bulk_in_ox::Vector{String}
         bulk .= bulk_in;
 	end
 
-	bulk = normalize(bulk); 
+	bulk = normalize(bulk);
 
 	for i=1:length(MAGEMin_ox)
         id = findall(bulk_in_ox .== MAGEMin_ox[i]);
