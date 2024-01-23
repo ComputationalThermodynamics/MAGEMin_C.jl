@@ -4,6 +4,8 @@ import Base.show
 using Base.Threads: @threads
 using ProgressMeter
 
+const VecOrMat = Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}
+
 export  init_MAGEMin, finalize_MAGEMin, point_wise_minimization, convertBulk4MAGEMin, use_predefined_bulk_rock, define_bulk_rock, create_output,
         print_info, create_gmin_struct, single_point_minimization, multi_point_minimization, MAGEMin_Data, Initialize_MAGEMin, Finalize_MAGEMin
 
@@ -113,17 +115,18 @@ end
 # wrapper for single point minimization
 function single_point_minimization(     P::Float64,
                                         T::Float64,
-                                        MAGEMin_db::MAGEMin_Data;
+                                        MAGEMin_db::MAGEMin_Data,
+                                        X::_T       = nothing;
                                         test::Int64 = 0, # if using a build-in test case
-                                        X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}} = nothing,
                                         Xoxides     = Vector{String},
                                         sys_in      = "mol",
                                         progressbar = true        # show a progress bar or not?
-                                        ) where _T <: Float64
+                                        ) where _T <: VecOrMat
 
     P = [P];
     T = [T];
-    if ~isnothing(X)
+
+    if X isa AbstractVector{Float64}
         X = [X]
     end
 
@@ -131,8 +134,8 @@ function single_point_minimization(     P::Float64,
     Out_PT     =   multi_point_minimization(P,
                                             T,
                                             MAGEMin_db,
+                                            X,
                                             test=test,
-                                            X=X,
                                             Xoxides=Xoxides,
                                             sys_in=sys_in,
                                             progressbar=progressbar);
@@ -203,15 +206,15 @@ julia> versioninfo()
 ```
 
 """
-function multi_point_minimization(  P::Vector{Float64},
-                                    T::Vector{Float64},
-                                    MAGEMin_db::MAGEMin_Data;
-                                    test        = 0, # if using a build-in test case
-                                    X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}}=nothing,
-                                    Xoxides     = Vector{String},
-                                    sys_in      = "mol",
-                                    progressbar = true        # show a progress bar or not?
-                                    ) where _T <: Float64
+function multi_point_minimization(   P::T1,
+    T::T1,
+    MAGEMin_db::MAGEMin_Data,
+    X::T2=nothing;
+    test        = 0, # if using a build-in test case
+    Xoxides     = Vector{String},
+    sys_in::String      = "mol",
+    progressbar = true        # show a progress bar or not?
+    ) where {T1 <: Vector{Float64}, T2 <: VecOrMat}
 
     # Set the compositional info
     CompositionType::Int64 = 0;
@@ -345,7 +348,7 @@ function define_bulk_rock(gv, bulk_in, bulk_in_ox, sys_in,db)
 end
 
 
-function normalize(vector::Vector{Float64})
+function normalize(vector::T1) where {T1 <: AbstractVector{Float64}}
     return vector ./ sum(vector)
 end
 
@@ -356,7 +359,7 @@ convertBulk4MAGEMin( bulk_in, bulk_in_ox, sys_in)
 receives bulk-rock composition in [mol,wt] fraction and associated oxide list and sends back bulk-rock composition converted for MAGEMin use
 
 """
-function convertBulk4MAGEMin(bulk_in::Vector{Float64},bulk_in_ox::Vector{String},sys_in::String,db::String);
+function convertBulk4MAGEMin(bulk_in::T1,bulk_in_ox::Vector{String},sys_in::String,db::String) where {T1 <: AbstractVector{Float64}}
 
 	ref_ox          = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "MnO"; "H2O"; "S"];
 	ref_MolarMass   = [60.08; 101.96; 56.08; 40.30; 71.85; 159.69; 94.2; 61.98; 79.88; 16.0; 151.99; 70.937; 18.015; 32.06];      #Molar mass of oxides
@@ -364,11 +367,11 @@ function convertBulk4MAGEMin(bulk_in::Vector{Float64},bulk_in_ox::Vector{String}
     if db == "ig"
 	    MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];
     elseif db == "igd"
-        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];      
+        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];
     elseif db == "alk"
-        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];    
+        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];
     elseif db == "mb"
-        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "H2O"];     
+        MAGEMin_ox      = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "H2O"];
     elseif db == "um"
         MAGEMin_ox      = ["SiO2"; "Al2O3"; "MgO" ;"FeO"; "O"; "H2O"; "S"];
     elseif db == "mp"
@@ -376,7 +379,7 @@ function convertBulk4MAGEMin(bulk_in::Vector{Float64},bulk_in_ox::Vector{String}
     else
         print("Database not implemented...\n")
     end
-    
+
 	MAGEMin_bulk    = zeros(length(MAGEMin_ox));
     bulk            = zeros(length(MAGEMin_ox));
 	# convert to mol, if system unit = wt
@@ -389,9 +392,9 @@ function convertBulk4MAGEMin(bulk_in::Vector{Float64},bulk_in_ox::Vector{String}
         bulk .= bulk_in;
 	end
 
-	bulk = normalize(bulk); 
+	bulk = normalize(bulk);
 
-	for i=1:length(MAGEMin_ox)
+	for i=axes(MAGEMin_ox,1)
         id = findall(bulk_in_ox .== MAGEMin_ox[i]);
 		if isempty(id) == 0
 			MAGEMin_bulk[i] = bulk[id[1]];
