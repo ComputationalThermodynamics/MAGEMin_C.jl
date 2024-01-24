@@ -145,10 +145,10 @@ end
 
 
 """
-    Out_PT = multi_point_minimization(P:Vector{_T}, T::Vector, MAGEMin_db::MAGEMin_Data; sys_in="mol", test=0, X::Union{Nothing, Vector, Vector{Vector}}=nothing, progressbar=true)
+    Out_PT = multi_point_minimization(P::T1, T::T1, MAGEMin_db::MAGEMin_Data, X::T2=nothing; test = 0, Xoxides = Vector{String}, sys_in::String = "mol", progressbar = true) where {T1 <: Vector{Float64}, T2 <: VecOrMat}
 
 Perform (parallel) MAGEMin calculations for a range of points as a function of pressure `P`, temperature `T` and/or composition `X`. The database `MAGEMin_db` must be initialised before calling the routine.
-The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xodides` and `sys_in` (that specifies whether the input is in "mol" or "wt").
+The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xoxides` and `sys_in` (that specifies whether the input is in "mol" or "wt").
 
 Below a few examples:
 
@@ -173,7 +173,7 @@ julia> T = fill(1100.0,n)
 julia> Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
 julia> X = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
 julia> sys_in = "wt"
-julia> out = multi_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
+julia> out = multi_point_minimization(P, T, data, X, Xoxides=Xoxides, sys_in=sys_in)
 julia> Finalize_MAGEMin(data)
 ```
 
@@ -188,7 +188,7 @@ julia> X1 = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0]
 julia> X2 = [49.43; 14.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
 julia> X = [X1,X2]
 julia> sys_in = "wt"
-julia> out = multi_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
+julia> out = multi_point_minimization(P, T, data, X, Xoxides=Xoxides, sys_in=sys_in)
 julia> Finalize_MAGEMin(data)
 ```
 
@@ -196,12 +196,12 @@ Activating multithreading on julia
 ===
 
 To take advantage of multithreading, you need to start julia from the terminal with:
-```julia
-\$julia -t auto
+```bash
+\$ julia -t auto
 ```
 which will automatically use all threads on your machine. Alternatively, use `julia -t 4` to start it on 4 threads.
 If you are interested to see what you can do on your machine type:
-```
+```julia
 julia> versioninfo()
 ```
 
