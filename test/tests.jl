@@ -267,8 +267,3 @@ println("Testing points from the reference diagrams:")
 
 
 end
-
-
-
-cd(cur_dir)
-
