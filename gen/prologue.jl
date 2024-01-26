@@ -2,20 +2,16 @@
 # START OF PROLOGUE
 #
 using MAGEMin_C, MAGEMin_jll
-const HASH_JEN = 0
-
-using Libdl: dlext
+const HASH_JEN = 0;
 
 
 function __init__()
-    libname = "libMAGEMin." * dlext
-    if isfile(libname)
-        global libMAGEMin = joinpath(pwd(), libname)
-        println("Using locally compiled version of $(libname)")
+    if isfile("libMAGEMin.dylib")
+        global libMAGEMin = joinpath(pwd(),"libMAGEMin.dylib")
+        println("Using locally compiled version of libMAGEMin.dylib")
     else
         global libMAGEMin = MAGEMin_jll.libMAGEMin
-        libname = basename(libMAGEMin)
-        println("Using $(libname) from MAGEMin_jll")
+        println("Using libMAGEMin.dylib from MAGEMin_jll")
     end
 end
 
