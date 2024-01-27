@@ -14,7 +14,7 @@ data        =   use_predefined_bulk_rock(data, test);
 # Call optimization routine for given P & T & bulk_rock
 P           =   8.0
 T           =   800.0
-out         =   point_wise_minim(P,T, data);
+out         =   point_wise_minimization(P,T, data);
 
 @show out
 
@@ -36,7 +36,7 @@ gv          =   use_predefined_bulk_rock(gv, test, db);
 gv.verbose=-1
 P           =   8.0
 T           =   800.0
-out         =   point_wise_minim(P,T, gv, z_b, DB, splx_data, sys_in);
+out         =   point_wise_minimization(P,T, gv, z_b, DB, splx_data, sys_in);
 @test out.G_system ≈ -797.7491828675325
 @test out.ph == ["spn", "cpx",  "opx", "ol"]
 @test all(abs.(out.ph_frac - [0.027985692010022857, 0.14166112328585387, 0.24227821491186913, 0.5880749697922566])  .< 1e-2)
@@ -130,7 +130,7 @@ end
     data         = use_predefined_bulk_rock(data, test)
     P           = 8.0
     T           = 1200.0
-    out         = point_wise_minim(P,T, data)
+    out         = point_wise_minimization(P,T, data)
 
     tol = 1e-2;
     @test abs(out.bulkMod - 94.98281736576462           < tol)
