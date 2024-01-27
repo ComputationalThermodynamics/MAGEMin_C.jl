@@ -31,7 +31,7 @@ end
 """
     Dat = Initialize_MAGEMin(db = "ig"; verbose::Union{Bool, Int64} = true)
 
-Initializes MAGEMin on one or more threads, for the database `db`. You can surpress all output with `verbose=false`. `verbose=true` will give a brief summary of the result, whereas `verbose=1` will give more details about the computations.
+Initializes MAGEMin on one or more threads, for the database `db`. You can supress all output with `verbose=false`. `verbose=true` will give a brief summary of the result, whereas `verbose=1` will give more details about the computations.
 """
 function Initialize_MAGEMin(db = "ig";  verbose::Union{Int64,Bool}  = 0,
                                         limitCaOpx::Int64           = 0,
@@ -531,7 +531,7 @@ julia> T           = 800.0;
 julia> gv.verbose  = -1;        # switch off any verbose
 julia> out         = point_wise_minimization(P,T, gv, z_b, DB, splx_data, sys_in)
 Pressure          : 8.0      [kbar]
-Temperature       : 800.0    [Celcius]
+Temperature       : 800.0    [Celsius]
      Stable phase | Fraction (mol fraction)
               opx   0.24229
                ol   0.58808
@@ -560,7 +560,7 @@ julia> P,T         = 10.0, 1100.0;
 julia> gv.verbose  = -1;        # switch off any verbose
 julia> out         = point_wise_minimization(P,T, gv, z_b, DB, splx_data, sys_in)
 Pressure          : 10.0      [kbar]
-Temperature       : 1100.0    [Celcius]
+Temperature       : 1100.0    [Celsius]
      Stable phase | Fraction (mol fraction)
              pl4T   0.01114
               liq   0.74789
@@ -698,7 +698,7 @@ struct gmin_struct{T,I}
     G_system::T             # G of system
     Gamma::Vector{T}        # Gamma
     P_kbar::T               # Pressure in kbar
-    T_C::T                  # Temperature in Celcius
+    T_C::T                  # Temperature in Celsius
 
     # bulk rock composition:
     bulk::Vector{T}
@@ -888,7 +888,7 @@ end
 # Print brief info about pointwise calculation result
 function show(io::IO, g::gmin_struct)
     println(io, "Pressure          : $(g.P_kbar)      [kbar]")
-    println(io, "Temperature       : $(round(g.T_C,digits=4))    [Celcius]")
+    println(io, "Temperature       : $(round(g.T_C,digits=4))    [Celsius]")
 
     println(io, "     Stable phase | Fraction (mol fraction) ")
     for i=1:length(g.ph)
