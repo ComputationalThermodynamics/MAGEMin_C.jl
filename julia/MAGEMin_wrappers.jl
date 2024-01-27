@@ -11,9 +11,9 @@ const VecOrMat = Union{Nothing, AbstractVector{Float64}, AbstractVector{<:Abstra
 
 export  init_MAGEMin, finalize_MAGEMin, point_wise_minimization, convertBulk4MAGEMin, use_predefined_bulk_rock, define_bulk_rock, create_output,
         print_info, create_gmin_struct, pwm_init, pwm_run,
-        single_point_minimization,
-        multi_point_minimization, MAGEMin_Data,
-        Initialize_MAGEMin, Finalize_MAGEMin
+        single_point_minim,
+        multi_point_minim, MAGEMin_Data,
+        Initialize_MAGEMin, Finalize_MAGEMin, single_point_minimization, multi_point_minimization
 
 
 """
@@ -151,7 +151,7 @@ end
 
 
 # wrapper for single point minimization
-function single_point_minimization(     P::T1,
+function single_point_minim(     P::T1,
                                         T::T1,
                                         MAGEMin_db::MAGEMin_Data,
                                         X::T2=nothing;
@@ -169,7 +169,7 @@ function single_point_minimization(     P::T1,
     end
 
 
-    Out_PT     =   multi_point_minimization(P,
+    Out_PT     =   multi_point_minim(P,
                                             T,
                                             MAGEMin_db,
                                             X,
@@ -182,9 +182,14 @@ function single_point_minimization(     P::T1,
     return Out_PT[1]
 end
 
+# The old API is still supported, but deprecated and implemented using the old one
+function single_point_minimization(P::Float64, T::Float64, MAGEMin_db::MAGEMin_Data; test::Int64 = 0, X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}} = nothing, B::Union{Nothing, _T, Vector{_T}}=nothing, Xoxides = Vector{String}, sys_in = "mol", progressbar = true) where _T <: Float64
+    Base.depwarn("`single_point_minimization(P,T,MAGEMin_db;test=0,X=nothing,B=nothing,Xoxides=Vector{String},sys_in=\"mol\",progressbar=true)` is deprecated, use `single_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=\"mol\",progressbar=true)` instead.", :single_point_minimization, force=true)
+    single_point_minim(P,T,MAGEMin_db,X;test=test, B=B,Xoxides=Xoxides,sys_in=sys_in, progressbar = progressbar)
+end
 
 """
-Out_PT =multi_point_minimization(P::Vector{T1}, T::Vector{T1}, MAGEMin_db::MAGEMin_Data, X::T2=nothing; test=0, caseB::Union{Nothing, T1, Vector{T1}} = nothing, Xoxides= Vector{String}, sys_in= "mol", progressbar = true) where {T1 <: Float64, T2 <: VecOrMat}
+Out_PT =multi_point_minim(P::Vector{T1}, T::Vector{T1}, MAGEMin_db::MAGEMin_Data, X::T2=nothing; test=0, caseB::Union{Nothing, T1, Vector{T1}} = nothing, Xoxides= Vector{String}, sys_in= "mol", progressbar = true) where {T1 <: Float64, T2 <: VecOrMat}
 
 Perform (parallel) MAGEMin calculations for a range of points as a function of pressure `P`, temperature `T` and/or composition `X`. The database `MAGEMin_db` must be initialised before calling the routine.
 The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xodides` and `sys_in` (that specifies whether the input is in "mol" or "wt").
@@ -198,7 +203,7 @@ julia> data = Initialize_MAGEMin("ig", verbose=false);
 julia> n = 10
 julia> P = rand(8:40.0,n)
 julia> T = rand(800:1500.0,n)
-julia> out = multi_point_minimization(P, T, data, test=0)
+julia> out = multi_point_minim(P, T, data, test=0)
 julia> Finalize_MAGEMin(data)
 ```
 
@@ -212,7 +217,7 @@ julia> T = fill(1100.0,n)
 julia> Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
 julia> X = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
 julia> sys_in = "wt"
-julia> out = multi_point_minimization(P, T, data, X, Xoxides=Xoxides, sys_in=sys_in)
+julia> out = multi_point_minim(P, T, data, X, Xoxides=Xoxides, sys_in=sys_in)
 julia> Finalize_MAGEMin(data)
 ```
 
@@ -227,7 +232,7 @@ julia> X1 = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0]
 julia> X2 = [49.43; 14.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
 julia> X = [X1,X2]
 julia> sys_in = "wt"
-julia> out = multi_point_minimization(P, T, data, X, Xoxides=Xoxides, sys_in=sys_in)
+julia> out = multi_point_minim(P, T, data, X, Xoxides=Xoxides, sys_in=sys_in)
 julia> Finalize_MAGEMin(data)
 ```
 
@@ -245,7 +250,7 @@ julia> versioninfo()
 ```
 
 """
-function multi_point_minimization(  P::Vector{T1},
+function multi_point_minim(  P::Vector{T1},
                                     T::Vector{T1},
                                     MAGEMin_db::MAGEMin_Data,
                                     X::T2=nothing;
@@ -307,31 +312,31 @@ function multi_point_minimization(  P::Vector{T1},
         progr = Progress(length(P), desc="Computing $(length(P)) points...") # progress meter
     end
     @threads :static for i in eachindex(P)
-    # Get thread-local buffers. As of Julia v1.9, a dynamic scheduling of
-    # the threads is the default setting. To avoid task migration and the
-    # resulting concurrency issues, we restrict the loop to static scheduling.
-    id          = Threads.threadid()
-    gv          = MAGEMin_db.gv[id]
-    z_b         = MAGEMin_db.z_b[id]
-    DB          = MAGEMin_db.DB[id]
-    splx_data   = MAGEMin_db.splx_data[id]
+        # Get thread-local buffers. As of Julia v1.9, a dynamic scheduling of
+        # the threads is the default setting. To avoid task migration and the
+        # resulting concurrency issues, we restrict the loop to static scheduling.
+        id          = Threads.threadid()
+        gv          = MAGEMin_db.gv[id]
+        z_b         = MAGEMin_db.z_b[id]
+        DB          = MAGEMin_db.DB[id]
+        splx_data   = MAGEMin_db.splx_data[id]
 
-    if CompositionType==2
-        # different bulk-rock composition for every point - specify it here
-        gv = define_bulk_rock(gv, X[i], Xoxides, sys_in, MAGEMin_db.db);
-    end
+        if CompositionType==2
+            # different bulk-rock composition for every point - specify it here
+            gv = define_bulk_rock(gv, X[i], Xoxides, sys_in, MAGEMin_db.db);
+        end
 
-    # compute a new point using a ccall
-    if isnothing(B)
-        out         = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data)
-    else
-        out         = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data; buffer_n = B[i])
-    end
-    Out_PT[i]   = deepcopy(out)
+        # compute a new point using a ccall
+        if isnothing(B)
+            out         = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data)
+        else
+            out         = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data; buffer_n = B[i])
+        end
+        Out_PT[i]   = deepcopy(out)
 
-    if progressbar
-        next!(progr)
-    end
+        if progressbar
+            next!(progr)
+        end
     end
     if progressbar
         finish!(progr)
@@ -340,6 +345,10 @@ function multi_point_minimization(  P::Vector{T1},
     return Out_PT
 end
 
+function multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMin_db::MAGEMin_Data; test=0, X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}}=nothing, B=nothing, Xoxides = Vector{String}, sys_in = "mol",progressbar = true) where _T <: Float64
+    Base.depwarn("`multi_point_minimization(P,T,MAGEMin_db;test=0,X=nothing,B=nothing,Xoxides=Vector{String},sys_in=\"mol\",progressbar=true)` is deprecated, use `multi_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=\"mol\",progressbar=true)` instead.", :multi_point_minimization, force=true)
+    multi_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=sys_in,progressbar=progressbar)
+end
 
 """
 bulk_rock = use_predefined_bulk_rock(gv, test=-1, db="ig")
@@ -523,7 +532,7 @@ julia> gv.verbose  = -1;        # switch off any verbose
 julia> out         = point_wise_minimization(P,T, gv, z_b, DB, splx_data, sys_in)
 Pressure          : 8.0      [kbar]
 Temperature       : 800.0    [Celcius]
-     Stable phase | Fraction (mol 1 atom basis)
+     Stable phase | Fraction (mol fraction)
               opx   0.24229
                ol   0.58808
               cpx   0.14165
@@ -552,7 +561,7 @@ julia> gv.verbose  = -1;        # switch off any verbose
 julia> out         = point_wise_minimization(P,T, gv, z_b, DB, splx_data, sys_in)
 Pressure          : 10.0      [kbar]
 Temperature       : 1100.0    [Celcius]
-     Stable phase | Fraction (mol 1 atom basis)
+     Stable phase | Fraction (mol fraction)
              pl4T   0.01114
               liq   0.74789
               cpx   0.21862
@@ -881,7 +890,7 @@ function show(io::IO, g::gmin_struct)
     println(io, "Pressure          : $(g.P_kbar)      [kbar]")
     println(io, "Temperature       : $(round(g.T_C,digits=4))    [Celcius]")
 
-    println(io, "     Stable phase | Fraction (mol 1 atom basis) ")
+    println(io, "     Stable phase | Fraction (mol fraction) ")
     for i=1:length(g.ph)
         println(io, "   $(lpad(g.ph[i],14," "))   $( round(g.ph_frac[i], digits=5)) ")
     end
@@ -1111,6 +1120,3 @@ function print_info(g::gmin_struct)
     print("\n")
 
 end
-
-
-
