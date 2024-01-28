@@ -11,8 +11,7 @@ const VecOrMat = Union{Nothing, AbstractVector{Float64}, AbstractVector{<:Abstra
 
 export  init_MAGEMin, finalize_MAGEMin, point_wise_minimization, convertBulk4MAGEMin, use_predefined_bulk_rock, define_bulk_rock, create_output,
         print_info, create_gmin_struct, pwm_init, pwm_run,
-        single_point_minim,
-        multi_point_minim, MAGEMin_Data,
+        single_point_minim, multi_point_minim, MAGEMin_Data, W_Data,
         Initialize_MAGEMin, Finalize_MAGEMin, single_point_minimization, multi_point_minimization
 
 
@@ -27,18 +26,26 @@ mutable struct MAGEMin_Data{TypeGV, TypeZB, TypeDB, TypeSplxData}
     splx_data   :: TypeSplxData
 end
 
+"""
+Holds the MAGEMin databases & required structures for every thread
+"""
+mutable struct W_Data{T2,T2,M1}
+    SS_id   :: Vector{Int64}
+    SS_len  :: Vector{Int64}
+    Ws      :: Vector{Matrix{Float64}}
+end
 
 """
     Dat = Initialize_MAGEMin(db = "ig"; verbose::Union{Bool, Int64} = true)
 
-Initializes MAGEMin on one or more threads, for the database `db`. You can supress all output with `verbose=false`. `verbose=true` will give a brief summary of the result, whereas `verbose=1` will give more details about the computations.
+Initializes MAGEMin on one or more threads, for the database `db`. You can surpress all output with `verbose=false`. `verbose=true` will give a brief summary of the result, whereas `verbose=1` will give more details about the computations.
 """
-function Initialize_MAGEMin(db = "ig";  verbose::Union{Int64,Bool}  = 0,
-                                        limitCaOpx::Int64           = 0,
-                                        CaOpxLim::Float64           = 0.0,
-                                        mbCpx::Int64                = 1,
-                                        buffer::String              = "NONE",
-                                        solver::Int64               = 1         )
+function Initialize_MAGEMin(db = "ig";  verbose     ::Union{Int64,Bool} = 0,
+                                        limitCaOpx  ::Int64             = 0,
+                                        CaOpxLim    ::Float64           = 0.0,
+                                        mbCpx       ::Int64             = 1,
+                                        buffer      ::String            = "NONE",
+                                        solver      ::Int64             = 1         )
 
     gv, z_b, DB, splx_data = init_MAGEMin(db;   verbose     = verbose,
                                                 mbCpx       = mbCpx,
@@ -62,7 +69,12 @@ function Initialize_MAGEMin(db = "ig";  verbose::Union{Int64,Bool}  = 0,
     end
 
     for id in 1:nt
-        gv, z_b, DB, splx_data = init_MAGEMin(db; verbose=verbose, mbCpx=mbCpx, limitCaOpx=limitCaOpx, CaOpxLim=CaOpxLim, buffer=buffer, solver=solver)
+        gv, z_b, DB, splx_data = init_MAGEMin(db;   verbose     = verbose,
+                                                    mbCpx       = mbCpx,
+                                                    limitCaOpx  = limitCaOpx,
+                                                    CaOpxLim    = CaOpxLim,
+                                                    buffer      = buffer,
+                                                    solver      = solver    );
 
         list_gv[id]         = gv
         list_z_b[id]        = z_b
@@ -82,12 +94,7 @@ function Finalize_MAGEMin(dat::MAGEMin_Data)
     for id in 1:Threads.nthreads()
 
         LibMAGEMin.FreeDatabases(dat.gv[id], dat.DB[id], dat.z_b[id])
-
-        # These are indeed not freed yet (same with C-code), which should be added for completion
-        # They are rather small structs compared to the others
-        # z_b = dat.z_b[id]
-        # splx_data = dat.splx_data[id]
-
+        # splx_data needs to be freed
      end
      return nothing
 end
@@ -98,7 +105,13 @@ end
 
 Initializes MAGEMin (including setting global options) and loads the Database.
 """
-function  init_MAGEMin(db="ig"; verbose=0, mbCpx=0, limitCaOpx=0, CaOpxLim=1.0, buffer="NONE", solver=1)
+function  init_MAGEMin( db          =  "ig";
+                        verbose     =   0,
+                        mbCpx       =   0,
+                        limitCaOpx  =   0,
+                        CaOpxLim    =   1.0,
+                        buffer      =  "NONE",
+                        solver      =   1           )
 
     z_b         = LibMAGEMin.bulk_infos()
     gv          = LibMAGEMin.global_variables()
@@ -124,18 +137,18 @@ function  init_MAGEMin(db="ig"; verbose=0, mbCpx=0, limitCaOpx=0, CaOpxLim=1.0, 
         print("Database not implemented...\n")
     end
 
-    gv.verbose  = verbose
-    gv.mbCpx    = mbCpx
-    gv.limitCaOpx = limitCaOpx
-    gv.CaOpxLim = CaOpxLim
-    gv.solver   = solver
-    gv.buffer   = pointer(buffer)
+    gv.verbose      = verbose
+    gv.mbCpx        = mbCpx
+    gv.limitCaOpx   = limitCaOpx
+    gv.CaOpxLim     = CaOpxLim
+    gv.solver       = solver
+    gv.buffer       = pointer(buffer)
 
-    gv          = LibMAGEMin.global_variable_init(gv, pointer_from_objref(z_b))
-    DB          = LibMAGEMin.InitializeDatabases(gv, gv.EM_database)
+    gv              = LibMAGEMin.global_variable_init(gv, pointer_from_objref(z_b))
+    DB              = LibMAGEMin.InitializeDatabases(gv, gv.EM_database)
 
-    LibMAGEMin.init_simplex_A( pointer_from_objref(splx_data), gv)
-    LibMAGEMin.init_simplex_B_em( pointer_from_objref(splx_data), gv)
+    LibMAGEMin.init_simplex_A(      pointer_from_objref(splx_data), gv)
+    LibMAGEMin.init_simplex_B_em(   pointer_from_objref(splx_data), gv)
 
     return gv, z_b, DB, splx_data
 end
@@ -151,40 +164,42 @@ end
 
 
 # wrapper for single point minimization
-function single_point_minim(     P::T1,
-                                        T::T1,
-                                        MAGEMin_db::MAGEMin_Data,
-                                        X::T2=nothing;
-                                        test::Int64 = 0, # if using a build-in test case,
-                                        B::Union{Nothing, T1, Vector{T1}} = nothing,
-                                        Xoxides     = Vector{String},
-                                        sys_in      = "mol",
-                                        progressbar = true        # show a progress bar or not?
-                                        ) where {T1 <: Float64, T2 <: VecOrMat}
+function single_point_minim(     P           ::  T1,
+                                 T           ::  T1,
+                                 MAGEMin_db  ::  MAGEMin_Data,
+                                 X           ::  T2                              = nothing;
+                                 test        ::  Int64                           = 0, # if using a build-in test case,
+                                 B           ::  Union{Nothing, T1, Vector{T1}}  = nothing,
+                                 W           ::  Union{Nothing, W_Data}          = nothing,
+                                 Xoxides     = Vector{String},
+                                 sys_in      = "mol",
+                                 progressbar = true        # show a progress bar or not?
 
-    P = [P];
-    T = [T];
+                                 ) where {T1 <: Float64, T2 <: VecOrMat}
+
+    P   = [P];
+    T   = [T];
     if X isa AbstractVector{Float64}
         X = [X]
     end
 
-
-    Out_PT     =   multi_point_minim(P,
-                                            T,
-                                            MAGEMin_db,
-                                            X,
-                                            test=test,
-                                            B=B,
-                                            Xoxides=Xoxides,
-                                            sys_in=sys_in,
-                                            progressbar=progressbar);
+    Out_PT     =   multi_point_minim(    P,
+                                         T,
+                                         MAGEMin_db,
+                                         X,
+                                         test        =   test,
+                                         B           =   B,
+                                         W           =   W,
+                                         Xoxides     =   Xoxides,
+                                         sys_in      =   sys_in,
+                                         progressbar =   progressbar     );
 
     return Out_PT[1]
 end
 
 # The old API is still supported, but deprecated and implemented using the old one
 function single_point_minimization(P::Float64, T::Float64, MAGEMin_db::MAGEMin_Data; test::Int64 = 0, X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}} = nothing, B::Union{Nothing, _T, Vector{_T}}=nothing, Xoxides = Vector{String}, sys_in = "mol", progressbar = true) where _T <: Float64
-    Base.depwarn("`single_point_minimization(P,T,MAGEMin_db;test=0,X=nothing,B=nothing,Xoxides=Vector{String},sys_in=\"mol\",progressbar=true)` is deprecated, use `single_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=\"mol\",progressbar=true)` instead.", :single_point_minimization, force=true)
+    Base.depwarn("`single_point_minimization(P,T,MAGEMin_db;test=0,X=nothing,B=nothing,Xoxides=Vector{String},sys_in=\"mol\",progressbar=true)` is deprecated, use `single_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=\"mol\",progressbar=true)` instead.", :single_point_minimization)
     single_point_minim(P,T,MAGEMin_db,X;test=test, B=B,Xoxides=Xoxides,sys_in=sys_in, progressbar = progressbar)
 end
 
@@ -250,16 +265,17 @@ julia> versioninfo()
 ```
 
 """
-function multi_point_minim(  P::Vector{T1},
-                                    T::Vector{T1},
-                                    MAGEMin_db::MAGEMin_Data,
-                                    X::T2=nothing;
-                                    test        = 0, # if using a build-in test case
-                                    B::Union{Nothing, T1, Vector{T1}} = nothing,
-                                    Xoxides     = Vector{String},
-                                    sys_in      = "mol",
-                                    progressbar = true        # show a progress bar or not?
-                                    ) where {T1 <: Float64, T2 <: VecOrMat}
+function multi_point_minim(  P           ::  Vector{T1},
+                             T           ::  Vector{T1},
+                             MAGEMin_db  ::  MAGEMin_Data,
+                             X           ::  T2=nothing;
+                             test        ::  Int64                           = 0, # if using a build-in test case,
+                             B           ::  Union{Nothing, T1, Vector{T1}}  = nothing,
+                             W           ::  Union{Nothing, W_Data}          = nothing,
+                             Xoxides     = Vector{String},
+                             sys_in      = "mol",
+                             progressbar = true        # show a progress bar or not?
+                             ) where {T1 <: Float64, T2 <: VecOrMat}
 
     # Set the compositional info
     CompositionType::Int64 = 0;
@@ -295,17 +311,17 @@ function multi_point_minim(  P::Vector{T1},
     # in some weird way with (libsc, p4est, t8code) - in particular on Linux where
     # we get segfaults. To avoid this, we force serial compilation by calling MAGEMin
     # once before the loop.
-    let id      = 1
-        gv          = MAGEMin_db.gv[id]
-        z_b         = MAGEMin_db.z_b[id]
-        DB          = MAGEMin_db.DB[id]
-        splx_data   = MAGEMin_db.splx_data[id]
-        if isnothing(B)
-            point_wise_minimization(P[1], T[1], gv, z_b, DB, splx_data, sys_in)
-        else
-            point_wise_minimization(P[1], T[1], gv, z_b, DB, splx_data, sys_in; buffer_n = B[1])
-        end
-    end
+    # let id      = 1
+    #     gv          = MAGEMin_db.gv[id]
+    #     z_b         = MAGEMin_db.z_b[id]
+    #     DB          = MAGEMin_db.DB[id]
+    #     splx_data   = MAGEMin_db.splx_data[id]
+    #     if isnothing(B)
+    #         point_wise_minimization(P[1], T[1], gv, z_b, DB, splx_data, sys_in)
+    #     else
+    #         point_wise_minimization(P[1], T[1], gv, z_b, DB, splx_data, sys_in; buffer_n = B[1])
+    #     end
+    # end
 
     # main loop
     if progressbar
@@ -328,9 +344,9 @@ function multi_point_minim(  P::Vector{T1},
 
         # compute a new point using a ccall
         if isnothing(B)
-            out         = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data)
+            out     = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data)
         else
-            out         = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data; buffer_n = B[i])
+            out     = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data; buffer_n = B[i], W = W)
         end
         Out_PT[i]   = deepcopy(out)
 
@@ -345,8 +361,8 @@ function multi_point_minim(  P::Vector{T1},
     return Out_PT
 end
 
-function multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMin_db::MAGEMin_Data; test=0, X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}}=nothing, B=nothing, Xoxides = Vector{String}, sys_in = "mol",progressbar = true) where _T <: Float64
-    Base.depwarn("`multi_point_minimization(P,T,MAGEMin_db;test=0,X=nothing,B=nothing,Xoxides=Vector{String},sys_in=\"mol\",progressbar=true)` is deprecated, use `multi_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=\"mol\",progressbar=true)` instead.", :multi_point_minimization, force=true)
+function multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMin_db::MAGEMin_Data; test=0, X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}}=nothing, B::Union{Nothing, _T, Vector{_T}}=nothing, Xoxides = Vector{String}, sys_in = "mol",progressbar = true) where _T <: Float64
+    Base.depwarn("`multi_point_minimization(P,T,MAGEMin_db;test=0,X=nothing,B=nothing,Xoxides=Vector{String},sys_in=\"mol\",progressbar=true)` is deprecated, use `multi_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=\"mol\",progressbar=true)` instead.", :multi_point_minimization)
     multi_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=sys_in,progressbar=progressbar)
 end
 
@@ -499,7 +515,6 @@ function convertBulk4MAGEMin(bulk_in::T1,bulk_in_ox::Vector{String},sys_in::Stri
         c = idNonH2O;
     end
 
-
     id0 = findall(MAGEMin_bulk[c] .== 0.0)
     if ~isempty(id0)
         MAGEMin_bulk[id0] .= 1e-4;
@@ -577,14 +592,11 @@ julia> finalize_MAGEMin(gv,DB)
 ```
 
 """
-function point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data; buffer_n = 0.0)
-    gv.buffer_n     = buffer_n
-
-    input_data      =   LibMAGEMin.io_data();                           # zero (not used actually)
-
-    z_b.T           =   T + 273.15    # in K
+function point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data; buffer_n = 0.0, W = nothing)
+    gv.buffer_n     =   buffer_n
+    input_data      =   LibMAGEMin.io_data();           # zero (not used actually)
+    z_b.T           =   T + 273.15                      # in K
     z_b.P           =   P
-
     gv.numPoint     = 1; 							    # the number of the current point */
 
     # Perform the point-wise minimization after resetting variables
@@ -624,11 +636,11 @@ end
 
 Performs a point-wise optimization for a given pressure `P` and temperature `T` foir the data specified in the MAGEMin database `MAGEMin_Data` (where also compoition is specified)
 """
-point_wise_minimization(P::Number,T::Number, gv, z_b, DB, splx_data; buffer_n::Float64 = 0.0) = point_wise_minimization(Float64(P),Float64(T), gv, z_b, DB, splx_data; buffer_n)
+point_wise_minimization(P::Number,T::Number, gv, z_b, DB, splx_data; buffer_n::Float64 = 0.0, W::Union{Nothing, W_Data} = nothing) = point_wise_minimization(Float64(P),Float64(T), gv, z_b, DB, splx_data; buffer_n, W)
 
-point_wise_minimization(P::Number,T::Number, gv::LibMAGEMin.global_variables, z_b::LibMAGEMin.bulk_infos, DB::LibMAGEMin.Database, splx_data::LibMAGEMin.simplex_datas, sys_in::String; buffer_n::Float64 = 0.0) = point_wise_minimization(P,T, gv, z_b, DB, splx_data; buffer_n)
+point_wise_minimization(P::Number,T::Number, gv::LibMAGEMin.global_variables, z_b::LibMAGEMin.bulk_infos, DB::LibMAGEMin.Database, splx_data::LibMAGEMin.simplex_datas, sys_in::String; buffer_n::Float64 = 0.0, W::Union{Nothing, W_Data} = nothing) = point_wise_minimization(P,T, gv, z_b, DB, splx_data; buffer_n, W)
 
-point_wise_minimization(P::Number,T::Number, data::MAGEMin_Data; buffer_n::Float64 = 0.0) = point_wise_minimization(P,T, data.gv[1], data.z_b[1], data.DB[1], data.splx_data[1]; buffer_n)
+point_wise_minimization(P::Number,T::Number, data::MAGEMin_Data; buffer_n::Float64 = 0.0, W::Union{Nothing, W_Data} = nothing) = point_wise_minimization(P,T, data.gv[1], data.z_b[1], data.DB[1], data.splx_data[1]; buffer_n, W)
 
 
 """
