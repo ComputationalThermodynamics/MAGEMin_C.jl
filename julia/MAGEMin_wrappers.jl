@@ -198,10 +198,12 @@ function single_point_minim(     P           ::  T1,
 end
 
 # The old API is still supported, but deprecated and implemented using the old one
-function single_point_minimization(P::Float64, T::Float64, MAGEMin_db::MAGEMin_Data; test::Int64 = 0, X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}} = nothing, B::Union{Nothing, _T, Vector{_T}}=nothing, Xoxides = Vector{String}, sys_in = "mol", progressbar = true) where _T <: Float64
-    Base.depwarn("`single_point_minimization(P,T,MAGEMin_db;test=0,X=nothing,B=nothing,Xoxides=Vector{String},sys_in=\"mol\",progressbar=true)` is deprecated, use `single_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=\"mol\",progressbar=true)` instead.", :single_point_minimization)
-    single_point_minim(P,T,MAGEMin_db,X;test=test, B=B,Xoxides=Xoxides,sys_in=sys_in, progressbar = progressbar)
-end
+Base.@deprecate single_point_minimization(P::Float64, T::Float64, MAGEMin_db::MAGEMin_Data; test::Int64 = 0, X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}} = nothing, B::Union{Nothing, _T, Vector{_T}}=nothing, Xoxides = Vector{String}, sys_in = "mol", progressbar = true) where _T <: Float64 single_point_minim(P,T,MAGEMin_db,X;test=test, B=B,Xoxides=Xoxides,sys_in=sys_in, progressbar = progressbar)
+
+# function 
+#     Base.depwarn("`single_point_minimization(P,T,MAGEMin_db;test=0,X=nothing,B=nothing,Xoxides=Vector{String},sys_in=\"mol\",progressbar=true)` is deprecated, use `single_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=\"mol\",progressbar=true)` instead.", :single_point_minimization)
+    
+# end
 
 """
 Out_PT =multi_point_minim(P::Vector{T1}, T::Vector{T1}, MAGEMin_db::MAGEMin_Data, X::T2=nothing; test=0, caseB::Union{Nothing, T1, Vector{T1}} = nothing, Xoxides= Vector{String}, sys_in= "mol", progressbar = true) where {T1 <: Float64, T2 <: VecOrMat}
@@ -361,10 +363,8 @@ function multi_point_minim(  P           ::  Vector{T1},
     return Out_PT
 end
 
-function multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMin_db::MAGEMin_Data; test=0, X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}}=nothing, B::Union{Nothing, _T, Vector{_T}}=nothing, Xoxides = Vector{String}, sys_in = "mol",progressbar = true) where _T <: Float64
-    Base.depwarn("`multi_point_minimization(P,T,MAGEMin_db;test=0,X=nothing,B=nothing,Xoxides=Vector{String},sys_in=\"mol\",progressbar=true)` is deprecated, use `multi_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=\"mol\",progressbar=true)` instead.", :multi_point_minimization)
-    multi_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=sys_in,progressbar=progressbar)
-end
+
+Base.@deprecate multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMin_db::MAGEMin_Data; test=0, X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}}=nothing, B::Union{Nothing, _T, Vector{_T}}=nothing, Xoxides = Vector{String}, sys_in = "mol",progressbar = true) where _T <: Float64 multi_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=sys_in,progressbar=progressbar)
 
 """
 bulk_rock = use_predefined_bulk_rock(gv, test=-1, db="ig")
