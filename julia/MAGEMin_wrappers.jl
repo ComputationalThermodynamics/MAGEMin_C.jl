@@ -195,10 +195,10 @@ end
 
 
 """
-Out_PT =multi_point_minimization(P::Vector{T1}, T::Vector{T1}, MAGEMin_db::MAGEMin_Data, X::T2=nothing; test=0, caseB::Union{Nothing, T1, Vector{T1}} = nothing, Xoxides= Vector{String}, sys_in= "mol", progressbar = true) where {T1 <: Float64, T2 <: VecOrMat}
+Out_PT =multi_point_minimization(P::Vector{T1},T::Vector{T1},MAGEMin_db::MAGEMin_Data;test::Int64=0,X::VecOrMat=nothing,B::Union{Nothing, T1, Vector{T1}}=nothing,W::Union{Nothing, W_Data}=nothing,Xoxides=Vector{String},sys_in="mol",progressbar=true) where {T1 <: Float64}
 
 Perform (parallel) MAGEMin calculations for a range of points as a function of pressure `P`, temperature `T` and/or composition `X`. The database `MAGEMin_db` must be initialised before calling the routine.
-The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xodides` and `sys_in` (that specifies whether the input is in "mol" or "wt").
+The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xoxides` and `sys_in` (that specifies whether the input is in "mol" or "wt").
 
 Below a few examples:
 
