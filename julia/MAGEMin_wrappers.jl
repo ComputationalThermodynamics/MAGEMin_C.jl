@@ -26,7 +26,7 @@ end
 """
 Holds the MAGEMin databases & required structures for every thread
 """
-mutable struct W_Data{T2,T2,M1}
+mutable struct W_Data
     SS_id   :: Vector{Int64}
     SS_len  :: Vector{Int64}
     Ws      :: Vector{Matrix{Float64}}
