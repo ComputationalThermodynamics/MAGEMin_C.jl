@@ -195,7 +195,7 @@ end
 
 
 """
-Out_PT =multi_point_minimization(P::Vector{T1},T::Vector{T1},MAGEMin_db::MAGEMin_Data;test::Int64=0,X::Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}=nothing,B::Union{Nothing, T1, Vector{T1}}=nothing,W::Union{Nothing, W_Data}=nothing,Xoxides=Vector{String},sys_in="mol",progressbar=true) where {T1 <: Float64}
+Out_PT =multi_point_minimization(P::T2,T::T2,MAGEMin_db::MAGEMin_Data;test::Int64=0,X::Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}=nothing,B::Union{Nothing, T1, Vector{T1}}=nothing,W::Union{Nothing, W_Data}=nothing,Xoxides=Vector{String},sys_in="mol",progressbar=true) where {T1 <: Float64, T2 <: AbstractVector{T1}}
 
 Perform (parallel) MAGEMin calculations for a range of points as a function of pressure `P`, temperature `T` and/or composition `X`. The database `MAGEMin_db` must be initialised before calling the routine.
 The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xoxides` and `sys_in` (that specifies whether the input is in "mol" or "wt").
@@ -256,8 +256,8 @@ julia> versioninfo()
 ```
 
 """
-function multi_point_minimization(  P           ::  Vector{T1},
-                                    T           ::  Vector{T1},
+function multi_point_minimization(  P           ::  T2,
+                                    T           ::  T2,
                                     MAGEMin_db  ::  MAGEMin_Data;
                                     test        ::  Int64                           = 0, # if using a build-in test case,
                                     X           ::  VecOrMat=nothing,
@@ -266,7 +266,7 @@ function multi_point_minimization(  P           ::  Vector{T1},
                                     Xoxides     = Vector{String},
                                     sys_in      = "mol",
                                     progressbar = true        # show a progress bar or not?
-                                    ) where {T1 <: Float64}
+                                    ) where {T1 <: Float64, T2 <: AbstractVector{T1}}
 
     # Set the compositional info
     CompositionType::Int64 = 0;

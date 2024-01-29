@@ -107,6 +107,25 @@ end
     Finalize_MAGEMin(data)
 end
 
+@testset "view array PT" begin
+
+    data    = Initialize_MAGEMin("ig", verbose=false);
+
+    # different bulk rock per point
+    P       = [10.0, 10.0, 0]
+    T       = [1100.0, 1100.0, 0]
+    Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
+    X1      = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
+    X2      = [49.43; 14.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
+    X       = [X1,X2]
+    sys_in  = "wt"
+    P_view = @view P[1:2]
+    T_view = @view T[1:2]
+    out     = multi_point_minimization(P_view, T_view, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
+
+    Finalize_MAGEMin(data)
+end
+
 @testset "convert bulk rock" begin
 
     bulk_in_ox = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
