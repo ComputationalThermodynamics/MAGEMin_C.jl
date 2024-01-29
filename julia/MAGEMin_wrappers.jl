@@ -6,13 +6,10 @@ using ProgressMeter
 
 const VecOrMat = Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}
 
-# export  init_MAGEMin, finalize_MAGEMin, point_wise_minimization, convertBulk4MAGEMin, use_predefined_bulk_rock, define_bulk_rock,create_output,
-#         print_info, create_gmin_struct, pwm_init, pwm_run
-
 export  init_MAGEMin, finalize_MAGEMin, point_wise_minimization, convertBulk4MAGEMin, use_predefined_bulk_rock, define_bulk_rock, create_output,
         print_info, create_gmin_struct, pwm_init, pwm_run,
-        single_point_minim, multi_point_minim, MAGEMin_Data, W_Data,
-        Initialize_MAGEMin, Finalize_MAGEMin, single_point_minimization, multi_point_minimization
+        single_point_minimization, multi_point_minimization, MAGEMin_Data, W_Data,
+        Initialize_MAGEMin, Finalize_MAGEMin
 
 
 """
@@ -174,7 +171,6 @@ function single_point_minimization(     P           ::  T1,
                                         Xoxides     = Vector{String},
                                         sys_in      = "mol",
                                         progressbar = true        # show a progress bar or not?
-
                                     ) where {T1 <: Float64}
 
     P   = [P];
@@ -184,15 +180,15 @@ function single_point_minimization(     P           ::  T1,
     end
 
     Out_PT     =   multi_point_minimization(    P,
-                                         T,
-                                         MAGEMin_db,
-                                         test        =   test,
-                                         X           =   X,
-                                         B           =   B,
-                                         W           =   W,
-                                         Xoxides     =   Xoxides,
-                                         sys_in      =   sys_in,
-                                         progressbar =   progressbar);
+                                                T,
+                                                MAGEMin_db,
+                                                test        =   test,
+                                                X           =   X,
+                                                B           =   B,
+                                                W           =   W,
+                                                Xoxides     =   Xoxides,
+                                                sys_in      =   sys_in,
+                                                progressbar =   progressbar);
 
     return Out_PT[1]
 end
