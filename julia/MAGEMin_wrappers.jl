@@ -195,7 +195,7 @@ end
 
 
 """
-Out_PT =multi_point_minimization(P::Vector{T1},T::Vector{T1},MAGEMin_db::MAGEMin_Data;test::Int64=0,X::VecOrMat=nothing,B::Union{Nothing, T1, Vector{T1}}=nothing,W::Union{Nothing, W_Data}=nothing,Xoxides=Vector{String},sys_in="mol",progressbar=true) where {T1 <: Float64}
+Out_PT =multi_point_minimization(P::Vector{T1},T::Vector{T1},MAGEMin_db::MAGEMin_Data;test::Int64=0,X::Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}=nothing,B::Union{Nothing, T1, Vector{T1}}=nothing,W::Union{Nothing, W_Data}=nothing,Xoxides=Vector{String},sys_in="mol",progressbar=true) where {T1 <: Float64}
 
 Perform (parallel) MAGEMin calculations for a range of points as a function of pressure `P`, temperature `T` and/or composition `X`. The database `MAGEMin_db` must be initialised before calling the routine.
 The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xoxides` and `sys_in` (that specifies whether the input is in "mol" or "wt").
@@ -514,9 +514,9 @@ end
 
 
 """
-    point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data, sys_in::String="mol")
+    point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data; buffer_n = 0.0, W = nothing)
 
-Computes the stable assemblage at `P` [kbar], `T` [C] and for a given bulk rock composition
+Computes the stable assemblage at `P` [kbar], `T` [°C] and for a given bulk rock composition
 
 
 # Example 1
