@@ -47,6 +47,7 @@ julia> out  = point_wise_minimization(P,T, data);
  Mode  :  0.24229  0.58808  0.14165  0.02798
 ```
 
+
 ### Example 2 - custom composition
 And here a case in which you specify your own bulk rock composition.
 ```julia
@@ -59,14 +60,14 @@ julia> sys_in  = "wt"
 julia> out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 Pressure          : 10.0      [kbar]
 Temperature       : 1100.0    [Celsius]
-     Stable phase | Fraction (mol 1 atom basis) 
-              liq   0.73698 
-              cpx   0.17241 
-             pl4T   0.04846 
-     Stable phase | Fraction (wt fraction) 
-              liq   0.70765 
-              cpx   0.18894 
-             pl4T   0.05083 
+     Stable phase | Fraction (mol fraction)
+              liq   0.73698
+              cpx   0.17241
+             pl4T   0.04846
+     Stable phase | Fraction (wt fraction)
+              liq   0.70765
+              cpx   0.18894
+             pl4T   0.05083
 Gibbs free energy : -907.392253  (22 iterations; 62.25 ms)
 Oxygen fugacity          : 3.400537515666476e-9
 ```
@@ -103,8 +104,6 @@ julia> Finalize_MAGEMin(data)
 By default, this will show a progressbar (which you can deactivate with the `progressbar=false` option).
 
 You can also specify a custom bulk rock for all points (see above), or a custom bulk rock for every point.
-
-
 
 ### Running it in parallel
 Julia can be run in parallel using multi-threading. To take advantage of this, you need to start julia from the terminal with:

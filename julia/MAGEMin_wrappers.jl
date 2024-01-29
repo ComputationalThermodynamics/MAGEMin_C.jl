@@ -6,13 +6,9 @@ using ProgressMeter
 
 const VecOrMat = Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}
 
-# export  init_MAGEMin, finalize_MAGEMin, point_wise_minimization, convertBulk4MAGEMin, use_predefined_bulk_rock, define_bulk_rock,create_output,
-#         print_info, create_gmin_struct, pwm_init, pwm_run
-
 export  init_MAGEMin, finalize_MAGEMin, point_wise_minimization, convertBulk4MAGEMin, use_predefined_bulk_rock, define_bulk_rock, create_output,
         print_info, create_gmin_struct, pwm_init, pwm_run,
-        single_point_minimization,
-        multi_point_minimization, MAGEMin_Data,
+        single_point_minimization, multi_point_minimization, MAGEMin_Data, W_Data,
         Initialize_MAGEMin, Finalize_MAGEMin
 
 
@@ -27,18 +23,26 @@ mutable struct MAGEMin_Data{TypeGV, TypeZB, TypeDB, TypeSplxData}
     splx_data   :: TypeSplxData
 end
 
+"""
+Holds the MAGEMin databases & required structures for every thread
+"""
+mutable struct W_Data
+    SS_id   :: Vector{Int64}
+    SS_len  :: Vector{Int64}
+    Ws      :: Vector{Matrix{Float64}}
+end
 
 """
     Dat = Initialize_MAGEMin(db = "ig"; verbose::Union{Bool, Int64} = true)
 
 Initializes MAGEMin on one or more threads, for the database `db`. You can surpress all output with `verbose=false`. `verbose=true` will give a brief summary of the result, whereas `verbose=1` will give more details about the computations.
 """
-function Initialize_MAGEMin(db = "ig";  verbose::Union{Int64,Bool}  = 0,
-                                        limitCaOpx::Int64           = 0,
-                                        CaOpxLim::Float64           = 0.0,
-                                        mbCpx::Int64                = 1,
-                                        buffer::String              = "NONE",
-                                        solver::Int64               = 1         )
+function Initialize_MAGEMin(db = "ig";  verbose     ::Union{Int64,Bool} = 0,
+                                        limitCaOpx  ::Int64             = 0,
+                                        CaOpxLim    ::Float64           = 0.0,
+                                        mbCpx       ::Int64             = 1,
+                                        buffer      ::String            = "NONE",
+                                        solver      ::Int64             = 1         )
 
     gv, z_b, DB, splx_data = init_MAGEMin(db;   verbose     = verbose,
                                                 mbCpx       = mbCpx,
@@ -62,7 +66,12 @@ function Initialize_MAGEMin(db = "ig";  verbose::Union{Int64,Bool}  = 0,
     end
 
     for id in 1:nt
-        gv, z_b, DB, splx_data = init_MAGEMin(db; verbose=verbose, mbCpx=mbCpx, limitCaOpx=limitCaOpx, CaOpxLim=CaOpxLim, buffer=buffer, solver=solver)
+        gv, z_b, DB, splx_data = init_MAGEMin(db;   verbose     = verbose,
+                                                    mbCpx       = mbCpx,
+                                                    limitCaOpx  = limitCaOpx,
+                                                    CaOpxLim    = CaOpxLim,
+                                                    buffer      = buffer,
+                                                    solver      = solver    );
 
         list_gv[id]         = gv
         list_z_b[id]        = z_b
@@ -82,12 +91,7 @@ function Finalize_MAGEMin(dat::MAGEMin_Data)
     for id in 1:Threads.nthreads()
 
         LibMAGEMin.FreeDatabases(dat.gv[id], dat.DB[id], dat.z_b[id])
-
-        # These are indeed not freed yet (same with C-code), which should be added for completion
-        # They are rather small structs compared to the others
-        # z_b = dat.z_b[id]
-        # splx_data = dat.splx_data[id]
-
+        # splx_data needs to be freed
      end
      return nothing
 end
@@ -98,7 +102,13 @@ end
 
 Initializes MAGEMin (including setting global options) and loads the Database.
 """
-function  init_MAGEMin(db="ig"; verbose=0, mbCpx=0, limitCaOpx=0, CaOpxLim=1.0, buffer="NONE", solver=1)
+function  init_MAGEMin( db          =  "ig";
+                        verbose     =   0,
+                        mbCpx       =   0,
+                        limitCaOpx  =   0,
+                        CaOpxLim    =   1.0,
+                        buffer      =  "NONE",
+                        solver      =   1           )
 
     z_b         = LibMAGEMin.bulk_infos()
     gv          = LibMAGEMin.global_variables()
@@ -124,18 +134,18 @@ function  init_MAGEMin(db="ig"; verbose=0, mbCpx=0, limitCaOpx=0, CaOpxLim=1.0, 
         print("Database not implemented...\n")
     end
 
-    gv.verbose  = verbose
-    gv.mbCpx    = mbCpx
-    gv.limitCaOpx = limitCaOpx
-    gv.CaOpxLim = CaOpxLim
-    gv.solver   = solver
-    gv.buffer   = pointer(buffer)
+    gv.verbose      = verbose
+    gv.mbCpx        = mbCpx
+    gv.limitCaOpx   = limitCaOpx
+    gv.CaOpxLim     = CaOpxLim
+    gv.solver       = solver
+    gv.buffer       = pointer(buffer)
 
-    gv          = LibMAGEMin.global_variable_init(gv, pointer_from_objref(z_b))
-    DB          = LibMAGEMin.InitializeDatabases(gv, gv.EM_database)
+    gv              = LibMAGEMin.global_variable_init(gv, pointer_from_objref(z_b))
+    DB              = LibMAGEMin.InitializeDatabases(gv, gv.EM_database)
 
-    LibMAGEMin.init_simplex_A( pointer_from_objref(splx_data), gv)
-    LibMAGEMin.init_simplex_B_em( pointer_from_objref(splx_data), gv)
+    LibMAGEMin.init_simplex_A(      pointer_from_objref(splx_data), gv)
+    LibMAGEMin.init_simplex_B_em(   pointer_from_objref(splx_data), gv)
 
     return gv, z_b, DB, splx_data
 end
@@ -151,43 +161,44 @@ end
 
 
 # wrapper for single point minimization
-function single_point_minimization(     P::T1,
-                                        T::T1,
-                                        MAGEMin_db::MAGEMin_Data,
-                                        X::T2=nothing;
-                                        test::Int64 = 0, # if using a build-in test case,
-                                        B::Union{Nothing, T1, Vector{T1}} = nothing,
+function single_point_minimization(     P           ::  T1,
+                                        T           ::  T1,
+                                        MAGEMin_db  ::  MAGEMin_Data;
+                                        test        ::  Int64                           = 0, # if using a build-in test case,
+                                        X           ::  VecOrMat                        = nothing,
+                                        B           ::  Union{Nothing, T1, Vector{T1}}  = nothing,
+                                        W           ::  Union{Nothing, W_Data}          = nothing,
                                         Xoxides     = Vector{String},
                                         sys_in      = "mol",
                                         progressbar = true        # show a progress bar or not?
-                                        ) where {T1 <: Float64, T2 <: VecOrMat}
+                                    ) where {T1 <: Float64}
 
-    P = [P];
-    T = [T];
+    P   = [P];
+    T   = [T];
     if X isa AbstractVector{Float64}
         X = [X]
     end
 
-
-    Out_PT     =   multi_point_minimization(P,
-                                            T,
-                                            MAGEMin_db,
-                                            X,
-                                            test=test,
-                                            B=B,
-                                            Xoxides=Xoxides,
-                                            sys_in=sys_in,
-                                            progressbar=progressbar);
+    Out_PT     =   multi_point_minimization(    P,
+                                                T,
+                                                MAGEMin_db,
+                                                test        =   test,
+                                                X           =   X,
+                                                B           =   B,
+                                                W           =   W,
+                                                Xoxides     =   Xoxides,
+                                                sys_in      =   sys_in,
+                                                progressbar =   progressbar);
 
     return Out_PT[1]
 end
 
 
 """
-Out_PT =multi_point_minimization(P::Vector{T1}, T::Vector{T1}, MAGEMin_db::MAGEMin_Data, X::T2=nothing; test=0, caseB::Union{Nothing, T1, Vector{T1}} = nothing, Xoxides= Vector{String}, sys_in= "mol", progressbar = true) where {T1 <: Float64, T2 <: VecOrMat}
+Out_PT =multi_point_minimization(P::T2,T::T2,MAGEMin_db::MAGEMin_Data;test::Int64=0,X::Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}=nothing,B::Union{Nothing, T1, Vector{T1}}=nothing,W::Union{Nothing, W_Data}=nothing,Xoxides=Vector{String},sys_in="mol",progressbar=true) where {T1 <: Float64, T2 <: AbstractVector{T1}}
 
 Perform (parallel) MAGEMin calculations for a range of points as a function of pressure `P`, temperature `T` and/or composition `X`. The database `MAGEMin_db` must be initialised before calling the routine.
-The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xodides` and `sys_in` (that specifies whether the input is in "mol" or "wt").
+The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xoxides` and `sys_in` (that specifies whether the input is in "mol" or "wt").
 
 Below a few examples:
 
@@ -212,7 +223,7 @@ julia> T = fill(1100.0,n)
 julia> Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
 julia> X = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
 julia> sys_in = "wt"
-julia> out = multi_point_minimization(P, T, data, X, Xoxides=Xoxides, sys_in=sys_in)
+julia> out = multi_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 julia> Finalize_MAGEMin(data)
 ```
 
@@ -227,7 +238,7 @@ julia> X1 = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0]
 julia> X2 = [49.43; 14.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
 julia> X = [X1,X2]
 julia> sys_in = "wt"
-julia> out = multi_point_minimization(P, T, data, X, Xoxides=Xoxides, sys_in=sys_in)
+julia> out = multi_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 julia> Finalize_MAGEMin(data)
 ```
 
@@ -245,16 +256,17 @@ julia> versioninfo()
 ```
 
 """
-function multi_point_minimization(  P::Vector{T1},
-                                    T::Vector{T1},
-                                    MAGEMin_db::MAGEMin_Data,
-                                    X::T2=nothing;
-                                    test        = 0, # if using a build-in test case
-                                    B::Union{Nothing, T1, Vector{T1}} = nothing,
+function multi_point_minimization(  P           ::  T2,
+                                    T           ::  T2,
+                                    MAGEMin_db  ::  MAGEMin_Data;
+                                    test        ::  Int64                           = 0, # if using a build-in test case,
+                                    X           ::  VecOrMat=nothing,
+                                    B           ::  Union{Nothing, T1, Vector{T1}}  = nothing,
+                                    W           ::  Union{Nothing, W_Data}          = nothing,
                                     Xoxides     = Vector{String},
                                     sys_in      = "mol",
                                     progressbar = true        # show a progress bar or not?
-                                    ) where {T1 <: Float64, T2 <: VecOrMat}
+                                    ) where {T1 <: Float64, T2 <: AbstractVector{T1}}
 
     # Set the compositional info
     CompositionType::Int64 = 0;
@@ -290,48 +302,48 @@ function multi_point_minimization(  P::Vector{T1},
     # in some weird way with (libsc, p4est, t8code) - in particular on Linux where
     # we get segfaults. To avoid this, we force serial compilation by calling MAGEMin
     # once before the loop.
-    let id      = 1
-        gv          = MAGEMin_db.gv[id]
-        z_b         = MAGEMin_db.z_b[id]
-        DB          = MAGEMin_db.DB[id]
-        splx_data   = MAGEMin_db.splx_data[id]
-        if isnothing(B)
-            point_wise_minimization(P[1], T[1], gv, z_b, DB, splx_data, sys_in)
-        else
-            point_wise_minimization(P[1], T[1], gv, z_b, DB, splx_data, sys_in; buffer_n = B[1])
-        end
-    end
+    # let id      = 1
+    #     gv          = MAGEMin_db.gv[id]
+    #     z_b         = MAGEMin_db.z_b[id]
+    #     DB          = MAGEMin_db.DB[id]
+    #     splx_data   = MAGEMin_db.splx_data[id]
+    #     if isnothing(B)
+    #         point_wise_minimization(P[1], T[1], gv, z_b, DB, splx_data, sys_in)
+    #     else
+    #         point_wise_minimization(P[1], T[1], gv, z_b, DB, splx_data, sys_in; buffer_n = B[1])
+    #     end
+    # end
 
     # main loop
     if progressbar
         progr = Progress(length(P), desc="Computing $(length(P)) points...") # progress meter
     end
     @threads :static for i in eachindex(P)
-    # Get thread-local buffers. As of Julia v1.9, a dynamic scheduling of
-    # the threads is the default setting. To avoid task migration and the
-    # resulting concurrency issues, we restrict the loop to static scheduling.
-    id          = Threads.threadid()
-    gv          = MAGEMin_db.gv[id]
-    z_b         = MAGEMin_db.z_b[id]
-    DB          = MAGEMin_db.DB[id]
-    splx_data   = MAGEMin_db.splx_data[id]
+        # Get thread-local buffers. As of Julia v1.9, a dynamic scheduling of
+        # the threads is the default setting. To avoid task migration and the
+        # resulting concurrency issues, we restrict the loop to static scheduling.
+        id          = Threads.threadid()
+        gv          = MAGEMin_db.gv[id]
+        z_b         = MAGEMin_db.z_b[id]
+        DB          = MAGEMin_db.DB[id]
+        splx_data   = MAGEMin_db.splx_data[id]
 
-    if CompositionType==2
-        # different bulk-rock composition for every point - specify it here
-        gv = define_bulk_rock(gv, X[i], Xoxides, sys_in, MAGEMin_db.db);
-    end
+        if CompositionType==2
+            # different bulk-rock composition for every point - specify it here
+            gv = define_bulk_rock(gv, X[i], Xoxides, sys_in, MAGEMin_db.db);
+        end
 
-    # compute a new point using a ccall
-    if isnothing(B)
-        out         = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data)
-    else
-        out         = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data; buffer_n = B[i])
-    end
-    Out_PT[i]   = deepcopy(out)
+        # compute a new point using a ccall
+        if isnothing(B)
+            out     = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data)
+        else
+            out     = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data; buffer_n = B[i], W = W)
+        end
+        Out_PT[i]   = deepcopy(out)
 
-    if progressbar
-        next!(progr)
-    end
+        if progressbar
+            next!(progr)
+        end
     end
     if progressbar
         finish!(progr)
@@ -490,7 +502,6 @@ function convertBulk4MAGEMin(bulk_in::T1,bulk_in_ox::Vector{String},sys_in::Stri
         c = idNonH2O;
     end
 
-
     id0 = findall(MAGEMin_bulk[c] .== 0.0)
     if ~isempty(id0)
         MAGEMin_bulk[id0] .= 1e-4;
@@ -503,9 +514,9 @@ end
 
 
 """
-    point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data, sys_in::String="mol")
+    point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data; buffer_n = 0.0, W = nothing)
 
-Computes the stable assemblage at `P` [kbar], `T` [C] and for a given bulk rock composition
+Computes the stable assemblage at `P` [kbar], `T` [°C] and for a given bulk rock composition
 
 
 # Example 1
@@ -522,8 +533,8 @@ julia> T           = 800.0;
 julia> gv.verbose  = -1;        # switch off any verbose
 julia> out         = point_wise_minimization(P,T, gv, z_b, DB, splx_data, sys_in)
 Pressure          : 8.0      [kbar]
-Temperature       : 800.0    [Celcius]
-     Stable phase | Fraction (mol 1 atom basis)
+Temperature       : 800.0    [Celsius]
+     Stable phase | Fraction (mol fraction)
               opx   0.24229
                ol   0.58808
               cpx   0.14165
@@ -551,8 +562,8 @@ julia> P,T         = 10.0, 1100.0;
 julia> gv.verbose  = -1;        # switch off any verbose
 julia> out         = point_wise_minimization(P,T, gv, z_b, DB, splx_data, sys_in)
 Pressure          : 10.0      [kbar]
-Temperature       : 1100.0    [Celcius]
-     Stable phase | Fraction (mol 1 atom basis)
+Temperature       : 1100.0    [Celsius]
+     Stable phase | Fraction (mol fraction)
              pl4T   0.01114
               liq   0.74789
               cpx   0.21862
@@ -568,14 +579,11 @@ julia> finalize_MAGEMin(gv,DB)
 ```
 
 """
-function point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data; buffer_n = 0.0)
-    gv.buffer_n     = buffer_n
-
-    input_data      =   LibMAGEMin.io_data();                           # zero (not used actually)
-
-    z_b.T           =   T + 273.15    # in K
+function point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data; buffer_n = 0.0, W = nothing)
+    gv.buffer_n     =   buffer_n
+    input_data      =   LibMAGEMin.io_data();           # zero (not used actually)
+    z_b.T           =   T + 273.15                      # in K
     z_b.P           =   P
-
     gv.numPoint     = 1; 							    # the number of the current point */
 
     # Perform the point-wise minimization after resetting variables
@@ -615,11 +623,11 @@ end
 
 Performs a point-wise optimization for a given pressure `P` and temperature `T` foir the data specified in the MAGEMin database `MAGEMin_Data` (where also compoition is specified)
 """
-point_wise_minimization(P::Number,T::Number, gv, z_b, DB, splx_data; buffer_n::Float64 = 0.0) = point_wise_minimization(Float64(P),Float64(T), gv, z_b, DB, splx_data; buffer_n)
+point_wise_minimization(P::Number,T::Number, gv, z_b, DB, splx_data; buffer_n::Float64 = 0.0, W::Union{Nothing, W_Data} = nothing) = point_wise_minimization(Float64(P),Float64(T), gv, z_b, DB, splx_data; buffer_n, W)
 
-point_wise_minimization(P::Number,T::Number, gv::LibMAGEMin.global_variables, z_b::LibMAGEMin.bulk_infos, DB::LibMAGEMin.Database, splx_data::LibMAGEMin.simplex_datas, sys_in::String; buffer_n::Float64 = 0.0) = point_wise_minimization(P,T, gv, z_b, DB, splx_data; buffer_n)
+point_wise_minimization(P::Number,T::Number, gv::LibMAGEMin.global_variables, z_b::LibMAGEMin.bulk_infos, DB::LibMAGEMin.Database, splx_data::LibMAGEMin.simplex_datas, sys_in::String; buffer_n::Float64 = 0.0, W::Union{Nothing, W_Data} = nothing) = point_wise_minimization(P,T, gv, z_b, DB, splx_data; buffer_n, W)
 
-point_wise_minimization(P::Number,T::Number, data::MAGEMin_Data; buffer_n::Float64 = 0.0) = point_wise_minimization(P,T, data.gv[1], data.z_b[1], data.DB[1], data.splx_data[1]; buffer_n)
+point_wise_minimization(P::Number,T::Number, data::MAGEMin_Data; buffer_n::Float64 = 0.0, W::Union{Nothing, W_Data} = nothing) = point_wise_minimization(P,T, data.gv[1], data.z_b[1], data.DB[1], data.splx_data[1]; buffer_n, W)
 
 
 """
@@ -689,7 +697,7 @@ struct gmin_struct{T,I}
     G_system::T             # G of system
     Gamma::Vector{T}        # Gamma
     P_kbar::T               # Pressure in kbar
-    T_C::T                  # Temperature in Celcius
+    T_C::T                  # Temperature in Celsius
 
     # bulk rock composition:
     bulk::Vector{T}
@@ -879,9 +887,9 @@ end
 # Print brief info about pointwise calculation result
 function show(io::IO, g::gmin_struct)
     println(io, "Pressure          : $(g.P_kbar)      [kbar]")
-    println(io, "Temperature       : $(round(g.T_C,digits=4))    [Celcius]")
+    println(io, "Temperature       : $(round(g.T_C,digits=4))    [Celsius]")
 
-    println(io, "     Stable phase | Fraction (mol 1 atom basis) ")
+    println(io, "     Stable phase | Fraction (mol fraction) ")
     for i=1:length(g.ph)
         println(io, "   $(lpad(g.ph[i],14," "))   $( round(g.ph_frac[i], digits=5)) ")
     end
@@ -1111,6 +1119,3 @@ function print_info(g::gmin_struct)
     print("\n")
 
 end
-
-
-
