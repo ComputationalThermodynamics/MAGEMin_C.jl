@@ -47,9 +47,6 @@ julia> out  = point_wise_minimization(P,T, data);
  Mode  :  0.24229  0.58808  0.14165  0.02798
 ```
 
-> [!WARNING]
-> Since Version 1.3.6, the functions `point_wise_minimization` and `multi_point_minimization` are deprecated. Use `single_point_minim` and `multi_point_minim` instead.
-
 
 ### Example 2 - custom composition
 And here a case in which you specify your own bulk rock composition.
@@ -60,7 +57,7 @@ julia> P,T     = 10.0, 1100.0
 julia> Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
 julia> X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
 julia> sys_in  = "wt"
-julia> out     = single_point_minim(P, T, data, X, Xoxides=Xoxides, sys_in=sys_in)
+julia> out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 Pressure          : 10.0      [kbar]
 Temperature       : 1100.0    [Celsius]
      Stable phase | Fraction (mol fraction)
@@ -101,7 +98,7 @@ julia> test = 0         #KLB1
 julia> n    = 1000
 julia> P    = rand(8.0:40,n);
 julia> T    = rand(800.0:2000.0, n);
-julia> out  = multi_point_minim(P,T, data, test=test);
+julia> out  = multi_point_minimization(P,T, data, test=test);
 julia> Finalize_MAGEMin(data)
 ```
 By default, this will show a progressbar (which you can deactivate with the `progressbar=false` option).
@@ -127,4 +124,4 @@ Platform Info:
   LLVM: libLLVM-14.0.6 (ORCJIT, apple-m1)
   Threads: 8 on 8 virtual cores
 ```
-The function `multi_point_minim` will automatically utilize parallelization if you run it on >1 threads.
+The function `multi_point_minimization` will automatically utilize parallelization if you run it on >1 threads.

@@ -164,18 +164,18 @@ end
 
 
 # wrapper for single point minimization
-function single_point_minim(     P           ::  T1,
-                                 T           ::  T1,
-                                 MAGEMin_db  ::  MAGEMin_Data,
-                                 X           ::  T2                              = nothing;
-                                 test        ::  Int64                           = 0, # if using a build-in test case,
-                                 B           ::  Union{Nothing, T1, Vector{T1}}  = nothing,
-                                 W           ::  Union{Nothing, W_Data}          = nothing,
-                                 Xoxides     = Vector{String},
-                                 sys_in      = "mol",
-                                 progressbar = true        # show a progress bar or not?
+function single_point_minimization(     P           ::  T1,
+                                        T           ::  T1,
+                                        MAGEMin_db  ::  MAGEMin_Data;
+                                        test        ::  Int64                           = 0, # if using a build-in test case,
+                                        X           ::  VecOrMat                        = nothing,
+                                        B           ::  Union{Nothing, T1, Vector{T1}}  = nothing,
+                                        W           ::  Union{Nothing, W_Data}          = nothing,
+                                        Xoxides     = Vector{String},
+                                        sys_in      = "mol",
+                                        progressbar = true        # show a progress bar or not?
 
-                                 ) where {T1 <: Float64, T2 <: VecOrMat}
+                                    ) where {T1 <: Float64}
 
     P   = [P];
     T   = [T];
@@ -183,30 +183,23 @@ function single_point_minim(     P           ::  T1,
         X = [X]
     end
 
-    Out_PT     =   multi_point_minim(    P,
+    Out_PT     =   multi_point_minimization(    P,
                                          T,
                                          MAGEMin_db,
-                                         X,
                                          test        =   test,
+                                         X           =   X,
                                          B           =   B,
                                          W           =   W,
                                          Xoxides     =   Xoxides,
                                          sys_in      =   sys_in,
-                                         progressbar =   progressbar     );
+                                         progressbar =   progressbar);
 
     return Out_PT[1]
 end
 
-# The old API is still supported, but deprecated and implemented using the old one
-Base.@deprecate single_point_minimization(P::Float64, T::Float64, MAGEMin_db::MAGEMin_Data; test::Int64 = 0, X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}} = nothing, B::Union{Nothing, _T, Vector{_T}}=nothing, Xoxides = Vector{String}, sys_in = "mol", progressbar = true) where _T <: Float64 single_point_minim(P,T,MAGEMin_db,X;test=test, B=B,Xoxides=Xoxides,sys_in=sys_in, progressbar = progressbar)
-
-# function 
-#     Base.depwarn("`single_point_minimization(P,T,MAGEMin_db;test=0,X=nothing,B=nothing,Xoxides=Vector{String},sys_in=\"mol\",progressbar=true)` is deprecated, use `single_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=\"mol\",progressbar=true)` instead.", :single_point_minimization)
-    
-# end
 
 """
-Out_PT =multi_point_minim(P::Vector{T1}, T::Vector{T1}, MAGEMin_db::MAGEMin_Data, X::T2=nothing; test=0, caseB::Union{Nothing, T1, Vector{T1}} = nothing, Xoxides= Vector{String}, sys_in= "mol", progressbar = true) where {T1 <: Float64, T2 <: VecOrMat}
+Out_PT =multi_point_minimization(P::Vector{T1}, T::Vector{T1}, MAGEMin_db::MAGEMin_Data, X::T2=nothing; test=0, caseB::Union{Nothing, T1, Vector{T1}} = nothing, Xoxides= Vector{String}, sys_in= "mol", progressbar = true) where {T1 <: Float64, T2 <: VecOrMat}
 
 Perform (parallel) MAGEMin calculations for a range of points as a function of pressure `P`, temperature `T` and/or composition `X`. The database `MAGEMin_db` must be initialised before calling the routine.
 The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xodides` and `sys_in` (that specifies whether the input is in "mol" or "wt").
@@ -220,7 +213,7 @@ julia> data = Initialize_MAGEMin("ig", verbose=false);
 julia> n = 10
 julia> P = rand(8:40.0,n)
 julia> T = rand(800:1500.0,n)
-julia> out = multi_point_minim(P, T, data, test=0)
+julia> out = multi_point_minimization(P, T, data, test=0)
 julia> Finalize_MAGEMin(data)
 ```
 
@@ -234,7 +227,7 @@ julia> T = fill(1100.0,n)
 julia> Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
 julia> X = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
 julia> sys_in = "wt"
-julia> out = multi_point_minim(P, T, data, X, Xoxides=Xoxides, sys_in=sys_in)
+julia> out = multi_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 julia> Finalize_MAGEMin(data)
 ```
 
@@ -249,7 +242,7 @@ julia> X1 = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0]
 julia> X2 = [49.43; 14.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
 julia> X = [X1,X2]
 julia> sys_in = "wt"
-julia> out = multi_point_minim(P, T, data, X, Xoxides=Xoxides, sys_in=sys_in)
+julia> out = multi_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 julia> Finalize_MAGEMin(data)
 ```
 
@@ -267,17 +260,17 @@ julia> versioninfo()
 ```
 
 """
-function multi_point_minim(  P           ::  Vector{T1},
-                             T           ::  Vector{T1},
-                             MAGEMin_db  ::  MAGEMin_Data,
-                             X           ::  T2=nothing;
-                             test        ::  Int64                           = 0, # if using a build-in test case,
-                             B           ::  Union{Nothing, T1, Vector{T1}}  = nothing,
-                             W           ::  Union{Nothing, W_Data}          = nothing,
-                             Xoxides     = Vector{String},
-                             sys_in      = "mol",
-                             progressbar = true        # show a progress bar or not?
-                             ) where {T1 <: Float64, T2 <: VecOrMat}
+function multi_point_minimization(  P           ::  Vector{T1},
+                                    T           ::  Vector{T1},
+                                    MAGEMin_db  ::  MAGEMin_Data;
+                                    test        ::  Int64                           = 0, # if using a build-in test case,
+                                    X           ::  VecOrMat=nothing,
+                                    B           ::  Union{Nothing, T1, Vector{T1}}  = nothing,
+                                    W           ::  Union{Nothing, W_Data}          = nothing,
+                                    Xoxides     = Vector{String},
+                                    sys_in      = "mol",
+                                    progressbar = true        # show a progress bar or not?
+                                    ) where {T1 <: Float64}
 
     # Set the compositional info
     CompositionType::Int64 = 0;
@@ -363,8 +356,6 @@ function multi_point_minim(  P           ::  Vector{T1},
     return Out_PT
 end
 
-
-Base.@deprecate multi_point_minimization(P::Vector{Float64}, T::Vector{Float64}, MAGEMin_db::MAGEMin_Data; test=0, X::Union{Nothing, Vector{_T}, Vector{Vector{_T}}}=nothing, B::Union{Nothing, _T, Vector{_T}}=nothing, Xoxides = Vector{String}, sys_in = "mol",progressbar = true) where _T <: Float64 multi_point_minim(P,T,MAGEMin_db,X;test=test,B=B,Xoxides=Xoxides,sys_in=sys_in,progressbar=progressbar)
 
 """
 bulk_rock = use_predefined_bulk_rock(gv, test=-1, db="ig")

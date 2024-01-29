@@ -48,7 +48,7 @@ finalize_MAGEMin(gv,DB,z_b)
     T       =   fill(800.0,n)
     db      =   "ig"
     data    =   Initialize_MAGEMin(db, verbose=false);
-    out     =   multi_point_minim(P, T, data, test=0);
+    out     =   multi_point_minimization(P, T, data, test=0);
     @test out[end].G_system ≈ -797.7491828675325
     @test out[end].ph == ["spn", "cpx",  "opx", "ol"]
     @test all(abs.(out[end].ph_frac - [0.027985692010022857, 0.14166112328585387, 0.24227821491186913, 0.5880749697922566])  .< 1e-2)
@@ -66,7 +66,7 @@ end
     Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
     X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
     sys_in  = "wt"
-    out     = single_point_minim(P, T, data, X, Xoxides=Xoxides, sys_in=sys_in)
+    out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 
     @test abs(out.G_system + 916.8283889543869)/abs(916.8283889543869) < 2e-4
 
@@ -79,7 +79,7 @@ end
     X2      = [49.43; 14.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
     X       = [X1,X2]
     sys_in  = "wt"
-    out     = multi_point_minim(P, T, data, X, Xoxides=Xoxides, sys_in=sys_in)
+    out     = multi_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 
     @test out[1].G_system ≈ -916.8283889543869 rtol=2e-4
     @test out[2].G_system ≈ -912.5920719174167 rtol=2e-4
@@ -100,7 +100,7 @@ end
     X = [[1.0], X]
     X_view = @view X[2,:]
 
-    out     = single_point_minim(P, T, data, X_view, Xoxides=Xoxides, sys_in=sys_in)
+    out     = single_point_minimization(P, T, data, X=X_view, Xoxides=Xoxides, sys_in=sys_in)
 
     @test abs(out.G_system + 916.8283889543869)/abs(916.8283889543869) < 2e-4
 
@@ -168,7 +168,7 @@ function TestPoints(list, data::MAGEMin_Data)
     P = [ l.P for l in list]
     T = [ l.T for l in list]
     test = [ l.test for l in list]
-    out_vec = multi_point_minim(P, T, data, test = test[1]);
+    out_vec = multi_point_minimization(P, T, data, test = test[1]);
 
     # Check if the points this fit
     for (i,out) in enumerate(out_vec)
