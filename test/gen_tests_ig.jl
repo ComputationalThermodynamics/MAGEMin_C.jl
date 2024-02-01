@@ -1,4 +1,4 @@
-# This script helps to generate a list of points for testing MAGEMin using reference built-in bulk-rock compositions
+# This script helps to generate a lsit of points for testing MAGEMin using reference built-in bulk-rock compositions
 
 cur_dir = pwd();    
 if  cur_dir[end-3:end]=="test"
@@ -12,7 +12,7 @@ gv, z_b, DB, splx_data      = init_MAGEMin(db);
 
 
 sys_in      = "mol"     #default is mol, if wt is provided conversion will be done internally (MAGEMin works on mol basis)
-test        = 6         #KLB1
+test        = 0         #KLB1
 gv          = use_predefined_bulk_rock(gv, test, db);
 
 mutable struct outP{ _T  } 

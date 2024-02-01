@@ -6,6 +6,9 @@ using ProgressMeter
 
 const VecOrMat = Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}
 
+# export  init_MAGEMin, finalize_MAGEMin, point_wise_minimization, convertBulk4MAGEMin, use_predefined_bulk_rock, define_bulk_rock,create_output,
+#         print_info, create_gmin_struct, pwm_init, pwm_run
+
 export  init_MAGEMin, finalize_MAGEMin, point_wise_minimization, convertBulk4MAGEMin, use_predefined_bulk_rock, define_bulk_rock, create_output,
         print_info, create_gmin_struct, pwm_init, pwm_run,
         single_point_minimization, multi_point_minimization, MAGEMin_Data, W_Data,
@@ -24,13 +27,15 @@ mutable struct MAGEMin_Data{TypeGV, TypeZB, TypeDB, TypeSplxData}
 end
 
 """
-Holds the MAGEMin databases & required structures for every thread
+Holds the overriding Ws parameters
+0 = "mp", 1 = "mb", 2 = "ig", 3 = "igd", 4 = "um", 5 = "ige", 6 = "alk"
 """
 mutable struct W_Data
     SS_id   :: Vector{Int64}
     SS_len  :: Vector{Int64}
     Ws      :: Vector{Matrix{Float64}}
 end
+
 
 """
     Dat = Initialize_MAGEMin(db = "ig"; verbose::Union{Bool, Int64} = true)
@@ -171,7 +176,7 @@ function single_point_minimization(     P           ::  T1,
                                         Xoxides     = Vector{String},
                                         sys_in      = "mol",
                                         progressbar = true        # show a progress bar or not?
-                                    ) where {T1 <: Float64}
+                                        ) where {T1 <: Float64}
 
     P   = [P];
     T   = [T];
@@ -196,6 +201,7 @@ end
 
 """
 Out_PT =multi_point_minimization(P::T2,T::T2,MAGEMin_db::MAGEMin_Data;test::Int64=0,X::Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}=nothing,B::Union{Nothing, T1, Vector{T1}}=nothing,W::Union{Nothing, W_Data}=nothing,Xoxides=Vector{String},sys_in="mol",progressbar=true) where {T1 <: Float64, T2 <: AbstractVector{T1}}
+
 
 Perform (parallel) MAGEMin calculations for a range of points as a function of pressure `P`, temperature `T` and/or composition `X`. The database `MAGEMin_db` must be initialised before calling the routine.
 The bulk-rock composition can either be set to be one of the pre-defined build-in test cases, or can be specified specifically by passing `X`, `Xoxides` and `sys_in` (that specifies whether the input is in "mol" or "wt").
@@ -256,17 +262,17 @@ julia> versioninfo()
 ```
 
 """
-function multi_point_minimization(  P           ::  T2,
-                                    T           ::  T2,
-                                    MAGEMin_db  ::  MAGEMin_Data;
-                                    test        ::  Int64                           = 0, # if using a build-in test case,
-                                    X           ::  VecOrMat=nothing,
-                                    B           ::  Union{Nothing, T1, Vector{T1}}  = nothing,
-                                    W           ::  Union{Nothing, W_Data}          = nothing,
-                                    Xoxides     = Vector{String},
-                                    sys_in      = "mol",
-                                    progressbar = true        # show a progress bar or not?
-                                    ) where {T1 <: Float64, T2 <: AbstractVector{T1}}
+function multi_point_minimization(P           ::  T2,
+                                  T           ::  T2,
+                                  MAGEMin_db  ::  MAGEMin_Data;
+                                  test        ::  Int64                           = 0, # if using a build-in test case,
+                                  X           ::  VecOrMat=nothing,
+                                  B           ::  Union{Nothing, T1, Vector{T1}}  = nothing,
+                                  W           ::  Union{Nothing, W_Data}          = nothing,
+                                  Xoxides     = Vector{String},
+                                  sys_in      = "mol",
+                                  progressbar = true        # show a progress bar or not?
+                                  ) where {T1 <: Float64, T2 <: AbstractVector{Float64}}
 
     # Set the compositional info
     CompositionType::Int64 = 0;
@@ -351,7 +357,6 @@ function multi_point_minimization(  P           ::  T2,
 
     return Out_PT
 end
-
 
 """
 bulk_rock = use_predefined_bulk_rock(gv, test=-1, db="ig")
@@ -485,38 +490,37 @@ function convertBulk4MAGEMin(bulk_in::T1,bulk_in_ox::Vector{String},sys_in::Stri
     MAGEMin_bulk .= normalize(MAGEMin_bulk);
 
     # check which component can safely be put to 0.0
-    idNonH2O = findall(MAGEMin_ox .!= "H2O");
+    d = []
+    c = []
     if db == "ig" || db == "igd" || db == "ige" ||  db == "alk"
-        idNonCr2O3  = findall(MAGEMin_ox .!= "Cr2O3");
-        idNonTiO2   = findall(MAGEMin_ox .!= "TiO2");
-        idNonO      = findall(MAGEMin_ox .!= "O");
-
-        a = intersect(idNonH2O,idNonCr2O3);
-        b = intersect(idNonO,idNonTiO2);
-        c = intersect(a,b);
+        c = findall(MAGEMin_ox .!= "Cr2O3" .&& MAGEMin_ox .!= "TiO2" .&& MAGEMin_ox .!= "O" .&& MAGEMin_ox .!= "H2O");
+        d = findall(MAGEMin_ox .== "Cr2O3" .|| MAGEMin_ox .== "TiO2" .|| MAGEMin_ox .== "O");# .|| MAGEMin_ox .== "H2O");
     elseif db == "mb"               #for the metabasite database it is better to set a low value for H2O as dry system have not been validated
-        idNonTiO2   = findall(MAGEMin_ox .!= "TiO2");
-        idNonO      = findall(MAGEMin_ox .!= "O");
-        c = intersect(idNonO,idNonTiO2);
+        c = findall(MAGEMin_ox .!= "TiO2" .&& MAGEMin_ox .!= "O");
+        d = findall(MAGEMin_ox .== "TiO2" .|| MAGEMin_ox .== "O");
     else
-        c = idNonH2O;
+        c = findall(MAGEMin_ox .!= "H2O");
     end
 
-    id0 = findall(MAGEMin_bulk[c] .== 0.0)
+    id0 = findall(MAGEMin_bulk[c] .< 1e-5)
     if ~isempty(id0)
-        MAGEMin_bulk[id0] .= 1e-4;
+        MAGEMin_bulk[c[id0]] .= 1e-5;
     end
 
-    MAGEMin_bulk .= normalize(MAGEMin_bulk)*100.0;
+    id1 = findall(MAGEMin_bulk[d] .< 1e-5)
+    if ~isempty(id1)
+        MAGEMin_bulk[d[id1]] .= 0.0;
+    end
+    MAGEMin_bulk .= normalize(MAGEMin_bulk).*100.0
 
     return MAGEMin_bulk, MAGEMin_ox;
 end
 
 
 """
-    point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data; buffer_n = 0.0, W = nothing)
+    point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data, sys_in::String="mol")
 
-Computes the stable assemblage at `P` [kbar], `T` [°C] and for a given bulk rock composition
+Computes the stable assemblage at `P` [kbar], `T` [C] and for a given bulk rock composition
 
 
 # Example 1
@@ -584,7 +588,7 @@ function point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data; 
     input_data      =   LibMAGEMin.io_data();           # zero (not used actually)
     z_b.T           =   T + 273.15                      # in K
     z_b.P           =   P
-    gv.numPoint     = 1; 							    # the number of the current point */
+    gv.numPoint     =   1; 							    # the number of the current point */
 
     # Perform the point-wise minimization after resetting variables
     gv      = LibMAGEMin.reset_gv(gv,z_b, DB.PP_ref_db, DB.SS_ref_db)
@@ -599,6 +603,18 @@ function point_wise_minimization(P::Float64,T::Float64, gv, z_b, DB, splx_data; 
 
     gv      = LibMAGEMin.ComputeG0_point(gv.EM_database, z_b, gv, DB.PP_ref_db,DB.SS_ref_db);
 
+    # here we can over-ride default W's
+    if ~isnothing(W)
+        if gv.EM_database  == W.database    # check if the database fit
+
+
+        else
+            print(" Wrong database number, please make sure the custom Ws are linked to the right database\n")
+        end
+    end
+
+
+    # computing minimization
     time = @elapsed  gv      = LibMAGEMin.ComputeEquilibrium_Point(gv.EM_database, input_data, z_b, gv, pointer_from_objref(splx_data),	DB.PP_ref_db,DB.SS_ref_db,DB.cp);
 
     # Postprocessing (NOTE: we should switch off printing if gv.verbose=0)
@@ -693,88 +709,89 @@ end
 
 """
 struct gmin_struct{T,I}
-    MAGEMin_ver::String
-    G_system::T             # G of system
-    Gamma::Vector{T}        # Gamma
-    P_kbar::T               # Pressure in kbar
-    T_C::T                  # Temperature in Celsius
+    MAGEMin_ver :: String
+    G_system    :: T             # G of system
+    Gamma       :: Vector{T}        # Gamma
+    P_kbar      :: T               # Pressure in kbar
+    T_C         :: T                  # Temperature in Celcius
 
     # bulk rock composition:
-    bulk::Vector{T}
-    bulk_M::Vector{T}
-    bulk_S::Vector{T}
-    bulk_F::Vector{T}
+    bulk        :: Vector{T}
+    bulk_M      :: Vector{T}
+    bulk_S      :: Vector{T}
+    bulk_F      :: Vector{T}
 
-    bulk_wt::Vector{T}
-    bulk_M_wt::Vector{T}
-    bulk_S_wt::Vector{T}
-    bulk_F_wt::Vector{T}
+    bulk_wt     :: Vector{T}
+    bulk_M_wt   :: Vector{T}
+    bulk_S_wt   :: Vector{T}
+    bulk_F_wt   :: Vector{T}
 
     # Fractions:
     # Solid, melt, fluid fractions
-    frac_M::T
-    frac_S::T
-    frac_F::T
+    frac_M      :: T
+    frac_S      :: T
+    frac_F      :: T
 
-    frac_M_wt::T
-    frac_S_wt::T
-    frac_F_wt::T
+    frac_M_wt   :: T
+    frac_S_wt   :: T
+    frac_F_wt   :: T
 
     # Solid, melt, fluid densities
-    alpha::T
-    V::T
-    cp::T
-    rho::T
-    rho_M::T
-    rho_S::T
-    rho_F::T
+    alpha       :: T
+    V           :: T
+    cp          :: T
+    s_cp        :: T
+    rho         :: T
+    rho_M       :: T
+    rho_S       :: T
+    rho_F       :: T
 
     # Oxygen fugacity
-    fO2::T
+    fO2         :: T
 
     # Activities
-    aH2O::T
-    aSiO2::T
-    aTiO2::T
-    aAl2O3::T
-    aMgO::T
-    aFeO::T
+    aH2O        :: T
+    aSiO2       :: T
+    aTiO2       :: T
+    aAl2O3      :: T
+    aMgO        :: T
+    aFeO        :: T
 
     # Phase fractions and type:
-    n_PP::Int64                 # number of pure phases
-    n_SS::Int64                 # number of solid solutions
+    n_PP        :: Int64                 # number of pure phases
+    n_SS        :: Int64                 # number of solid solutions
 
-    ph_frac::Vector{T}          # phase fractions
-    ph_frac_wt::Vector{T}          # phase fractions
-    ph_type::Vector{I}      # type of phase (SS or PP)
-    ph_id::Vector{I}        # id of phase
-    ph::Vector{String}          # Name of phase
+    ph_frac     :: Vector{T}          # phase fractions
+    ph_frac_wt  :: Vector{T}          # phase fractions
+    ph_type     :: Vector{I}      # type of phase (SS or PP)
+    ph_id       :: Vector{I}        # id of phase
+    ph          :: Vector{String}          # Name of phase
 
-    SS_vec::Vector{LibMAGEMin.SS_data}
-    PP_vec::Vector{LibMAGEMin.PP_data}
+    SS_vec      :: Vector{LibMAGEMin.SS_data}
+    PP_vec      :: Vector{LibMAGEMin.PP_data}
 
-    oxides::Vector{String}
+    oxides      :: Vector{String}
 
     # Seismic velocity info
-    Vp::T               # P-wave velocity
-    Vs::T               # S-wave velocity
-    Vp_S::T               # P-wave velocity of solid aggregate
-    Vs_S::T               # S-wave velocity of solid aggregate
-    bulkMod::T          # Elastic bulk modulus
-    shearMod::T         # Elastic shear modulus
-    bulkModulus_M::T          # Elastic bulk modulus
-    bulkModulus_S::T          # Elastic bulk modulus
-    shearModulus_S::T         # Elastic shear modulus
+    Vp              :: T                # P-wave velocity
+    Vs              :: T                # S-wave velocity
+    Vp_S            :: T                # P-wave velocity of solid aggregate
+    Vs_S            :: T                # S-wave velocity of solid aggregate
+    bulkMod         :: T                # Elastic bulk modulus
+    shearMod        :: T                # Elastic shear modulus
+    bulkModulus_M   :: T                # Elastic bulk modulus
+    bulkModulus_S   :: T                # Elastic bulk modulus
+    shearModulus_S  :: T                # Elastic shear modulus
 
     # thermodynamic properties
-    entropy::T          # entropy
-    enthalpy::T         # enthalpy
+    entropy         :: T          # entropy
+    enthalpy        :: T         # enthalpy
 
     # Numerics:
-    iter::I             # number of iterations required
-    bulk_res_norm::T    # bulk residual norm
-    time_ms::T          # computational time for this point
-    status::I           # status of calculations
+    iter            :: I             # number of iterations required
+    bulk_res_norm   :: T    # bulk residual norm
+    time_ms         :: T          # computational time for this point
+    status          :: I           # status of calculations
 end
 
 """
@@ -818,6 +835,7 @@ function create_gmin_struct(DB, gv, time)
     alpha   = stb.alpha
     V       = stb.V
     cp      = stb.cp
+    s_cp    = stb.s_cp
     rho     = stb.rho
     rho_M   = stb.rho_M
     rho_S   = stb.rho_S
@@ -869,7 +887,7 @@ function create_gmin_struct(DB, gv, time)
                 bulk_wt, bulk_M_wt, bulk_S_wt, bulk_F_wt,
                 frac_M, frac_S, frac_F,
                 frac_M_wt, frac_S_wt, frac_F_wt,
-                alpha, V, cp,
+                alpha, V, cp, s_cp,
                 rho, rho_M, rho_S, rho_F,
                 fO2, aH2O, aSiO2, aTiO2, aAl2O3, aMgO, aFeO,
                 n_PP, n_SS,
@@ -1083,6 +1101,7 @@ function print_info(g::gmin_struct)
     print("$(lpad(round(g.G_system,digits=5),20," ")) ")
     print("$(lpad(round(g.alpha,digits=5),29," ")) ")
     print("$(lpad(round(g.cp,digits=5),29," ")) ")
+    print("$(lpad(round(g.s_cp,digits=5),29," ")) ")
     print("$(lpad(round(g.V,digits=5),29," ")) ")
     print("$(lpad(round(g.rho,digits=5),29," ")) ")
     print("$(lpad(round(g.entropy,digits=5),21," ")) ")
@@ -1119,3 +1138,6 @@ function print_info(g::gmin_struct)
     print("\n")
 
 end
+
+
+
