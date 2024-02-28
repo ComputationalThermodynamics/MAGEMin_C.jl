@@ -33,18 +33,18 @@ julia> data = use_predefined_bulk_rock(data, test);
 julia> P    = 8.0;
 julia> T    = 800.0;
 julia> out  = point_wise_minimization(P,T, data);
- Status             :            0
- Mass residual      : +8.03033e-06
- Rank               :            0
- Point              :            1
- Temperature        :   +800.00000       [C]
+ Status             :            0 
+ Mass residual      : +5.34576e-06
+ Rank               :            0 
+ Point              :            1 
+ Temperature        :   +800.00000       [C] 
  Pressure           :     +8.00000       [kbar]
 
- SOL = [G: -797.749] (26 iterations, 40.98 ms)
- GAM = [-979.481479,-1774.104933,-795.260896,-673.747606,-375.066863,-917.567179,-829.994361,-1023.642804,-257.017193,-1308.294760]
+ SOL = [G: -797.749] (25 iterations, 39.62 ms)
+ GAM = [-979.481432,-1774.104523,-795.261024,-673.747244,-375.070247,-917.557241,-829.990582,-1023.656703,-257.019268,-1308.294427]
 
- Phase :      opx       ol      cpx      spn
- Mode  :  0.24229  0.58808  0.14165  0.02798
+ Phase :      spn      cpx      opx       ol 
+ Mode  :  0.02799  0.14166  0.24228  0.58807 
 ```
 
 
@@ -60,29 +60,29 @@ julia> sys_in  = "wt"
 julia> out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 Pressure          : 10.0      [kbar]
 Temperature       : 1100.0    [Celsius]
-     Stable phase | Fraction (mol fraction)
-              liq   0.73698
-              cpx   0.17241
-             pl4T   0.04846
-     Stable phase | Fraction (wt fraction)
-              liq   0.70765
-              cpx   0.18894
-             pl4T   0.05083
-Gibbs free energy : -907.392253  (22 iterations; 62.25 ms)
-Oxygen fugacity          : 3.400537515666476e-9
+     Stable phase | Fraction (mol fraction) 
+              liq   0.75133 
+              cpx   0.20987 
+              opx   0.03877 
+     Stable phase | Fraction (wt fraction) 
+              liq   0.73001 
+              cpx   0.22895 
+              opx   0.04096 
+Gibbs free energy : -916.874646  (45 iterations; 86.53 ms)
+Oxygen fugacity          : 2.0509883251350577e-8
 ```
 
 After the calculation is finished, the structure `out` holds all the information about the stable assemblage, including seismic velocities, melt content, melt chemistry, densities etc.
 You can show a full overview of that with
 ```julia
-julia> print_info(out[1])
+julia> print_info(out)
 ```
 If you are interested in the density or seismic velocity at the point, access it with
 ```julia
-julia> out[1].rho
-3144.282577840362
-julia> out[1].Vp
-5.919986959559542
+julia> out.rho
+2755.2995530913095
+julia> out.Vp
+3.945646731595539
 ```
 Once you are done with all calculations, release the memory with
 ```julia
