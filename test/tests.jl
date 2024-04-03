@@ -269,8 +269,6 @@ println("Testing points from the reference diagrams:")
 
 end
 
-
-
 # a few tests that gave problems in the past
 println("Testing problematic points:")
 @testset verbose = true "Problematic points" begin
