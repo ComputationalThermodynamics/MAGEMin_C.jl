@@ -231,7 +231,7 @@ SS_ref G_SS_mb_liq_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     int i, j;
     int n_em = SS_ref_db.n_em;
     
-    char   *EM_tmp[] 		= {"q4L","abL","kspL","wo1L","sl1L","fa2L","fo2L","watL","anoL"};
+    char   *EM_tmp[] 		= {"q4L","abL","kspL","wo1L","sl1L","fa2L","fo2L","h2oL","anoL"};
     for (int i = 0; i < SS_ref_db.n_em; i++){
         strcpy(SS_ref_db.EM_list[i],EM_tmp[i]);
     };
@@ -240,6 +240,13 @@ SS_ref G_SS_mb_liq_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"fac","pq","xab","xksp","pwo","psil","ph2o","pan","pol","xFe","xMg"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+
+
     SS_ref_db.W[0] = 12.0 - 0.4*SS_ref_db.P;
     SS_ref_db.W[1] = -0.5*SS_ref_db.P - 2.0;
     SS_ref_db.W[2] = -5.00;
@@ -424,6 +431,12 @@ SS_ref G_SS_mb_hb_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xvA","xNaA","xKA","xMgM13","xFeM13","xMgM2","xFeM2","xAlM2","xFe3M2","xTiM2","xCaM4","xMgM4","xFeM4","xNaM4","xSiT1","xAlT1","xOHV","xOV"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+
     SS_ref_db.W[0] = 20.0;
     SS_ref_db.W[1] = 25.0;
     SS_ref_db.W[2] = 65.0;
@@ -445,16 +458,16 @@ SS_ref G_SS_mb_hb_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     SS_ref_db.W[18] = 35.0;
     SS_ref_db.W[19] = 50.0;
     SS_ref_db.W[20] = 90.0;
-    SS_ref_db.W[21] = 106.700000000000;
+    SS_ref_db.W[21] = 106.7;
     SS_ref_db.W[22] = 94.8;
     SS_ref_db.W[23] = 94.8;
     SS_ref_db.W[24] = 40.0;
     SS_ref_db.W[25] = 8.00;
     SS_ref_db.W[26] = 15.0;
     SS_ref_db.W[27] = 100.;
-    SS_ref_db.W[28] = 113.500000000000;
+    SS_ref_db.W[28] = 113.5;
     SS_ref_db.W[29] = 100.;
-    SS_ref_db.W[30] = 111.200000000000;
+    SS_ref_db.W[30] = 111.2;
     SS_ref_db.W[31] = 0.0;
     SS_ref_db.W[32] = 54.0;
     SS_ref_db.W[33] = 75.0;
@@ -677,6 +690,12 @@ SS_ref G_SS_mb_aug_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM1","xFeM1","xAlM1","xFe3M1","xMgM2","xFeM2","xCaM2","xNaM2","xSiT1","xAlT1","xSiT2","xAlT2"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 29.8 - 0.03*SS_ref_db.P;
     SS_ref_db.W[1] = 25.8 - 0.03*SS_ref_db.P;
     SS_ref_db.W[2] = 26.0;
@@ -833,6 +852,12 @@ SS_ref G_SS_mb_dio_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM1m","xFeM1m","xFe3M1m","xAlM1m","xMgM1a","xFeM1a","xFe3M1a","xAlM1a","xNaM2c","xCaM2c","xNaM2n","xCaM2n"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 26.0;
     SS_ref_db.W[1] = 24.0;
     SS_ref_db.W[2] = 5.00;
@@ -841,9 +866,9 @@ SS_ref G_SS_mb_dio_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     SS_ref_db.W[5] = 3.00;
     SS_ref_db.W[6] = 4.00;
     SS_ref_db.W[7] = 21.0;
-    SS_ref_db.W[8] = 15.7500000000000;
+    SS_ref_db.W[8] = 15.75;
     SS_ref_db.W[9] = 2.00;
-    SS_ref_db.W[10] = 24.6500000000000;
+    SS_ref_db.W[10] = 24.65;
     SS_ref_db.W[11] = 20.8;
     SS_ref_db.W[12] = 17.2;
     SS_ref_db.W[13] = 2.00;
@@ -851,9 +876,9 @@ SS_ref G_SS_mb_dio_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     SS_ref_db.W[15] = 16.4;
     SS_ref_db.W[16] = 22.2;
     SS_ref_db.W[17] = 3.00;
-    SS_ref_db.W[18] = 18.4500000000000;
+    SS_ref_db.W[18] = 18.45;
     SS_ref_db.W[19] = 19.5;
-    SS_ref_db.W[20] = 24.5500000000000;
+    SS_ref_db.W[20] = 24.55;
     
     
     em_data jd_eq 		= get_em_data(		EM_database, 
@@ -957,6 +982,12 @@ SS_ref G_SS_mb_opx_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM1","xFeM1","xFe3M1","xAlM1","xMgM2","xFeM2","xCaM2","xAlT","xSiT"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 7.00;
     SS_ref_db.W[1] = 4.00;
     SS_ref_db.W[2] = 13.0 - 0.15*SS_ref_db.P;
@@ -1090,6 +1121,12 @@ SS_ref G_SS_mb_g_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_in
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgX","xFeX","xCaX","xAlY","xFe3Y"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 2.50;
     SS_ref_db.W[1] = 31.0;
     SS_ref_db.W[2] = 5.40;
@@ -1188,6 +1225,12 @@ SS_ref G_SS_mb_ol_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM","xFeM"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 9.00;
     
     
@@ -1244,6 +1287,12 @@ SS_ref G_SS_mb_fsp_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xNaA","xCaA","xKA","xAlTB","xSiTB"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = -0.04*SS_ref_db.P - 0.00935*SS_ref_db.T + 14.6;
     SS_ref_db.W[1] = 0.338*SS_ref_db.P - 0.00957*SS_ref_db.T + 24.1;
     SS_ref_db.W[2] = 48.5 - 0.13*SS_ref_db.P;
@@ -1318,6 +1367,12 @@ SS_ref G_SS_mb_abc_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xNaA","xCaA"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 3.40;
     
     SS_ref_db.v[0] = 0.640;
@@ -1377,6 +1432,12 @@ SS_ref G_SS_mb_k4tr_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xNaA","xCaA","xKA","xAlTB","xSiTB"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = -0.04*SS_ref_db.P - 0.00935*SS_ref_db.T + 14.6;
     SS_ref_db.W[1] = 0.338*SS_ref_db.P - 0.00957*SS_ref_db.T + 24.1;
     SS_ref_db.W[2] = 48.5 - 0.13*SS_ref_db.P;
@@ -1451,6 +1512,12 @@ SS_ref G_SS_mb_sp_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xAl","xFe3","xTi","xMg","xFe2"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 0.0;
     SS_ref_db.W[1] = 18.5;
     SS_ref_db.W[2] = 27.0;
@@ -1555,6 +1622,12 @@ SS_ref G_SS_mb_ilm_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xFe2A","xTiA","xFe3A","xFe2B","xTiB","xFe3B"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+  
     SS_ref_db.W[0] = 15.6;
     SS_ref_db.W[1] = 26.6;
     SS_ref_db.W[2] = 11.0;
@@ -1639,6 +1712,12 @@ SS_ref G_SS_mb_ilmm_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xFeA","xTiA","xMgA","xFe3A","xFeB","xTiB","xFe3B"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 15.6;
     SS_ref_db.W[1] = 26.6;
     SS_ref_db.W[2] = 4.00;
@@ -1718,6 +1797,12 @@ SS_ref G_SS_mb_ep_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xFeM1","xAlM1","xFeM3","xAlM3"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 1.00;
     SS_ref_db.W[1] = 3.00;
     SS_ref_db.W[2] = 1.00;
@@ -1799,6 +1884,12 @@ SS_ref G_SS_mb_bi_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM3","xFeM3","xFe3M3","xTiM3","xAlM3","xMgM12","xFeM12","xSiT","xAlT","xOHV","xOV"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 12.0;
     SS_ref_db.W[1] = 4.00;
     SS_ref_db.W[2] = 10.0;
@@ -1937,6 +2028,12 @@ SS_ref G_SS_mb_mu_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xKA","xNaA","xCaA","xMgM2A","xFeM2A","xAlM2A","xAlM2B","xFe3M2B","xSiT1","xAlT1"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 0.2*SS_ref_db.P;
     SS_ref_db.W[1] = 0.2*SS_ref_db.P;
     SS_ref_db.W[2] = 0.353*SS_ref_db.P + 0.0034*SS_ref_db.T + 10.12;
@@ -2077,6 +2174,12 @@ SS_ref G_SS_mb_chl_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM1","xFeM1","xAlM1","xMgM23","xFeM23","xMgM4","xFeM4","xFe3M4","xAlM4","xSiT2","xAlT2"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 17.0;
     SS_ref_db.W[1] = 17.0;
     SS_ref_db.W[2] = 20.0;
@@ -2219,6 +2322,12 @@ SS_ref G_SS_mp_liq_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"fac","pq","xab","xksp","pan","psil","pol","xFe","xMg","ph2o"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 12.0 - 0.4*SS_ref_db.P;
     SS_ref_db.W[1] = -0.5*SS_ref_db.P - 2.0;
     SS_ref_db.W[2] = 5.0;
@@ -2381,6 +2490,12 @@ SS_ref G_SS_mp_bi_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM3","xMnM3","xFeM3","xFe3M3","xTiM3","xAlM3","xMgM12","xMnM12","xFeM12","xSiT","xAlT","xOHV","xOV"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 12.0;
     SS_ref_db.W[1] = 4.0;
     SS_ref_db.W[2] = 10.0;
@@ -2545,6 +2660,12 @@ SS_ref G_SS_mp_cd_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xFeX","xMgX","xMnX","xH2OH","xvH"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 8.0;
     SS_ref_db.W[1] = 0.0;
     SS_ref_db.W[2] = 6.0;
@@ -2637,6 +2758,12 @@ SS_ref G_SS_mp_chl_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM1","xMnM1","xFeM1","xAlM1","xMgM23","xFeM23","xMgM4","xFeM4","xFe3M4","xAlM4","xSiT2","xAlT2"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 17.0;
     SS_ref_db.W[1] = 17.0;
     SS_ref_db.W[2] = 20.0;
@@ -2801,6 +2928,12 @@ SS_ref G_SS_mp_ctd_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xAlM1A","xFe3M1A","xFeM1B","xMgM1B","xMnM1B"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 4.0;
     SS_ref_db.W[1] = 3.0;
     SS_ref_db.W[2] = 1.0;
@@ -2907,6 +3040,12 @@ SS_ref G_SS_mp_ep_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xFeM1","xAlM1","xFeM3","xAlM3"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 1.0;
     SS_ref_db.W[1] = 3.0;
     SS_ref_db.W[2] = 1.0;
@@ -2988,6 +3127,12 @@ SS_ref G_SS_mp_g_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_in
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgX","xFeX","xMnX","xCaX","xAlY","xFe3Y"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 2.5;
     SS_ref_db.W[1] = 2.0;
     SS_ref_db.W[2] = 31.0;
@@ -3109,6 +3254,12 @@ SS_ref G_SS_mp_ilm_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xFe2A","xTiA","xFe3A","xFe2B","xTiB","xFe3B"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 15.6;
     SS_ref_db.W[1] = 26.6;
     SS_ref_db.W[2] = 11.0;
@@ -3184,6 +3335,12 @@ SS_ref G_SS_mp_ilmm_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xFeA","xTiA","xMgA","xMnA","xFe3A","xFeB","xTiB"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 15.6;
     SS_ref_db.W[1] = 26.6;
     SS_ref_db.W[2] = 4.0;
@@ -3296,6 +3453,12 @@ SS_ref G_SS_mp_ma_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xKA","xNaA","xCaA","xMgM2A","xFeM2A","xAlM2A","xAlM2B","xFe3M2B","xSiT1","xAlT1"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 0.2*SS_ref_db.P;
     SS_ref_db.W[1] = 0.2*SS_ref_db.P;
     SS_ref_db.W[2] = 0.353*SS_ref_db.P + 0.0034*SS_ref_db.T + 10.12;
@@ -3435,6 +3598,12 @@ SS_ref G_SS_mp_mt_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xTiM","xFe3M","xFeM","xFe3T","xFeT"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 2.4;
     SS_ref_db.W[1] = 1.0;
     SS_ref_db.W[2] = -5.0;
@@ -3515,6 +3684,12 @@ SS_ref G_SS_mp_mu_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xKA","xNaA","xCaA","xMgM2A","xFeM2A","xAlM2A","xAlM2B","xFe3M2B","xSiT1","xAlT1"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 0.2*SS_ref_db.P;
     SS_ref_db.W[1] = 0.2*SS_ref_db.P;
     SS_ref_db.W[2] = 0.353*SS_ref_db.P + 0.0034*SS_ref_db.T + 10.12;
@@ -3654,6 +3829,12 @@ SS_ref G_SS_mp_opx_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM1","xFeM1","xMnM1","xFe3M1","xAlM1","xMgM2","xFeM2","xMnM2","xCaM2","xSiT","xAlT"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 7.0;
     SS_ref_db.W[1] = 4.0;
     SS_ref_db.W[2] = 13.0 - 0.15*SS_ref_db.P;
@@ -3810,6 +3991,12 @@ SS_ref G_SS_mp_fsp_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xNaA","xCaA","xKA","xAlTB","xSiTB"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = -0.04*SS_ref_db.P - 0.00935*SS_ref_db.T + 14.6;
     SS_ref_db.W[1] = 0.338*SS_ref_db.P - 0.00957*SS_ref_db.T + 24.1;
     SS_ref_db.W[2] = 48.5 - 0.13*SS_ref_db.P;
@@ -3884,6 +4071,12 @@ SS_ref G_SS_mp_sa_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM3","xFeM3","xFe3M3","xAlM3","xMgM456","xFeM456","xSiT","xAlT"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 10. - 0.02*SS_ref_db.P;
     SS_ref_db.W[1] = 16.;
     SS_ref_db.W[2] = 12.;
@@ -3991,6 +4184,12 @@ SS_ref G_SS_mp_sp_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xAl","xFe3","xTi","xMg","xFe2"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 16.;
     SS_ref_db.W[1] = 2.;
     SS_ref_db.W[2] = 20.;
@@ -4089,6 +4288,12 @@ SS_ref G_SS_mp_st_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgX","xFeX","xMnX","xAlY","xFe3Y","xTiY","xvY"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 16.;
     SS_ref_db.W[1] = 12.;
     SS_ref_db.W[2] = 2.;
@@ -4220,9 +4425,19 @@ SS_ref G_SS_ig_fper_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk
     for (int i = 0; i < SS_ref_db.n_em; i++){
         strcpy(SS_ref_db.EM_list[i],EM_tmp[i]);
     };
-    
+    int n_xeos = SS_ref_db.n_xeos;
+    char   *CV_tmp[] 		= {"x"};
+    for (int i = 0; i < SS_ref_db.n_xeos; i++){
+        strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
+    };
+    char   *SF_tmp[] 		= {"xFe","xMg"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+
     SS_ref_db.W[0] = 13.0;
-    
+
     
     em_data per_eq 		= get_em_data(		EM_database, 
     										len_ox,
@@ -4277,6 +4492,12 @@ SS_ref G_SS_ig_bi_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM3","xFeM3","xFe3M3","xTiM3","xAlM3","xMgM12","xFeM12","xSiT","xAlT","xOHV","xOV"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0]  = 12.;
     SS_ref_db.W[1]  = 4.;
     SS_ref_db.W[2]  = 10.;
@@ -4422,7 +4643,13 @@ SS_ref G_SS_ig_cpx_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
-  SS_ref_db.W[0] = 25.8;
+    char   *SF_tmp[] 		= {"xMgM1","xFeM1","xAlM1","xFe3M1","xCrM1","xTiM1","xMgM2","xFeM2","xCaM2","xNaM2","xKM2","xSiT","xAlT"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
+    SS_ref_db.W[0] = 25.8;
     SS_ref_db.W[1] = 13.0 - 0.06*SS_ref_db.P;
     SS_ref_db.W[2] = 8.0;
     SS_ref_db.W[3] = 8.0;
@@ -4680,6 +4907,11 @@ SS_ref G_SS_ig_cd_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xFeX","xMgX","xH2OH","xvH"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
 
     SS_ref_db.W[0] = 6.0;
     SS_ref_db.W[1] = 0.0;
@@ -4754,7 +4986,12 @@ SS_ref G_SS_ig_ep_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
-    
+    char   *SF_tmp[] 		= {"xFeM1","xAlM1","xFeM3","xAlM3"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+
     SS_ref_db.W[0] = 1.0;
     SS_ref_db.W[1] = 3.0;
     SS_ref_db.W[2] = 1.0;
@@ -4839,7 +5076,12 @@ SS_ref G_SS_ig_fl_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
-    
+    char   *SF_tmp[] 		= {"pq","psl","pwo","pfo","pfa","pjd","phm","pek","pti","pkj","ph2o","fac"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+
     SS_ref_db.W[0] = 0.;
     SS_ref_db.W[1] = 0.;
     SS_ref_db.W[2] = 0.;
@@ -5089,7 +5331,12 @@ SS_ref G_SS_ig_g_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_in
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
-    
+    char   *SF_tmp[] 		= {"xMgM1","xFeM1","xCaM1","xAlM2","xCrM2","xFe3M2","xMgM2","xTiM2"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+
     SS_ref_db.W[0] = 0.1*SS_ref_db.P + 4.0;
     SS_ref_db.W[1] = 0.04*SS_ref_db.P - 0.01*SS_ref_db.T + 45.4;
     SS_ref_db.W[2] = -0.036*SS_ref_db.P - 0.01*SS_ref_db.T + 107.0;
@@ -5249,7 +5496,12 @@ SS_ref G_SS_ig_hb_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
-    
+    char   *SF_tmp[] 		= {"xvA","xNaA","xKA","xMgM13","xFeM13","xMgM2","xFeM2","xAlM2","xFe3M2","xTiM2","xCaM4","xMgM4","xFeM4","xNaM4","xSiT1","xAlT1","xOHV","xOV"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+
     SS_ref_db.W[0] = 20.0;
     SS_ref_db.W[1] = 25.0;
     SS_ref_db.W[2] = 65.0;
@@ -5516,6 +5768,11 @@ SS_ref G_SS_ig_ilm_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xFeA","xTiA","xFe3A","xFe2B","xTiB","xFe3B"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
 
  
     SS_ref_db.W[0] = 7.05;
@@ -5585,7 +5842,7 @@ SS_ref G_SS_ig_liq_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     int i, j;
     int n_em = SS_ref_db.n_em;
     
-    char   *EM_tmp[] 		= {"q4L","slL","wo1L","fo2L","fa2L","jdL","hmL","ekL","tiL","kjL","ctL","wat1L"};
+    char   *EM_tmp[] 		= {"q4L","slL","wo1L","fo2L","fa2L","jdL","hmL","ekL","tiL","kjL","ctL","h2o1L"};
     for (int i = 0; i < SS_ref_db.n_em; i++){
         strcpy(SS_ref_db.EM_list[i],EM_tmp[i]);
     };
@@ -5594,6 +5851,12 @@ SS_ref G_SS_ig_liq_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"pq","psl","pwo","pjd","phm","pek","pti","pkj","pct","pol","sumT","mgM","feM","CaM","AlM","sumM","xh","xv"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 9.5 - 0.1*SS_ref_db.P;
     SS_ref_db.W[1] = -10.3;
     SS_ref_db.W[2] = -3.12*SS_ref_db.P - 26.5;
@@ -5873,6 +6136,12 @@ SS_ref G_SS_ig_mu_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xKA","xNaA","xCaA","xMgM2A","xFeM2A","xAlM2A","xAlM2B","xFe3M2B","xSiT1","xAlT1"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 0.2*SS_ref_db.P;
     SS_ref_db.W[1] = 0.2*SS_ref_db.P;
     SS_ref_db.W[2] = 0.353*SS_ref_db.P + 0.0034*SS_ref_db.T + 10.12;
@@ -6013,7 +6282,12 @@ SS_ref G_SS_ig_ol_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
-    
+    char   *SF_tmp[] 		= {"xMgM1","xFeM1","xMgM2","xFeM2","xCaM2"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+
     SS_ref_db.W[0] = 24.0;
     SS_ref_db.W[1] = 38.0;
     SS_ref_db.W[2] = 24.0;
@@ -6091,7 +6365,12 @@ SS_ref G_SS_ig_opx_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
-    
+    char   *SF_tmp[] 		= {"xMgM1","xFeM1","xAlM1","xFe3M1","xCrM1","xTiM1","xMgM2","xFeM2","xCaM2","xNaM2","xSiT","xAlT"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+
     SS_ref_db.W[0] = 7.0;
     SS_ref_db.W[1] = 4.0;
     SS_ref_db.W[2] = 29.4;
@@ -6305,6 +6584,12 @@ SS_ref G_SS_ig_fsp_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xNaA","xCaA","xKA","xAlTB","xSiTB"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = -0.04*SS_ref_db.P - 0.00935*SS_ref_db.T + 14.6;
     SS_ref_db.W[1] = 0.338*SS_ref_db.P - 0.00957*SS_ref_db.T + 24.1;
     SS_ref_db.W[2] = 48.5 - 0.13*SS_ref_db.P;
@@ -6386,7 +6671,12 @@ SS_ref G_SS_ig_spn_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
-    
+    char   *SF_tmp[] 		= {"xMgT","xFeT","xAlT","xFe3T","xMgM","xFeM","xAlM","xFe3M","xCrM","xTiM"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+
     SS_ref_db.W[0] = -8.2;
     SS_ref_db.W[1] = 3.5;
     SS_ref_db.W[2] = -13.0;
@@ -6555,6 +6845,12 @@ SS_ref G_SS_um_fluid_function(SS_ref SS_ref_db, int EM_database, int len_ox, bul
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xH2","xH2O"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     em_data H2_eq 		= get_em_data(		EM_database, 
     										len_ox,
     										z_b,
@@ -6608,6 +6904,12 @@ SS_ref G_SS_um_ol_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMg","xFe"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 8.0;
     
     
@@ -6664,6 +6966,12 @@ SS_ref G_SS_um_br_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMg","xFe"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     em_data br_eq 		= get_em_data(		EM_database, 
     										len_ox,
     										z_b,
@@ -6725,6 +7033,12 @@ SS_ref G_SS_um_ch_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMg","xFe"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 36.000;
     
     
@@ -6789,6 +7103,12 @@ SS_ref G_SS_um_atg_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM1","xFeM1","xFe3M1","xAlM1","xMgM2","xFeM2","xSiT","xAlT"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 12.000;
     SS_ref_db.W[1] = 4.0;
     SS_ref_db.W[2] = 10.000;
@@ -6898,6 +7218,12 @@ SS_ref G_SS_um_g_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_in
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM1","xFeM1"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+
     SS_ref_db.W[0] = 0.1*SS_ref_db.P + 4.0;
     
     
@@ -6955,6 +7281,12 @@ SS_ref G_SS_um_ta_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM1","xFeM1","xvM1","xMgM23","xFeM23","xFe3M23","xAlM23","xSiT2","xAlT2"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 12.000;
     SS_ref_db.W[1] = 8.0;
     SS_ref_db.W[2] = 10.000;
@@ -7073,6 +7405,12 @@ SS_ref G_SS_um_chl_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM1","xFeM1","xAlM1","xMgM23","xFeM23","xMgM4","xFeM4","xFe3M4","xAlM4","xSiT2","xAlT2"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 17.00;
     SS_ref_db.W[1] = 17.00;
     SS_ref_db.W[2] = 20.00;
@@ -7202,6 +7540,12 @@ SS_ref G_SS_um_anth_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM4","xFeM4","xMgM13","xFeM13","xAlM2","xMgM2","xFeM2","xAlT1","xSiT1"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+
     SS_ref_db.W[0] = 25.00;
     SS_ref_db.W[1] = 33.00;
     SS_ref_db.W[2] = 18.00;
@@ -7293,6 +7637,12 @@ SS_ref G_SS_um_spi_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xAl","xFe3","xMg","xFe2"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 0.0;
     SS_ref_db.W[1] = 18.500;
     SS_ref_db.W[2] = 40.000;
@@ -7363,6 +7713,12 @@ SS_ref G_SS_um_opx_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xMgM1","xFeM1","xFe3M1","xAlM1","xMgM2","xFeM2","xAlT","xSiT"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+    
     SS_ref_db.W[0] = 7.0;
     SS_ref_db.W[1] = 4.0;
     SS_ref_db.W[2] = 13.0 - 0.15*SS_ref_db.P;
@@ -7464,6 +7820,12 @@ SS_ref G_SS_um_po_function(SS_ref SS_ref_db, int EM_database, int len_ox, bulk_i
     for (int i = 0; i < SS_ref_db.n_xeos; i++){
         strcpy(SS_ref_db.CV_list[i],CV_tmp[i]);
     };
+    char   *SF_tmp[] 		= {"xfeM2","xVM2"};
+    for (int i = 0; i < SS_ref_db.n_sf; i++){
+        strcpy(SS_ref_db.SF_list[i],SF_tmp[i]);
+    };
+    //int si = sizeof(SF_tmp)/sizeof(SF_tmp[0]); printf("sz_tmp: %d n_sf %d\n",si,SS_ref_db.n_sf);
+
     SS_ref_db.W[0] = -3.190;
     
     
