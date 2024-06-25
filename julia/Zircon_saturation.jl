@@ -73,7 +73,6 @@ function zirconium_saturation(  out     :: MAGEMin_C.gmin_struct{Float64, Int64}
 
             # # Compute C_zr_liq
             C_zr_liq = 10^(0.96 - 5790.0 / (out.T_C + 273.15) - 1.28 * (out.P_kbar * 0.1) + 12.39 * opt_basicity + 0.83 * xH2O + 2.06 * (out.P_kbar * 0.1) * opt_basicity)
-            # C_zr_liq = 0
         else
             print("Model $model for zirconium saturation is invalid\n")
         end
