@@ -228,14 +228,16 @@ function Initialize_MAGEMin(db = "ig";  verbose     ::Union{Int64,Bool} = 0,
                                         CaOpxLim    ::Float64           = 0.0,
                                         mbCpx       ::Int64             = 1,
                                         buffer      ::String            = "NONE",
-                                        solver      ::Int64             = 1         )
+                                        solver      ::Int64             = 1,
+                                        dataset     ::Int64             = -1)
 
     gv, z_b, DB, splx_data = init_MAGEMin(db;   verbose     = verbose,
                                                 mbCpx       = mbCpx,
                                                 limitCaOpx  = limitCaOpx,
                                                 CaOpxLim    = CaOpxLim,
                                                 buffer      = buffer,
-                                                solver      = solver    );
+                                                solver      = solver,
+                                                dataset     = dataset    );
 
     nt              = Threads.nthreads()
     list_gv         = Vector{typeof(gv)}(undef, nt)
@@ -257,7 +259,8 @@ function Initialize_MAGEMin(db = "ig";  verbose     ::Union{Int64,Bool} = 0,
                                                     limitCaOpx  = limitCaOpx,
                                                     CaOpxLim    = CaOpxLim,
                                                     buffer      = buffer,
-                                                    solver      = solver    );
+                                                    solver      = solver,
+                                                    dataset     = dataset    );
 
         list_gv[id]         = gv
         list_z_b[id]        = z_b
@@ -294,7 +297,8 @@ function  init_MAGEMin( db          =  "ig";
                         limitCaOpx  =   0,
                         CaOpxLim    =   1.0,
                         buffer      =  "NONE",
-                        solver      =   1           )
+                        solver      =   1,
+                        dataset     =   -1   )
 
     z_b         = LibMAGEMin.bulk_infos()
     gv          = LibMAGEMin.global_variables()
@@ -325,6 +329,7 @@ function  init_MAGEMin( db          =  "ig";
     gv.limitCaOpx   = limitCaOpx
     gv.CaOpxLim     = CaOpxLim
     gv.solver       = solver
+    gv.EM_dataset   = dataset
     gv.buffer       = pointer(buffer)
 
     gv              = LibMAGEMin.global_variable_init(gv, pointer_from_objref(z_b))
