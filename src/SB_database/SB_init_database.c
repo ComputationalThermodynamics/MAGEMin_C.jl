@@ -18,8 +18,7 @@
 #include "../MAGEMin.h"
 #include "../initialize.h"
 #include "../all_endmembers.h"
-#include "TC_init_database.h"
-
+#include "SB_init_database.h"
 
 oxide_data oxide_info = {
 	15,						/* number of endmembers */
@@ -29,81 +28,19 @@ oxide_data oxide_info = {
 	{66.7736,108.653,42.9947,40.3262,38.7162,69.1514,61.1729,70.3246,30.5827,40.1891,106.9795,69.5449,62.8768,9.5557,33.2556	},
 	// for the standard molar entropy the values are already normalized by the reference temperature = 298.15K (25°C) and expressed in kJ
 };
-
-metapelite_dataset metapelite_db = {
-	62,							/* Endmember default dataset number */
-	11,							/* number of oxides */			
-	23,							/* number of pure phases */
-	15,							/* number of solution phases */
-	{"SiO2"	,"Al2O3","CaO"	,"MgO"	,"FeO"	,"K2O"	,"Na2O"	,"TiO2"	,"O"	,"MnO"	,"H2O"											},
-	{"q"	,"crst"	,"trd"	,"coe"	,"stv"	,"ky"	,"sill"	,"and"	,"ru"	,"sph"	,"O2"  ,"H2O"	,
-	"qfm"	,"qif"	,"nno"	,"hm"	,"cco"	,"aH2O"	, "aO2"	,"aMgO"	,"aFeO"	,"aAl2O3"		,"aTiO2"								},
-	{"liq"	,"fsp"	,"bi"	,"g"	,"ep"	,"ma"	,"mu"	,"opx"	,"sa"	,"cd"	,"st"	,"chl"	,"ctd"	,"sp"  ,"ilmm"  ,"aq17"	},
-	
-	{1		,1		,1		,1		,1		,1		,1		,1		,1 		,1 		,1 		,1 		,1 		,1 		,1 		,1		},  // allow solvus?
-	{2450	,231 	,981	,756	,110 	,1875	,1875	,1277	,230	,343	,540	,2270	,216	,405 	,1430 	,1		},  // # of pseudocompound
-	{0.249	,0.049	,0.19	,0.19	,0.049	,0.19	,0.19	,0.249	,0.19	,0.145	,0.19	,0.249	,0.19	,0.124 	,0.099 	,1.0	},  // discretization step
-
-	6.0, 						/* max dG under which a phase is considered to be reintroduced  					*/
-	473.15,						/* max temperature above which PGE solver is active 								*/
-	873.15,						/** minimum temperature above which melt is considered 								*/
-
-	4,							/** number of inner PGE iterations, this has to be made mass or dG dependent 		*/
-	0.025,						/** maximum mol% phase change during one PGE iteration in wt% 						*/
-	2.5,						/** maximum delta_G of reference change during PGE 									*/
-	1.0,						/** maximum update factor during PGE under-relax < 0.0, over-relax > 0.0 	 		*/
-
-	1e-1,						/** merge instances of solution phase if norm < val 								*/
-	1e-4,						/** fraction of solution phase when re-introduced 									*/
-	1e-6						/** objective function tolerance 				 									*/
-};
-
-metabasite_dataset metabasite_db = {
-	62,							/* Endmember default dataset number */
-	10,							/* number of oxides */			
-	24,							/* number of pure phases */
-	15,							/* number of solution phases */
-	{"SiO2"	,"Al2O3","CaO"	,"MgO"	,"FeO"	,"K2O"	,"Na2O"	,"TiO2"	,"O"	,"H2O"													},
-	{"q"	,"crst"	,"trd"	,"coe"	,"law"	,"ky"	,"sill"	,"and"	,"ru"	,"sph"	,"sph"  ,"ab"	,"H2O"	,
-	"qfm"	,"qif"	,"nno"	,"hm"	,"cco"	,"aH2O"	, "aO2"	,"aMgO"	,"aFeO"	,"aAl2O3"		,"aTiO2"								},
-	{"sp"	,"opx"	,"fsp"	,"liq"	,"mu"	,"ilm"	,"ol"	,"hb"	,"ep"	,"g"	,"chl"	,"bi"	,"dio"	,"abc"  ,"spn"			},
-	
-	{1		,1		,1		,1		,1		,1		,1		,1		,1 		,1 		,1 		,1 		,1 		,1 		,1				},  // allow solvus?
-	{936	,1730 	,231	,3504	,4536 	,420	,11		,7663	,110	,216	,3980	,1097	,1808	,21 	,196			},  // # of pseudocompound
-	{0.09	,0.19	,0.049	,0.199	,0.19	,0.09	,0.098	,0.249	,0.049	,0.19	,0.19	,0.149	,0.16	,0.049 	,0.09			},  // discretization step
-
-	{"sp"	,"opx"	,"fsp"	,"liq"	,"mu"	,"ilm"	,"ol"	,"hb"	,"ep"	,"g"	,"chl"	,"bi"	,"aug"	,"abc"  ,"spn"			},
-	{1		,1		,1		,1		,1		,1		,1		,1		,1 		,1 		,1 		,1 		,1 		,1 		,1				},  // allow solvus?
-	{936	,1730 	,231	,3504	,4536 	,130	,11		,7663	,110	,216	,3980	,1097	,2389	,21 	,196			},  // # of pseudocompound
-	{0.09	,0.19	,0.049	,0.199	,0.19	,0.09	,0.098	,0.249	,0.049	,0.19	,0.19	,0.149	,0.249	,0.049 	,0.09			},  // discretization step
-
-	4.0, 						/* max dG under which a phase is considered to be reintroduced  					*/
-	473.15,						/* max temperature above which PGE solver is active 								*/
-	873.15,						/** minimum temperature above which melt is considered 								*/
-
-	2,							/** number of inner PGE iterations, this has to be made mass or dG dependent 		*/
-	0.025,						/** maximum mol% phase change during one PGE iteration in wt% 						*/
-	2.5,						/** maximum delta_G of reference change during PGE 									*/
-	1.0,						/** maximum update factor during PGE under-relax < 0.0, over-relax > 0.0 	 		*/
-
-	1e-1,						/** merge instances of solution phase if norm < val 								*/
-	1e-4,						/** fraction of solution phase when re-introduced 									*/
-	1e-6						/** objective function tolerance 				 									*/
-};
-
-igneous_dataset igneous_db = {
-	634,						/* Endmember default dataset number */
-	11,							/* number of oxides */			
-	24,							/* number of pure phases */
-	15,							/* number of solution phases */
-	{"SiO2"	,"Al2O3","CaO"	,"MgO"	,"FeO"	,"K2O"	,"Na2O"	,"TiO2"	,"O"	,"Cr2O3","H2O"											},
-	{"ne"	,"q"	,"crst"	,"trd"	,"coe"	,"stv"	,"ky"	,"sill"	,"and"	,"ru"	,"sph"	,"O2"	,
-	"qfm"	,"mw"	,"qif"	,"nno"	,"hm"	,"cco"	,"aH2O"	, "aO2"	,"aMgO"	,"aFeO"	,"aAl2O3"		,"aTiO2"								},
-	{"spn"	,"bi"	,"cd"	,"cpx"	,"ep"	,"g"	,"hb"	,"ilm"	,"liq"	,"ol"	,"opx"	,"fsp"	,"fl"	,"mu"	,"fper"					},
+// SiO2:0 CaO:1 Al2O3:2 FeO:3 MgO:4 Na2O:5 */
+stx11_dataset stx11_db = {
+	47,							/* Endmember default dataset number */
+	6,							/* number of oxides */			
+	10,							/* number of pure phases */
+	14,							/* number of solution phases */
+	{"SiO2"	,"CaO"	,"Al2O3","FeO"	,"MgO"	,"Na2O"																							},
+	{"neph"	,"ky"	,"seif"	,"st"	,"coe"	,"qtz"	,"capv"	,"aMgO"	,"aFeO"	,"aAl2O3"														},
+	{"plg"	,"sp"	,"ol"	,"wa"	,"ri"	,"opx"	,"cpx"	,"hpcpx","ak"	,"gtmj"	,"pv"	,"ppv"	,"mw"	,"cf"							},
 	
 	{1		,1		,1		,1		,1		,1		,1		,1		,1 		,1 		,1 		,1 		,1		,1		,1						}, // allow solvus?
 	{1521	,3554	,121	,4124	,210	,2450	,5498	,420	,3088	,381	,3412	,231	,11		,2376	,20						}, // # of pseudocompound
-	{0.249	,0.124	,0.098	,0.249	,0.049	,0.145	,0.33	,0.0499	,0.198	,0.098	,0.249	,0.049	,1.0 	,0.198	,0.05					}, // discretization step
+	{0.249	,0.124	,0.098	,0.249	,0.049	,0.145	,0.33	,0.0499	,0.198	,0.098	,0.249	,0.049	,1.0 	,0.198	,0.05					}, // discretization step in endmember fraction
 
 	6.0, 						/** max dG under which a phase is considered to be reintroduced  					*/
 	673.15,						/** max temperature above which PGE solver is active 								*/
@@ -119,156 +56,13 @@ igneous_dataset igneous_db = {
 	1e-6						/** objective function tolerance 				 									*/
 };
 
-ultramafic_dataset ultramafic_db = {
-	633,						/* Endmember default dataset number */
-	7,							/* number of oxides */			
-	21,							/* number of pure phases */
-	12,							/* number of solution phases */
-	{"SiO2"	,"Al2O3","MgO"	,"FeO"	,"O"	,"H2O"	,"S"												},
-	{"q"	,"crst"	,"trd"	,"coe"	,"stv"	,"ky"	,"sill"	,"and"	,"pyr"	,"O2"  	,
-	"qfm"	,"qif"	,"nno"	,"hm"	,"cco"	,"aH2O"	, "aO2"	,"aMgO"	,"aFeO"	,"aAl2O3"		,"aTiO2"	},
-	{"fl"	,"ol"  ,"br"	,"ch"	,"atg"	,"g"	,"ta"	,"chl"	,"spi"	,"opx"	,"po"	,"anth" 	},
-	
-	{1		,1		,1		,1		,1		,1		,1		,1		,1 		,1 		,1		,1			},  // allow solvus?
-	{11  	,10  	,10 	,10 	,489 	,10  	,985 	,2691	,100	,196	,10		,274		},  // No. of pseudocompound
-	{0.001	,0.1	,0.1	,0.1	,0.19	,0.1	,0.19	,0.19	,0.1	,0.19	,0.1	,0.249		},  // discretization step
-
-	4.0, 						/* max dG under which a phase is considered to be reintroduced  					*/
-	473.15,						/* max temperature above which PGE solver is active 								*/
-	873.15,						/** minimum temperature above which melt is considered 								*/
-
-	4,							/** number of inner PGE iterations, this has to be made mass or dG dependent 		*/
-	0.025,						/** maximum mol% phase change during one PGE iteration in wt% 						*/
-	1.5,						/** maximum delta_G of reference change during PGE 									*/
-	1.0,						/** maximum update factor during PGE under-relax < 0.0, over-relax > 0.0 	 		*/
-
-	1e-1,						/** merge instances of solution phase if norm < val 								*/
-	1e-4,						/** fraction of solution phase when re-introduced 									*/
-	1e-6						/** objective function tolerance 				 									*/
-};
-
 /* Function to allocate the memory of the data to be used/saved during PGE iterations */
-global_variable global_variable_TC_init( 	global_variable  	 gv,
+global_variable global_variable_SV_init( 	global_variable  	 gv,
 											bulk_info 			*z_b 	){
 	int i, j;
 
-	/* load database */
 	if (gv.EM_database == 0){
-		metapelite_dataset db 	= metapelite_db;
-		if (gv.EM_dataset == -1){
-			gv.EM_dataset = db.ds_version;	
-		}
-		gv.len_pp   		= db.n_pp;		
-		gv.len_ss  			= db.n_ss;
-		gv.len_ox  			= db.n_ox;
-
-		gv.PC_df_add		= db.PC_df_add;					/** min value of df under which the PC is added 									*/
-		gv.solver_switch_T  = db.solver_switch_T;
-		gv.min_melt_T       = db.min_melt_T ;				/** minimum temperature above which melt is considered 								*/
-
-		gv.inner_PGE_ite    = db.inner_PGE_ite;				/** number of inner PGE iterations, this has to be made mass or dG dependent 		*/
-		gv.max_n_phase  	= db.max_n_phase;				/** maximum mol% phase change during one PGE iteration in wt% 						*/
-		gv.max_g_phase  	= db.max_g_phase;				/** maximum delta_G of reference change during PGE 									*/
-		gv.max_fac          = db.max_fac;					/** maximum update factor during PGE under-relax < 0.0, over-relax > 0.0 	 		*/
-
-		gv.merge_value		= db.merge_value;				/** merge instances of solution phase if norm < val 								*/
-		gv.re_in_n          = db.re_in_n;					/** fraction of phase when being reintroduce.  										*/
-		gv.obj_tol 			= db.obj_tol;
-
-		/* alloc */
-		gv.ox 				= malloc (gv.len_ox * sizeof(char*)		);
-		for (i = 0; i < gv.len_ox; i++){
-			gv.ox[i] 		= malloc(20 * sizeof(char));	
-			strcpy(gv.ox[i],db.ox[i]);
-		}
-
-		gv.PP_list 			= malloc (gv.len_pp * sizeof(char*)		);
-		for (i = 0; i < (gv.len_pp); i++){	
-			gv.PP_list[i] 	= malloc(20 * sizeof(char));
-			strcpy(gv.PP_list[i],db.PP[i]);
-		}
-		gv.SS_list 			= malloc ((gv.len_ss) * sizeof (char*)	);
-		gv.n_SS_PC     		= malloc ((gv.len_ss) * sizeof (int) 	);
-		gv.verifyPC  		= malloc ((gv.len_ss) * sizeof (int) 	);
-		gv.SS_PC_stp     	= malloc ((gv.len_ss) * sizeof (double) );
-		for (i = 0; i < gv.len_ss; i++){ 
-			gv.SS_list[i] 	= malloc(20 * sizeof(char)				);
-			strcpy(gv.SS_list[i],db.SS[i]);
-			gv.verifyPC[i]  = db.verifyPC[i]; 
-			gv.n_SS_PC[i] 	= db.n_SS_PC[i]; 
-			gv.SS_PC_stp[i] = db.SS_PC_stp[i]; 	
-		}
-	}
-	else if (gv.EM_database == 1){
-		metabasite_dataset db 	= metabasite_db;
-		if (gv.EM_dataset == -1){
-			gv.EM_dataset = db.ds_version;	
-		}
-		gv.len_pp   		= db.n_pp;		
-		gv.len_ss  			= db.n_ss;
-		gv.len_ox  			= db.n_ox;
-
-		gv.PC_df_add		= db.PC_df_add;					/** min value of df under which the PC is added 									*/
-		gv.solver_switch_T  = db.solver_switch_T;
-		gv.min_melt_T       = db.min_melt_T ;				/** minimum temperature above which melt is considered 								*/
-
-		gv.inner_PGE_ite    = db.inner_PGE_ite;				/** number of inner PGE iterations, this has to be made mass or dG dependent 		*/
-		gv.max_n_phase  	= db.max_n_phase;				/** maximum mol% phase change during one PGE iteration in wt% 						*/
-		gv.max_g_phase  	= db.max_g_phase;				/** maximum delta_G of reference change during PGE 									*/
-		gv.max_fac          = db.max_fac;					/** maximum update factor during PGE under-relax < 0.0, over-relax > 0.0 	 		*/
-
-		gv.merge_value		= db.merge_value;				/** merge instances of solution phase if norm < val 								*/
-		gv.re_in_n          = db.re_in_n;					/** fraction of phase when being reintroduce.  										*/
-		gv.obj_tol 			= db.obj_tol;
-
-		/* alloc */
-		gv.ox 				= malloc (gv.len_ox * sizeof(char*)		);
-		for (i = 0; i < gv.len_ox; i++){
-			gv.ox[i] 		= malloc(20 * sizeof(char));	
-			strcpy(gv.ox[i],db.ox[i]);
-		}
-
-		gv.PP_list 			= malloc (gv.len_pp * sizeof(char*)		);
-		for (i = 0; i < (gv.len_pp); i++){	
-			gv.PP_list[i] 	= malloc(20 * sizeof(char));
-			strcpy(gv.PP_list[i],db.PP[i]);
-		}
-
-		gv.SS_list 			= malloc ((gv.len_ss) * sizeof (char*)	);
-		gv.n_SS_PC     		= malloc ((gv.len_ss) * sizeof (int) 	);
-
-		gv.verifyPC  		= malloc ((gv.len_ss) * sizeof (int) 	);
-		gv.SS_PC_stp     	= malloc ((gv.len_ss) * sizeof (double) );
-
-		for (i = 0; i < gv.len_ss; i++){ 
-			gv.SS_list[i] 	= malloc(20 * sizeof(char)				);
-		}
-
-		if (gv.mbCpx == 0){
-			for (i = 0; i < gv.len_ss; i++){ 
-				strcpy(gv.SS_list[i],db.SS1[i]);
-				gv.verifyPC[i]  = db.verifyPC1[i]; 
-				gv.n_SS_PC[i] 	= db.n_SS_PC1[i]; 
-				gv.SS_PC_stp[i] = db.SS_PC_stp1[i]; 	
-			}
-		}
-		else{
-			for (i = 0; i < gv.len_ss; i++){ 
-				strcpy(gv.SS_list[i],db.SS2[i]);
-				gv.verifyPC[i]  = db.verifyPC2[i]; 
-				gv.n_SS_PC[i] 	= db.n_SS_PC2[i]; 
-				gv.SS_PC_stp[i] = db.SS_PC_stp2[i]; 	
-			}
-		}
-	}
-	else if (gv.EM_database == 2){
-		igneous_dataset db 	= igneous_db;
-		if (gv.EM_dataset == -1 || gv.EM_dataset == 62){
-			if (gv.EM_dataset == 62 && gv.verbose == 1){
-				printf(" dataset ds62 cannot be used with the igneous database (missing end-members), setting default dataset (ds634)\n");
-			}
-			gv.EM_dataset = db.ds_version;
-		}
+		stx11_dataset db 	= stx11_db;
 		gv.len_pp   		= db.n_pp;		
 		gv.len_ss  			= db.n_ss;
 		gv.len_ox  			= db.n_ox;
@@ -286,51 +80,6 @@ global_variable global_variable_TC_init( 	global_variable  	 gv,
 		gv.re_in_n          = db.re_in_n;					/** fraction of phase when being reintroduce.  										*/
 		gv.obj_tol 			= db.obj_tol;
 
-		gv.ox 				= malloc (gv.len_ox * sizeof(char*)		);
-		for (i = 0; i < gv.len_ox; i++){
-			gv.ox[i] 		= malloc(20 * sizeof(char));	
-			strcpy(gv.ox[i],db.ox[i]);
-		}
-
-		gv.PP_list 			= malloc (gv.len_pp * sizeof(char*)		);
-		for (i = 0; i < (gv.len_pp); i++){	
-			gv.PP_list[i] 	= malloc(20 * sizeof(char));
-			strcpy(gv.PP_list[i],db.PP[i]);
-		}
-
-		gv.SS_list 			= malloc ((gv.len_ss) * sizeof (char*)	);
-		gv.n_SS_PC     		= malloc ((gv.len_ss) * sizeof (int) 	);
-		gv.verifyPC  		= malloc ((gv.len_ss) * sizeof (int) 	);
-		gv.SS_PC_stp     	= malloc ((gv.len_ss) * sizeof (double) );
-		for (i = 0; i < gv.len_ss; i++){ 
-			gv.SS_list[i] 	= malloc(20 * sizeof(char)				);
-			strcpy(gv.SS_list[i],db.SS[i]);
-			gv.verifyPC[i]  = db.verifyPC[i]; 
-			gv.n_SS_PC[i] 	= db.n_SS_PC[i]; 
-			gv.SS_PC_stp[i] = db.SS_PC_stp[i]; 	
-		}
-	}
-	else if (gv.EM_database == 4){
-		ultramafic_dataset db = ultramafic_db;
-		if (gv.EM_dataset == -1){
-			gv.EM_dataset = db.ds_version;	
-		}
-		gv.len_pp   		= db.n_pp;		
-		gv.len_ss  			= db.n_ss;
-		gv.len_ox  			= db.n_ox;
-
-		gv.PC_df_add		= db.PC_df_add;					/** min value of df under which the PC is added 									*/
-		gv.solver_switch_T  = db.solver_switch_T;
-		gv.min_melt_T       = db.min_melt_T;				/** minimum temperature above which melt is considered 								*/
-
-		gv.inner_PGE_ite    = db.inner_PGE_ite;				/** number of inner PGE iterations, this has to be made mass or dG dependent 		*/
-		gv.max_n_phase  	= db.max_n_phase;				/** maximum mol% phase change during one PGE iteration in wt% 						*/
-		gv.max_g_phase  	= db.max_g_phase;				/** maximum delta_G of reference change during PGE 									*/
-		gv.max_fac          = db.max_fac;					/** maximum update factor during PGE under-relax < 0.0, over-relax > 0.0 	 		*/
-
-		gv.merge_value		= db.merge_value;				/** merge instances of solution phase if norm < val 								*/
-		gv.re_in_n          = db.re_in_n;					/** fraction of phase when being reintroduce.  										*/
-		gv.obj_tol 			= db.obj_tol;
 		gv.ox 				= malloc (gv.len_ox * sizeof(char*)		);
 		for (i = 0; i < gv.len_ox; i++){
 			gv.ox[i] 		= malloc(20 * sizeof(char));	
@@ -665,16 +414,16 @@ global_variable get_bulk_metabasite( global_variable gv) {
 	else if (gv.test == 3){
 		/* SiO2 Al2O3 CaO MgO FeO K2O Na2O TiO2 O H2O 	*/
 		/* BL478: Sample 478 of Beard & Lofgren (1991)		*/
-		gv.bulk_rock[0]  = 52.73;		/** SiO2 	*/
-		gv.bulk_rock[1]  = 9.57;		/** Al2O2 	*/
-		gv.bulk_rock[2]  = 9.94;		/** CaO  	*/
-		gv.bulk_rock[3]  = 6.76;		/** MgO 	*/
-		gv.bulk_rock[4]  = 10.49;		/** FeO 	*/
-		gv.bulk_rock[5]  = 0.24;		/** K2O	 	*/
-		gv.bulk_rock[6]  = 3.28;		/** Na2O 	*/
-		gv.bulk_rock[7]  = 1.2;			/** TiO2 	*/
-		gv.bulk_rock[8]  = 1.3;			/** O 		*/
-		gv.bulk_rock[9]  = 3.5;			/** H2O 	*/
+		gv.bulk_rock[0]  = 53.949210157968395;		/** SiO2 	*/
+		gv.bulk_rock[1]  = 9.258148370325934;		/** Al2O2 	*/
+		gv.bulk_rock[2]  = 10.147970405918816;		/** CaO  	*/
+		gv.bulk_rock[3]  = 8.108378324335131;		/** MgO 	*/
+		gv.bulk_rock[4]  = 10.137972405518896;		/** FeO 	*/
+		gv.bulk_rock[5]  = 0.10997800439912016;		/** K2O	 	*/
+		gv.bulk_rock[6]  = 2.539492101579684;		/** Na2O 	*/
+		gv.bulk_rock[7]  = 1.349730053989202;		/** TiO2 	*/
+		gv.bulk_rock[8]  = 0.9798040391921614;		/** O 		*/
+		gv.bulk_rock[9]  = 3.4193161367726455;		/** H2O 	*/
 	}
 	else if (gv.test == 4){
 		/* SiO2 Al2O3 CaO MgO FeO K2O Na2O TiO2 O H2O 	*/
