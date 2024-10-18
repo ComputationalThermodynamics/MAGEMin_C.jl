@@ -320,6 +320,7 @@ int runMAGEMin(			int    argc,
 	
 
 	gv = compute_phase_mol_fraction(	gv,
+										z_b,
 										PP_ref_db,
 										SS_ref_db,
 										cp				);
@@ -1012,6 +1013,7 @@ void FreeDatabases(		global_variable gv,
 
 	for ( i = 0; i < n_ox; i++){
 		if  (DB.sp[0].oxides[i]				!=NULL)  free( DB.sp[0].oxides[i] 			);	
+		if  (DB.sp[0].elements[i]			!=NULL)  free( DB.sp[0].elements[i] 		);	
 		if  (DB.sp[0].ph[i]					!=NULL)  free( DB.sp[0].ph[i] 				);	
 	}
 
@@ -1061,6 +1063,7 @@ void FreeDatabases(		global_variable gv,
 	free(DB.sp[0].mSS);
 
 	free(DB.sp[0].oxides);
+	free(DB.sp[0].elements);
 	free(DB.sp[0].ph);
 
 	free(DB.sp[0].bulk);
@@ -1100,6 +1103,8 @@ void FreeDatabases(		global_variable gv,
 		free(DB.cp[i].mu);
 		free(DB.cp[i].gbase);
 		free(DB.cp[i].ss_comp);
+		free(DB.cp[i].ss_comp_mol);
+		free(DB.cp[i].ss_comp_wt);
 		free(DB.cp[i].sf);
 	}
 
@@ -1272,6 +1277,7 @@ void FreeDatabases(		global_variable gv,
 
 	free(gv.pp_n);
 	free(gv.pp_n_mol);
+	free(gv.pp_n_wt);
 	free(gv.pp_xi);
 	free(gv.delta_pp_n);
 	free(gv.delta_pp_xi);
@@ -1291,9 +1297,11 @@ void FreeDatabases(		global_variable gv,
 	free(gv.tmp3);
 	free(gv.n_ss_array);
 	/* ================ z_b ============= */
+	for (j = 0; j < n_ox; j++) {free(z_b.elName[j]);} 		free(z_b.elName);	
 	free(z_b.apo);
 	free(z_b.masspo);
 	free(z_b.opo);
+	free(z_b.cpo);
 	free(z_b.ElEntropy);
 	free(z_b.id);
 	free(z_b.bulk_rock);

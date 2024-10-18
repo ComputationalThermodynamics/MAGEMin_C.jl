@@ -42,10 +42,12 @@ typedef double (*PC_type) (			unsigned         n,
 typedef struct oxide_datas {
 	int 	n_ox;
 	char    oxName[15][20];
+	char    elName[15][20];
 	double  oxMass[15];
 	double  atPerOx[15];
 	double  ElEntropy[15]; //standard molar entropy
 	double  OPerOx[15];
+	double  catPerOx[15];
 
 } oxide_data;
 
@@ -133,6 +135,7 @@ typedef struct global_variables {
 	
 	double  *pp_n;				/** fraction of pure phase in estimated phase assemblage */
 	double  *pp_n_mol;			/** fraction of pure phase in estimated phase assemblage */
+	double  *pp_n_wt;			/** fraction of pure phase in estimated phase assemblage */
 	double  *pp_xi;				/** penalty term -> distance from G-hyperplane */
 	double  *delta_pp_n;		/** fraction of pure phase in estimated phase assemblage */
 	double  *delta_pp_xi;		/** penalty term -> distance from G-hyperplane*/
@@ -521,6 +524,7 @@ typedef struct OUTDATA {
 /* structure to store position of zeros and non-zeros positions in bulk_rock composition */
 typedef struct bulk_infos {
 	char   **oxName;
+	char   **elName;
 	double  *oxMass;
 	int     *atPerOx;
 
@@ -538,6 +542,7 @@ typedef struct bulk_infos {
     double   fbc;				/** number of atom for the bulk	rock composition		*/
     double  *masspo;			/** Molar mass per oxide 								*/
 	double  *opo;				/** Oxygen per oxide 									*/	
+	double  *cpo;				/** Cation per oxide 									*/	
     double  *ElEntropy;			/** Molar entropy per oxide 							*/
 
 } bulk_info;
@@ -558,9 +563,11 @@ typedef struct csd_phase_sets {
 	
 	double 	ss_n;
 	double 	ss_n_mol;
+	double 	ss_n_wt;
 	double  delta_ss_n;
 	double 	df;
 	double 	factor;
+	double 	factor_norm;
 	double  min_time;
 	double  sum_xi;
 	double  sum_dxi;
@@ -578,6 +585,8 @@ typedef struct csd_phase_sets {
 	double *delta_mu;
 	double *sf;
 	double *ss_comp;
+	double *ss_comp_mol;
+	double *ss_comp_wt;
 	double *gbase;				/** chemical potentials 									*/
 
 	double  mass;
@@ -700,6 +709,7 @@ typedef struct stb_systems {
 	
 	int     nOx;
 	char  **oxides;
+	char  **elements;
 	
 	double  P;
 	double  T;
