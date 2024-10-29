@@ -7,6 +7,7 @@ Julia interface to the MAGEMin C package, which performs thermodynamic equilibri
 See the [MAGEMin](https://github.com/ComputationalThermodynamics/MAGEMin) page for more details on the package & how to use it.
 
 ## Using the julia interface
+### Installation
 First install julia. We recommend downloading the official binary from the [julia](julialang.org) webpage.
 
 Next, install the `MAGEMin_C` package with:
@@ -21,7 +22,17 @@ pkg> test MAGEMin_C
 
 By pushing `backspace` you return from the package manager to the main julia terminal. This will download a compiled version of the library as well as some wrapper functions to your system.
 
-Next, you can do calculations with:
+
+### Thermodynamic dataset selection
+Thermodynamic dataset acronym are the following:
+- `mtl` -> mantle (Holland et al., 2013)
+- `mp` -> metapelite (White et al., 2014)
+- `mb` -> metabasite (Green et al., 2016)
+- `ig` -> igneous (Holland et al., 2018)
+- `um` -> ultramafic (Evans & Frost, 2021)
+- `ume` -> ultramafic extended (Green et al., 2016 + Evans & Frost, 2021)
+
+
 ### Example 1 - predefined compositions
 This is an example of how to use it for a predefined bulk rock composition:
 ```julia
