@@ -1,6 +1,6 @@
 name = "MAGEMin_C"
 uuid = "e5d170eb-415a-4524-987b-12f1bce1ddab"
-authors = ["Boris Kaus <kaus@uni-mainz.de> & Nicolas Riel <riel@uni-mainz.de>"]
+authors = ["Nicolas Riel <riel@uni-mainz.de> & Boris Kaus <kaus@uni-mainz.de>"]
 version = "1.6.1"
 
 [deps]
@@ -15,8 +15,8 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 CEnum = "0.4"
-DataFrames = "1.6.1"
 CSV = "0.10.14"
-MAGEMin_jll = "1.5.6 - 1.5.6"
+DataFrames = "1.6.1"
+MAGEMin_jll = "1.5.7 - 1.5.7"
 ProgressMeter = "1"
 julia = "1.6"
