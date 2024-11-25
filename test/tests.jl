@@ -14,7 +14,7 @@ data        =   use_predefined_bulk_rock(data, test);
 P           =   80.0
 T           =   800.0
 out         =   point_wise_minimization(P,T, data);
-
+ 
 @test sort(out.ph) == sort(["gtmj", "hpcpx", "ol" ,"cpx"])
 Finalize_MAGEMin(data)
 
