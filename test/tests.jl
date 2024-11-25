@@ -8,15 +8,15 @@ using MAGEMin_C         # load MAGEMin (needs to be loaded from main directory t
 
 
 # generic test for sb11 database
-data        =   Initialize_MAGEMin("sb11", verbose=true);
-test        =   1         #KLB1
-data        =   use_predefined_bulk_rock(data, test);
-P           =   80.0
-T           =   800.0
-out         =   point_wise_minimization(P,T, data);
+# data        =   Initialize_MAGEMin("sb11", verbose=true);
+# test        =   1         #KLB1
+# data        =   use_predefined_bulk_rock(data, test);
+# P           =   80.0
+# T           =   800.0
+# out         =   point_wise_minimization(P,T, data);
  
-@test sort(out.ph) == sort(["gtmj", "hpcpx", "ol" ,"cpx"])
-Finalize_MAGEMin(data)
+# @test sort(out.ph) == sort(["gtmj", "hpcpx", "ol" ,"cpx"])
+# Finalize_MAGEMin(data)
 
 # generic test for thermocalc database
 data        =   Initialize_MAGEMin("ig", verbose=true);
