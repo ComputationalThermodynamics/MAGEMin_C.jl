@@ -463,7 +463,9 @@ end
 
 
 """
-Out_PT =multi_point_minimization(P::T2,T::T2,MAGEMin_db::MAGEMin_Data;test::Int64=0,X::Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}=nothing,B::Union{Nothing, T1, Vector{T1}}=nothing,W::Union{Nothing, W_Data}=nothing,Xoxides=Vector{String},sys_in="mol",progressbar=true) where {T1 <: Float64, T2 <: AbstractVector{T1}}
+Out_PT =multi_point_minimization(P::T2,T::T2,MAGEMin_db::MAGEMin_Data;test::Int64=0,X::Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}=nothing,B::Union{Nothing, T1, Vector{T1}}=nothing,W::Union{Nothing, W_Data}=nothing,Xoxides=Vector{String},sys_in="mol",progressbar=true, 
+                                callback_fn ::Union{Nothing, Function}= nothing,  
+                                callback_int::Int64 = 1) where {T1 <: Float64, T2 <: AbstractVector{T1}}
 
 
 Perform (parallel) MAGEMin calculations for a range of points as a function of pressure `P`, temperature `T` and/or composition `X`. The database `MAGEMin_db` must be initialised before calling the routine.
@@ -540,7 +542,9 @@ function multi_point_minimization(P           ::  T2,
                                   Xoxides     = Vector{String},
                                   sys_in      = "mol",
                                   rg          = "tc",
-                                  progressbar = true        # show a progress bar or not?
+                                  progressbar = true,        # show a progress bar or not?
+                                  callback_fn ::  Union{Nothing, Function}= nothing, 
+                                  callback_int::  Int64 = 1
                                   ) where {T1 <: Float64, T2 <: AbstractVector{Float64}}
 
     # Set the compositional info
@@ -579,6 +583,7 @@ function multi_point_minimization(P           ::  T2,
     if progressbar
         progr = Progress(length(P), desc="Computing $(length(P)) points...") # progress meter
     end
+    count  = 0;
     @threads :static for i in eachindex(P)
 
         # Get thread-local buffers. As of Julia v1.9, a dynamic scheduling of
@@ -623,13 +628,19 @@ function multi_point_minimization(P           ::  T2,
         if progressbar
             next!(progr)
         end
+        if mod(i,callback_int)==0 && !isnothing(callback_fn)
+            count   += 1
+            callback_fn(count, length(P), time())
+        end
     end
     if progressbar
         finish!(progr)
     end
+    if !isnothing(callback_fn)
+        callback_fn(length(P), length(P), time())
+    end
 
     return Out_PT
-
 end
 
 
@@ -1063,7 +1074,7 @@ function point_wise_minimization(   P       ::Float64,
     if ~isnothing(rm_list)
         # if the list of phase to be removed is not empty then we first activate all combination
         # the following entries are set to 2, as only values of 0 or 1 are considered in the C code
-        # i.e. that all phases are first set active before removing the ones in the list (with expection of the restricted ones)
+        # i.e. that all phases are first set active before removing the ones in the list (with exception of the restricted ones)
         gv.mbCpx        = 2
         gv.mbIlm        = 2
         gv.mpSp         = 2
@@ -2159,5 +2170,5 @@ include("TE_partitioning.jl")
 include("Zircon_saturation.jl")
 include("export2CSV.jl")
 
-# Loading Adapative mesh refinement functions
+# Loading Adaptive mesh refinement functions
 include("AMR.jl")
