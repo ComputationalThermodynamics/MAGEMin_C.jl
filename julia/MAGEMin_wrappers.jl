@@ -1074,7 +1074,7 @@ function point_wise_minimization(   P       ::Float64,
     if ~isnothing(rm_list)
         # if the list of phase to be removed is not empty then we first activate all combination
         # the following entries are set to 2, as only values of 0 or 1 are considered in the C code
-        # i.e. that all phases are first set active before removing the ones in the list (with expection of the restricted ones)
+        # i.e. that all phases are first set active before removing the ones in the list (with exception of the restricted ones)
         gv.mbCpx        = 2
         gv.mbIlm        = 2
         gv.mpSp         = 2
@@ -2170,5 +2170,5 @@ include("TE_partitioning.jl")
 include("Zircon_saturation.jl")
 include("export2CSV.jl")
 
-# Loading Adapative mesh refinement functions
+# Loading Adaptive mesh refinement functions
 include("AMR.jl")
