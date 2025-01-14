@@ -1,7 +1,7 @@
 name = "MAGEMin_C"
 uuid = "e5d170eb-415a-4524-987b-12f1bce1ddab"
 authors = ["Nicolas Riel <riel@uni-mainz.de>  & Boris Kaus <kaus@uni-mainz.de>"]
-version = "1.7.0"
+version = "1.7.1"
 
 [deps]
 CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
@@ -11,6 +11,7 @@ Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 MAGEMin_jll = "763ebaa8-b0d2-5f6b-90ef-4fc23b5db1c4"
 NLopt_jll = "079eb43e-fd8e-5478-9966-2cf3e3edb778"
+OpenBLAS32_jll = "656ef2d0-ae68-5445-9ca0-591084a874a2"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
@@ -18,7 +19,8 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 CEnum = "0.4"
 CSV = "0.10.14"
 DataFrames = "1.6.1"
-MAGEMin_jll = "1.6.3 - 1.6.3"
-NLopt_jll = "2.8.0 - 2.8.0"
+MAGEMin_jll = "1.6.4 - 1.6.4"
+NLopt_jll = "2.9.0 - 2.9.0"
+OpenBLAS32_jll = "0.3.28 - 0.3.28"
 ProgressMeter = "1"
 julia = "1.6"
