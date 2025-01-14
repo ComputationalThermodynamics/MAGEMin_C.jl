@@ -1,3 +1,5 @@
 .vscode
 Manifest.toml
 /src/*.o
+/src/TC_database/*.o
+/src/SB_database/*.o
