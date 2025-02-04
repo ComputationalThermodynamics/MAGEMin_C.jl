@@ -1,57 +1,51 @@
-# MAGEMin_C.jl
-
-[![Build Status](https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/workflows/CI/badge.svg)](https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/actions)
-[![DOI](https://zenodo.org/badge/489304972.svg)](https://zenodo.org/doi/10.5281/zenodo.10212322)
+MAGEMin_C.jl
+Build Status DOI
 
 Julia interface to the MAGEMin C package, which performs thermodynamic equilibrium calculations.
 
-## Using the julia interface
-### Installation
-First install julia. We recommend downloading the official binary from the [julia](julialang.org) webpage.
+Using the julia interface
+Installation
+First install julia. We recommend downloading the official binary from the julia webpage.
 
-Next, install the `MAGEMin_C` package with:
-```julia
+Next, install the MAGEMin_C package with:
+
 ]
 pkg> add MAGEMin_C
-```
 You can check if it works on your system by running the build-in test suite:
-```julia
+
 pkg> test MAGEMin_C
-```
+By pushing backspace you return from the package manager to the main julia terminal. This will download a compiled version of the library as well as some wrapper functions to your system.
 
-By pushing `backspace` you return from the package manager to the main julia terminal. This will download a compiled version of the library as well as some wrapper functions to your system.
-
-
-### Thermodynamic dataset selection
+Thermodynamic dataset selection
 Thermodynamic dataset acronym are the following:
-- `mtl` -> mantle (Holland et al., 2013)
-- `mp` -> metapelite (White et al., 2014)
-- `mb` -> metabasite (Green et al., 2016)
-- `ig` -> igneous (Green et al., 2025 updated from and replacing Holland et al., 2018)
-- `igad` -> igneous alkaline dry (Weller et al., 2024)
-- `um` -> ultramafic (Evans & Frost, 2021)
-- `ume` -> ultramafic extended (Green et al., 2016 + Evans & Frost, 2021)
 
-### Oxygen buffers and activity
+mtl -> mantle (Holland et al., 2013)
+mp -> metapelite (White et al., 2014)
+mb -> metabasite (Green et al., 2016)
+ig -> igneous (Green et al., 2025 updated from and replacing Holland et al., 2018)
+igad -> igneous alkaline dry (Weller et al., 2024)
+um -> ultramafic (Evans & Frost, 2021)
+ume -> ultramafic extended (Green et al., 2016 + Evans & Frost, 2021)
+Oxygen buffers and activity
 Several buffers can be used to fix the oxygen fugacity
-- `qfm`
-- `qif`
-- `nno`
-- `hm`
-- `cco`
 
+qfm
+qif
+nno
+hm
+cco
 Similarly activity can be fixed for the following oxides
-- `aH2O` -> using water as reference phase
-- `aO2`   -> using dioxygen as reference phase
-- `aMgO` -> using periclase as reference phase
-- `aFeO` -> using ferropericlase as reference phase
-- `aAl2O3` -> using corundum as reference phase
-- `aTiO2` -> using rutile as reference phase
-- `aSiO2` -> using quartz/coesite as reference phase
 
-### Example 1 - predefined compositions
+aH2O -> using water as reference phase
+aO2 -> using dioxygen as reference phase
+aMgO -> using periclase as reference phase
+aFeO -> using ferropericlase as reference phase
+aAl2O3 -> using corundum as reference phase
+aTiO2 -> using rutile as reference phase
+aSiO2 -> using quartz/coesite as reference phase
+Example 1 - predefined compositions
 This is an example of how to use it for a predefined bulk rock composition:
-```julia
+
 using MAGEMin_C
 db   = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
 data = Initialize_MAGEMin(db, verbose=true);
@@ -60,9 +54,8 @@ data = use_predefined_bulk_rock(data, test);
 P    = 8.0;
 T    = 800.0;
 out  = point_wise_minimization(P,T, data);
-```
 which gives
-``` julia
+
  Status             :            0 
  Mass residual      : +5.34576e-06
  Rank               :            0 
@@ -75,12 +68,9 @@ which gives
 
  Phase :      spn      cpx      opx       ol 
  Mode  :  0.02799  0.14166  0.24228  0.58807 
-```
-
-
-### Example 2 - custom composition
+Example 2 - custom composition
 And here a case in which you specify your own bulk rock composition.
-```julia
+
 using MAGEMin_C
 data    = Initialize_MAGEMin("ig", verbose=false);
 P,T     = 10.0, 1100.0
@@ -88,9 +78,8 @@ Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2";
 X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
 sys_in  = "wt"
 out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
-```
 which gives:
-``` julia
+
 Pressure          : 10.0      [kbar]
 Temperature       : 1100.0    [Celsius]
      Stable phase | Fraction (mol fraction) 
@@ -103,27 +92,42 @@ Temperature       : 1100.0    [Celsius]
               opx   0.04096 
 Gibbs free energy : -916.874646  (45 iterations; 86.53 ms)
 Oxygen fugacity          : 2.0509883251350577e-8
-```
+After the calculation is finished, the structure out holds all the information about the stable assemblage, including seismic velocities, melt content, melt chemistry, densities etc. You can show a full overview of that with
 
-After the calculation is finished, the structure `out` holds all the information about the stable assemblage, including seismic velocities, melt content, melt chemistry, densities etc.
-You can show a full overview of that with
-```julia
 print_info(out)
-```
 If you are interested in the density or seismic velocity at the point, access it with
-```julia
+
 out.rho
 2755.2995530913095
 out.Vp
 3.945646731595539
-```
 Once you are done with all calculations, release the memory with
-```julia
+
 Finalize_MAGEMin(data)
-```
-### Example 3 - Removing solution phase(s) from consideration
-To suppress solution phases from the calculation, define a remove list `rm_list` using the `remove_phases()` function. In the latter, provide a vector of the solution phase(s) you want to remove and the database acronym as a second argument. Then pass the created `rm_list` to the `single_point_minimization()` function.
-```julia
+Example 3 - Export data to CSV
+Using previous example to compute a point:
+
+using MAGEMin_C
+dtb     = "ig"
+data    = Initialize_MAGEMin(dtb, verbose=false);
+P,T     = 10.0, 1100.0
+Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
+X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
+sys_in  = "wt"
+out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
+Exporting the result of the minimization(s) to an CSV file is straightforward:
+
+MAGEMin_data2dataframe(out,dtb,"filename")
+where out is the output structure, dtb is the database acronym and "filename" is the filename :)
+
+Notes
+
+You don't have to add the file extension .csv
+The output path (MAGEMin_C directory) is displayed in the Julia terminal
+For multiple points, simply provide the Julia Vector{out}. See Example 8 for more details on how to create a vector of minimization output.
+Example 4 - Removing solution phase(s) from consideration
+To suppress solution phases from the calculation, define a remove list rm_list using the remove_phases() function. In the latter, provide a vector of the solution phase(s) you want to remove and the database acronym as a second argument. Then pass the created rm_list to the single_point_minimization() function.
+
 using MAGEMin_C
 data    = Initialize_MAGEMin("mp", verbose=-1, solver=0);
 rm_list = remove_phases(["liq","sp"],"mp");
@@ -132,9 +136,8 @@ Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","K2O","Na2O","TiO2","O","MnO","H2O"]
 X       = [70.999,12.805,0.771,3.978,6.342,2.7895,1.481,0.758,0.72933,0.075,30.0];
 sys_in  = "mol";
 out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in,rm_list=rm_list)
-```
 which gives:
-``` julia
+
 Pressure          : 10.713125      [kbar]
 Temperature       : 1177.3438    [Celsius]
      Stable phase | Fraction (mol fraction) 
@@ -161,10 +164,8 @@ Temperature       : 1177.3438    [Celsius]
 Gibbs free energy : -920.021202  (25 iterations; 27.45 ms)
 Oxygen fugacity          : -5.4221261006295105
 Delta QFM                : 2.506745293747623
-```
+Note that if you want to suppress a single phase, you still need to define a vector to be passed to the remove_phases() function, such as:
 
-Note that if you want to suppress a single phase, you still need to define a vector to be passed to the `remove_phases()` function, such as:
-```julia
 using MAGEMin_C
 data    = Initialize_MAGEMin("mp", verbose=-1, solver=0);
 rm_list = remove_phases(["liq"],"mp");
@@ -173,9 +174,8 @@ Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","K2O","Na2O","TiO2","O","MnO","H2O"]
 X       = [70.999,12.805,0.771,3.978,6.342,2.7895,1.481,0.758,0.72933,0.075,30.0];
 sys_in  = "mol";
 out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in,rm_list=rm_list)
-```
 which gives:
-```julia
+
 Pressure          : 10.713125      [kbar]
 Temperature       : 1177.3438    [Celsius]
      Stable phase | Fraction (mol fraction) 
@@ -205,15 +205,11 @@ Temperature       : 1177.3438    [Celsius]
 Gibbs free energy : -920.00146  (19 iterations; 27.79 ms)
 Oxygen fugacity          : -5.760704474307317
 Delta QFM                : 2.1681669200698166
-```
+Example 5 - oxygen buffer
+Here we need to initialize MAGEMin with the desired buffer (qfm in this case, see list at the beginning).
 
-### Example 4 - oxygen buffer
+Note that O/Fe2O3 value needs to be large enough to saturate the system. Excess oxygen-content will be removed from the output
 
-Here we need to initialize MAGEMin with the desired buffer (qfm in this case, see list at the beginning). 
-
-*Note that O/Fe2O3 value needs to be large enough to saturate the system. Excess oxygen-content will be removed from the output*
-
-```julia
 using MAGEMin_C 
 data    = Initialize_MAGEMin("ig", verbose=false, buffer="qfm");
 P,T     = 10.0, 1100.0
@@ -221,11 +217,8 @@ Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","K2O","Na2O","TiO2","O","Cr2O3","H2O
 X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 4.0; 0.1; 3.0];
 sys_in  = "wt"    
 out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
-```
-
 Buffer offset in the log10 scale can be applied as
 
-```julia
 using MAGEMin_C 
 data    = Initialize_MAGEMin("ig", verbose=false, buffer="qfm");
 P,T     = 10.0, 1100.0
@@ -234,15 +227,11 @@ X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 4.0; 0.1; 3.0];
 offset  = -1.0
 sys_in  = "wt"    
 out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, B=offset, sys_in=sys_in)
-```
-
-### Example 5 - activity buffer
-
+Example 6 - activity buffer
 Like for oxygen buffer, activity buffer can be prescribe as follow
 
-*Note that the corresponding oxide-content needs to be large enough to saturate the system. Excess oxide-content will be removed from the output*
+Note that the corresponding oxide-content needs to be large enough to saturate the system. Excess oxide-content will be removed from the output
 
-```julia
 using MAGEMin_C 
 data    = Initialize_MAGEMin("ig", verbose=false, buffer="aTiO2");
 P,T     = 10.0, 700.0
@@ -251,11 +240,7 @@ X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 4.0; 0.1; 0.1; 3.0];
 value  = 0.9
 sys_in  = "wt"    
 out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, B=value, sys_in=sys_in)
-```
-
-### Example 6 - many points
-
-```julia
+Example 7 - many points
 using MAGEMin_C
 db   = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
 data  = Initialize_MAGEMin(db, verbose=false);
@@ -265,18 +250,15 @@ P    = rand(8.0:40,n);
 T    = rand(800.0:2000.0, n);
 out  = multi_point_minimization(P,T, data, test=test);
 Finalize_MAGEMin(data)
-```
-By default, this will show a progressbar (which you can deactivate with the `progressbar=false` option).
+By default, this will show a progressbar (which you can deactivate with the progressbar=false option).
 
 You can also specify a custom bulk rock for all points (see above), or a custom bulk rock for every point.
 
-### Example 7 - fractional crystallization
+Example 8 - fractional crystallization
+The following example shows how to perform fractional crystallization using a hydrous basalt magma as a starting composition. The results are displayed using PlotlyJS. This example is provided in the hope it may be useful for learning how to use MAGEMin_C for more advanced applications.
 
-The following example shows how to perform fractional crystallization using a hydrous basalt magma as a starting composition. The results are displayed using PlotlyJS. This example is provided in the hope it may be useful for learning how to use MAGEMin_C for more advanced applications. 
+Note that if we wanted to use a buffer, we would need to initialize MAGEMin as in example 4. Because during fractional crystallization the bulk-rock composition is updated at every step, we would need to increase the oxygen-content (O) of the new bulk-rock
 
-*Note that if we wanted to use a buffer, we would need to initialize MAGEMin as in example 4. Because during fractional crystallization the bulk-rock composition is updated at every step, we would need to increase the oxygen-content (`O`) of the new bulk-rock*
-
-```julia
 using MAGEMin_C
 using PlotlyJS
 
@@ -374,10 +356,7 @@ layout = Layout(    title           = "Melt composition",
 
 
 plot([trace1,trace2,trace3,trace4], layout)
-```
-<img src="https://github.com/ComputationalThermodynamics/repositories_pictures/blob/main/MAGEMin_C/Melt_compo.png?raw=true" alt="drawing" width="640" alt="centered image"/>
-
-```julia
+drawing
 
 # section to plot density evolution
 trace1 = scatter(   x       = x, 
@@ -404,39 +383,28 @@ layout = Layout(    title           = "Density evolution",
 
 
 plot([trace1,trace2,trace3], layout)
-```
+drawing
+Access complete information about the minimization
+in the previous examples the results of the minimization are saved in a structure called out. To access all the information stored in the structure simply do:
 
-
-<img src="https://github.com/ComputationalThermodynamics/repositories_pictures/blob/main/MAGEMin_C/Density_evolution.png?raw=true" alt="drawing" width="640" alt="centered image"/>
-
-
-### Access complete information about the minimization
-
-in the previous examples the results of the minimization are saved in a structure called `out`. To access all the information stored in the structure simply do:
-```julia
 out.
-```
-Then press `tab` (tabulation key) to display all stored data:
-```julia
+Then press tab (tabulation key) to display all stored data:
+
 out.
 G_system Gamma MAGEMin_ver M_sys PP_vec P_kbar SS_vec T_C V Vp Vp_S Vs Vs_S X
 aAl2O3 aFeO aH2O aMgO aSiO2 aTiO2 alpha bulk bulkMod bulkModulus_M bulkModulus_S bulk_F bulk_F_wt bulk_M
 bulk_M_wt bulk_S bulk_S_wt bulk_res_norm bulk_wt cp dQFM dataset enthalpy entropy fO2 frac_F frac_F_wt frac_M
 frac_M_wt frac_S frac_S_wt iter mSS_vec n_PP n_SS n_mSS oxides ph ph_frac ph_frac_vol ph_frac_wt ph_id
 ph_type rho rho_F rho_M rho_S s_cp shearMod shearModulus_S status time_ms
-```
 In order to access any of these variables type for instance:
-```julia
+
 out.fO2
-```
 which will give you the oxygen fugacity:
-```julia
+
 out.fO2
 -4.405735414252153
-```
-to access the list of stable phases and their fraction in `mol`:
+to access the list of stable phases and their fraction in mol:
 
-```julia
 out.ph
 4-element Vector{String}:
  "liq"
@@ -450,55 +418,52 @@ out.ph_frac
  0.003792750364729876
  0.020229088594267013
  0.0054959712304740085
- ```
- Chemical potential of the pure components (oxides) of the system is retrieved as:
- ```julia
- out.Gamma
+Chemical potential of the pure components (oxides) of the system is retrieved as:
+
+out.Gamma
 11-element Vector{Float64}:
- -1017.3138187719679
- -1847.7215909497188
-  -881.3605772634041
-  -720.5475835413267
-  -428.1896629304572
- -1051.6248892195592
- -1008.7336303031074
- -1070.7332593397723
-  -228.07833391903714
-  -561.1937065530427
-  -440.764181608507
+-1017.3138187719679
+-1847.7215909497188
+ -881.3605772634041
+ -720.5475835413267
+ -428.1896629304572
+-1051.6248892195592
+-1008.7336303031074
+-1070.7332593397723
+ -228.07833391903714
+ -561.1937065530427
+ -440.764181608507
 
 out.oxides
 11-element Vector{String}:
- "SiO2"
- "Al2O3"
- "CaO"
- "MgO"
- "FeO"
- "K2O"
- "Na2O"
- "TiO2"
- "O"
- "MnO"
- "H2O"
- ```
- The composition in `wt` of the first listed solution phase ("liq") can be accessed as
- ```julia
- out.SS_vec[1].Comp_wt
+"SiO2"
+"Al2O3"
+"CaO"
+"MgO"
+"FeO"
+"K2O"
+"Na2O"
+"TiO2"
+"O"
+"MnO"
+"H2O"
+The composition in wt of the first listed solution phase ("liq") can be accessed as
+
+out.SS_vec[1].Comp_wt
 11-element Vector{Float64}:
- 0.6174962747665693
- 0.1822124172602761
- 0.006265730986600257
- 0.0185105629478801
- 0.04555393290694774
- 0.038161590650707795
- 0.013329583423813463
- 0.0
- 0.0
- 0.0
- 0.07846990705720527
- ```
-and the end-member fraction in `wt` and their names as
-```julia
+0.6174962747665693
+0.1822124172602761
+0.006265730986600257
+0.0185105629478801
+0.04555393290694774
+0.038161590650707795
+0.013329583423813463
+0.0
+0.0
+0.0
+0.07846990705720527
+and the end-member fraction in wt and their names as
+
  out.SS_vec[1].emFrac_wt
 8-element Vector{Float64}:
  0.4608062343057727
@@ -519,15 +484,12 @@ and the end-member fraction in `wt` and their names as
  "fo2L"
  "fa2L"
  "h2oL"
-```
-### Running it in parallel
+Running it in parallel
 Julia can be run in parallel using multi-threading. To take advantage of this, you need to start julia from the terminal with:
-```bash
+
 $julia -t auto
-```
-which will automatically use all threads on your machine. Alternatively, use `julia -t 4` to start it on 4 threads.
-If you are interested to see what you can do on your machine, type:
-```julia
+which will automatically use all threads on your machine. Alternatively, use julia -t 4 to start it on 4 threads. If you are interested to see what you can do on your machine, type:
+
 versioninfo()
 Julia Version 1.9.0
 Commit 8e630552924 (2023-05-07 11:25 UTC)
@@ -538,5 +500,4 @@ Platform Info:
   LIBM: libopenlibm
   LLVM: libLLVM-14.0.6 (ORCJIT, apple-m1)
   Threads: 8 on 8 virtual cores
-```
-The function `multi_point_minimization` will automatically utilize parallelization if you run it on >1 threads.
+The function multi_point_minimization will automatically utilize parallelization if you run it on >1 threads.
