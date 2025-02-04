@@ -121,7 +121,31 @@ Once you are done with all calculations, release the memory with
 ```julia
 Finalize_MAGEMin(data)
 ```
-### Example 3 - Removing solution phase(s) from consideration
+
+### Example 3 - Export data to CSV
+Using previous example to compute a point:
+```julia
+using MAGEMin_C
+dtb     = "ig"
+data    = Initialize_MAGEMin(dtb, verbose=false);
+P,T     = 10.0, 1100.0
+Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
+X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
+sys_in  = "wt"
+out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
+```
+Exporting the result of the minimization(s) to an CSV file is straightforward:
+```julia
+MAGEMin_data2dataframe(out,dtb,"filename")
+```
+where `out` is the output structure, `dtb` is the database acronym and `"filename"` is the filename :)
+
+Notes
+* You don't have to add the file extension `.csv`
+* The output path (MAGEMin_C directory) is displayed in the Julia terminal
+* For multiple points, simply provide the `Julia` ```Vector{out}```. See Example 8 for more details on how to create a vector of minimization output.
+
+### Example 4 - Removing solution phase(s) from consideration
 To suppress solution phases from the calculation, define a remove list `rm_list` using the `remove_phases()` function. In the latter, provide a vector of the solution phase(s) you want to remove and the database acronym as a second argument. Then pass the created `rm_list` to the `single_point_minimization()` function.
 ```julia
 using MAGEMin_C
@@ -207,7 +231,7 @@ Oxygen fugacity          : -5.760704474307317
 Delta QFM                : 2.1681669200698166
 ```
 
-### Example 4 - oxygen buffer
+### Example 5 - oxygen buffer
 
 Here we need to initialize MAGEMin with the desired buffer (qfm in this case, see list at the beginning). 
 
@@ -236,7 +260,7 @@ sys_in  = "wt"
 out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, B=offset, sys_in=sys_in)
 ```
 
-### Example 5 - activity buffer
+### Example 6 - activity buffer
 
 Like for oxygen buffer, activity buffer can be prescribe as follow
 
@@ -253,7 +277,7 @@ sys_in  = "wt"
 out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, B=value, sys_in=sys_in)
 ```
 
-### Example 6 - many points
+### Example 7 - many points
 
 ```julia
 using MAGEMin_C
@@ -270,7 +294,7 @@ By default, this will show a progressbar (which you can deactivate with the `pro
 
 You can also specify a custom bulk rock for all points (see above), or a custom bulk rock for every point.
 
-### Example 7 - fractional crystallization
+### Example 8 - fractional crystallization
 
 The following example shows how to perform fractional crystallization using a hydrous basalt magma as a starting composition. The results are displayed using PlotlyJS. This example is provided in the hope it may be useful for learning how to use MAGEMin_C for more advanced applications. 
 
