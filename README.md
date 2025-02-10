@@ -34,11 +34,12 @@ Thermodynamic dataset acronym are the following:
 
 ### Oxygen buffers and activity
 Several buffers can be used to fix the oxygen fugacity
-- `qfm`
-- `qif`
-- `nno`
-- `hm`
-- `cco`
+- `qfm` -> quartz-fayalite-magnetite
+- `qif` -> quartz-iron-fayalite
+- `nno` -> nickel-nickel oxide
+- `hm` -> hematite-magnetite
+- `iw` -> iron-wüstite
+- `cco` -> carbon dioxide-carbon
 
 Similarly activity can be fixed for the following oxides
 - `aH2O` -> using water as reference phase
