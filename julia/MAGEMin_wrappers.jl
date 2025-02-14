@@ -1552,8 +1552,9 @@ function get_mineral_name(db, ss, SS_vec)
             if 1.0 - x[1] > 0.5;        mineral_name = "hem";
             else                        mineral_name = "ilm";   end 
         elseif ss == "dio"
-            if 2*x[4] > 0.5;            mineral_name = "omph";
-            else                        mineral_name = "dio";   end 
+            if x[2] > 0.0 && x[2] <= 0.3;       mineral_name = "dio";
+            elseif x[2] > 0.3 && x[2] <= 0.7;   mineral_name = "omph";
+            else                                mineral_name = "jd";   end 
         elseif ss == "occm"
             if x[2] > 0.5;              mineral_name = "sid";
             elseif x[3] > 0.5;          mineral_name = "ank";  
@@ -1606,7 +1607,7 @@ function get_ss_from_mineral(db, mrl, mbCpx)
             ss = "ilm"
         elseif mrl == "hemm" || mrl == "ilmm"
             ss = "ilmm"
-        elseif mrl == "omph" || mrl == "dio"
+        elseif mrl == "omph" || mrl == "dio" || mrl == "jd"
             if mbCpx == 0
                 ss = "dio"
             else
