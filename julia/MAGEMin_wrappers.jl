@@ -144,10 +144,10 @@ struct gmin_struct{T,I}
     status          :: I           # status of calculations
 end
 
-struct light_gmin_struct{T <: Float32, I <: Int8} 
+struct light_gmin_struct{T <: Float32, I <: Int8}
     P_kbar      :: T                    # Pressure in kbar
     T_C         :: T                    # Temperature in Celsius
-   
+
     ph_frac_1at :: Vector{T}            # phase fractions
     ph_type     :: Vector{I}            # type of phase (SS or PP)
     ph_id_db    :: Vector{I}            # id of phase
@@ -179,7 +179,7 @@ mutable struct db_infos
     ss_name :: Array{String}
     data_pp :: Array{String}
 end
-        
+
 
 """
     Holds the MAGEMin databases & required structures for every thread
@@ -246,7 +246,7 @@ function remove_phases( list        :: Union{Nothing,Vector{String}},
     else
         rm_list = nothing
     end
-    
+
     return rm_list;
 end
 
@@ -275,7 +275,7 @@ function Initialize_MAGEMin(db = "ig";  verbose     ::Union{Int64,Bool} = 0,
                                                 buffer      = buffer,
                                                 solver      = solver    );
 
-    nt              = Threads.nthreads()
+    nt              = Threads.maxthreadid()
     list_gv         = Vector{typeof(gv)}(undef, nt)
     list_z_b        = Vector{typeof(z_b)}(undef, nt)
     list_DB         = Vector{typeof(DB)}(undef, nt)
@@ -315,7 +315,7 @@ end
 Finalizes MAGEMin and clears variables
 """
 function Finalize_MAGEMin(dat::MAGEMin_Data)
-    for id in 1:Threads.nthreads()
+    for id in 1:Threads.maxthreadid()
         LibMAGEMin.FreeDatabases(dat.gv[id], dat.DB[id], dat.z_b[id])
         # splx_data needs to be freed
      end
@@ -385,7 +385,7 @@ function  init_MAGEMin( db          =  "ig";
         if db == "sb11"
             gv.EM_database = 0
             unsafe_copyto!(convert(Ptr{UInt8}, gv.db), pointer(db), length(db) + 1)
-        else 
+        else
             print("Database not implemented... using default sb11\n")
             gv.EM_database = 0
         end
@@ -429,9 +429,9 @@ function single_point_minimization(     P           ::  T1,
                                         light       ::  Bool                            = false,
                                         name_solvus ::  Bool                            = false,
                                         test        ::  Int64                           = 0, # if using a build-in test case,
-                                        X           ::  VecOrMat                        = nothing,      
+                                        X           ::  VecOrMat                        = nothing,
                                         B           ::  Union{Nothing, T1, Vector{T1}}  = nothing,
-                                        scp         ::  Int64                           = 0,   
+                                        scp         ::  Int64                           = 0,
                                         rm_list     ::  Union{Nothing, Vector{Int64}}   = nothing,
                                         W           ::  Union{Nothing, W_Data}          = nothing,
                                         data_in     ::  Union{Nothing, gmin_struct{Float64, Int64}, Vector{gmin_struct{Float64, Int64}}} = nothing,
@@ -449,7 +449,7 @@ function single_point_minimization(     P           ::  T1,
 
     if data_in isa gmin_struct{Float64, Int64}
         data_in = [data_in]
-    end  
+    end
 
     Out_PT     =   multi_point_minimization(    P,
                                                 T,
@@ -473,8 +473,8 @@ end
 
 
 """
-Out_PT =multi_point_minimization(P::T2,T::T2,MAGEMin_db::MAGEMin_Data;test::Int64=0,X::Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}=nothing,B::Union{Nothing, T1, Vector{T1}}=nothing,W::Union{Nothing, W_Data}=nothing,Xoxides=Vector{String},sys_in="mol",progressbar=true, 
-                                callback_fn ::Union{Nothing, Function}= nothing,  
+Out_PT =multi_point_minimization(P::T2,T::T2,MAGEMin_db::MAGEMin_Data;test::Int64=0,X::Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}=nothing,B::Union{Nothing, T1, Vector{T1}}=nothing,W::Union{Nothing, W_Data}=nothing,Xoxides=Vector{String},sys_in="mol",progressbar=true,
+                                callback_fn ::Union{Nothing, Function}= nothing,
                                 callback_int::Int64 = 1) where {T1 <: Float64, T2 <: AbstractVector{T1}}
 
 
@@ -545,7 +545,7 @@ function multi_point_minimization(P           ::  T2,
                                   test        ::  Int64                           = 0, # if using a build-in test case,
                                   X           ::  VecOrMat                        = nothing,
                                   B           ::  Union{Nothing, T1, Vector{T1}}  = nothing,
-                                  scp         ::  Int64                           = 0,     
+                                  scp         ::  Int64                           = 0,
                                   rm_list     ::  Union{Nothing, Vector{Int64}}   = nothing,
                                   data_in     ::  Union{Nothing, Vector{gmin_struct{Float64, Int64}}} = nothing,
                                   W           ::  Union{Nothing, W_Data}          = nothing,
@@ -553,7 +553,7 @@ function multi_point_minimization(P           ::  T2,
                                   sys_in      = "mol",
                                   rg          = "tc",
                                   progressbar = true,        # show a progress bar or not?
-                                  callback_fn ::  Union{Nothing, Function}= nothing, 
+                                  callback_fn ::  Union{Nothing, Function}= nothing,
                                   callback_int::  Int64 = 1
                                   ) where {T1 <: Float64, T2 <: AbstractVector{Float64}}
 
@@ -563,7 +563,7 @@ function multi_point_minimization(P           ::  T2,
     if isnothing(X)
         # Use one of the build-in tests
         # Create thread-local data
-        for i in 1:Threads.nthreads()
+        for i in 1:Threads.maxthreadid()
             MAGEMin_db.gv[i] = use_predefined_bulk_rock(MAGEMin_db.gv[i], test, MAGEMin_db.db);
         end
         CompositionType = 0;    # build-in tests
@@ -573,7 +573,7 @@ function multi_point_minimization(P           ::  T2,
         @assert length(X) == length(Xoxides)
 
             # Set the bulk rock composition for all points
-            for i in 1:Threads.nthreads()
+            for i in 1:Threads.maxthreadid()
                 MAGEMin_db.gv[i] = define_bulk_rock(MAGEMin_db.gv[i], X, Xoxides, sys_in, MAGEMin_db.db);
             end
             CompositionType = 1;    # specified bulk composition for all points
@@ -616,7 +616,7 @@ function multi_point_minimization(P           ::  T2,
                     out     = point_wise_minimization_iguess(P[i], T[i], gv, z_b, DB, splx_data; scp, rm_list, data_in = data_in[i])
                 else
                     out     = point_wise_minimization_iguess(P[i], T[i], gv, z_b, DB, splx_data; buffer_n = B[i], W = W, scp, rm_list, data_in = data_in[i])
-                end  
+                end
             else
                 if isnothing(B)
                     out     = point_wise_minimization(P[i], T[i], gv, z_b, DB, splx_data; scp, rm_list, name_solvus=name_solvus)
@@ -662,7 +662,7 @@ function AMR_minimization(  init_sub    ::  Int64,
                             test        ::  Int64                           = 0, # if using a build-in test case,
                             X           ::  VecOrMat                        = nothing,
                             B           ::  Union{Nothing, T1, Vector{T1}}  = 0.0,
-                            scp         ::  Int64                           = 0,     
+                            scp         ::  Int64                           = 0,
                             rm_list     ::  Union{Nothing, Vector{Int64}}   = nothing,
                             data_in     ::  Union{Nothing, Vector{gmin_struct{Float64, Int64}}} = nothing,
                             W           ::  Union{Nothing, W_Data}          = nothing,
@@ -703,7 +703,7 @@ function AMR_minimization(  init_sub    ::  Int64,
                 Xvec[i] = X;
             end
 
-            Out_XY_new  =   multi_point_minimization(Pvec, Tvec, MAGEMin_db, X=Xvec, B=Bvec, Xoxides=Xoxides, sys_in=sys_in, scp=scp, rm_list=rm_list, rg=rg, test=test,data_in=data_in); 
+            Out_XY_new  =   multi_point_minimization(Pvec, Tvec, MAGEMin_db, X=Xvec, B=Bvec, Xoxides=Xoxides, sys_in=sys_in, scp=scp, rm_list=rm_list, rg=rg, test=test,data_in=data_in);
         else
             println("There is no new point to compute...")
         end
@@ -785,8 +785,8 @@ end
     data = use_predefined_bulk_rock(data::MAGEMin_Data, test=0)
 Returns the pre-defined bulk rock composition of a given test
 """
-function use_predefined_bulk_rock(data::MAGEMin_Data, test=0)  
-    nt = Threads.nthreads()
+function use_predefined_bulk_rock(data::MAGEMin_Data, test=0)
+    nt = Threads.maxthreadid()
     for id in 1:nt
         data.gv[id] =  use_predefined_bulk_rock(data.gv[id], test, data.db);
     end
@@ -810,7 +810,7 @@ end
 
 
 function wt2mol(    bulk_wt     :: Vector{Float64},
-                    bulk_ox     :: Vector{String}) 
+                    bulk_ox     :: Vector{String})
 
     ref_ox          = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "MnO"; "H2O"; "CO2"; "S"];
     ref_MolarMass   = [60.08; 101.96; 56.08; 40.30; 71.85; 159.69; 94.2; 61.98; 79.88; 16.0; 151.99; 70.937; 18.015; 44.01; 32.06];      #Molar mass of oxides
@@ -829,7 +829,7 @@ function wt2mol(    bulk_wt     :: Vector{Float64},
 end
 
 function mol2wt(    bulk_mol     :: Vector{Float64},
-                    bulk_ox      :: Vector{String}) 
+                    bulk_ox      :: Vector{String})
 
     ref_ox          = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "MnO"; "H2O"; "CO2"; "S"];
     ref_MolarMass   = [60.08; 101.96; 56.08; 40.30; 71.85; 159.69; 94.2; 61.98; 79.88; 16.0; 151.99; 70.937; 18.015; 44.01; 32.06];      #Molar mass of oxides
@@ -890,7 +890,7 @@ function convertBulk4MAGEMin(   bulk_in     :: T1,
         tmp_id    = findall(filter .!= "Fe2O3")
         if !isempty(tmp_id)
             filter = filter[tmp_id]
-            
+
             for i=1:length(bulk_in_ox)
                 if bulk_in_ox[i] in filter
                 else
@@ -905,7 +905,7 @@ function convertBulk4MAGEMin(   bulk_in     :: T1,
 
 	MAGEMin_bulk    = zeros(length(MAGEMin_ox));
     bulk            = zeros(length(MAGEMin_ox));
-    
+
 	# convert to mol, if system unit = wt
 	if sys_in == "wt"
 		for i=1:length(bulk_in_ox)
@@ -1066,7 +1066,7 @@ function point_wise_minimization(   P       ::Float64,
     if P < 0.001
         P = 0.001
     end
-    
+
     z_b.P           =   P
     gv.numPoint     =   1; 							    # the number of the current point */
 
@@ -1090,7 +1090,7 @@ function point_wise_minimization(   P       ::Float64,
         gv.mpSp         = 2
         gv.mpIlm        = 2
     end
-    
+
     gv      = LibMAGEMin.ComputeG0_point(gv.EM_database, z_b, gv, DB.PP_ref_db,DB.SS_ref_db);
 
 
@@ -1151,7 +1151,7 @@ function point_wise_minimization(   P       ::Float64,
     # Transform results to a more convenient julia struct
     if light == true
         out = deepcopy(create_light_gmin_struct(DB));
-    else    
+    else
         out = deepcopy(create_gmin_struct(DB, gv, time; name_solvus = name_solvus));
     end
     # here we compute specific heat capacity using reactions
@@ -1199,7 +1199,7 @@ function point_wise_minimization_iguess(    P           ::  Number,
     if P < 0.001
         P = 0.001
     end
-    
+
     z_b.P           =   P
     gv.numPoint     =   1; 							    # the number of the current point */
 
@@ -1219,7 +1219,7 @@ function point_wise_minimization_iguess(    P           ::  Number,
     if ~isnothing(rm_list)
         SS_ref_db   = unsafe_wrap(Vector{LibMAGEMin.SS_ref},DB.SS_ref_db,gv.len_ss);
 
-        for i in eachindex(rm_list)  
+        for i in eachindex(rm_list)
             flags = zeros(Int32,5);
             unsafe_copyto!(SS_ref_db[rm_list[i]].ss_flags,pointer(flags), 5)
         end
@@ -1402,7 +1402,7 @@ point_wise_minimization(P       ::  Number,
                         rm_list ::  Union{Nothing, Vector{Int64}}   = nothing,
                         name_solvus::Bool       = false,
                         data_in ::  Union{Nothing, gmin_struct{Float64, Int64}, Vector{gmin_struct{Float64, Int64}}} = nothing,
-                        W       ::  Union{Nothing, W_Data} = nothing) = 
+                        W       ::  Union{Nothing, W_Data} = nothing) =
                         point_wise_minimization(Float64(P),Float64(T), gv, z_b, DB, splx_data; buffer_n, scp, rm_list, name_solvus, data_in, W)
 
 point_wise_minimization(P       ::  Number,
@@ -1417,7 +1417,7 @@ point_wise_minimization(P       ::  Number,
                         rm_list ::  Union{Nothing, Vector{Int64}}   = nothing,
                         name_solvus::Bool       = false,
                         data_in ::  Union{Nothing, gmin_struct{Float64, Int64}, Vector{gmin_struct{Float64, Int64}}} = nothing,
-                        W       ::  Union{Nothing, W_Data} = nothing) = 
+                        W       ::  Union{Nothing, W_Data} = nothing) =
                         point_wise_minimization(Float64(P),Float64(T), gv, z_b, DB, splx_data; buffer_n, scp,  rm_list, name_solvus, data_in, W)
 
 point_wise_minimization(P       ::  Number,
@@ -1428,7 +1428,7 @@ point_wise_minimization(P       ::  Number,
                         rm_list ::  Union{Nothing, Vector{Int64}}   = nothing,
                         name_solvus::Bool       = false,
                         data_in ::  Union{Nothing, gmin_struct{Float64, Int64}, Vector{gmin_struct{Float64, Int64}}} = nothing,
-                        W       ::  Union{Nothing, W_Data} = nothing) = 
+                        W       ::  Union{Nothing, W_Data} = nothing) =
                         point_wise_minimization(Float64(P),Float64(T), data.gv[1], data.z_b[1], data.DB[1], data.splx_data[1]; buffer_n, scp, rm_list, name_solvus, data_in, W)
 
 
@@ -1492,7 +1492,7 @@ end
 function get_mineral_name(db, ss, SS_vec)
 
     mineral_name = ss
-   
+
     if db == "ig" || db == "igad"
         x = SS_vec.compVariables
         if ss == "spl"
@@ -1510,20 +1510,20 @@ function get_mineral_name(db, ss, SS_vec)
             if x[3] - 0.5 > 0.0;        mineral_name = "gl";
             elseif -x[3] -x[4] + 0.2 > 0.0;   mineral_name = "act";
             else
-                if x[6] < 0.1;          mineral_name = "cumm"; 
-                elseif -1/2*x[4]+x[6]-x[7]-x[8]-x[2]+x[3]>0.5;      mineral_name = "tr";       
+                if x[6] < 0.1;          mineral_name = "cumm";
+                elseif -1/2*x[4]+x[6]-x[7]-x[8]-x[2]+x[3]>0.5;      mineral_name = "tr";
                 else                    mineral_name = "amp";    end
-            end  
+            end
         elseif ss == "ilm"
             if -x[1] + 0.5 > 0.0;       mineral_name = "hem";
-            else                        mineral_name = "ilm";   end 
+            else                        mineral_name = "ilm";   end
         elseif ss == "nph"
             if x[2] - 0.5 > 0.0;       mineral_name = "K-nph";
-            else                        mineral_name = "nph";   end 
+            else                        mineral_name = "nph";   end
         elseif ss == "cpx"
             if x[3] - 0.6 > 0.0;        mineral_name = "pig";
             elseif x[4] - 0.5 > 0.0;    mineral_name = "Na-cpx";
-            else                        mineral_name = "cpx";   end 
+            else                        mineral_name = "cpx";   end
         end
 
     elseif db == "mp" || db == "mpe" || db == "mb" || db == "ume"
@@ -1541,25 +1541,25 @@ function get_mineral_name(db, ss, SS_vec)
             if x[3] - 0.5 > 0.0;        mineral_name = "gl";
             elseif -x[3]-x[4]+0.2>0.0;  mineral_name = "act";
             else
-                if x[6] < 0.1;          mineral_name = "cumm"; 
-                elseif -1/2*x[4]+x[6]-x[7]-x[8]-x[2]+x[3]>0.5;      mineral_name = "tr";     
+                if x[6] < 0.1;          mineral_name = "cumm";
+                elseif -1/2*x[4]+x[6]-x[7]-x[8]-x[2]+x[3]>0.5;      mineral_name = "tr";
                 else                    mineral_name = "amp";    end
-            end  
+            end
         elseif ss == "ilmm"
             if x[1] - 0.5 > 0.0;        mineral_name = "ilmm";
-            else                        mineral_name = "hemm";   end 
+            else                        mineral_name = "hemm";   end
         elseif ss == "ilm"
             if 1.0 - x[1] > 0.5;        mineral_name = "hem";
-            else                        mineral_name = "ilm";   end 
+            else                        mineral_name = "ilm";   end
         elseif ss == "dio"
             if x[2] > 0.0 && x[2] <= 0.3;       mineral_name = "dio";
             elseif x[2] > 0.3 && x[2] <= 0.7;   mineral_name = "omph";
-            else                                mineral_name = "jd";   end 
+            else                                mineral_name = "jd";   end
         elseif ss == "occm"
             if x[2] > 0.5;              mineral_name = "sid";
-            elseif x[3] > 0.5;          mineral_name = "ank";  
-            elseif x[1] > 0.25 && x[3] < 0.01;         mineral_name = "mag";  
-            else                        mineral_name = "cc";   end 
+            elseif x[3] > 0.5;          mineral_name = "ank";
+            elseif x[1] > 0.25 && x[3] < 0.01;         mineral_name = "mag";
+            else                        mineral_name = "cc";   end
 
         end
 
@@ -1574,7 +1574,7 @@ end
 function get_ss_from_mineral(db, mrl, mbCpx)
 
     ss = mrl
-   
+
     if db =="ig" || db == "igad"
 
         if mrl == "cm" || mrl == "mgt" || mrl == "usp"
@@ -2076,7 +2076,7 @@ function point_wise_minimization_with_guess(mSS_vec, P, T, gv, z_b, DB, splx_dat
             ph_id_A_jll[i,1] = 0
             ph_id_A_jll[i,2] = ph_id-1
             ph_id_A_jll[i,3] = 0
-            ph_id_A_jll[i,4] = 0    
+            ph_id_A_jll[i,4] = 0
         elseif mSS_vec[i].ph_type == "ss"
             ph_id   = mSS_vec[i].ph_id+1
             ph      = mSS_vec[i].ph_name
