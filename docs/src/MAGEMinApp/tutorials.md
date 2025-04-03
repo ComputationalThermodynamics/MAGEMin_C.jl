@@ -451,7 +451,90 @@ which results in
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_klb1_dQFM.png?raw=true" alt="MAGEMinApp klb1 dQFM" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 ```
 
-### 4. Trace-element modelling
+### 4. Buffers
+
+Several buffers can be used to fix the oxygen fugacity
+- `qfm` -> quartz-fayalite-magnetite
+- `qif` -> quartz-iron-fayalite
+- `nno` -> nickel-nickel oxide
+- `hm` -> hematite-magnetite
+- `iw` -> iron-wüstite
+- `cco` -> carbon dioxide-carbon
+
+Similarly activity can be fixed for the following oxides
+- `aH2O` -> using water as reference phase
+- `aO2`   -> using dioxygen as reference phase
+- `aMgO` -> using periclase as reference phase
+- `aFeO` -> using ferropericlase as reference phase
+- `aAl2O3` -> using corundum as reference phase
+- `aTiO2` -> using rutile as reference phase
+- `aSiO2` -> using quartz/coesite as reference phase
+
+Let's compute a P-T diagram using the `qfm` buffer. For instance, select the thermodynamic database to be `Metabasite` (Green et al., 2016). Choose the pressure-temperature range of your choice. Select `SQA synthethic amphibolitic composition` in the middle `Bulk-rock composition` panel, then in the `Phase diagram parameters` left panel, select `Buffer = QFM`. Finally, make sure you saturate the bulk-rock in `O` by changing the value to 3.0:
+
+```@raw html
+
+<img src="../assets/MAGEMinApp_buffer_QFM_setup.png" alt="MAGEMinApp QFM setup" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+```
+
+Which gives, after 4 levels of refinements:
+
+```@raw html
+
+<img src="../assets/MAGEMinApp_buffer_QFM_diagram.png" alt="MAGEMinApp QFM diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+```
+
+!!! note
+    - If you click on any point of the diagram, you can see in the `Informations` panel, that every field contain a `qfm` phase. This phase has a fraction equal to 0.0 and simply shows that the system is buffered. 
+    - If one of the field does not have the buffer phase, it indicates that not enough free `O` has been provided.
+
+    ```@raw html
+
+    <img src="../assets/MAGEMinApp_buffer_QFM_diagram_info.png" alt="MAGEMinApp QFM diagram info" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+    ```
+
+!!! warning
+    - The `Buffer offset` option in the `Bulk-rock composition` panel is used to offset the oxygen buffer in the $RT log()$ scale, while for activity it serves as the activity value.
+
+### 5. Latent heat of reaction
+
+Heat capacity is computed as a second order derivative of the Gibbs energy with respect to temperature using numerical differentiation.
+
+\$C_p = -T \\frac{\\partial ^2G}{\\partial T^2}\$
+
+**There is however two ways to retrieve the second order derivative:**
+  1. Default option `Specific Cp = G0` - no latent heat of reaction: Fixing the phase assemblage (phase proportions and compositions) and computing the Gibbs energy of the assemblage at T, T+eps and T-eps.
+  2. Full differentiation option `Specific Cp = G_system` - latent heat of reaction: Computing three stable phase equilibrium at T, T+eps and T-eps.
+
+!!! note
+    - While the first method is computationally more efficient, it does not account for the latent heat of reaction. When having correct heat budget is important it is therefore recommanded to employ the second approach.
+
+To compute a phase diagram that takes into account latent heat reaction simply choose `Specific Cp = G_system` in the `Phase diagram parameters` panel:
+
+```@raw html
+
+<img src="../assets/MAGEMinApp_LH_setup.png" alt="MAGEMinApp LH setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
+```
+
+Using the metapelite database and the `FPWorldMedian pelite - oversaturated` composition and 4 levels of refinement, together with displaying s_cp (and capping max value to 4000 for the colormap) gives:
+
+```@raw html
+
+<img src="../assets/MAGEMinApp_LH_diagram.png" alt="MAGEMinApp LH diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+```
+
+!!! note
+    - Without accounting for latent heat of reaction (`Specific Cp = G0`), the values of the specific heat capacity are drastically different:
+
+    ```@raw html
+
+    <img src="../assets/MAGEMinApp_noLH_diagram.png" alt="MAGEMinApp noLH diagram" style="max-width: 45%; height: auto; display: block; margin: 0 auto;">
+    ```
+
+
+
+
+### 6. Trace-element modelling
 
 Let's predict trace-element partitioning together with a new phase diagram using the metapelite database (White et al., 2014) and the pre-defined World Median Pelite oversaturated.
 
@@ -523,7 +606,7 @@ In order to display trace-element spectrum from any suprasolids point of the com
     <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_TE_spectrum_single.png?raw=true" alt="MAGEMinApp TE spectrum single" style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
     ```
 
-### 5. Solidus H₂O-saturated phase diagram
+### 7. Solidus H₂O-saturated phase diagram
 
 To compute solidus H₂O-saturated phase diagram, let's (for instance) change the thermodynamic database to Metabasite (Green et al., 2016), choose `Solidus H₂O-saturated = true`, select `clinopyroxene = aug`:
 
@@ -550,7 +633,7 @@ Computing the diagram and displaying the system H₂O-activity should gives:
     - First, for the given pressure range (and using 50 pressure steps), the water-saturated solidus is extracted using bisection method. Subsequently, the pressure-dependent solidus temperature is interpolated using PChip interpolant. At Tsuprasolidus = Tsolidus + 0.01 K, a second interpolation is used to retrieve the amount of water saturating the melt. The latter interpolant is then used to prescribe the water content of the bulk, ensuring pressure-dependent water saturation at solidus (+ 0.1 K). 
     - Extra water can be added in the `Phase diagram parameter` panel, using the option `Additional H₂O [mol%]`.
 
-### 6. T-X fixed pressure diagram
+### 8. T-X fixed pressure diagram
 
 The objective of T-X diagram is to fix the pressure while having in the vertical axis a range of temperature and on the horizontal axis a varying bulk-rock composition. Variation in the bulk-rock composition can be applied to any oxides and the two end-member bulk-rock composition added to bulk-rock input file (see [Bulk-rock input file](@ref)).
 
@@ -586,7 +669,36 @@ Compute the diagram with `Initial grid subdivision = 5` and `Refinement levels =
 !!! tip
     - In some cases, when `Boost mode = true`, the produced diagram will display some poorly resolved reaction lines. To fix this you can either increase the initial grid subdivision `Initial grid subdivision = 5` or set  `Boost mode = false`.
 
-### 7. PT-X diagram
+
+#### T-X buffer
+
+Previously we changed the composition from `Ijolite` to `Ne-Syenite`. Let's instead vary the `qfm` buffer offset for `Ijolite` composition from -5 to 5.
+
+In the `Phase diagram parameters` left panel, select `Buffer = QFM`, then in the middle `Bulk-rock composition` panel, select `Ijolite` for both left and right composition. Then change `Buffer offset` to -5 for the left entry, and to 5 for the right entry. Don't forget to increase the `O` content, for isntance to 3.0:
+
+```@raw html
+
+<img src="../assets/MAGEMinApp_TX_buffer_setup.png" alt="MAGEMinApp TX buffer setup" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+``` 
+
+Which after 4 levels of refinements results in:
+
+```@raw html
+
+<img src="../assets/MAGEMinApp_TX_buffer_diagram.png" alt="MAGEMinApp TX buffer diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+``` 
+
+!!! warning 
+    - Here, you can see that we did not provide enough `O` as `qfm` phase does not appear on the right side of the diagram. You can easely fix that by change the `O` value to 10 and relaunch the calculation
+
+Fixing the `O` content and contouring $\Delta_{QFM}$ gives the desired result:
+
+```@raw html
+
+<img src="../assets/MAGEMinApp_TX_buffer_diagram_cor.png" alt="MAGEMinApp TX buffer diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+``` 
+
+### 9. PT-X diagram
 
 PT-X diagrams differ from P-X and T-X diagrams in the sense that both pressure and temperature can be varied along a pressure-temperature path. This option can be particularily useful when modelling subduction geotherm for instance.
 
@@ -613,7 +725,7 @@ Then in the `Bulk-rock composition` middle panel, select the pre-defined bulk `F
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_PTX_diagram.png?raw=true" alt="MAGEMinAppPTX diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 ``` 
 
-### 8. T-T poly-metamorphic diagram
+### 10. T-T poly-metamorphic diagram
 
 The goal of a T-T poly-metamorphic diagram is to predict the evolution of the stable phase assemblage for a rock undergoing two successive metamorphic events. 
 
@@ -644,7 +756,7 @@ Compute the diagram which should give:
 !!! note
     - At very high temperature extracting nearly all the melt may become a problem as you are left with highly refractory compositions. In this case you either leave slightly more melt in the host-rock or decrease the maximum temperature.
 
-### 9. LaMEM density diagram
+### 11. LaMEM density diagram
 
 #### Quickstart
 
