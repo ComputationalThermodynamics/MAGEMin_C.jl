@@ -474,14 +474,14 @@ Let's compute a P-T diagram using the `qfm` buffer. For instance, select the the
 
 ```@raw html
 
-<img src="../assets/MAGEMinApp_buffer_QFM_setup.png" alt="MAGEMinApp QFM setup" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_buffer_QFM_setup.png?raw=true" alt="MAGEMinApp QFM setup" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 ```
 
 Which gives, after 4 levels of refinements:
 
 ```@raw html
 
-<img src="../assets/MAGEMinApp_buffer_QFM_diagram.png" alt="MAGEMinApp QFM diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_buffer_QFM_diagram.png?raw=true" alt="MAGEMinApp QFM diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 ```
 
 !!! note
@@ -490,7 +490,7 @@ Which gives, after 4 levels of refinements:
 
     ```@raw html
 
-    <img src="../assets/MAGEMinApp_buffer_QFM_diagram_info.png" alt="MAGEMinApp QFM diagram info" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+    <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_buffer_QFM_diagram_info.png?raw=true" alt="MAGEMinApp QFM diagram info" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
     ```
 
 !!! warning
@@ -513,14 +513,14 @@ To compute a phase diagram that takes into account latent heat reaction simply c
 
 ```@raw html
 
-<img src="../assets/MAGEMinApp_LH_setup.png" alt="MAGEMinApp LH setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_LH_setup.png?raw=true" alt="MAGEMinApp LH setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
 ```
 
 Using the metapelite database and the `FPWorldMedian pelite - oversaturated` composition and 4 levels of refinement, together with displaying s_cp (and capping max value to 4000 for the colormap) gives:
 
 ```@raw html
 
-<img src="../assets/MAGEMinApp_LH_diagram.png" alt="MAGEMinApp LH diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_LH_diagram.png?raw=true" alt="MAGEMinApp LH diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 ```
 
 !!! note
@@ -528,7 +528,7 @@ Using the metapelite database and the `FPWorldMedian pelite - oversaturated` com
 
     ```@raw html
 
-    <img src="../assets/MAGEMinApp_noLH_diagram.png" alt="MAGEMinApp noLH diagram" style="max-width: 45%; height: auto; display: block; margin: 0 auto;">
+    <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_noLH_diagram.png?raw=true" alt="MAGEMinApp noLH diagram" style="max-width: 45%; height: auto; display: block; margin: 0 auto;">
     ```
 
 
@@ -678,14 +678,14 @@ In the `Phase diagram parameters` left panel, select `Buffer = QFM`, then in the
 
 ```@raw html
 
-<img src="../assets/MAGEMinApp_TX_buffer_setup.png" alt="MAGEMinApp TX buffer setup" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_TX_buffer_setup.png?raw=true" alt="MAGEMinApp TX buffer setup" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 ``` 
 
 Which after 4 levels of refinements results in:
 
 ```@raw html
 
-<img src="../assets/MAGEMinApp_TX_buffer_diagram.png" alt="MAGEMinApp TX buffer diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_TX_buffer_diagram.png?raw=true" alt="MAGEMinApp TX buffer diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 ``` 
 
 !!! warning 
@@ -695,7 +695,7 @@ Fixing the `O` content and contouring $\Delta_{QFM}$ gives the desired result:
 
 ```@raw html
 
-<img src="../assets/MAGEMinApp_TX_buffer_diagram_cor.png" alt="MAGEMinApp TX buffer diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_TX_buffer_diagram_cor.png?raw=true" alt="MAGEMinApp TX buffer diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 ``` 
 
 ### 9. PT-X diagram
