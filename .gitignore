@@ -3,3 +3,7 @@ Manifest.toml
 /src/*.o
 /src/TC_database/*.o
 /src/SB_database/*.o
+/docs/build/*
+/docs/node_modules/*
+/docs/package-lock.json
+/docs/Manifest.toml
