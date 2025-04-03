@@ -6,7 +6,7 @@ makedocs(;
     modules     = [MAGEMin_C],
     repo        = Remotes.GitHub("ComputationalThermodynamics", "MAGEMin_C.jl"),
     authors     = "Nicolas-Riel <nriel@uni-mainz.de>, and contributors",
-    # sitename    = "MAGEMin",
+    sitename    = "MAGEMin",
     format      = DocumenterVitepress.MarkdownVitepress(
         repo    = "github.com/ComputationalThermodynamics/MAGEMin_C.jl",
         devbranch = "main",
