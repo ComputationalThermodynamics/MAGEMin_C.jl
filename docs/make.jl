@@ -8,7 +8,8 @@ makedocs(;
     authors     = "Nicolas-Riel <nriel@uni-mainz.de>, and contributors",
     sitename    = "MAGEMin",
     format      = DocumenterVitepress.MarkdownVitepress(
-        repo    = "https://github.com/ComputationalThermodynamics/MAGEMin_C.jl",
+        repo    = "github.com/ComputationalThermodynamics/MAGEMin_C.jl",
+        devbranch = "main",
     ),
     pages = [
         "Home"          => "index.md",
@@ -36,8 +37,6 @@ makedocs(;
 
 deploydocs(;
     repo            = "github.com/ComputationalThermodynamics/MAGEMin_C.jl",
-    target          = "build", # this is where Vitepress stores its output
     devbranch       = "main",
-    branch          = "gh-pages",
     push_preview    = true,
 )
