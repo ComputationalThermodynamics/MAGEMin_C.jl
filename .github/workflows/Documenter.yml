@@ -1,0 +1,51 @@
+# Sample workflow for building and deploying a VitePress site to GitHub Pages
+#
+name: Documenter
+
+on:
+  # Runs on pushes targeting the `master` branch. Change this to `main` if you're
+  # using the `main` branch as the default branch.
+  push:
+    branches:
+      - main
+    tags: ['*']
+    paths-ignore:
+      - '.zenodo.json'
+      - '.github/workflows/SpellCheck.yml'
+      - '.github/workflows/UnitTests.yml'
+      - '.github/workflows/TagBot.yml'
+  pull_request:
+    paths-ignore:
+      - '.github/workflows/SpellCheck.yml'
+      - '.github/workflows/UnitTests.yml'
+      - '.github/workflows/TagBot.yml'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Cancel redundant CI tests automatically
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    permissions:
+      contents: write
+      pull-requests: read
+      statuses: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.11'
+      - uses: julia-actions/cache@v2
+      - uses: julia-actions/julia-buildpkg@latest
+      - name: Install dependencies
+        run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+      - name: Build and deploy
+        uses: julia-actions/julia-docdeploy@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # If authenticating with GitHub Actions token
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # If authenticating with SSH deploy key
