@@ -6,11 +6,11 @@ First install julia. We recommend that you follow the instructions on how to ins
 Once `Julia` is installed, open a terminal (Linux, MacOS) or a powershell (Windows) and launch a threaded `Julia` instance to make use of parallel computation:
 
 ```
-julia -t 6
+julia -t auto
 ```
 
 !!! tip
-    The number of available threads is machine-dependent. To know how many threads you have you can type the command `versioninfo()` in a `Julia`terminal.
+    The number of available threads is machine-dependent. To know how many threads you have you can type the command `versioninfo()` in a `Julia`terminal. The keyword `auto` will use all you have in your machine. You can also specify the number of threads you want to use, e.g.,  `julia -t 4` for four cores.
 
 
 ```julia
@@ -29,7 +29,9 @@ And execute the app as:
 
 ```julia
 julia> App()
+[ Info: Listening on: 127.0.0.1:8050, thread id: 1
 ```
+Now you can open `127.0.0.1:8050` in your favorite web browser.
 
 ...and that's it!
 
