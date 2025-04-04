@@ -1,4 +1,3 @@
-
 ## How to install MAGEMinApp.jl
 
 First install julia. We recommend that you follow the instructions on how to install `Julia` from the [julia](https://julialang.org) webpage.

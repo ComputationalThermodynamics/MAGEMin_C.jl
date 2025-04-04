@@ -18,7 +18,11 @@ makedocs(;
         "MAGEMinApp.jl" => [
                 "Introduction"  => "MAGEMinApp/MAGEMinApp.md",
                 "Installation"  => "MAGEMinApp/installation.md",
-                "Tutorials"     => "MAGEMinApp/tutorials.md",
+                "Bulk-rock input file"     => "MAGEMinApp/bulk_rock.md",
+                "Phase diagrams tutorials" => "MAGEMinApp/PD_tutorials.md",
+                "P-T-X paths tutorials"  => "MAGEMinApp/PTX_tutorials.md",
+                "Citation"      => "MAGEMinApp/citation.md",
+                "Interface"     => "MAGEMinApp/interface.md",
         ],
         "MAGEMin_C.jl" => [
                 "Introduction"  => "MAGEMin_C/MAGEMin_C.md",
