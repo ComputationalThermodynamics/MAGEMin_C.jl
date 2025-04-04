@@ -30,7 +30,7 @@ sys_in  = "wt"
 out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 ```
 
-- `using MAGEMin_C`loads the package, while `data    = Initialize_MAGEMin("ig", verbose=false);` initializes `MAGEMin_C` with the wanted database and reduced verbose.
+- `using MAGEMin_C` loads the package, while `data    = Initialize_MAGEMin("ig", verbose=false);` initializes `MAGEMin_C` with the wanted database and reduced verbose.
 - `out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)`performs the phase equilibrium calculation given the provided parameters. The results of the computation, such as the stable phase names, fractions, composition etc, are store in the `out` structure. Details about how to access the full list of saved variables are provided in the tutorials section.
 
 
