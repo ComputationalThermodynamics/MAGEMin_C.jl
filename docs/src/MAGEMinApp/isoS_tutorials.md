@@ -12,7 +12,7 @@ Isentropic paths are easy to setup. Simply launch `MAGEMinApp` and navigate to t
 
 ```@raw html
 
-<img src="../assets/isoS_path_setup.png" alt="isoS path setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/isoS_path_setup.png?raw=true" alt="isoS path setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
 ```
 
 In the `Path options` panel, you can choose the resolution (number of pressure steps) and the tolerance to enforce constant entropy.
@@ -24,7 +24,7 @@ Compute the path:
 
 ```@raw html
 
-<img src="../assets/isoS_path_diagram.png" alt="isoS path diagram" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/isoS_path_diagram.png?raw=true" alt="isoS path diagram" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 ```
 
 !!! note
@@ -32,6 +32,6 @@ Compute the path:
 
     ```@raw html
 
-    <img src="../assets/isoS_path_info.png" alt="isoS path info" style="max-width: 75%; height: auto; display: block; margin: 0 auto;">
+    <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/isoS_path_info.png?raw=true" alt="isoS path info" style="max-width: 75%; height: auto; display: block; margin: 0 auto;">
     ```
 
