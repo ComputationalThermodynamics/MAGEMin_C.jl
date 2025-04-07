@@ -4,9 +4,11 @@ This page provides a set of examples showing how to use MAGEMin_C.jl to perform 
 
 !!! note
     - Examples 1 to 7 are simple exercises to make you familiar with the the various options available for the calculation
-    - Examples 8 to 9 are more advanced and some basic background in `Julia` programming are recommanded
+    - Examples 8 to 10 are more advanced and some basic background in `Julia` programming are recommanded
 
-## E.1 - Predefined compositions
+## Quickstart examples
+
+### E.1 - Predefined compositions
 This is an example of how to use it for a predefined bulk rock composition:
 ```julia
 using MAGEMin_C
@@ -45,7 +47,7 @@ which gives
     - `ume` -> ultramafic extended (Green et al., 2016 + Evans & Frost, 2021)
 
 
-## E.2 - Custom composition
+### E.2 - Custom composition
 And here a case in which you specify your own bulk rock composition.
 ```julia
 using MAGEMin_C
@@ -89,7 +91,7 @@ Once you are done with all calculations, release the memory with
 Finalize_MAGEMin(data)
 ```
 
-## E.3 - Export data to CSV
+### E.3 - Export data to CSV
 Using previous example to compute a point:
 ```julia
 using MAGEMin_C
@@ -112,7 +114,7 @@ where `out` is the output structure, `dtb` is the database acronym and `"filenam
     * The output path (MAGEMin_C directory) is displayed in the Julia terminal
     * For multiple points, simply provide the `Julia` ```Vector{out}```. See Example 8 for more details on how to create a vector of minimization output.
 
-## E.4 - Removing solution phase(s) from consideration
+### E.4 - Removing solution phase(s) from consideration
 To suppress solution phases from the calculation, define a remove list `rm_list` using the `remove_phases()` function. In the latter, provide a vector of the solution phase(s) you want to remove and the database acronym as a second argument. Then pass the created `rm_list` to the `single_point_minimization()` function.
 ```julia
 using MAGEMin_C
@@ -200,7 +202,7 @@ Oxygen fugacity          : -5.760704474307317
 Delta QFM                : 2.1681669200698166
 ```
 
-## E.5 - Oxygen buffer
+### E.5 - Oxygen buffer
 
 Here we need to initialize MAGEMin with the desired buffer (qfm in this case, see list at the beginning). 
 
@@ -240,7 +242,7 @@ out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, B=offset, 
     - `cco` -> carbon dioxide-carbon
 
 
-## E.6 - Activity buffer
+### E.6 - Activity buffer
 
 Like for oxygen buffer, activity buffer can be prescribe as follow
 
@@ -269,7 +271,7 @@ out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, B=value, s
     - `aSiO2` -> using quartz/coesite as reference phase
 
 
-## E.7 - Many points
+### E.7 - Many points
 
 ```julia
 using MAGEMin_C
@@ -286,7 +288,9 @@ By default, this will show a progressbar (which you can deactivate with the `pro
 
 You can also specify a custom bulk rock for all points (see above), or a custom bulk rock for every point.
 
-## E.8 - Fractional crystallization
+## Advanced examples
+
+### E.8 - Fractional crystallization
 
 The following example shows how to perform fractional crystallization using a hydrous basalt magma as a starting composition. The results are displayed using PlotlyJS. This example is provided in the hope it may be useful for learning how to use MAGEMin_C for more advanced applications. 
 
@@ -430,7 +434,7 @@ plot([trace1,trace2,trace3], layout)
 <img src="../assets/Density_evolution.png" alt="Density evolution" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
 ```
 
-## E.9 - Threaded (parallel) fractional crystallization
+### E.9 - Threaded (parallel) fractional crystallization
 
 ```julia
 
@@ -554,6 +558,103 @@ Out_all     = perform_threaded_calc(Out_all, data, dtb, n_starting_points, start
 Finalize_MAGEMin(data)
 
 ```
+
+### E.10 - Isentropic path calculation
+
+```julia
+using MAGEMin_C
+using Plots
+using ProgressMeter
+
+dtb         = "ig"
+data        = Initialize_MAGEMin(dtb,verbose=-1);
+test        = 0         # KLB-1
+data        = use_predefined_bulk_rock(data, test);
+
+MPT         = 1350.0;                                                            # Mantle potential temperature in °C
+adiabat     = 0.55;                                                              # Adiabatic gradient in the upper mantle °C/km
+Depth       = 100.0;                                                             # Depth in km
+rho_Mantle  = 3300.0;                                                            # Density of the mantle in kg/m³
+
+Ts          = MPT + adiabat * Depth                                              # Starting temperature in the isentropic path (rough estimate)
+Ps          = Depth*1e3*9.81*rho_Mantle/1e5/1e3                                  # Starting pressure in kbar (rough estimate)
+Pe          = 0.001;                                                             # Ending pressure in kbar
+
+n_steps     = 32;                                                                # number of steps in the isentropic path
+n_max       = 32;                                                                # Maximum number of iterations in the bisection method
+tolerance   = 0.1;                                                               # Tolerance for the bisection method
+P           = Array(range(Ps, stop=Pe, length=n_steps))                          # Defines pressure values for the isentropic path
+out         = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef, n_steps)      # Vector to store the output of the single_point_minimization function
+out_tmp     = MAGEMin_C.gmin_struct{Float64, Int64};
+
+# compute the reference entropy at pressure and temperature of reference 
+out[1]      = deepcopy( single_point_minimization(Ps,Ts, data));
+Sref        = out[1].entropy                                                    # Entropy of the system at the starting point   
+
+@showprogress for j = 2:n_steps
+
+        a           = out[j-1].T_C - 50.0
+        b           = out[j-1].T_C
+        n           = 1
+        conv        = 0
+        n           = 0
+        sign_a      = -1
+
+        while n < n_max && conv == 0
+            c       = (a+b)/2.0
+            out_tmp = deepcopy( single_point_minimization(P[j],c, data));
+            result  = out_tmp.entropy - Sref
+
+            sign_c  = sign(result)
+
+            if abs(b-a) < tolerance
+                conv = 1
+            else
+                if  sign_c == sign_a
+                    a = c
+                    sign_a = sign_c
+                else
+                    b = c
+                end
+                
+            end
+            n += 1
+        end
+
+        out[j] = deepcopy(out_tmp)
+end
+
+Finalize_MAGEMin(data)
+
+
+#=
+    In the following section we extract the melt fraction, total melt fraction, SiO2 in the melt, melt density for all steps
+=#
+S           = [out[i].entropy for i in 1:n_steps];                          # check entropy values
+frac_M      = [out[i].frac_M for i in 1:n_steps];                           # Melt fraction for all steps
+frac_M[frac_M .== 0.0] .= NaN;                                              # Replace 0.0 values with NaN
+T           = [out[i].T_C for i in 1:n_steps];                              # extract temperature for all steps
+
+SiO2_id     = findfirst(out[1].oxides .== "SiO2")                           # Index of SiO2 in the oxides array   
+dry_id      = findall(out[1].oxides .!= "H2O")                              # Indices of all oxides except H2O
+SiO2_M_dry  = [ (out[i].bulk_M[SiO2_id] / sum(out[i].bulk_M[dry_id])*100.0) for i in 1:n_steps];                             # SiO2 in the melt for all steps
+rho_M       = [ (out[i].rho_M) for i in 1:n_steps];                         # melt density for all steps
+rho_M[rho_M .== 0.0] .= NaN;                                                # Replace 0.0 values with NaN
+
+
+#=
+    Ploting the results using Plots
+=#
+p1          = plot(T,P, xlabel="Temperature (°C)", marker = :circle, markersize = 2, lw=2, ylabel="Pressure (kbar)", legend=false)
+p2          = plot(frac_M,P, xlabel="Melt fraction (mol)", marker = :circle, markersize = 2, lw=2, ylabel="Pressure (kbar)", legend=false)
+p3          = plot(rho_M,P, xlabel="Melt density (kg/m³)", marker = :circle, markersize = 2, lw=2, ylabel="Pressure (kbar)",        legend=false)
+p4          = plot(SiO2_M_dry,P, xlabel="SiO₂ melt anhydrous (mol%)", marker = :circle, markersize = 2, lw=2, ylabel="Pressure (kbar)",  legend=false)
+
+
+fig = plot(p1, p2, p3, p4, layout=(2, 2), size=(800, 600))
+savefig(fig,"isentropic_path.png")
+```
+
 
 ## Access complete information about the minimization
 
