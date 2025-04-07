@@ -21,6 +21,7 @@ makedocs(;
                 "Bulk-rock input file"     => "MAGEMinApp/bulk_rock.md",
                 "Phase diagrams tutorials" => "MAGEMinApp/PD_tutorials.md",
                 "P-T-X paths tutorials"  => "MAGEMinApp/PTX_tutorials.md",
+                "Isentropic paths tutorials"  => "MAGEMinApp/isoS_tutorials.md",
                 "Citation"      => "MAGEMinApp/citation.md",
                 "Interface"     => "MAGEMinApp/interface.md",
         ],
