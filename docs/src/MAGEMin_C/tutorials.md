@@ -3,7 +3,7 @@
 This page provides a set of examples showing how to use MAGEMin_C.jl to perform phase equilibrium calculations.
 
 !!! note
-    - Examples 1 to 7 are simple exercises to make you familiar with the the various options available for the calculation
+    - Examples 1 to 7 are simple exercises to make you familiar with the various options available for the calculation
     - Examples 8 to 10 are more advanced and some basic background in `Julia` programming are recommanded
 
 ## Quickstart examples
