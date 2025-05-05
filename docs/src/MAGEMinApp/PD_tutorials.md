@@ -206,8 +206,33 @@ which results in
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_klb1_dQFM.png?raw=true" alt="MAGEMinApp klb1 dQFM" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 ```
+### 4. Deactivate solution and/or pure phases
 
-### 4. Buffers
+In some cases, it is useful to deactivte a solution model (activity-composition model) or a pure phase. 
+
+Let's first select the thermodynamic database to be `Metapelite` (White et al., 2014) and use the default bulk-rock composition `FPWorldMedian pelite - water oversaturated`. Keep the default diagram type `P-T Diagram` and pressure range and update the temperature range from 400 to 1000 °C. in the top-left `Phase diagram parameters` panel, simply click on the rounded button of the `Phase selection` option, to display the list of available phases for the selection thermodynamic database:
+
+
+```@raw html
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_phase_selection.png?raw=true" alt="MAGEMinApp phase selection" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+```
+
+Once the `Phase selection` panels are unfolded you can provide your custom selection of phases. For instance let's unselect `liq`, `mt` and `ilmm`, and then perform the calculation. Refining the phase diagram twice gives:
+
+```@raw html
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_phase_selection_pd.png?raw=true" alt="MAGEMinApp phase selection pd" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+```
+
+!!! note
+    - Here, the solution models `liq`, `mt` and `ilmm` are deactivated. However, you can see the phase `mt` appearing for instance in the large LP-HT (`cd`+`pl`+`afs`+`ilm`+`mt`+`q`+`H2O`) field. This is because the `sp` model can also produce `mt` compositions.
+
+!!! warning
+    - When all `Solution phase` are selected, the default combination of phases for the activity-composition set will be applied. In the case of the `Metapelite` thermodynamic database the default combination fir spinel and ilmenite is `sp` and `ilm`.
+    - As soon as one solution model is unselected the default combination is deactivated. This implies that you manually have to select which combination of phase you want and make sure you are not using 2 spinel or 2 ilmenite models at the same time!
+
+### 5. Buffers
 
 Several buffers can be used to fix the oxygen fugacity
 - `qfm` -> quartz-fayalite-magnetite
@@ -252,7 +277,7 @@ Which gives, after 4 levels of refinements:
 !!! warning
     - The `Buffer offset` option in the `Bulk-rock composition` panel is used to offset the oxygen buffer in the $RT log()$ scale, while for activity it serves as the activity value.
 
-### 5. Latent heat of reaction
+### 6. Latent heat of reaction
 
 Heat capacity is computed as a second order derivative of the Gibbs energy with respect to temperature using numerical differentiation.
 
@@ -288,9 +313,7 @@ Using the metapelite database and the `FPWorldMedian pelite - oversaturated` com
     ```
 
 
-
-
-### 6. Trace-element modelling
+### 7. Trace-element modelling
 
 Let's predict trace-element partitioning together with a new phase diagram using the metapelite database (White et al., 2014) and the pre-defined World Median Pelite oversaturated.
 
@@ -362,7 +385,7 @@ In order to display trace-element spectrum from any suprasolids point of the com
     <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_TE_spectrum_single.png?raw=true" alt="MAGEMinApp TE spectrum single" style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
     ```
 
-### 7. Solidus H₂O-saturated phase diagram
+### 8. Solidus H₂O-saturated phase diagram
 
 To compute solidus H₂O-saturated phase diagram, let's (for instance) change the thermodynamic database to Metabasite (Green et al., 2016), choose `Solidus H₂O-saturated = true`, select `clinopyroxene = aug`:
 
@@ -389,7 +412,7 @@ Computing the diagram and displaying the system H₂O-activity should gives:
     - First, for the given pressure range (and using 50 pressure steps), the water-saturated solidus is extracted using bisection method. Subsequently, the pressure-dependent solidus temperature is interpolated using PChip interpolant. At Tsuprasolidus = Tsolidus + 0.01 K, a second interpolation is used to retrieve the amount of water saturating the melt. The latter interpolant is then used to prescribe the water content of the bulk, ensuring pressure-dependent water saturation at solidus (+ 0.1 K). 
     - Extra water can be added in the `Phase diagram parameter` panel, using the option `Additional H₂O [mol%]`.
 
-### 8. T-X fixed pressure diagram
+### 9. T-X fixed pressure diagram
 
 The objective of T-X diagram is to fix the pressure while having in the vertical axis a range of temperature and on the horizontal axis a varying bulk-rock composition. Variation in the bulk-rock composition can be applied to any oxides and the two end-member bulk-rock composition added to bulk-rock input file (see [Bulk-rock input file](@ref)).
 
@@ -454,7 +477,7 @@ Fixing the `O` content and contouring $\Delta_{QFM}$ gives the desired result:
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_TX_buffer_diagram_cor.png?raw=true" alt="MAGEMinApp TX buffer diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 ``` 
 
-### 9. PT-X diagram
+### 10. PT-X diagram
 
 PT-X diagrams differ from P-X and T-X diagrams in the sense that both pressure and temperature can be varied along a pressure-temperature path. This option can be particularily useful when modelling subduction geotherm for instance.
 
@@ -481,7 +504,7 @@ Then in the `Bulk-rock composition` middle panel, select the pre-defined bulk `F
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_PTX_diagram.png?raw=true" alt="MAGEMinAppPTX diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 ``` 
 
-### 10. T-T poly-metamorphic diagram
+### 11. T-T poly-metamorphic diagram
 
 The goal of a T-T poly-metamorphic diagram is to predict the evolution of the stable phase assemblage for a rock undergoing two successive metamorphic events. 
 
@@ -512,7 +535,7 @@ Compute the diagram which should give:
 !!! note
     - At very high temperature extracting nearly all the melt may become a problem as you are left with highly refractory compositions. In this case you either leave slightly more melt in the host-rock or decrease the maximum temperature.
 
-### 11. LaMEM density diagram
+### 12. LaMEM density diagram
 
 #### Quickstart
 
