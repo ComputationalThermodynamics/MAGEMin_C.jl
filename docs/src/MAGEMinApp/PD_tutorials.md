@@ -208,7 +208,7 @@ which results in
 ```
 ### 4. Deactivate solution and/or pure phases
 
-In some cases, it is useful to deactivte a solution model (activity-composition model) or a pure phase. 
+In some cases, it is useful to deactivate a solution model (activity-composition model) or a pure phase. 
 
 Let's first select the thermodynamic database to be `Metapelite` (White et al., 2014) and use the default bulk-rock composition `FPWorldMedian pelite - water oversaturated`. Keep the default diagram type `P-T Diagram` and pressure range and update the temperature range from 400 to 1000 °C. in the top-left `Phase diagram parameters` panel, simply click on the rounded button of the `Phase selection` option, to display the list of available phases for the selection thermodynamic database:
 

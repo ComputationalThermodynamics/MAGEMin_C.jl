@@ -3,7 +3,7 @@
 This page provides a set of examples showing how to use MAGEMin_C.jl to perform phase equilibrium calculations.
 
 !!! note
-    - Examples 1 to 7 are simple exercises to make you familiar with the the various options available for the calculation
+    - Examples 1 to 7 are simple exercises to make you familiar with the various options available for the calculation
     - Examples 8 to 10 are more advanced and some basic background in `Julia` programming are recommanded
 
 ## Quickstart examples
@@ -824,4 +824,4 @@ The function `multi_point_minimization` will automatically utilize parallelizati
 
 - White, RW, Powell, R, Holland, TJB, Johnson, TE & Green, ECR (2014). New mineral activity-composition relations for thermodynamic calculations in metapelitic systems. Journal of Metamorphic Geology, 32, 261-286, doi: 10.1111/jmg.12071
 
-- Holland, TJB & Powell, RW (2011). An improved and extended internally consistent thermodynamic dataset for phases of petrological interest,involving a new equation of state for solids. Journal of Metamorphic Geology, 29, 333-383, doi: 10.1111/j.1525-1314.2010.00923.x
+- Holland, TJB & Powell, RW (2011). An improved and extended internally consistent thermodynamic dataset for phases of petrological interest, involving a new equation of state for solids. Journal of Metamorphic Geology, 29, 333-383, doi: 10.1111/j.1525-1314.2010.00923.x
