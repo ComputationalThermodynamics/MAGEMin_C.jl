@@ -2,7 +2,6 @@
 
 `MAGEMin_C` is designed to simplify single and multipoint phase equilibrium modelling using `Julia` programming language. The main objective is to provide a set of routine to initialize MAGEMin, perform a set of calculation, store the results of the phase equilibrium modelling in an output structure and free (deallocate) MAGEMin. This approach allow to easily create custom script to perform advanced phas equilibrium modelling calculations but also to offer an interface with geodynamic modelling (such as reactive two-phase modelling of magma transport).
 
-
 ## Quick start
 
 The most convinient way to use `MAGEMin_C.jl` is by first creating a `Julia` script. To do so, simply create a new text file and change the extension to `.jl`, e.g., `MAGEMin_C_script.jl`.
@@ -33,10 +32,8 @@ out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys
 - `using MAGEMin_C` loads the package, while `data    = Initialize_MAGEMin("ig", verbose=false);` initializes `MAGEMin_C` with the wanted database and reduced verbose.
 - `out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)`performs the phase equilibrium calculation given the provided parameters. The results of the computation, such as the stable phase names, fractions, composition etc, are store in the `out` structure. Details about how to access the full list of saved variables are provided in the tutorials section.
 
-
 !!! note
     A number of options other than `verbose=false` can be added to the command. For instance `solver= x` or `buffer= "qfm"` are also valid. The complete list of options is given in the in the tutorials section.
-
 
 !!! note
     Thermodynamic dataset acronym are the following:
@@ -46,4 +43,8 @@ out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys
     - `ig` -> igneous (Green et al., 2025 updated from and replacing Holland et al., 2018)
     - `igad` -> igneous alkaline dry (Weller et al., 2024)
     - `um` -> ultramafic (Evans & Frost, 2021)
+    - `sb11` -> Stixrude & Lithgow-Bertelloni (2011)
+    - `sb21` -> Stixrude & Lithgow-Bertelloni (2021)
     - `ume` -> ultramafic extended (Green et al., 2016 + Evans & Frost, 2021)
+    - `mpe` -> extended metapelite (White et al., 2014 + Green et al., 2016 + Franzolin et al., 2011 + Diener et al., 2007)
+    - `mbe` -> extended metabasite (Green et al., 2016 + Diener et al., 2007 + Rebay et al., 2022)
