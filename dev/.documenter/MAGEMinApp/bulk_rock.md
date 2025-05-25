@@ -40,7 +40,15 @@ Thermodynamic dataset acronym are the following:
   
 - `um` -&gt; ultramafic (Evans &amp; Frost, 2021)
   
+- `sb11` -&gt; Stixrude &amp; Lithgow-Bertelloni (2011)
+  
+- `sb21` -&gt; Stixrude &amp; Lithgow-Bertelloni (2021)
+  
 - `ume` -&gt; ultramafic extended (Green et al., 2016 + Evans &amp; Frost, 2021)
+  
+- `mpe` -&gt; extended metapelite (White et al., 2014 + Green et al., 2016 + Franzolin et al., 2011 + Diener et al., 2007)
+  
+- `mbe` -&gt; extended metabasite (Green et al., 2016 + Diener et al., 2007 + Rebay et al., 2022)
   
 
 :::

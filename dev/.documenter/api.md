@@ -11,7 +11,7 @@ AMR_data
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/AMR.jl#L15-L17" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/AMR.jl#L15-L17" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -26,7 +26,7 @@ Holds the partitioning coefficient database
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/TE_partitioning.jl#L167-L169" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/TE_partitioning.jl#L167-L169" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -41,7 +41,7 @@ Holds the MAGEMin databases & required structures for every thread
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L221-L223" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L221-L223" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -58,7 +58,7 @@ Holds the overriding Ws parameters
 0 = &quot;mp&quot;, 1 = &quot;mb&quot;, 11 = &quot;mbe&quot;,2 = &quot;ig&quot;, 3 = &quot;igad&quot;, 4 = &quot;um&quot;, 5 = &quot;ume&quot;, 6 = &quot;mtl&quot;, 7 = &quot;mpe&quot;, 8 = &quot;sb11&quot;, 9 = &quot;sb21&quot;
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L232-L235" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L232-L235" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -73,7 +73,7 @@ Holds general information about the database
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L207-L209" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L207-L209" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -88,7 +88,7 @@ structure that holds the result of the pointwise minimization
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L63-L65" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L63-L65" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -103,7 +103,7 @@ Holds general information about solution phases
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L193-L195" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L193-L195" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -118,7 +118,7 @@ AMR(data)
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/AMR.jl#L135-L137" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/AMR.jl#L135-L137" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -135,7 +135,7 @@ Finalize_MAGEMin(dat::MAGEMin_Data)
 Finalizes MAGEMin and clears variables
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L354-L357" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L354-L357" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -152,7 +152,7 @@ Dat = Initialize_MAGEMin(db = "ig"; verbose::Union{Bool, Int64} = true)
 Initializes MAGEMin on one or more threads, for the database `db`. You can suppress all output with `verbose=false`. `verbose=true` will give a brief summary of the result, whereas `verbose=1` will give more details about the computations.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L291-L295" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L291-L295" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -169,7 +169,7 @@ Transform MAGEMin output into a dataframe for quick(ish) save
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/export2CSV.jl#L174-L179" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/export2CSV.jl#L174-L179" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -186,7 +186,7 @@ Transform MAGEMin output into a dataframe for quick(ish) save
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/export2CSV.jl#L416-L421" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/export2CSV.jl#L416-L421" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -203,7 +203,7 @@ Transform MAGEMin trace-element output into a dataframe for quick(ish) save
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/export2CSV.jl#L12-L17" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/export2CSV.jl#L12-L17" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -218,7 +218,7 @@ TE_prediction
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/TE_partitioning.jl#L443-L445" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/TE_partitioning.jl#L443-L445" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -233,7 +233,7 @@ all_identical(arr::Vector{UInt64})
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/AMR.jl#L83-L86" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/AMR.jl#L83-L86" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -248,7 +248,7 @@ Function to allocate memory for the output
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L40-L42" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L40-L42" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -263,7 +263,7 @@ compute_index(value, min_value, delta)
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/AMR.jl#L32-L34" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/AMR.jl#L32-L34" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -280,7 +280,7 @@ MAGEMin_bulk, MAGEMin_ox; = convertBulk4MAGEMin(bulk_in::T1,bulk_in_ox::Vector{S
 receives bulk-rock composition in [mol,wt] fraction and associated oxide list and sends back bulk-rock composition converted for MAGEMin use
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L891-L896" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L891-L896" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -297,7 +297,7 @@ out = create_gmin_struct(gv, z_b)
 This extracts the output of a pointwise MAGEMin optimization and adds it into a julia structure
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L1438-L1442" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L1438-L1442" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -314,7 +314,7 @@ out = create_light_gmin_struct(gv, z_b)
 This extracts the output of a pointwise MAGEMin optimization and adds it into a julia structure
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L1582-L1586" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L1582-L1586" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -331,7 +331,7 @@ finalize_MAGEMin(gv,DB)
 Cleans up the memory
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L467-L470" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L467-L470" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -346,7 +346,7 @@ Get the partitioning coefficient database from Oliveira Da Costa, E. ...
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/TE_partitioning.jl#L268-L270" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/TE_partitioning.jl#L268-L270" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -361,7 +361,7 @@ Get the partitioning coefficient database from Oliveira Da Costa, E. ...
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/TE_partitioning.jl#L245-L247" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/TE_partitioning.jl#L245-L247" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -376,7 +376,7 @@ Get the Li partitioning coefficient (Oliveira Da Costa, E. ...)
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/TE_partitioning.jl#L207-L209" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/TE_partitioning.jl#L207-L209" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -391,7 +391,7 @@ Get the partitioning coefficient database from Matt Morris et ., 2025 ...
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/TE_partitioning.jl#L180-L182" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/TE_partitioning.jl#L180-L182" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -406,7 +406,7 @@ Get the partitioning coefficient database from Laurent, O. ...
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/TE_partitioning.jl#L292-L294" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/TE_partitioning.jl#L292-L294" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -426,7 +426,7 @@ The function receives as an input a single/Vector of MAGEMin_C output structure 
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/export2CSV.jl#L379-L386" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/export2CSV.jl#L379-L386" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -441,7 +441,7 @@ This function returns the solution phase name given the mineral name (handling s
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/name_solvus.jl#L96-L98" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/name_solvus.jl#L96-L98" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -458,7 +458,7 @@ gv, DB = init_MAGEMin(;EM_database=0)
 Initializes MAGEMin (including setting global options) and loads the Database.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L367-L371" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L367-L371" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -473,7 +473,7 @@ compute_hash_map(data)
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/AMR.jl#L40-L42" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/AMR.jl#L40-L42" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -548,7 +548,7 @@ julia> versioninfo()
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L528-L592" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L528-L592" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -628,7 +628,7 @@ julia> finalize_MAGEMin(gv,DB)
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L1031-L1096" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L1031-L1096" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -645,7 +645,7 @@ out = point_wise_minimization(P::Number,T::Number, data::MAGEMin_Data)
 Performs a point-wise optimization for a given pressure `P` and temperature `T` for the data specified in the MAGEMin database `MAGEMin_Data` (where also compoition is specified)
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L1332-L1336" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L1332-L1336" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -660,7 +660,7 @@ out = function point_wise_minimization_with_guess(mSS_vec :: Vector{mSS_data}, P
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L1867-L1869" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L1867-L1869" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -677,7 +677,7 @@ print_info(g::gmin_struct)
 Prints a more extensive overview of the simulation results
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L1649-L1653" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L1649-L1653" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -693,7 +693,7 @@ The objective here is to be able to use MAGEMin for thermodynamic database inver
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L1381-L1384" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L1381-L1384" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -708,7 +708,7 @@ Function to retrieve the list of indexes of the solution phases to be removed fr
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L256-L258" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L256-L258" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -723,7 +723,7 @@ Function to retrieve the general information of the databases
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L244-L246" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L244-L246" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -738,7 +738,7 @@ split_and_keep(data)
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/AMR.jl#L91-L94" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/AMR.jl#L91-L94" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -752,7 +752,7 @@ bulk_rock = use_predefined_bulk_rock(gv, test=-1, db=&quot;ig&quot;)
 Returns the pre-defined bulk rock composition of a given test
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L766-L770" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L766-L770" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -769,7 +769,7 @@ data = use_predefined_bulk_rock(data::MAGEMin_Data, test=0)
 Returns the pre-defined bulk rock composition of a given test
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/f02563a1fa8a976e053ff403f3eda365c37eef5e/julia/MAGEMin_wrappers.jl#L825-L828" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/c56546cb6bcf87669d13ff19c0e291e3d31719d0/julia/MAGEMin_wrappers.jl#L825-L828" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
