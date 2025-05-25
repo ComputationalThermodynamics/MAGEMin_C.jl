@@ -16,6 +16,16 @@ function norm(vec :: Vector{Float64})
     return sqrt(sum(vec.^2))
 end
 
+# using MAGEMin_C
+# data        =   Initialize_MAGEMin("mbe", verbose=1);
+# test        =   0 
+# data        =   use_predefined_bulk_rock(data, test);
+# P           =   32.0
+# T           =   400.0
+# out         =   point_wise_minimization(P,T, data);
+# Finalize_MAGEMin(data)
+
+
 data        =   Initialize_MAGEMin("sb21", verbose=-1);
 test        =   1         #KLB1
 data        =   use_predefined_bulk_rock(data, test);
@@ -54,17 +64,7 @@ Finalize_MAGEMin(data)
 end
 
 
-@testset "test ume database" begin
-    data        =   Initialize_MAGEMin("ume", verbose=-1);
-    test        =   0
-    data        =   use_predefined_bulk_rock(data, test);
-    P           =   20.0
-    T           =   400.0
-    out         =   point_wise_minimization(P,T, data);
-    Finalize_MAGEMin(data)
 
-    @test sort(out.ph) == sort(["fl", "spi", "ta", "aug", "chl", "pyr"])
-end
 
 # Tests from L. Candioti - ETH - Oct 2024
 @testset "test mass conservation" begin
@@ -454,6 +454,17 @@ end
     Finalize_MAGEMin(data)
 end
 
+@testset "test ume" begin
+
+    data        =   Initialize_MAGEMin("ume", verbose=-1);
+    test        =   0
+    data        =   use_predefined_bulk_rock(data, test);
+    P           =   20.0
+    T           =   400.0
+    out         =   point_wise_minimization(P,T, data);
+    Finalize_MAGEMin(data)
+    @test sort(out.ph) == sort(["amp", "fl", "atg", "spi", "chl", "ta", "pyr"])
+end
 
 # Stores data of tests
 mutable struct outP{ _T  } 
