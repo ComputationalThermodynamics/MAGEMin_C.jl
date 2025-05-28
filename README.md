@@ -31,7 +31,11 @@ Thermodynamic dataset acronym are the following:
 - `ig` -> igneous (Green et al., 2025 updated from and replacing Holland et al., 2018)
 - `igad` -> igneous alkaline dry (Weller et al., 2024)
 - `um` -> ultramafic (Evans & Frost, 2021)
+- `sb11` -> Stixrude & Lithgow-Bertelloni (2011)
+- `sb21` -> Stixrude & Lithgow-Bertelloni (2021)
 - `ume` -> ultramafic extended (Green et al., 2016 + Evans & Frost, 2021)
+- `mpe` -> extended metapelite (White et al., 2014 + Green et al., 2016 + Franzolin et al., 2011 + Diener et al., 2007)
+- `mbe` -> extended metabasite (Green et al., 2016 + Diener et al., 2007 + Rebay et al., 2022)
 
 ### Oxygen buffers and activity
 Several buffers can be used to fix the oxygen fugacity
