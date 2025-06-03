@@ -1,1 +1,0 @@
-import{_ as t,c as e,o as n}from"./chunks/framework.D35As6yu.js";const l=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"contributing.md","filePath":"contributing.md","lastUpdated":null}'),a={name:"contributing.md"};function r(o,c,i,s,d,p){return n(),e("div")}const m=t(a,[["render",r]]);export{l as __pageData,m as default};
