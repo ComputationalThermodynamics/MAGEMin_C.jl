@@ -42,7 +42,7 @@ makedocs(;
 
 deploydocs(;
     repo            = "github.com/ComputationalThermodynamics/MAGEMin_C.jl",
-    target          = "dev", # this is where Vitepress stores its output
+    branch          = "gh-pages", # this is where Vitepress stores its output
     devbranch       = "main",
     push_preview    = true,
 )
