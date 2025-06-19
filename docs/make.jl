@@ -9,8 +9,8 @@ makedocs(;
     sitename    = "MAGEMin",
     format      = DocumenterVitepress.MarkdownVitepress(
         repo    = "github.com/ComputationalThermodynamics/MAGEMin_C.jl",
-        #devbranch = "main",
-        #devurl = "dev",
+        devbranch = "main",
+        devurl = "dev",
     ),
     pages = [
         "Home"          => "index.md",
@@ -47,6 +47,6 @@ deploydocs(;
     repo            = "github.com/ComputationalThermodynamics/MAGEMin_C.jl",
     target          = "dev", # this is where Vitepress stores its output
     branch          = "gh-pages",
-    #devbranch       = "main",
+    devbranch       = "main",
     push_preview    = true,
 )
