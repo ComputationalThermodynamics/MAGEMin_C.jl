@@ -1,301 +1,17 @@
-# MAGEMin_C.jl: Examples
+# MAGEMin_C.jl: Tutorials
 
-This page provides a set of examples showing how to use MAGEMin_C.jl to perform phase equilibrium calculations.
+This page provides a set of detailed tutorials showing how to use MAGEMin_C.jl to perform phase equilibrium calculations.
+
+!!! info
+    - [Iterative phase equilibrium calculation](#Iterative-phase-equilibrium-calculation )
+    - [Single point trace element partitioning](#Single-point-trace-element-partitioning)
+    - [Trace element partitioning](#Trace-element-partitioning)
+
 
 !!! note
-    - Examples 1 to 7 are simple exercises to make you familiar with the various options available for the calculation
-    - Example 8 is a step-by-step tutorial showing how to build up complexity using `MAGEMin_C.jl`
-    - Examples 9 to 11 are more advanced and some basic background in `Julia` programming are recommanded
+    - The tutorials are not optimized for performances, but are provided in hope they can be useful to present `MAGEMin_C` functionality.
 
-## Quickstart examples
-
-### E.1 - Predefined compositions
-This is an example of how to use it for a predefined bulk rock composition:
-```julia
-using MAGEMin_C
-db   = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-data = Initialize_MAGEMin(db, verbose=true);
-test = 0         #KLB1
-data = use_predefined_bulk_rock(data, test);
-P    = 8.0;
-T    = 800.0;
-out  = point_wise_minimization(P,T, data);
-```
-which gives
-``` julia
- Status             :            0 
- Mass residual      : +5.34576e-06
- Rank               :            0 
- Point              :            1 
- Temperature        :   +800.00000       [C] 
- Pressure           :     +8.00000       [kbar]
-
- SOL = [G: -797.749] (25 iterations, 39.62 ms)
- GAM = [-979.481432,-1774.104523,-795.261024,-673.747244,-375.070247,-917.557241,-829.990582,-1023.656703,-257.019268,-1308.294427]
-
- Phase :      spn      cpx      opx       ol 
- Mode  :  0.02799  0.14166  0.24228  0.58807 
-```
-
-!!! note
-    Thermodynamic dataset acronym are the following:
-    - `mtl` -> mantle (Holland et al., 2013)
-    - `mp` -> metapelite (White et al., 2014)
-    - `mb` -> metabasite (Green et al., 2016)
-    - `ig` -> igneous (Green et al., 2025 updated from and replacing Holland et al., 2018)
-    - `igad` -> igneous alkaline dry (Weller et al., 2024)
-    - `um` -> ultramafic (Evans & Frost, 2021)
-    - `sb11` -> Stixrude & Lithgow-Bertelloni (2011)
-    - `sb21` -> Stixrude & Lithgow-Bertelloni (2021)
-    - `ume` -> ultramafic extended (Green et al., 2016 + Evans & Frost, 2021)
-    - `mpe` -> extended metapelite (White et al., 2014 + Green et al., 2016 + Franzolin et al., 2011 + Diener et al., 2007)
-    - `mbe` -> extended metabasite (Green et al., 2016 + Diener et al., 2007 + Rebay et al., 2022)
-
-
-### E.2 - Custom composition
-And here a case in which you specify your own bulk rock composition.
-```julia
-using MAGEMin_C
-data    = Initialize_MAGEMin("ig", verbose=false);
-P,T     = 10.0, 1100.0
-Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
-X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
-sys_in  = "wt"
-out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
-```
-which gives:
-``` julia
-Pressure          : 10.0      [kbar]
-Temperature       : 1100.0    [Celsius]
-     Stable phase | Fraction (mol fraction) 
-              liq   0.75133 
-              cpx   0.20987 
-              opx   0.03877 
-     Stable phase | Fraction (wt fraction) 
-              liq   0.73001 
-              cpx   0.22895 
-              opx   0.04096 
-Gibbs free energy : -916.874646  (45 iterations; 86.53 ms)
-Oxygen fugacity          : 2.0509883251350577e-8
-```
-
-After the calculation is finished, the structure `out` holds all the information about the stable assemblage, including seismic velocities, melt content, melt chemistry, densities etc.
-You can show a full overview of that with
-```julia
-print_info(out)
-```
-If you are interested in the density or seismic velocity at the point, access it with
-```julia
-out.rho
-2755.2995530913095
-out.Vp
-3.945646731595539
-```
-Once you are done with all calculations, release the memory with
-```julia
-Finalize_MAGEMin(data)
-```
-
-### E.3 - Export data to CSV
-Using previous example to compute a point:
-```julia
-using MAGEMin_C
-dtb     = "ig"
-data    = Initialize_MAGEMin(dtb, verbose=false);
-P,T     = 10.0, 1100.0
-Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "Fe2O3"; "K2O"; "Na2O"; "TiO2"; "Cr2O3"; "H2O"];
-X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 0.68; 0.0; 3.0];
-sys_in  = "wt"
-out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
-```
-Exporting the result of the minimization(s) to an CSV file is straightforward:
-```julia
-MAGEMin_data2dataframe(out,dtb,"filename")
-```
-where `out` is the output structure, `dtb` is the database acronym and `"filename"` is the filename :)
-
-!!! note
-    * You don't have to add the file extension `.csv`
-    * The output path (MAGEMin_C directory) is displayed in the Julia terminal
-    * For multiple points, simply provide the `Julia` ```Vector{out}```. See Example 8 for more details on how to create a vector of minimization output.
-
-### E.4 - Removing solution phase(s) from consideration
-To suppress solution phases from the calculation, define a remove list `rm_list` using the `remove_phases()` function. In the latter, provide a vector of the solution phase(s) you want to remove and the database acronym as a second argument. Then pass the created `rm_list` to the `single_point_minimization()` function.
-```julia
-using MAGEMin_C
-data    = Initialize_MAGEMin("mp", verbose=-1, solver=0);
-rm_list = remove_phases(["liq","sp"],"mp");
-P,T     = 10.713125, 1177.34375;
-Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","K2O","Na2O","TiO2","O","MnO","H2O"];
-X       = [70.999,12.805,0.771,3.978,6.342,2.7895,1.481,0.758,0.72933,0.075,30.0];
-sys_in  = "mol";
-out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in,rm_list=rm_list)
-```
-which gives:
-``` julia
-Pressure          : 10.713125      [kbar]
-Temperature       : 1177.3438    [Celsius]
-     Stable phase | Fraction (mol fraction) 
-              fsp   0.29236 
-                g   0.13786 
-             ilmm   0.01526 
-                q   0.22534 
-             sill   0.10705 
-              H2O   0.22213 
-     Stable phase | Fraction (wt fraction) 
-              fsp   0.34544 
-                g   0.17761 
-             ilmm   0.0261 
-                q   0.25385 
-             sill   0.12197 
-              H2O   0.07503 
-     Stable phase | Fraction (vol fraction) 
-              fsp   0.31975 
-                g   0.10873 
-             ilmm   0.01307 
-                q   0.23367 
-             sill   0.08991 
-              H2O   0.23487 
-Gibbs free energy : -920.021202  (25 iterations; 27.45 ms)
-Oxygen fugacity          : -5.4221261006295105
-Delta QFM                : 2.506745293747623
-```
-
-!!! note
-    Note that if you want to suppress a single phase, you still need to define a vector to be passed to the `remove_phases()` function, such as shown below.
-
-```julia
-using MAGEMin_C
-data    = Initialize_MAGEMin("mp", verbose=-1, solver=0);
-rm_list = remove_phases(["liq"],"mp");
-P,T     = 10.713125, 1177.34375;
-Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","K2O","Na2O","TiO2","O","MnO","H2O"];
-X       = [70.999,12.805,0.771,3.978,6.342,2.7895,1.481,0.758,0.72933,0.075,30.0];
-sys_in  = "mol";
-out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in,rm_list=rm_list)
-```
-which gives:
-```julia
-Pressure          : 10.713125      [kbar]
-Temperature       : 1177.3438    [Celsius]
-     Stable phase | Fraction (mol fraction) 
-              fsp   0.29337 
-                g   0.12 
-               sp   0.03036 
-                q   0.23953 
-             sill   0.08939 
-               ru   0.00521 
-              H2O   0.22213 
-     Stable phase | Fraction (wt fraction) 
-              fsp   0.34667 
-                g   0.15368 
-               sp   0.04514 
-                q   0.26983 
-             sill   0.10184 
-               ru   0.00781 
-              H2O   0.07503 
-     Stable phase | Fraction (vol fraction) 
-              fsp   0.31981 
-                g   0.09422 
-               sp   0.02492 
-                q   0.24761 
-             sill   0.07484 
-               ru   0.00446 
-              H2O   0.23413 
-Gibbs free energy : -920.00146  (19 iterations; 27.79 ms)
-Oxygen fugacity          : -5.760704474307317
-Delta QFM                : 2.1681669200698166
-```
-
-### E.5 - Oxygen buffer
-
-Here we need to initialize MAGEMin with the desired buffer (qfm in this case, see list at the beginning). 
-
-!!! note
-    Note that O/Fe2O3 value needs to be large enough to saturate the system. Excess oxygen-content will be removed from the output
-
-```julia
-using MAGEMin_C 
-data    = Initialize_MAGEMin("ig", verbose=false, buffer="qfm");
-P,T     = 10.0, 1100.0
-Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","K2O","Na2O","TiO2","O","Cr2O3","H2O"];
-X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 4.0; 0.1; 3.0];
-sys_in  = "wt"    
-out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
-```
-
-Buffer offset in the log10 scale can be applied as
-
-```julia
-using MAGEMin_C 
-data    = Initialize_MAGEMin("ig", verbose=false, buffer="qfm");
-P,T     = 10.0, 1100.0
-Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","K2O","Na2O","TiO2","O","Cr2O3","H2O"];
-X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 1.87; 4.0; 0.1; 3.0];
-offset  = -1.0
-sys_in  = "wt"    
-out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, B=offset, sys_in=sys_in)
-```
-
-!!! note
-    Several buffers can be used to fix the oxygen fugacity
-    - `qfm` -> quartz-fayalite-magnetite
-    - `qif` -> quartz-iron-fayalite
-    - `nno` -> nickel-nickel oxide
-    - `hm` -> hematite-magnetite
-    - `iw` -> iron-wüstite
-    - `cco` -> carbon dioxide-carbon
-
-
-### E.6 - Activity buffer
-
-Like for oxygen buffer, activity buffer can be prescribe as follow
-
-!!! note
-    Note that the corresponding oxide-content needs to be large enough to saturate the system. Excess oxide-content will be removed from the output
-
-```julia
-using MAGEMin_C 
-data    = Initialize_MAGEMin("ig", verbose=false, buffer="aTiO2");
-P,T     = 10.0, 700.0
-Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","K2O","Na2O","TiO2","O","Cr2O3","H2O"];
-X       = [48.43; 15.19; 11.57; 10.13; 6.65; 1.64; 0.59; 4.0; 0.1; 0.1; 3.0];
-value  = 0.9
-sys_in  = "wt"    
-out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, B=value, sys_in=sys_in)
-```
-
-!!! note
-    Similarly activity can be fixed for the following oxides
-    - `aH2O` -> using water as reference phase
-    - `aO2`   -> using dioxygen as reference phase
-    - `aMgO` -> using periclase as reference phase
-    - `aFeO` -> using ferropericlase as reference phase
-    - `aAl2O3` -> using corundum as reference phase
-    - `aTiO2` -> using rutile as reference phase
-    - `aSiO2` -> using quartz/coesite as reference phase
-
-
-### E.7 - Many points
-
-```julia
-using MAGEMin_C
-db   = "ig"  # database: ig, igneous (Holland et al., 2018); mp, metapelite (White et al 2014b)
-data  = Initialize_MAGEMin(db, verbose=false);
-test = 0         #KLB1
-n    = 1000
-P    = rand(8.0:40,n);
-T    = rand(800.0:2000.0, n);
-out  = multi_point_minimization(P,T, data, test=test);
-Finalize_MAGEMin(data)
-```
-By default, this will show a progressbar (which you can deactivate with the `progressbar=false` option).
-
-You can also specify a custom bulk rock for all points (see above), or a custom bulk rock for every point.
-
-## Step-by-step
-
-### E.8 - Loop phase equilibrium calculation
+## Iterative phase equilibrium calculation
 
 first add MAGEMin_C and Plots
 ```julia
@@ -312,7 +28,7 @@ using MAGEMin_C, Plots
 First let's first initialize MAGEMin with the metapelite database (White et al ., 2014)
 
 ```julia
-data        =   Initialize_MAGEMin("mp", verbose=true);
+data        =   Initialize_MAGEMin("mp", verbose=false);
 ```
 
 Then define the bulk-rock composition (wt fraction) the related oxide list and the system unit
@@ -337,6 +53,10 @@ and perform the test calculation:
 ```julia
 out  = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_unit, name_solvus = true)
 ```
+
+!!! note 
+    The option `name_solvus = true` is important here, as it allows for to properly name minerals based on their composition, e.g., `fsp` -> `pl` or `afs`
+
 
 which should gives:
 
@@ -506,541 +226,383 @@ Here, we first look for the id of "H2O" pure phase. Then, we get the water fract
     - The previous code snipped has to be placed after calling `single_point_minimization()`
     - Mind that for the igneous database, there is a fluid model "fl" instead of pure water ("H2O").
 
+## Single point trace element partitioning
 
-## Advanced examples
+The following example shows how to perform a single point equilibrium calculation and compute trace-element partitioning, using constant, linear and non-linear values.
 
-### E.9 - Fractional crystallization
+Let's first compute a phase equilibrium using the metapelite database:
 
-The following example shows how to perform fractional crystallization using a hydrous basalt magma as a starting composition. The results are displayed using PlotlyJS. This example is provided in the hope it may be useful for learning how to use MAGEMin_C for more advanced applications. 
+```julia
+dtb     = "mp"
+data    = Initialize_MAGEMin(dtb, verbose=false, solver=0);
+P,T     = 6.0, 699.0
+Xoxides = ["SiO2";  "TiO2";  "Al2O3";  "FeO";   "MnO";   "MgO";   "CaO";   "Na2O";  "K2O"; "H2O"; "O"];
+X       = [58.509,  1.022,   14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 10.0, 0.2];
+sys_in  = "wt"
+out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in, name_solvus=true)
+Finalize_MAGEMin(data)
+```
+
+!!! note 
+    The option `name_solvus = true` is important here, as it allows for to properly name minerals based on their composition, e.g., `fsp` -> `pl` or `afs`
+
+Then we define the trace elements we want to model:
+
+```julia
+el      = ["Li","Zr"]
+```
+The phases for which we have partitioning coefficients (KDs):
+
+```julia
+ph      = ["q","afs","pl","bi","opx","cd","mu","amp","fl","cpx","g","zrn"]
+```
+### Partitioning coefficient Matrix
+
+Subsequently, we need to define the partitioning coefficients. For instance let's define some arbitrary formulations for the KD's:
+
+```julia
+KDs     = ["0.17" "0.01";"0.14 * T_C/1000.0 + [:bi].compVariables[1]" "0.01";"0.33 + 0 01*P_kbar" "0.01";"1.67 * P_kbar / 10.0 + T_C/1000.0" "0.01";"0.2" "0.01";"125" "0.01";"0.82" "0.01";"0.2" "0.01";"0.65" "0.01";"0.26" "0.01";"0.01" "0.01";"0.01" "0.0"] 
+```
 
 !!! note
-    Note that if we wanted to use a buffer, we would need to initialize MAGEMin as in example 4. Because during fractional crystallization the bulk-rock composition is updated at every step, we would need to increase the oxygen-content (`O`) of the new bulk-rock
+    - Here `KDs` is a Matrix of `String` of size (n_ph, n_el). 
+    - Each line of the Matrix correspond to the partitioning coefficient formulation per phase and for all elements. For instance the first line `"0.17" "0.01"` indicates that `Li` and `Zr` have KD's of `"0.17"` and `"0.01"` for `q`.
+
+    | `KDs`  | el_1 | el_2 | el_m |
+    |---|------|------|------|
+    | ph_1 | KD_11    | KD_12    | KD_1m   |
+    | ph_2 | KD_21    | KD_22    | KD_2m   |
+    | ph_n | KD_n1    | KD_n2    | KD_nm   |  
+    where `n` is the total number of phases and `m` is the total number of trace elements.
+
+    - The second line is slightly more complex `"0.14 * T_C/1000.0 + [:bi].compVariables[1]" "0.01"`. The first entry `"0.14 * T_C/1000.0 + [:bi].compVariables[1]"` is a non-linear formulation of `Li` KD for `afs` that depends on temperature `T_C` and the compositional variable 1 of biotite. See [example E.2](examples.md#E.2.-Minimization-output) for details about the output structure.
+    - All variables from `MAGEMin_C` output structure can be accessed and used to define formulation for non-linear KDs. 
+    - Note that informations about specific minerals are accessed using for instance `[:bi].`
+
+
+We now need to define the starting concentration of the trace elements (ppm or ug/g):
 
 ```julia
-using MAGEMin_C
-using PlotlyJS
-
-# number of computational steps
-nsteps = 64
-
-# Starting/ending Temperature [°C]
-T = range(1200.0,600.0,nsteps)
-
-# Starting/ending Pressure [kbar]
-P = range(3.0,0.1,nsteps)
-
-# Starting composition [mol fraction], here we used an hydrous basalt; composition taken from Blatter et al., 2013 (01SB-872, Table 1), with added O and water saturated
-oxides  = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"]
-bulk_0  = [38.448328757254195, 7.718376151972274, 8.254653357127351, 9.95911842561036, 5.97899305676308, 0.24079752710315697, 2.2556006776515964, 0.7244006013202644, 0.7233140004182841, 0.0, 12.696417444779453];
-
-# Define bulk-rock composition unit
-sys_in  = "mol"
-
-# Choose database
-data    = Initialize_MAGEMin("ig", verbose=false);
-
-# allocate storage space
-Out_XY  = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef,nsteps)
-
-melt_F  = 1.0
-bulk    = copy(bulk_0)
-np      = 0
-while melt_F > 0.0
-    np             +=1
-
-    out     = single_point_minimization(P[np], T[np], data, X=bulk, Xoxides=oxides, sys_in=sys_in) 
-    Out_XY[np]   = deepcopy(out)
-
-    # retrieve melt composition to use as starting composition for next iteration
-    melt_F          = out.frac_M
-    bulk           .= out.bulk_M 
-
-    print("#$np  P: $(round(P[np],digits=3)), T: $(round(T[np],digits=3))\n")
-    print("    ---------------------\n")
-    print("     melt_F: $(round(melt_F, digits=3))\n     melt_composition: $(round.(bulk ,digits=3))\n\n")
-
-end
-
-ndata               = np -1             # last point has melt fraction = 0
-
-x                   = Vector{String}(undef,ndata)
-melt_SiO2_anhydrous = Vector{Float64}(undef,ndata)
-melt_FeO_anhydrous  = Vector{Float64}(undef,ndata)
-melt_H2O            = Vector{Float64}(undef,ndata)
-fluid_frac          = Vector{Float64}(undef,ndata)
-melt_density        = Vector{Float64}(undef,ndata)
-residual_density    = Vector{Float64}(undef,ndata)
-system_density      = Vector{Float64}(undef,ndata)
-
-for i=1:ndata
-    x[i]    = "[$(round(P[i],digits=3)), $(round(T[i],digits=3))]"
-    melt_SiO2_anhydrous[i]  = Out_XY[i].bulk_M[1] / (sum(Out_XY[i].bulk_M[1:end-1])) * 100.0
-    melt_FeO_anhydrous[i]   = Out_XY[i].bulk_M[5] / (sum(Out_XY[i].bulk_M[1:end-1])) * 100.0
-    melt_H2O[i]             = Out_XY[i].bulk_M[end] *100
-    fluid_frac[i]           = Out_XY[i].frac_F*100
-
-    melt_density[i]         = Out_XY[i].rho_M
-    residual_density[i]     = Out_XY[i].rho_S 
-    system_density[i]       = Out_XY[i].rho
-end
-
-# section to plot composition evolution
-trace1 = scatter(   x       = x, 
-                    y       = melt_SiO2_anhydrous, 
-                    name    = "Anyhdrous SiO₂ [mol%]",
-                    line    = attr( color   = "firebrick", 
-                                    width   = 2)                )
-trace2 = scatter(   x       = x, 
-                    y       = melt_FeO_anhydrous, 
-                    name    = "Anyhdrous FeO [mol%]",
-                    line    = attr( color   = "royalblue", 
-                                    width   = 2)                )
-
-trace3 = scatter(   x       = x, 
-                    y       = melt_H2O, 
-                    name    = "H₂O [mol%]",
-                    line    = attr( color   = "cornflowerblue", 
-                                    width   = 2)                )
-
-trace4 = scatter(   x       = x, 
-                    y       = fluid_frac, 
-                    name    = "fluid [mol%]",
-                    line    = attr( color   = "black", 
-                                    width   = 2)                )
-
-layout = Layout(    title           = "Melt composition",
-                    xaxis_title     = "PT [kbar, °C]",
-                    yaxis_title     = "Oxide [mol%]")
-
-
-plot([trace1,trace2,trace3,trace4], layout)
+C0      = [100.0,400.0]
 ```
 
-```@raw html
-<img src="../assets/Melt_compo.png" alt="MELT compo" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
-```
+Then create the KDs database:
 
 ```julia
-
-# section to plot density evolution
-trace1 = scatter(   x       = x, 
-                    y       = melt_density, 
-                    name    = "Melt density [kg/m³]",
-                    line    = attr( color   = "gold", 
-                                    width   = 2)                )
-                      
-trace2 = scatter(   x       = x, 
-                    y       = residual_density, 
-                    name    = "Residual density [kg/m³]",
-                    line    = attr( color   = "firebrick", 
-                                    width   = 2)                )
-                      
-trace3 = scatter(   x       = x, 
-                    y       = system_density, 
-                    name    = "System density[kg/m³]",
-                    line    = attr( color   = "coral", 
-                                    width   = 2)                )
-
-layout = Layout(    title           = "Density evolution",
-                    xaxis_title     = "PT [kbar, °C]",
-                    yaxis_title     = "Density [kg/³]")
-
-
-plot([trace1,trace2,trace3], layout)
+KDs_database = create_custom_KDs_database(el, ph, KDs)
 ```
 
-```@raw html
-<img src="../assets/Density_evolution.png" alt="Density evolution" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
-```
-
-### E.10 - Threaded (parallel) fractional crystallization
+And we can finally compute trace element partitioning as:
 
 ```julia
+out_TE = TE_prediction(out, C0, KDs_database, dtb; ZrSat_model = "CB") 
+```
 
-using ProgressMeter
-using MAGEMin_C
-using Base.Threads: @threads
+which yields:
 
-function get_data_thread( MAGEMin_db :: MAGEMin_Data )
+```
+MAGEMin_C.out_tepm(["Li", "Zr"], [100.0, 400.0], [154.51891525771387, 3107.727391290317], [92.57069316319014, 31.017280420226772], [30.903783051542774 31.07727391290317; 262.8366748533713 31.07727391290317; … ; 26.26821559381136 31.07727391290317; 1.5451891525771388 0.0], ["opx", "bi", "pl", "q", "zrn"], [0.10855984484830646, 0.20550703811276913, 0.5068659994696709, 0.1771366556875411, 0.0019304618817123876], 0.1199276845342525, 3107.727391290317, 47.86020212957779, 0.1522004049315548, [0.5324820362432465, 0.14855391402192616, 0.05910962038616418, 0.04560199231753971, 0.043702325897822, 0.02398578811001486, 0.03295421325994538, 0.010218205689218504, 0.001999648862860764, 0.0014098120682238678, 0.0999824431430382])
+```
 
-    id          = Threads.threadid()
-    gv          = MAGEMin_db.gv[id]
-    z_b         = MAGEMin_db.z_b[id]
-    DB          = MAGEMin_db.DB[id]
-    splx_data   = MAGEMin_db.splx_data[id]
-    
-   return (gv, z_b, DB, splx_data)
-end
+### Trace element output structure
 
-function example_of_threaded_MAGEMin_calc(  data_thread :: Tuple{Any, Any, Any, Any}, dtb :: String,
+The `out_TE`structure contains:
 
-                                            starting_P :: Float64,
-                                            starting_T :: Float64,
-                                            ending_T   :: Float64,
-                                            n_steps    :: Int64,
+```
+out_TE.
+C0           Cliq         Cliq_Zr
+Cmin         Csol         Sat_zr_liq
+bulk_cor_wt  elements     liq_wt_norm
+ph_TE        ph_wt_norm   zrc_wt
+```
 
-                                            sys_in     :: String,
-                                            bulk       :: Vector{Float64},
-                                            Xoxides    :: Vector{String}           )
+!!! note
+    - `C0` -> the starting concentrations of the trace element
+    - `Cliq` -> the trace element concentrations in the liquid
+    - `Cliq_Zr` -> the zirconium concentration of melt
+    - `Cmin` -> the trace element concentrations in the phases
+    - `Csol` -> the trace element concentrations of the solid part, 
+    - `Sat_zr_liq` -> the melt saturation value of zirconium
+    - `bulk_cor_wt` -> the corrected bulk rock composition from crystallized zircon
+    - `elements` -> names of thr trace elements
+    - `liq_wt_norm` -> the normalized wt fraction of melt
+    - `ph_TE` -> names of phase carrying the trace elements
+    - `ph_wt_norm` -> the normalized fraction of the phases
+    - `zrc_wt` -> the computed wt% of crystalllized zircon
 
-    gv, z_b, DB, splx_data = data_thread        # Unpack the MAGEMin data
 
-    Out_PT = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef, n_steps)
-    gv      = define_bulk_rock(gv, bulk, Xoxides, sys_in, dtb);
+!!! note
+    Available zirconium saturation models are:
+    - `"none"` -> deactivate the call to zirconium saturation model
+    - `"WH"` -> Watson & Harrison (1983)
+    - `"B"` -> Boehnke et al. (2013)
+    - `"CB"` -> Crisp and Berry (2022)
 
-    for i = 1:n_steps
 
+## Trace element partitioning
 
-        P       = Float64(starting_P)
-        T       = Float64(starting_T - (starting_T - ending_T) * (i-1)/(n_steps-1))
+First install and use `ProgressMeter` and `Plots` packages:
 
-        out     = point_wise_minimization(  P, T, gv, z_b, DB, splx_data;
-                                                name_solvus=true)
+```julia
+] add ProgressMeter, Plots
 
-        Out_PT[i] = deepcopy(out)
+using ProgressMeter, Plots, MAGEMin_C
+```
 
-        if "liq" in out.ph 
-            bulk    = out.bulk_M
-            oxides  = out.oxides
+Such as previous example let's initialize `MAGEMin` using the `metapelite` dataset (White et al., 2014):
 
-            gv      = define_bulk_rock(gv, bulk, oxides, "mol", dtb);
-        end
-
-    end
-
-    return Out_PT
-
-end
-
-function perform_threaded_calc( Out_all     :: Vector{Vector{MAGEMin_C.gmin_struct{Float64, Int64}}},
-                                data        :: MAGEMin_Data,
-                                dtb         :: String,
-                                n_starting_points :: Int64,
-                                starting_P  :: Vector{Float64},
-                                starting_T  :: Vector{Float64},
-                                ending_T    :: Vector{Float64},
-                                n_steps     :: Int64,
-                                sys_in      :: String,
-                                bulk        :: Matrix{Float64},
-                                Xoxides     :: Vector{String} )
-
-    progr = Progress(n_starting_points, desc="Computing $n_starting_points examples of threaded MAGEMin_calc...") # progress meter
-    @threads :static for i=1:n_starting_points
-
-        data_thread = get_data_thread(data)
-        starting_P_  = starting_P[i]
-        starting_T_  = starting_T[i]
-        ending_T_    = ending_T[i]
-        n_steps_     = n_steps
-        bulk_        = bulk[i,:]
-
-        Out_PT = example_of_threaded_MAGEMin_calc(  data_thread, dtb,
-
-                                                    starting_P_,
-                                                    starting_T_,
-                                                    ending_T_,
-                                                    n_steps_,
-                                                    sys_in,
-                                                    bulk_,
-                                                    Xoxides )
-
-        Out_all[i] = Out_PT
-        next!(progr)
-
-    end
-    finish!(progr)
-
-    return Out_all
-end
-
-# first initialize MAGEMin
+```julia
 dtb     = "mp"
-data    = Initialize_MAGEMin(dtb, verbose=-1; solver=2);
-
-n_starting_points  = 64
-
-# Allocate memory for the output (Nested_structure where each element is a vector of gmin_struct)
-Out_all  =  Vector{Vector{MAGEMin_C.gmin_struct{Float64, Int64}}}(undef, n_starting_points);
-
-
-starting_P  = [range(1.0,10.0,n_starting_points);]      # 10 starting points
-starting_T  = ones(n_starting_points) .* 1300.0      
-ending_T    = ones(n_starting_points) .* 600.0  
-n_steps     = 128
-
-sys_in      = "wt"
-bulk        = repeat([58.509,  1.022,   14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 10.0, 0.0]', n_starting_points)
-Xoxides     = ["SiO2", "TiO2", "Al2O3", "FeO",  "MnO",  "MgO",  "CaO",  "Na2O", "K2O","H2O","O"]
-
-Out_all     = perform_threaded_calc(Out_all, data, dtb, n_starting_points, starting_P, starting_T, ending_T, n_steps, sys_in, bulk, Xoxides);
-
-Finalize_MAGEMin(data)
-
+data    = Initialize_MAGEMin(dtb, verbose=false, solver=0);
+Xoxides = ["SiO2";  "TiO2";  "Al2O3";  "FeO";   "MnO";   "MgO";   "CaO";   "Na2O";  "K2O"; "H2O"; "O"];
+X       = [58.509,  1.022,   14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 10.0, 0.2];
+sys_in  = "wt"
 ```
 
-### E.11 - Isentropic path calculation
+To compute a fractional crystallization path, we can for instance choose to fix pressure:
 
 ```julia
-using MAGEMin_C
-using Plots
-using ProgressMeter
+P       = 6.0 #kbar
+```
 
-dtb         = "ig"
-data        = Initialize_MAGEMin(dtb,verbose=-1);
-test        = 0         # KLB-1
-data        = use_predefined_bulk_rock(data, test);
+Then we need to define range of temperature for the calculation and a temperature step. This can be done as follow:
 
-MPT         = 1350.0;                                                            # Mantle potential temperature in °C
-adiabat     = 0.55;                                                              # Adiabatic gradient in the upper mantle °C/km
-Depth       = 100.0;                                                             # Depth in km
-rho_Mantle  = 3300.0;                                                            # Density of the mantle in kg/m³
+```julia
+T0      = [1200.0:-10.0:600.0;]
+```
 
-Ts          = MPT + adiabat * Depth                                              # Starting temperature in the isentropic path (rough estimate)
-Ps          = Depth*1e3*9.81*rho_Mantle/1e5/1e3                                  # Starting pressure in kbar (rough estimate)
-Pe          = 0.001;                                                             # Ending pressure in kbar
+!!! note
+    - Here the `;` before the `]` converts the `Vector{StepRange...}` into a `Vector{Float64}`
 
-n_steps     = 32;                                                                # number of steps in the isentropic path
-n_max       = 32;                                                                # Maximum number of iterations in the bisection method
-tolerance   = 0.1;                                                               # Tolerance for the bisection method
-P           = Array(range(Ps, stop=Pe, length=n_steps))                          # Defines pressure values for the isentropic path
-out         = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef, n_steps)      # Vector to store the output of the single_point_minimization function
-out_tmp     = MAGEMin_C.gmin_struct{Float64, Int64};
+We can retrieve the number of steps as:
 
-# compute the reference entropy at pressure and temperature of reference 
-out[1]      = deepcopy( single_point_minimization(Ps,Ts, data));
-Sref        = out[1].entropy                                                    # Entropy of the system at the starting point   
+```julia
+nsteps  = length(T0)
+```
 
-@showprogress for j = 2:n_steps
+We can then pre-allocate the output structures to store both the results of the phase equilibrium predictions and trace element partitioning:
 
-        a           = out[j-1].T_C - 50.0
-        b           = out[j-1].T_C
-        n           = 1
-        conv        = 0
-        n           = 0
-        sign_a      = -1
+```julia
+Out_XY      = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef,nsteps)
+Out_TE_XY   = Vector{MAGEMin_C.out_tepm}(undef,nsteps)
+```
 
-        while n < n_max && conv == 0
-            c       = (a+b)/2.0
-            out_tmp = deepcopy( single_point_minimization(P[j],c, data));
-            result  = out_tmp.entropy - Sref
+#### Trace element definition
 
-            sign_c  = sign(result)
+Let's now define the trace element starting conditions (as in previous example):
 
-            if abs(b-a) < tolerance
-                conv = 1
-            else
-                if  sign_c == sign_a
-                    a = c
-                    sign_a = sign_c
-                else
-                    b = c
-                end
-                
-            end
-            n += 1
-        end
+```julia
+ZrSat_model = "CB"
+el          = ["Li","Zr"]
+ph          = ["q","afs","pl","bi","opx","cd","mu","amp","fl","cpx","g","zrn"]
+KDs         = ["0.17" "0.01";"0.14 * T_C/1000.0 + [:bi].compVariables[1]" "0.01";"0.33 + 0.01*P_kbar" "0.01";"1.67 * P_kbar / 10.0 + T_C/1000.0" "0.01";"0.2" "0.01";"125" "0.01";"0.82" "0.01";"0.2" "0.01";"0.65" "0.01";"0.26" "0.01";"0.01" "0.01";"0.01" "0.0"] 
+C_te        = [100.0,400.0] #starting concentration of elements in ppm (ug/g)
+KDs_dtb     = create_custom_KDs_database(el, ph, KDs)
+```
 
-        out[j] = deepcopy(out_tmp)
+### Batch crystallization
+
+Before computing a liquid line of descent, let us first calculate a batch crystallization.
+
+First, copy the major and trace element bulk composition:
+
+```julia
+X0  = copy(X)
+C0  = copy(C_te)
+```
+
+Then perform the calculation:
+
+```julia
+@showprogress for i=1:nsteps
+    Out_XY[i]       = single_point_minimization(P, T0[i], data, X=X0, Xoxides=Xoxides, sys_in=sys_in, name_solvus=true)
+    Out_TE_XY[i]    = TE_prediction(Out_XY[i], C0, KDs_dtb, dtb; ZrSat_model = ZrSat_model)
 end
-
-Finalize_MAGEMin(data)
-
-
-#=
-    In the following section we extract the melt fraction, total melt fraction, SiO2 in the melt, melt density for all steps
-=#
-S           = [out[i].entropy for i in 1:n_steps];                          # check entropy values
-frac_M      = [out[i].frac_M for i in 1:n_steps];                           # Melt fraction for all steps
-frac_M[frac_M .== 0.0] .= NaN;                                              # Replace 0.0 values with NaN
-T           = [out[i].T_C for i in 1:n_steps];                              # extract temperature for all steps
-
-SiO2_id     = findfirst(out[1].oxides .== "SiO2")                           # Index of SiO2 in the oxides array   
-dry_id      = findall(out[1].oxides .!= "H2O")                              # Indices of all oxides except H2O
-SiO2_M_dry  = [ (out[i].bulk_M[SiO2_id] / sum(out[i].bulk_M[dry_id])*100.0) for i in 1:n_steps];                             # SiO2 in the melt for all steps
-rho_M       = [ (out[i].rho_M) for i in 1:n_steps];                         # melt density for all steps
-rho_M[rho_M .== 0.0] .= NaN;                                                # Replace 0.0 values with NaN
-
-
-#=
-    Ploting the results using Plots
-=#
-p1          = plot(T,P, xlabel="Temperature (°C)", marker = :circle, markersize = 2, lw=2, ylabel="Pressure (kbar)", legend=false)
-p2          = plot(frac_M,P, xlabel="Melt fraction (mol)", marker = :circle, markersize = 2, lw=2, ylabel="Pressure (kbar)", legend=false)
-p3          = plot(rho_M,P, xlabel="Melt density (kg/m³)", marker = :circle, markersize = 2, lw=2, ylabel="Pressure (kbar)",        legend=false)
-p4          = plot(SiO2_M_dry,P, xlabel="SiO₂ melt anhydrous (mol%)", marker = :circle, markersize = 2, lw=2, ylabel="Pressure (kbar)",  legend=false)
-
-
-fig = plot(p1, p2, p3, p4, layout=(2, 2), size=(800, 600))
-savefig(fig,"isentropic_path.png")
 ```
 
+!!! note
+    - The results of the phase prediction are stored in `Out_XY` and trace element prediction in `Out_TE_XY`.
+    - Here the `Out_XY[i]` is passed to `TE_prediction(Out_XY[i], ...)` as an argument together with `C0`, `KDs_dtb` and `ZrSat_model`.
 
-## Access complete information about the minimization
+    Available zirconium saturation models are:
+    - `"none"` -> deactivate the call to zirconium saturation model
+    - `"WH"` -> Watson & Harrison (1983)
+    - `"B"` -> Boehnke et al. (2013)
+    - `"CB"` -> Crisp and Berry (2022)
 
-in the previous examples the results of the minimization are saved in a structure called `out`. To access all the information stored in the structure simply do:
+#### Plot Li concentration
+
+Let's now plot the evolution of `Li` concentration in the melt and save the figure.
 
 ```julia
-out.
+Li_id   = findfirst(isequal("Li"), el)
+Li_melt = [Out_TE_XY[i].Cliq[Li_id] for i in 1:nsteps if !isnothing(Out_TE_XY[i].Cliq)]
+T       = [T0[i] for i in 1:nsteps if !isnothing(Out_TE_XY[i].Cliq)]
 ```
 
-Then press `tab` (tabulation key) to display all stored data:
+!!! note
+    - Here we create `Li_melt` and `T` arrays with the condition that `Out_TE_XY[i].Cliq` is not `nothing` i.e., that the variable is filled. This allow to filter out values where melt is not stable.
+
+```julia
+plot(   T,  Li_melt,
+        label   = "Li melt",
+        xlabel  = "T [°C]",
+        ylabel  = "Concentration [ug/g]",
+        title   = "Batch crystallization of Li in a melt",
+        marker  =  :circle,
+        legend  =  :topleft,
+        grid    =  true,
+        xflip   =  true)
+
+plot!(size=(640,400))
+savefig("MAGEMin_C_batch_Li.png")
+```
+
+which gives:
+
+```@raw html
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMin_C_batch_Li.png?raw=true" alt="Batch Li" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+```
+
+### Fractional crystallization
+
+Let's now adapt the previous code to extract cummulates during cooling. 
+
+We first need to create an additional `Xoxides0` array. This is done in order to be able to update the bulk rock composition. Note that we also create a `max_step` variable that will record when no melt is stable anymore.
+
+
+```julia
+X0          = copy(X)
+C0          = copy(C_te)
+Xoxides0    = copy(Xoxides)
+max_step    = 0
+```
+
+We then compute the fractional crystallization path:
+
+```julia
+@showprogress for i=1:nsteps
+    Out_XY[i]       = single_point_minimization(P, T0[i], data, X=X0, Xoxides=Xoxides0, sys_in=sys_in, name_solvus=true)
+    Out_TE_XY[i]    = TE_prediction(Out_XY[i], C0, KDs_dtb, dtb; ZrSat_model = ZrSat_model)
+    
+    X0              = deepcopy(Out_XY[i].bulk_M_wt)
+    Xoxides0        = deepcopy(Out_XY[i].oxides)
+    C0              = deepcopy(Out_TE_XY[i].Cliq)
+
+    if Out_XY[i].frac_M_wt == 0.0
+        max_step = i
+        break;
+    end
+end
+```
+
+Here `X0`, `Xoxides0` and `C0` are updated using melt composition in `wt` (`Out_XY[i].bulk_M_wt`), the corresponding oxide list (`Out_XY[i].oxides`) and the trace element composition of the melt (`Out_TE_XY[i].Cliq`). Subsequently, the iterations are stopped if the fraction of modeled melt reach 0.0:
+
+```julia
+if Out_XY[i].frac_M_wt == 0.0
+    max_step = i
+    break;
+end
+```
+#### Plot Li concentration
+
+We can then plot and save the results:
+
+```julia
+Li_id   = findfirst(isequal("Li"), el)
+Li_melt = [Out_TE_XY[i].Cliq[Li_id] for i in 1:max_step if !isnothing(Out_TE_XY[i].Cliq)]
+T       = [T0[i] for i in 1:max_step if !isnothing(Out_TE_XY[i].Cliq)]
+```
+!!! note
+    - Here we extract `Li_melt` and `T` up to `max_step` and not `nsteps`!
+
+```julia
+plot(   T,  Li_melt,
+        label   = "Li melt",
+        xlabel  = "T [°C]",
+        ylabel  = "Concentration [ug/g]",
+        title   = "Fractional crystallization of Li in a melt",
+        marker  =  :circle,
+        legend  =  :topleft,
+        grid    =  true,
+        xflip   =  true)
+
+plot!(size=(640,400))
+savefig("MAGEMin_C_LLD_Li.png")
+```
+which gives:
+
+```@raw html
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMin_C_LLD_Li.png?raw=true" alt="Li" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+```
+
+!!! warning
+    - When the bulk is first defined the order of the oxides is not necessarily as in the `MAGEMin_C` output. When updating the bulk in a loop, for instance using the melt composition, we therefore need to retrieve the corresponding oxide ordering.
+
+#### Plot fraction of zircon
+
+Similarily we can plot the fraction of zircon crystallized from the melt
+
+```julia
+Zrn_wt = [Out_TE_XY[i].zrc_wt for i in 1:max_step if !isnothing(Out_TE_XY[i].zrc_wt)]
+T       = [T0[i] for i in 1:max_step if !isnothing(Out_TE_XY[i].zrc_wt)]
+
+plot(   T,  Zrn_wt,
+        label   = "Zrn fraction",
+        xlabel  = "T [°C]",
+        ylabel  = "wt%",
+        title   = "Fractional crystallization of Zrn",
+        marker  =  :circle,
+        legend  =  :topleft,
+        grid    =  true,
+        xflip   =  true)
+
+plot!(size=(640,400))
+savefig("MAGEMin_C_LLD_Zrn.png")
+```
+which gives:
+
+```@raw html
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMin_C_LLD_Zrn.png?raw=true" alt="Zircon" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+```
+
+#### Plot Zr saturation and Zr concentration in melt
+
+We can also plot `Zr` concentration and saturation of the melt as:
 
 ```julia
 
-out.
-G_system Gamma MAGEMin_ver M_sys PP_vec P_kbar SS_vec T_C V Vp Vp_S Vs Vs_S X
-aAl2O3 aFeO aH2O aMgO aSiO2 aTiO2 alpha bulk bulkMod bulkModulus_M bulkModulus_S bulk_F bulk_F_wt bulk_M
-bulk_M_wt bulk_S bulk_S_wt bulk_res_norm bulk_wt cp dQFM dataset enthalpy entropy fO2 frac_F frac_F_wt frac_M
-frac_M_wt frac_S frac_S_wt iter mSS_vec n_PP n_SS n_mSS oxides ph ph_frac ph_frac_vol ph_frac_wt ph_id
-ph_type rho rho_F rho_M rho_S s_cp shearMod shearModulus_S status time_ms
+Zr_id   = findfirst(isequal("Zr"), el)
+Zr_melt = [Out_TE_XY[i].Cliq[Zr_id] for i in 1:max_step if !isnothing(Out_TE_XY[i].Cliq)]
+Zr_melt_sat = [Out_TE_XY[i].Sat_zr_liq for i in 1:max_step if !isnothing(Out_TE_XY[i].Cliq)]
+T       = [T0[i] for i in 1:max_step if !isnothing(Out_TE_XY[i].Cliq)]
+
+plot(   T,  Zr_melt,
+        label   = "Zr melt",
+        xlabel  = "T [°C]",
+        ylabel  = "[ug/g]",
+        title   = "Zirconium in melt and saturation",
+        marker  =  :circle,
+        legend  =  :topright,
+        grid    =  true,
+        xflip   =  true)
+
+plot!(  T,  Zr_melt_sat,
+        label   = "Zr melt saturation",
+        xlabel  = "T [°C]",
+        ylabel  = "[ug/g]",
+        title   = "Zirconium in melt and saturation",
+        marker  =  :circle,
+        legend  =  :topright,
+        grid    =  true,
+        xflip   =  true)
+
+plot!(size=(640,400))
+savefig("MAGEMin_C_LLD_Zr.png")
 ```
 
-In order to access any of these variables type for instance:
+which gives:
 
-```julia
-out.fO2
+```@raw html
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMin_C_LLD_Zr.png?raw=true" alt="LLD Zr" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
 ```
-
-which will give you the oxygen fugacity:
-
-```julia
-out.fO2
--4.405735414252153
-```
-
-to access the list of stable phases and their fraction in `mol`:
-
-```julia
-out.ph
-4-element Vector{String}:
-"liq"
-"g"
-"sp"
-"ru"
-
-out.ph_frac
-4-element Vector{Float64}:
-0.970482189810529
-0.003792750364729876
-0.020229088594267013
-0.0054959712304740085
-```
-
-Chemical potential of the pure components (oxides) of the system is retrieved as:
-
-```julia
-out.Gamma
-11-element Vector{Float64}:
--1017.3138187719679
--1847.7215909497188
--881.3605772634041
--720.5475835413267
--428.1896629304572
--1051.6248892195592
--1008.7336303031074
--1070.7332593397723
--228.07833391903714
--561.1937065530427
--440.764181608507
-
-out.oxides
-11-element Vector{String}:
-"SiO2"
-"Al2O3"
-"CaO"
-"MgO"
-"FeO"
-"K2O"
-"Na2O"
-"TiO2"
-"O"
-"MnO"
-"H2O"
-```
-
-The composition in `wt` of the first listed solution phase ("liq") can be accessed as
-
-```julia
-out.SS_vec[1].Comp_wt
-11-element Vector{Float64}:
-0.6174962747665693
-0.1822124172602761
-0.006265730986600257
-0.0185105629478801
-0.04555393290694774
-0.038161590650707795
-0.013329583423813463
-0.0
-0.0
-0.0
-0.07846990705720527
-```
-
-and the end-member fraction in `wt` and their names as
-
-```julia
-out.SS_vec[1].emFrac_wt
-8-element Vector{Float64}:
-0.4608062343057727
-0.0972375952287159
-0.17818888101139307
-0.02313962538195582
-0.12734359573100587
-0.025819902698522926
-0.047571646835750894
-0.03989251880688298
-out.SS_vec[1].emNames
-8-element Vector{String}:
-"q4L"
-"abL"
-"kspL"
-"anL"
-"slL"
-"fo2L"
-"fa2L"
-"h2oL"
-```
-
-## Running MAGEMin_C it in parallel
-
-Julia can be run in parallel using multi-threading. To take advantage of this, you need to start julia from the terminal with:
-
-```bash
-julia -t auto
-```
-which will automatically use all threads on your machine. Alternatively, use `julia -t 4` to start it on 4 threads.
-If you are interested to see what you can do on your machine, type:
-
-```julia
-versioninfo()
-Julia Version 1.9.0
-Commit 8e630552924 (2023-05-07 11:25 UTC)
-Platform Info:
-OS: macOS (arm64-apple-darwin22.4.0)
-CPU: 12 × Apple M2 Max
-WORD_SIZE: 64
-LIBM: libopenlibm
-LLVM: libLLVM-14.0.6 (ORCJIT, apple-m1)
-Threads: 8 on 8 virtual cores
-```
-
-The function `multi_point_minimization` will automatically utilize parallelization if you run it on >1 threads.
-
-
-## References
-
-- Green, ECR, Holland, TJB, Powell, R, Weller, OM, & Riel, N (2025). Journal of Petrology, 66, doi: 10.1093/petrology/egae079
-
-- Weller, OM, Holland, TJB, Soderman, CR, Green, ECR, Powell, R, Beard, CD & Riel, N (2024). New Thermodynamic Models for Anhydrous Alkaline-Silicate Magmatic Systems. Journal of Petrology, 65, doi: 10.1093/petrology/egae098
-
-- Holland, TJB, Green, ECR & Powell, R (2022). A thermodynamic modelfor feldspars in KAlSi3O8-NaAlSi3O8-CaAl2Si2O8 for mineral equilibrium calculations. Journal of Metamorphic Geology, 40, 587-600, doi: 10.1111/jmg.12639
-
-- Tomlinson, EL & Holland, TJB (2021). A Thermodynamic Model for the Subsolidus Evolution and Melting of Peridotite. Journal of Petrology,62, doi: 10.1093/petrology/egab012
-
-- Holland, TJB, Green, ECR & Powell, R (2018). Melting of Peridotitesthrough to Granites: A Simple Thermodynamic Model in the System KNCFMASHTOCr. Journal of Petrology, 59, 881-900, doi: 10.1093/petrology/egy048
-
-- Green, ECR, White, RW, Diener, JFA, Powell, R, Holland, TJB & Palin, RM (2016). Activity-composition relations for the calculationof partial melting equilibria in metabasic rocks. Journal of Metamorphic Geology, 34, 845-869, doi: 10.1111/jmg12211
-
-- White, RW, Powell, R, Holland, TJB, Johnson, TE & Green, ECR (2014). New mineral activity-composition relations for thermodynamic calculations in metapelitic systems. Journal of Metamorphic Geology, 32, 261-286, doi: 10.1111/jmg.12071
-
-- Holland, TJB & Powell, RW (2011). An improved and extended internally consistent thermodynamic dataset for phases of petrological interest, involving a new equation of state for solids. Journal of Metamorphic Geology, 29, 333-383, doi: 10.1111/j.1525-1314.2010.00923.x
