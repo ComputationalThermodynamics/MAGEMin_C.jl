@@ -61,3 +61,30 @@ If a new version of `MAGEMinApp` is available but the update did not work you ca
 ```
 
 where `x`, `y` and `z` are the integers of the version  number.
+
+
+## Running MAGEMin_C it in parallel
+
+Julia can be run in parallel using multi-threading. To take advantage of this, you need to start julia from the terminal with:
+
+```bash
+julia -t auto
+```
+which will automatically use all threads on your machine. Alternatively, use `julia -t 4` to start it on 4 threads.
+If you are interested to see what you can do on your machine, type:
+
+```julia
+versioninfo()
+Julia Version 1.9.0
+Commit 8e630552924 (2023-05-07 11:25 UTC)
+Platform Info:
+OS: macOS (arm64-apple-darwin22.4.0)
+CPU: 12 × Apple M2 Max
+WORD_SIZE: 64
+LIBM: libopenlibm
+LLVM: libLLVM-14.0.6 (ORCJIT, apple-m1)
+Threads: 8 on 8 virtual cores
+```
+
+The function `multi_point_minimization` will automatically utilize parallelization if you run it on >1 threads.
+
