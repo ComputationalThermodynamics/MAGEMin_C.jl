@@ -261,7 +261,7 @@ ph      = ["q","afs","pl","bi","opx","cd","mu","amp","fl","cpx","g","zrn"]
 Subsequently, we need to define the partitioning coefficients. For instance let's define some arbitrary formulations for the KD's:
 
 ```julia
-KDs     = ["0.17" "0.01";"0.14 * T_C/1000.0 + [:bi].compVariables[1]" "0.01";"0.33 + 0 01*P_kbar" "0.01";"1.67 * P_kbar / 10.0 + T_C/1000.0" "0.01";"0.2" "0.01";"125" "0.01";"0.82" "0.01";"0.2" "0.01";"0.65" "0.01";"0.26" "0.01";"0.01" "0.01";"0.01" "0.0"] 
+KDs     = ["0.17" "0.01";"0.14 * T_C/1000.0 + [:afs].compVariables[1]" "0.01";"0.33 + 0 01*P_kbar" "0.01";"1.67 * P_kbar / 10.0 + T_C/1000.0" "0.01";"0.2" "0.01";"125" "0.01";"0.82" "0.01";"0.2" "0.01";"0.65" "0.01";"0.26" "0.01";"0.01" "0.01";"0.01" "0.0"] 
 ```
 
 !!! note
@@ -275,9 +275,9 @@ KDs     = ["0.17" "0.01";"0.14 * T_C/1000.0 + [:bi].compVariables[1]" "0.01";"0.
     | ph_n | KD_n1    | KD_n2    | KD_nm   |  
     where `n` is the total number of phases and `m` is the total number of trace elements.
 
-    - The second line is slightly more complex `"0.14 * T_C/1000.0 + [:bi].compVariables[1]" "0.01"`. The first entry `"0.14 * T_C/1000.0 + [:bi].compVariables[1]"` is a non-linear formulation of `Li` KD for `afs` that depends on temperature `T_C` and the compositional variable 1 of biotite. See [example E.2](examples.md#E.2.-Minimization-output) for details about the output structure.
+    - The second line is slightly more complex `"0.14 * T_C/1000.0 + [:afs].compVariables[1]" "0.01"`. The first entry `"0.14 * T_C/1000.0 + [:afs].compVariables[1]"` is a non-linear formulation of `Li` KD for `afs` that depends on temperature `T_C` and the compositional variable 1 of biotite. See [example E.2](examples.md#E.2.-Minimization-output) for details about the output structure.
     - All variables from `MAGEMin_C` output structure can be accessed and used to define formulation for non-linear KDs. 
-    - Note that informations about specific minerals are accessed using for instance `[:bi].`
+    - Note that informations about specific minerals are accessed using for instance `[:afs].`
 
 
 We now need to define the starting concentration of the trace elements (ppm or ug/g):
@@ -395,7 +395,7 @@ Let's now define the trace element starting conditions (as in previous example):
 ZrSat_model = "CB"
 el          = ["Li","Zr"]
 ph          = ["q","afs","pl","bi","opx","cd","mu","amp","fl","cpx","g","zrn"]
-KDs         = ["0.17" "0.01";"0.14 * T_C/1000.0 + [:bi].compVariables[1]" "0.01";"0.33 + 0.01*P_kbar" "0.01";"1.67 * P_kbar / 10.0 + T_C/1000.0" "0.01";"0.2" "0.01";"125" "0.01";"0.82" "0.01";"0.2" "0.01";"0.65" "0.01";"0.26" "0.01";"0.01" "0.01";"0.01" "0.0"] 
+KDs         = ["0.17" "0.01";"0.14 * T_C/1000.0 + [:afs].compVariables[1]" "0.01";"0.33 + 0.01*P_kbar" "0.01";"1.67 * P_kbar / 10.0 + T_C/1000.0" "0.01";"0.2" "0.01";"125" "0.01";"0.82" "0.01";"0.2" "0.01";"0.65" "0.01";"0.26" "0.01";"0.01" "0.01";"0.01" "0.0"] 
 C_te        = [100.0,400.0] #starting concentration of elements in ppm (ug/g)
 KDs_dtb     = create_custom_KDs_database(el, ph, KDs)
 ```
