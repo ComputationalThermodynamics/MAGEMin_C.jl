@@ -31,7 +31,7 @@ const navTemp = {
 { text: 'MAGEMin_C.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMin_C/MAGEMin_C' },
 { text: 'Installation', link: '/MAGEMin_C/installation' },
-{ text: 'Tutorials - Output', link: '/MAGEMin_C/output_structure' },
+{ text: 'Tutorials - Output structure', link: '/MAGEMin_C/output_structure' },
 { text: 'Tutorials - Step by step', link: '/MAGEMin_C/tutorials' },
 { text: 'Tutorials - Quick examples', link: '/MAGEMin_C/examples' },
 { text: 'API', link: '/api' }]
@@ -128,7 +128,7 @@ export default defineConfig({
 { text: 'MAGEMin_C.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMin_C/MAGEMin_C' },
 { text: 'Installation', link: '/MAGEMin_C/installation' },
-{ text: 'Tutorials - Output', link: '/MAGEMin_C/output_structure' },
+{ text: 'Tutorials - Output structure', link: '/MAGEMin_C/output_structure' },
 { text: 'Tutorials - Step by step', link: '/MAGEMin_C/tutorials' },
 { text: 'Tutorials - Quick examples', link: '/MAGEMin_C/examples' },
 { text: 'API', link: '/api' }]
