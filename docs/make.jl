@@ -28,7 +28,7 @@ makedocs(;
         "MAGEMin_C.jl" => [
                 "Introduction"  => "MAGEMin_C/MAGEMin_C.md",
                 "Installation"  => "MAGEMin_C/installation.md",
-                "Tutorials - Output"  => "MAGEMin_C/output_structure.md",
+                "Tutorials - Output structure"  => "MAGEMin_C/output_structure.md",
                 "Tutorials - Step by step"      => "MAGEMin_C/tutorials.md",
                 "Tutorials - Quick examples"    => "MAGEMin_C/examples.md",
 
