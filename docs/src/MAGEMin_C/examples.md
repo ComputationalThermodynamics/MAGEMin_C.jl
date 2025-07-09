@@ -479,7 +479,7 @@ sys_in  = "mol"
 data    = Initialize_MAGEMin("ig", verbose=false);
 
 # allocate storage space
-Out_XY  = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef,nsteps)
+Out_XY  = Vector{out_struct}(undef,nsteps)
 
 melt_F  = 1.0
 bulk    = copy(bulk_0)
@@ -624,7 +624,7 @@ function example_of_threaded_MAGEMin_calc(  data_thread :: Tuple{Any, Any, Any, 
 
     gv, z_b, DB, splx_data = data_thread        # Unpack the MAGEMin data
 
-    Out_PT = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef, n_steps)
+    Out_PT = Vector{out_struct}(undef, n_steps)
     gv      = define_bulk_rock(gv, bulk, Xoxides, sys_in, dtb);
 
     for i = 1:n_steps
@@ -651,7 +651,7 @@ function example_of_threaded_MAGEMin_calc(  data_thread :: Tuple{Any, Any, Any, 
 
 end
 
-function perform_threaded_calc( Out_all     :: Vector{Vector{MAGEMin_C.gmin_struct{Float64, Int64}}},
+function perform_threaded_calc( Out_all     :: Vector{Vector{out_struct}},
                                 data        :: MAGEMin_Data,
                                 dtb         :: String,
                                 n_starting_points :: Int64,
@@ -699,7 +699,7 @@ data    = Initialize_MAGEMin(dtb, verbose=-1; solver=2);
 n_starting_points  = 64
 
 # Allocate memory for the output (Nested_structure where each element is a vector of gmin_struct)
-Out_all  =  Vector{Vector{MAGEMin_C.gmin_struct{Float64, Int64}}}(undef, n_starting_points);
+Out_all  =  Vector{Vector{out_struct}}(undef, n_starting_points);
 
 
 starting_P  = [range(1.0,10.0,n_starting_points);]      # 10 starting points
@@ -742,8 +742,8 @@ n_steps     = 32;                                                               
 n_max       = 32;                                                                # Maximum number of iterations in the bisection method
 tolerance   = 0.1;                                                               # Tolerance for the bisection method
 P           = Array(range(Ps, stop=Pe, length=n_steps))                          # Defines pressure values for the isentropic path
-out         = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef, n_steps)      # Vector to store the output of the single_point_minimization function
-out_tmp     = MAGEMin_C.gmin_struct{Float64, Int64};
+out         = Vector{out_struct}(undef, n_steps)      # Vector to store the output of the single_point_minimization function
+out_tmp     = out_struct;
 
 # compute the reference entropy at pressure and temperature of reference 
 out[1]      = deepcopy( single_point_minimization(Ps,Ts, data));
