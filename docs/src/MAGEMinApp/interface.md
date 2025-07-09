@@ -2,6 +2,13 @@
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_tabs.png?raw=true" alt="MAGEMinApp tabs" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
 ```
 
+## MAGEMinApp.jl Tips
+
+!!! tip
+    - Mind that when performing a calculation progress is indicated either by the progress bar at the top right corner of the interface, or by changing the name of your web-browser tab (where `MAGEMinApp` is opened) to `Updating...`
+    - Once a calculation is launched, avoid performing other actions as it may lead to calculation failure
+
+
 ## MAGEMinApp.jl interface
 
 The graphic user interface includes 4 main tabs, 3 for phase equilibrium calculation and 2 for supporting information. 

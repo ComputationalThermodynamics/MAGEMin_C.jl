@@ -330,7 +330,7 @@ sys_in  = "mol"
 data    = Initialize_MAGEMin("ig", verbose=false);
 
 # allocate storage space
-Out_XY  = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef,nsteps)
+Out_XY  = Vector{out_struct}(undef,nsteps)
 
 melt_F  = 1.0
 bulk    = copy(bulk_0)

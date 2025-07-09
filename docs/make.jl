@@ -14,7 +14,7 @@ makedocs(;
     ),
     pages = [
         "Home"          => "index.md",
-        "Method"        => "problem.md",
+        "Methods"        => "problem.md",
         "MAGEMinApp.jl" => [
                 "Introduction"  => "MAGEMinApp/MAGEMinApp.md",
                 "Installation"  => "MAGEMinApp/installation.md",

@@ -174,3 +174,17 @@ The metapelitic model (extended with MnO, White et al., 2014) allows to compute 
 
 !!! note
     Please keep in mind that the datasets are only calibrated for a limited range of `P`,`T` and `bulk rock` conditions. If you go too far outside those ranges, `MAGEMin` (or most other thermodynamic software packages for that matter) may not converge or give bogus results. Developing new, more widely applicable, thermodynamic datasets is a huge research topic, which will require funding to develop the models themselves, as well as to perform targeted experiments to calibrate those models.
+
+
+## [Thermodynamic database selection](@id available_database)
+
+The following diagram presents a rough idea of the pressure-temperature-composition conditions for which the available database can be used.
+
+
+```@raw html
+<img src="../assets/database.png" alt="MAGEMin database" style="width: 50%; height: auto; display: block; margin: 0 auto;">
+```
+
+!!! note
+    - The diagram is cut-off for high-silica content. However, `metapelite` and `igneous` database can be applied to higher SiO2-content
+    - The `mantle` database from Stixrude and Lithgow-Bertelloni (2021) can be applied to higher pressure, up to core mantle boundary.

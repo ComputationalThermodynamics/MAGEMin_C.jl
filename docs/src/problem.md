@@ -75,6 +75,189 @@ A simplified example of the Gibbs energy minimization approach used in MAGEMin i
 
 This MATLAB application includes two pure phases, sillimanite and quartz, and activity-composition (a-x) relations for feldspar (pl4T, Holland et al., 2021) in a reduced Na2O-CaO-K2O-Al2O3-SiO2 (NCKAS) chemical system.
 
+## Solvus phase naming
+
+A solvus is a boundary that defines the limit of solid solubility (miscibility) of phases described by the same solution model (or a-x model). It separates a single solid phase from a region where two (or more) distinct solid phases coexist due to compositional differences.
+
+```@raw html
+
+<img src="./assets/ternary_feldspar.png" alt="ternary_feldspar" style="width: 40%; height: auto; display: block; margin: 0 auto;">  
+
+```  
+
+Properly naming demixed phases is important as it allows to differentiate multiple stable instances of the same solution model e.g., plagioclase and alkali-felspar (feldspar) or muscovite and paragonite (muscovite) etc. While for some solution models, naming (or classifying) the demixed phases is relatively straigthforward (e.g., for feldspar) for other solution phases, such as amphibole, the classification rules are more complex and sometimes not fully accurate.
+
+
+### Igneous, igneous alkali dry (ig, igad)
+
+x = SS_vec.compVariables
+
+- spinel: `spl`
+```julia
+if x[3] - 0.5 > 0.0;        mineral_name = "cm"
+elseif x[4] - 0.5 > 0.0;    mineral_name = "usp"
+elseif x[2] - 0.5 > 0.0;    mineral_name = "mgt"
+else                        mineral_name = "spl"
+```
+
+- feldspar: `fsp`
+
+```julia
+if x[2] - 0.5 > 0.0;        mineral_name = "afs"
+else                        mineral_name = "pl"; 
+```
+
+- muscovite: `mu`
+
+```julia
+if x[4] - 0.5 > 0.0;        mineral_name = "pat"
+else                        mineral_name = "mu"
+```
+
+- amphibole: `amp`
+
+```julia
+if x[3] - 0.5 > 0.0;        mineral_name = "gl"
+elseif -x[3] -x[4] + 0.2 > 0.0;   mineral_name = "act"
+else
+    if x[6] < 0.1;          mineral_name = "cumm"
+    elseif -1/2*x[4]+x[6]-x[7]-x[8]-x[2]+x[3]>0.5;      mineral_name = "tr"    
+    else                    mineral_name = "amp"
+```
+
+- ilmenite: `ilm`
+
+```julia
+if -x[1] + 0.5 > 0.0;       mineral_name = "hem"
+else                        mineral_name = "ilm"
+```
+
+- nepheline: `nph`
+
+```julia
+if x[2] - 0.5 > 0.0;       mineral_name = "K-nph"
+else                        mineral_name = "nph"
+```
+
+
+- clinopyroxene: `cpx`
+
+```julia
+if x[3] - 0.6 > 0.0;        mineral_name = "pig"
+elseif x[4] - 0.5 > 0.0;    mineral_name = "Na-cpx"
+else                        mineral_name = "cpx"
+```
+
+### metapelite, metabasite, ultramafic (mp, mb, um, mpe, mbe, ume)
+
+x = SS_vec.compVariables
+
+- feldspar: `fsp`
+
+```julia
+if x[2] - 0.5 > 0.0;        mineral_name = "afs"
+else                        mineral_name = "pl"; 
+```
+
+- muscovite: `mu`
+
+```julia
+if x[4] - 0.5 > 0.0;        mineral_name = "pat"
+else                        mineral_name = "mu"
+```
+
+- spinel: `sp`
+
+```julia
+if x[2] - 0.5 > 0.0;        mineral_name = "sp"
+else                        mineral_name = "mt"
+```
+
+- amphibole: `amp`
+
+```julia
+if x[3] - 0.5 > 0.0;        mineral_name = "gl"
+elseif -x[3] -x[4] + 0.2 > 0.0;   mineral_name = "act"
+else
+    if x[6] < 0.1;          mineral_name = "cumm"
+    elseif -1/2*x[4]+x[6]-x[7]-x[8]-x[2]+x[3]>0.5;      mineral_name = "tr"    
+    else                    mineral_name = "amp"
+```
+
+- ilmenitem: `ilmm`
+
+```julia
+if x[1] - 0.5 > 0.0;        mineral_name = "ilmm"
+else                        mineral_name = "hemm"
+```
+
+- ilmenite: `ilm`
+
+```julia
+if 1.0 - x[1] > 0.5;        mineral_name = "hem"
+else                        mineral_name = "ilm"
+```
+
+- diopside: `dio`
+
+```julia
+if x[2] > 0.0 && x[2] <= 0.3;       mineral_name = "dio"
+elseif x[2] > 0.3 && x[2] <= 0.7;   mineral_name = "omph"
+else                                mineral_name = "jd"
+```
+
+- diopside: `occm`
+
+```julia
+if x[2] > 0.5;              mineral_name = "sid"
+elseif x[3] > 0.5;          mineral_name = "ank"
+elseif x[1] > 0.25 && x[3] < 0.01;         mineral_name = "mag"
+else                        mineral_name = "cc"
+```
+
+- ortho-amphibole: `oamp`
+
+```julia
+if x[2] < 0.3;              mineral_name = "anth"
+else                        mineral_name = "ged"
+```
+
+### List of mineral abbreviations (for solvus)
+
+| Acronym   | Full Mineral Name                |
+|-----------|----------------------------------|
+| act       | Actinolite                       |
+| afs       | Alkali Feldspar                  |
+| amp       | Amphibole                        |
+| ank       | Ankerite                         |
+| anth      | Anthophyllite                    |
+| cc        | Calcite                          |
+| cm        | Chromite                         |
+| cpx       | Clinopyroxene                    |
+| cumm      | Cummingtonite                    |
+| dio       | Diopside                         |
+| fsp       | Feldspar                         |
+| ged       | Gedrite                          |
+| gl        | Glaucophane                      |
+| hem/hemm  | Hematite                         |
+| ilm/ilmm  | Ilmenite                         |
+| jd        | Jadeite                          |
+| K-nph     | Potassic Nepheline               |
+| mt/mgt/mag| Magnetite                        |
+| mu        | Muscovite                        |
+| nph       | Nepheline                        |
+| Na-cpx    | Sodium Clinopyroxene             |
+| occm      | Carbonate (calcite group)        |
+| oamp      | Ortho-amphibole                  |
+| omph      | Omphacite                        |
+| pat       | Paragonite                       |
+| pig       | Pigeonite                        |
+| pl        | Plagioclase                      |
+| sid       | Siderite                         |
+| sp/spl    | Spinel                           |
+| tr        | Tremolite                        |
+| usp       | Ulvöspinel                       |
+
 ## References
 
 - Holland, T. J. B., Green, E. C. R., & Powell, R. (2021). A thermodynamic model for feldspars in KAlSi3O8-NaAlSi3O8-CaAl2Si2O8 for mineral equilibrium calculations.

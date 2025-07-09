@@ -123,7 +123,7 @@ Although this performs the set of 50 phase equilibrium calculations as intended,
 To store the results of the stable phase equilibrium calculations you can declare an array of MAGEMin_C output structure such as:
 
 ```julia
-out = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef,n)
+out = Vector{out_struct}(undef,n)
 for i=1:n
     T_calc  = T[i]       # retrieves the temperature from the temperature array we just defined  
     out[i]  = single_point_minimization(P, T_calc, data, X=X, Xoxides=Xoxides, sys_in=sys_unit, name_solvus = true)
@@ -131,7 +131,7 @@ end
 ```
 
 !!! note
-    The first line of previous snippet create a Vector of MAGEMin_C structures, of size ```n```and with undefined content. In this case we are interested in 1D array, but in a similar manner you could create a Matrix e.g., ```out = Matrix{MAGEMin_C.gmin_struct{Float64, Int64}}(undef,n,n)```
+    The first line of previous snippet create a Vector of MAGEMin_C structures, of size ```n```and with undefined content. In this case we are interested in 1D array, but in a similar manner you could create a Matrix e.g., ```out = Matrix{out_struct}(undef,n,n)```
 
 Once the calculation are peformed you can access all the informations:
 
@@ -301,7 +301,7 @@ out_TE = TE_prediction(out, C0, KDs_database, dtb; ZrSat_model = "CB")
 which yields:
 
 ```
-MAGEMin_C.out_tepm(["Li", "Zr"], [100.0, 400.0], [154.51891525771387, 3107.727391290317], [92.57069316319014, 31.017280420226772], [30.903783051542774 31.07727391290317; 262.8366748533713 31.07727391290317; … ; 26.26821559381136 31.07727391290317; 1.5451891525771388 0.0], ["opx", "bi", "pl", "q", "zrn"], [0.10855984484830646, 0.20550703811276913, 0.5068659994696709, 0.1771366556875411, 0.0019304618817123876], 0.1199276845342525, 3107.727391290317, 47.86020212957779, 0.1522004049315548, [0.5324820362432465, 0.14855391402192616, 0.05910962038616418, 0.04560199231753971, 0.043702325897822, 0.02398578811001486, 0.03295421325994538, 0.010218205689218504, 0.001999648862860764, 0.0014098120682238678, 0.0999824431430382])
+out_TE_struct(["Li", "Zr"], [100.0, 400.0], [154.51891525771387, 3107.727391290317], [92.57069316319014, 31.017280420226772], [30.903783051542774 31.07727391290317; 262.8366748533713 31.07727391290317; … ; 26.26821559381136 31.07727391290317; 1.5451891525771388 0.0], ["opx", "bi", "pl", "q", "zrn"], [0.10855984484830646, 0.20550703811276913, 0.5068659994696709, 0.1771366556875411, 0.0019304618817123876], 0.1199276845342525, 3107.727391290317, 47.86020212957779, 0.1522004049315548, [0.5324820362432465, 0.14855391402192616, 0.05910962038616418, 0.04560199231753971, 0.043702325897822, 0.02398578811001486, 0.03295421325994538, 0.010218205689218504, 0.001999648862860764, 0.0014098120682238678, 0.0999824431430382])
 ```
 
 ### Trace element output structure
@@ -383,8 +383,8 @@ nsteps  = length(T0)
 We can then pre-allocate the output structures to store both the results of the phase equilibrium predictions and trace element partitioning:
 
 ```julia
-Out_XY      = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef,nsteps)
-Out_TE_XY   = Vector{MAGEMin_C.out_tepm}(undef,nsteps)
+Out_XY      = Vector{out_struct}(undef,nsteps)
+Out_TE_XY   = Vector{out_TE_struct}(undef,nsteps)
 ```
 
 #### Trace element definition
