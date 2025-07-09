@@ -17,7 +17,7 @@ const baseTemp = {
 const navTemp = {
   nav: [
 { text: 'Home', link: '/index' },
-{ text: 'Method', link: '/problem' },
+{ text: 'Methods', link: '/problem' },
 { text: 'MAGEMinApp.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMinApp/MAGEMinApp' },
 { text: 'Installation', link: '/MAGEMinApp/installation' },
@@ -114,7 +114,7 @@ export default defineConfig({
     nav,
     sidebar: [
 { text: 'Home', link: '/index' },
-{ text: 'Method', link: '/problem' },
+{ text: 'Methods', link: '/problem' },
 { text: 'MAGEMinApp.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMinApp/MAGEMinApp' },
 { text: 'Installation', link: '/MAGEMinApp/installation' },

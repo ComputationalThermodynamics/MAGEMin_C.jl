@@ -1,13 +1,13 @@
 
 # MAGEMin_C.jl: Output structures: {#MAGEMin_C.jl:-Output-structures:}
 
-This part decribes the content of the output structure of `MAGEMin_C`. These structures save the results of the phase equilibrium prediction. The first one `MAGEMin_C gmin_struct` stores the result of the minimization while the second one `MAGEMin_C.out_tepm` stores the results of the trace-element partitioning model.
+This part decribes the content of the output structure of `MAGEMin_C`. These structures save the results of the phase equilibrium prediction. The first one `MAGEMin_C gmin_struct` stores the result of the minimization while the second one `out_TE_struct` stores the results of the trace-element partitioning model.
 
 Both of the structures can be (and should be) pre-allocated when performing multiple minimizations. Pre-allocation of the output structures is achieved as:
 
 ```julia
-Out_XY      = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef,n_calc)
-Out_TE_XY   = Vector{MAGEMin_C.out_tepm}(undef,n_calc)
+Out_XY      = Vector{out_struct}(undef,n_calc)
+Out_TE_XY   = Vector{out_TE_struct}(undef,n_calc)
 ```
 
 
@@ -212,6 +212,7 @@ The main structure stores the properties of the system.
 ├─ rho_M :: Float64             # [kg/m^3]  melt density
 ├─ rho_S :: Float64             # [kg/m^3]  solid density
 ├─ rho_F :: Float64             # [kg/m^3]  fluid/H2O density
+├─ eta_M :: Float64             # [Pa.s]    viscosity of the melt (after Giordano et al., 2008)
 ├─ fO2 :: Float64               # [-]       oxygen fugacity
 ├─ dQFM :: Float64              # [-]       oxygen fugacity offset from QFM buffer
 ├─ aH2O :: Float64              # [-]       system H2O activity
@@ -340,7 +341,7 @@ This sub-structure stores the properties of the metastable assemblage i.e., the 
 ```
 
 
-## MAGEMin_C.out_tepm {#MAGEMinC.outtepm}
+## out_TE_struct {#outTEstruct}
 
 This sub-structure stores the properties of the trace elements and accessory minerals.
 
