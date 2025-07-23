@@ -317,6 +317,7 @@ function Initialize_MAGEMin(db = "ig";  verbose     ::Union{Int64,Bool} = 0,
                                         mbIlm       ::Int64             = 0,
                                         mpSp        ::Int64             = 0,
                                         mpIlm       ::Int64             = 0,
+                                        ig_ed       ::Int64             = 0,
                                         buffer      ::String            = "NONE",
                                         solver      ::Int64             = 0         )
 
@@ -326,6 +327,7 @@ function Initialize_MAGEMin(db = "ig";  verbose     ::Union{Int64,Bool} = 0,
                                                 mbIlm       = mbIlm,
                                                 mpSp        = mpSp,
                                                 mpIlm       = mpIlm,
+                                                ig_ed       = ig_ed,
                                                 limitCaOpx  = limitCaOpx,
                                                 CaOpxLim    = CaOpxLim,
                                                 buffer      = buffer,
@@ -352,6 +354,7 @@ function Initialize_MAGEMin(db = "ig";  verbose     ::Union{Int64,Bool} = 0,
                                                     mbIlm       = mbIlm,
                                                     mpSp        = mpSp,
                                                     mpIlm       = mpIlm,
+                                                    ig_ed       = ig_ed,
                                                     limitCaOpx  = limitCaOpx,
                                                     CaOpxLim    = CaOpxLim,
                                                     buffer      = buffer,
@@ -392,6 +395,7 @@ function  init_MAGEMin( db          :: String               =  "ig";
                         mbIlm       :: Int64                =   0,
                         mpSp        :: Int64                =   0,
                         mpIlm       :: Int64                =   0,
+                        ig_ed       :: Int64                =   0,
                         limitCaOpx  :: Int64                =   0,
                         CaOpxLim    :: Float64              =   1.0,
                         buffer      :: String               =  "NONE",
@@ -460,6 +464,7 @@ function  init_MAGEMin( db          :: String               =  "ig";
     gv.mbIlm        = mbIlm
     gv.mpSp         = mpSp
     gv.mpIlm        = mpIlm
+    gv.ig_ed        = ig_ed
 
     gv.limitCaOpx   = limitCaOpx
     gv.CaOpxLim     = CaOpxLim
