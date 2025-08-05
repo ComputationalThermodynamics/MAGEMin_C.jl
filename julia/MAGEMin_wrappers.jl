@@ -909,7 +909,7 @@ function define_bulk_rock(gv, bulk_in, bulk_in_ox, sys_in,db)
 end
 
 
-function normalize(vector::AbstractVector)
+function normalize(vector::AbstractVector{Float64})
     return vector ./ sum(vector)
 end
 
