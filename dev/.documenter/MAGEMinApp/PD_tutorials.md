@@ -3,9 +3,39 @@
 
 ## Phase diagrams tutorials (MAGEMinApp v0.8.6) {#Phase-diagrams-tutorials-MAGEMinApp-v0.8.6}
 
-Here we provide a set of tutorials to generate various kind of phase diagrams, post-process the results (display various field, display reaction lines and iso-contours etc.) compute trace-element partitioning and Zr saturation.
+Here we provide a set of tutorials to generate various kind of phase diagrams, compute trace-element partitioning and Zr saturation, post-process the results, display various fields, reaction lines and iso-contours, and, export data and save the diagrams as `svg` graphic vector files.
 
-### 1. Quick start - first phase diagram {#1.-Quick-start-first-phase-diagram}
+::: tip Info
+- [1. First phase diagram](/MAGEMinApp/PD_tutorials#1.-First-phase-diagram)
+  
+- [2. Reaction lines and isopleths](/MAGEMinApp/PD_tutorials#2.-Reaction-lines-and-isopleths)
+  
+- [3. Displayed field and colormap options](/MAGEMinApp/PD_tutorials#3.-Displayed-field-and-colormap-options)
+  
+- [4. Export figures](/MAGEMinApp/PD_tutorials#4.-Export-figures)
+  
+- [5. Deactivate solution and pure phases](/MAGEMinApp/PD_tutorials#5.-Deactivate-solution-and-pure-phases)
+  
+- [6. Buffers](/MAGEMinApp/PD_tutorials#6.-Buffers)
+  
+- [7. Latent heat of reaction](/MAGEMinApp/PD_tutorials#7.-Latent-heat-of-reaction)
+  
+- [8. Trace element modelling](/MAGEMinApp/PD_tutorials#8.-Trace-element-modelling)
+  
+- [9. Solidus H2O saturated phase diagram](/MAGEMinApp/PD_tutorials#9.-Solidus-H2O-saturated-phase-diagram)
+  
+- [10. TX fixed pressure diagram](/MAGEMinApp/PD_tutorials#10.-TX-fixed-pressure-diagram)
+  
+- [11. PTX diagram](/MAGEMinApp/PD_tutorials#11.-PTX-diagram)
+  
+- [12. TT poly-metamorphic diagram](/MAGEMinApp/PD_tutorials#12.-TT-polymetamorphic-diagram)
+  
+- [13. LaMEM density diagram](/MAGEMinApp/PD_tutorials#13.-LaMEM-density-diagram)
+  
+
+:::
+
+### 1. First phase diagram {#1.-First-phase-diagram}
 
 For the first diagram, simply launch `MAGEMinApp` and navigate to the `Setup` sub-tab of the `Phase diagram` tab. Then click on `Compute phase diagram`.
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_compute.png?raw=true" alt="MAGEMinApp compute" style="max-width: 25%; height: auto; display: block; margin: 0 auto;">
@@ -176,7 +206,39 @@ which results in
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_klb1_dQFM.png?raw=true" alt="MAGEMinApp klb1 dQFM" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 
 
-### 4. Deactivate solution and/or pure phases {#4.-Deactivate-solution-and/or-pure-phases}
+### 4. Export figures {#4.-Export-figures}
+
+Pseudosections, including isopleths and reaction lines can be exported to `svg` by clicking on the little Camera at the top-right of the diagram:
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_Fig.png?raw=true" alt="MAGEMinApp export figure" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+
+
+However, this option merges all the layers together making it difficult to post-process the figures efficiently in any graphic vector software such as `Inkscape` or `Illustrator`. 
+
+A alternative way to export all layers individually is to use the `Export all layers` option:
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_button.png?raw=true" alt="MAGEMinApp export button" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
+
+
+Using the `Export all layers` option will generate a list of `svg` files in the `output` directory of MAGEMinApp:
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_all.png?raw=true" alt="MAGEMinApp export button" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
+
+
+This includes the displayed field (heatmap), the reactions lines, the labels of the phase equilibria (vector and text), a vector file per iso-contour and the iso-contour legends.
+
+Which gives for instance:
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_field.png?raw=true" alt="MAGEMinApp export field" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_reaction.png?raw=true" alt="MAGEMinApp export reaction" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_iso.png?raw=true" alt="MAGEMinApp export iso" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+
+
+### 5. Deactivate solution and pure phases {#5.-Deactivate-solution-and-pure-phases}
 
 In some cases, it is useful to deactivate a solution model (activity-composition model) or a pure phase. 
 
@@ -204,7 +266,7 @@ Once the `Phase selection` panels are unfolded you can provide your custom selec
 
 :::
 
-### 5. Buffers {#5.-Buffers}
+### 6. Buffers {#6.-Buffers}
 
 Several buffers can be used to fix the oxygen fugacity
 - `qfm` -&gt; quartz-fayalite-magnetite
@@ -263,7 +325,7 @@ Which gives, after 4 levels of refinements:
 
 :::
 
-### 6. Latent heat of reaction {#6.-Latent-heat-of-reaction}
+### 7. Latent heat of reaction {#7.-Latent-heat-of-reaction}
 
 Heat capacity is computed as a second order derivative of the Gibbs energy with respect to temperature using numerical differentiation.
 
@@ -300,7 +362,7 @@ Using the metapelite database and the `FPWorldMedian pelite - oversaturated` com
 
 :::
 
-### 7. Trace-element modelling {#7.-Trace-element-modelling}
+### 8. Trace element modelling {#8.-Trace-element-modelling}
 
 Let&#39;s predict trace-element partitioning together with a new phase diagram using the metapelite database (White et al., 2014) and the pre-defined World Median Pelite oversaturated.
 
@@ -367,7 +429,7 @@ In order to display trace-element spectrum from any suprasolids point of the com
 
 :::
 
-### 8. Solidus H₂O-saturated phase diagram {#8.-Solidus-HO-saturated-phase-diagram}
+### 9. Solidus H2O saturated phase diagram {#9.-Solidus-H2O-saturated-phase-diagram}
 
 To compute solidus H₂O-saturated phase diagram, let&#39;s (for instance) change the thermodynamic database to Metabasite (Green et al., 2016), choose `Solidus H₂O-saturated = true`, select `clinopyroxene = aug`:
 
@@ -392,7 +454,7 @@ Computing the diagram and displaying the system H₂O-activity should gives:
 
 :::
 
-### 9. T-X fixed pressure diagram {#9.-T-X-fixed-pressure-diagram}
+### 10. TX fixed pressure diagram {#10.-TX-fixed-pressure-diagram}
 
 The objective of T-X diagram is to fix the pressure while having in the vertical axis a range of temperature and on the horizontal axis a varying bulk-rock composition. Variation in the bulk-rock composition can be applied to any oxides and the two end-member bulk-rock composition added to bulk-rock input file (see [Bulk-rock input file](/MAGEMinApp/bulk_rock#Bulk-rock-input-file)).
 
@@ -453,7 +515,7 @@ Fixing the `O` content and contouring $\Delta_{QFM}$ gives the desired result:
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_TX_buffer_diagram_cor.png?raw=true" alt="MAGEMinApp TX buffer diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 
 
-### 10. PT-X diagram {#10.-PT-X-diagram}
+### 11. PTX diagram {#11.-PTX-diagram}
 
 PT-X diagrams differ from P-X and T-X diagrams in the sense that both pressure and temperature can be varied along a pressure-temperature path. This option can be particularily useful when modelling subduction geotherm for instance.
 
@@ -476,7 +538,7 @@ Then in the `Bulk-rock composition` middle panel, select the pre-defined bulk `F
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_PTX_diagram.png?raw=true" alt="MAGEMinAppPTX diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 
 
-### 11. T-T poly-metamorphic diagram {#11.-T-T-poly-metamorphic-diagram}
+### 12. TT polymetamorphic diagram {#12.-TT-polymetamorphic-diagram}
 
 The goal of a T-T poly-metamorphic diagram is to predict the evolution of the stable phase assemblage for a rock undergoing two successive metamorphic events. 
 
@@ -512,7 +574,7 @@ Compute the diagram which should give:
 
 :::
 
-### 12. LaMEM density diagram {#12.-LaMEM-density-diagram}
+### 13. LaMEM density diagram {#13.-LaMEM-density-diagram}
 
 #### Quickstart {#Quickstart}
 
