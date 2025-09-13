@@ -1,6 +1,19 @@
-# This file contains functions to extract variables from the output of MAGEMin.
-# Each function corresponds to a specific mineral phase and extracts the desired variables.
+# Functions for extracting data vectors of variables from MAGEMin output.
+# Each function is tailored to a specific mineral phase.
 # Written by T. Mackay-Champion, University of Oxford, 2025
+
+### Workflow ###
+#using MAGEMin_C
+#data    = Initialize_MAGEMin("mp", verbose=-1, solver=0);
+#P,T     = 10.0, 650.0
+#Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","K2O","Na2O","TiO2","O","MnO","H2O"];
+#X       = [70.999,12.805,0.771,3.978,6.342,2.7895,1.481,0.758,0.72933,0.075,30.0];
+#sys_in  = "mol"
+#out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
+#query = [(:g, :Xalm), (:g, :Xgrs), (:melt, :SiO2), (:cpx, :Xjd)]
+#data = run_query(out, query)
+################
+
 
 # Garnet: XAlm, Xgrs, Xsps, Xprp, vol%, cations apfu (12 oxygens)
 function f_g(out)
@@ -188,9 +201,9 @@ function f_plag(out)
 
     # If multiple feldspars, choose the one with an > san and highest vol%
     if !isempty(indices)
-        ind = Int[]       # to store indices where an > san
-        vols = Float64[]  # to store corresponding volumes
-        an_values = Float64[]   # to store anorthite values
+        ind = Int[]
+        vols = Float64[]
+        an_values = Float64[]
 
         for index in indices
             endMembers = out.SS_vec[index].emNames
@@ -209,7 +222,7 @@ function f_plag(out)
             end
         end
 
-        # Get index of phase with maximum volume (if any were stored)
+        # Get index of phase with maximum volume
         if !isempty(vols)
             max_vol_index = argmax(vols)
             index = ind[max_vol_index]
@@ -245,11 +258,11 @@ end
 function f_kfs(out)
     indices = findall(x -> occursin("fsp", x), out.ph)
 
-    # If multiple feldspars, choose the one with an > san and highest vol%
+    # If multiple feldspars, choose the one with san > an and highest vol%
     if !isempty(indices)
-        ind = Int[]       # to store indices where an > san
-        vols = Float64[]  # to store corresponding volumes
-        san_values = Float64[]   # to store anorthite values
+        ind = Int[]
+        vols = Float64[]
+        san_values = Float64[]
 
         for index in indices
             endMembers = out.SS_vec[index].emNames
@@ -268,7 +281,7 @@ function f_kfs(out)
             end
         end
 
-        # Get index of phase with maximum volume (if any were stored)
+        # Get index of phase with maximum volume
         if !isempty(vols)
             max_vol_index = argmax(vols)
             index = ind[max_vol_index]
@@ -412,9 +425,6 @@ function f_cpx(out)
     return results
 end
 
-# OPX: XX
-# f_opx
-
 # Olivine: Xfa, vol%, cations apfu (4 oxygens)
 function f_ol(out)
     index = find_phase_index(out, ["ol"])
@@ -544,7 +554,7 @@ end
 function molesCation(oxides,comp)
     oxide_mol = vector_to_tuple(oxides, comp)
 
-    # Use get to safely access named tuple fields, falling back to 0.0
+    # Access named tuple fields, falling back to 0.0
     get_nt(nt, field) = hasproperty(nt, field) ? getfield(nt, field) : 0.0
 
     # Cation moles
@@ -575,7 +585,7 @@ function molesCation_noH2O(oxides,comp)
     oxide_mol = vector_to_tuple(oxides, comp)
     oxide_mol = sum(values(oxide_wt)) - get(oxide_wt, :H2O, 0.0) # Make anhydrous
 
-    # Use get to safely access named tuple fields, falling back to 0.0
+    # Access named tuple fields, falling back to 0.0
     get_nt(nt, field) = hasproperty(nt, field) ? getfield(nt, field) : 0.0
 
     # Cation moles
@@ -646,7 +656,7 @@ function run_query(out, query)
         # Get the function from phase_table
         f = get(phase_table, phase_sym, nothing)
         if f === nothing
-            push!(results, missing)  # or handle error
+            push!(results, missing)
             continue
         end
 
@@ -657,19 +667,9 @@ function run_query(out, query)
         if haskey(res, var_sym)
             push!(results, getfield(res, var_sym))
         else
-            push!(results, missing)  # or handle error
+            push!(results, missing)
         end
     end
 
     return results
 end
-
-
-# Test scripts
-# using MAGEMin_C
-# data    = Initialize_MAGEMin("mp", verbose=-1, solver=0);
-# P,T     = 10.0, 1100.0
-#Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","K2O","Na2O","TiO2","O","MnO","H2O"];
-#X       = [70.999,12.805,0.771,3.978,6.342,2.7895,1.481,0.758,0.72933,0.075,30.0];
-#sys_in  = "mol"
-#out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
