@@ -78,8 +78,6 @@ if 0==1        #run test
     KDs_database = create_custom_KDs_database(el, ph, KDs)
 
     out_TE = TE_prediction(out, C0, KDs_database, dtb; ZrSat_model = "CB")
-
-    MAGEMin_dataTE2dataframe(out,out_TE,"mp","test_TE_output.csv")
 end
 
 
