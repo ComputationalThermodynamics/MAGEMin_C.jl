@@ -747,7 +747,7 @@ out_tmp     = out_struct;
 
 # compute the reference entropy at pressure and temperature of reference 
 out[1]      = deepcopy( single_point_minimization(Ps,Ts, data));
-Sref        = out[1].entropy                                                    # Entropy of the system at the starting point   
+Sref        = out[1].entropy[1]                                                    # Entropy of the system at the starting point   
 
 @showprogress for j = 2:n_steps
 
@@ -761,7 +761,7 @@ Sref        = out[1].entropy                                                    
         while n < n_max && conv == 0
             c       = (a+b)/2.0
             out_tmp = deepcopy( single_point_minimization(P[j],c, data));
-            result  = out_tmp.entropy - Sref
+            result  = out_tmp.entropy[1] - Sref
 
             sign_c  = sign(result)
 
@@ -788,7 +788,7 @@ Finalize_MAGEMin(data)
 #=
     In the following section we extract the melt fraction, total melt fraction, SiO2 in the melt, melt density for all steps
 =#
-S           = [out[i].entropy for i in 1:n_steps];                          # check entropy values
+S           = [out[i].entropy[1] for i in 1:n_steps];                          # check entropy values
 frac_M      = [out[i].frac_M for i in 1:n_steps];                           # Melt fraction for all steps
 frac_M[frac_M .== 0.0] .= NaN;                                              # Replace 0.0 values with NaN
 T           = [out[i].T_C for i in 1:n_steps];                              # extract temperature for all steps
