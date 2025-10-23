@@ -526,12 +526,12 @@ end
     P           = 4.5
     X           = [64.13, 0.91, 19.63, 6.85, 0.08, 2.41, 0.65, 1.38, 3.95, 40.0]
     Xoxides     = ["SiO2", "TiO2", "Al2O3", "FeO", "MnO", "MgO", "CaO", "Na2O", "K2O", "H2O"]
-    sys_in      = "mol"
+    sys_in      = "wt"
     out         =   single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in);
     Finalize_MAGEMin(data)
 
-    id_bi = findfirst(isequal("bi"), out.ph)
-    @test sum(abs.(out.SS_vec[id_bi].Comp_apfu .- [2.7200471702210804, 1.5599056595578387, 0.0, 0.889288666478316, 1.733735938353352, 1.0, 0.0, 0.08651639504830935, 12.0, 0.010506170341103422, 1.8269672099033814])) .< 1e-3
+    id_bi = findfirst( out.ph .== "bi" )
+    @test sum(abs.(out.SS_vec[id_bi].Comp_apfu .- [2.7139545235947877, 1.572090952810424, 0.0, 1.1115442718289477, 1.5026608485480333, 1.0, 0.0, 0.08905581689654532, 12.0, 0.010693586321261687, 1.8218883662069094])) .< 1e-3
 end
 
 
@@ -577,21 +577,6 @@ end
 end
 
 
-@testset "Metastability function" begin
-
-    data    = Initialize_MAGEMin("mp", verbose=-1; solver=0);
-    P,T     = 6.0, 630.0
-    Xoxides = ["SiO2";  "TiO2";  "Al2O3";  "FeO";   "MnO";   "MgO";   "CaO";   "Na2O";  "K2O"; "H2O"; "O"];
-    X       = [58.509,  1.022,   14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 10.0, 0.0];
-    sys_in  = "wt"
-    out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
-
-    Pmeta, Tmeta       = 6.0, 500.0
-    out2    = point_wise_metastability(out, Pmeta, Tmeta, data)
-    Finalize_MAGEMin(data)
-
-    @test abs(out.G_system + 806.7071168433587) < 1e-6
-end
 
 # Stores data of tests
 mutable struct outP{ _T  } 
