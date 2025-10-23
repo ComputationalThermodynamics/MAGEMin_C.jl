@@ -526,12 +526,12 @@ end
     P           = 4.5
     X           = [64.13, 0.91, 19.63, 6.85, 0.08, 2.41, 0.65, 1.38, 3.95, 40.0]
     Xoxides     = ["SiO2", "TiO2", "Al2O3", "FeO", "MnO", "MgO", "CaO", "Na2O", "K2O", "H2O"]
-    sys_in      = "mol"
+    sys_in      = "wt"
     out         =   single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in);
     Finalize_MAGEMin(data)
 
-    id_bi = findfirst(isequal("bi"), out.ph)
-    @test sum(abs.(out.SS_vec[id_bi].Comp_apfu .- [2.7200471702210804, 1.5599056595578387, 0.0, 0.889288666478316, 1.733735938353352, 1.0, 0.0, 0.08651639504830935, 12.0, 0.010506170341103422, 1.8269672099033814])) .< 1e-3
+    id_bi = findfirst( out.ph .== "bi" )
+    @test sum(abs.(out.SS_vec[id_bi].Comp_apfu .- [2.7139545235947877, 1.572090952810424, 0.0, 1.1115442718289477, 1.5026608485480333, 1.0, 0.0, 0.08905581689654532, 12.0, 0.010693586321261687, 1.8218883662069094])) .< 1e-3
 end
 
 
@@ -577,21 +577,6 @@ end
 end
 
 
-@testset "Metastability function" begin
-
-    data    = Initialize_MAGEMin("mp", verbose=-1; solver=0);
-    P,T     = 6.0, 630.0
-    Xoxides = ["SiO2";  "TiO2";  "Al2O3";  "FeO";   "MnO";   "MgO";   "CaO";   "Na2O";  "K2O"; "H2O"; "O"];
-    X       = [58.509,  1.022,   14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 10.0, 0.0];
-    sys_in  = "wt"
-    out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
-
-    Pmeta, Tmeta       = 6.0, 500.0
-    out2    = point_wise_metastability(out, Pmeta, Tmeta, data)
-    Finalize_MAGEMin(data)
-
-    @test abs(out.G_system + 806.7071168433587) < 1e-6
-end
 
 # Stores data of tests
 mutable struct outP{ _T  } 
@@ -733,8 +718,23 @@ println("Testing problematic points:")
 end
 
 
-# a few tests that gave problems in the past
-println("Override Ws")
+@testset "Metastability function" begin
+    data    = Initialize_MAGEMin("mp", verbose=-1; solver=0);
+    P,T     = 6.0, 630.0
+    Xoxides = ["SiO2";  "TiO2";  "Al2O3";  "FeO";   "MnO";   "MgO";   "CaO";   "Na2O";  "K2O"; "H2O"; "O"];
+    X       = [58.509,  1.022,   14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 10.0, 0.0];
+    sys_in  = "wt"
+
+    out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
+    Pmeta, Tmeta       = 6.0, 500.0
+    out2    = point_wise_metastability(out, Pmeta, Tmeta, data)
+
+    Finalize_MAGEMin(data)
+
+    @test abs(out.G_system + 806.7071168433587) < 1e-6
+    @test abs(out2.G_system + 791.460287) < 1e-6
+end
+
 @testset verbose = true "Test Ws override" begin
 
     #= First we create a structure to store the data in memory =#
@@ -750,9 +750,10 @@ println("Override Ws")
     Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","K2O","Na2O","TiO2","O","MnO","H2O"]
     X       = [70.999,12.805,0.771,3.978,6.342,2.7895,1.481,0.758,0.72933,0.075,30.0]
     sys_in  = "mol"    
-    out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in,W=new_Ws);
-    out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in);
-    @test norm(out.ph_frac) - 0.456 < 0.01
+    out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in ,W=new_Ws)
+    # out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
+    Finalize_MAGEMin(data)
+    @test norm(out.ph_frac) - 0.45682499466457954 < 0.01
 end
 
 #=
