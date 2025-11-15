@@ -307,7 +307,7 @@ el      = ["Li","Zr"]
 The phases for which we have partitioning coefficients (KDs):
 
 ```julia
-ph      = ["q","afs","pl","bi","opx","cd","mu","amp","fl","cpx","g","zrn"]
+ph      = ["q","afs","pl","bi","opx","cd","mu","amp","fl","cpx","g","zrc"]
 ```
 
 
@@ -367,7 +367,7 @@ out_TE = TE_prediction(out, C0, KDs_database, dtb; ZrSat_model = "CB")
 which yields:
 
 ```
-out_TE_struct(["Li", "Zr"], [100.0, 400.0], [154.51891525771387, 3107.727391290317], [92.57069316319014, 31.017280420226772], [30.903783051542774 31.07727391290317; 262.8366748533713 31.07727391290317; … ; 26.26821559381136 31.07727391290317; 1.5451891525771388 0.0], ["opx", "bi", "pl", "q", "zrn"], [0.10855984484830646, 0.20550703811276913, 0.5068659994696709, 0.1771366556875411, 0.0019304618817123876], 0.1199276845342525, 3107.727391290317, 47.86020212957779, 0.1522004049315548, [0.5324820362432465, 0.14855391402192616, 0.05910962038616418, 0.04560199231753971, 0.043702325897822, 0.02398578811001486, 0.03295421325994538, 0.010218205689218504, 0.001999648862860764, 0.0014098120682238678, 0.0999824431430382])
+out_TE_struct(["Li", "Zr"], [100.0, 400.0], [154.51891525771387, 3107.727391290317], [92.57069316319014, 31.017280420226772], [30.903783051542774 31.07727391290317; 262.8366748533713 31.07727391290317; … ; 26.26821559381136 31.07727391290317; 1.5451891525771388 0.0], ["opx", "bi", "pl", "q", "zrc"], [0.10855984484830646, 0.20550703811276913, 0.5068659994696709, 0.1771366556875411, 0.0019304618817123876], 0.1199276845342525, 3107.727391290317, 47.86020212957779, 0.1522004049315548, [0.5324820362432465, 0.14855391402192616, 0.05910962038616418, 0.04560199231753971, 0.043702325897822, 0.02398578811001486, 0.03295421325994538, 0.010218205689218504, 0.001999648862860764, 0.0014098120682238678, 0.0999824431430382])
 ```
 
 
@@ -490,7 +490,7 @@ Let&#39;s now define the trace element starting conditions (as in previous examp
 ```julia
 ZrSat_model = "CB"
 el          = ["Li","Zr"]
-ph          = ["q","afs","pl","bi","opx","cd","mu","amp","fl","cpx","g","zrn"]
+ph          = ["q","afs","pl","bi","opx","cd","mu","amp","fl","cpx","g","zrc"]
 KDs         = ["0.17" "0.01";"0.14 * T_C/1000.0 + [:afs].compVariables[1]" "0.01";"0.33 + 0.01*P_kbar" "0.01";"1.67 * P_kbar / 10.0 + T_C/1000.0" "0.01";"0.2" "0.01";"125" "0.01";"0.82" "0.01";"0.2" "0.01";"0.65" "0.01";"0.26" "0.01";"0.01" "0.01";"0.01" "0.0"] 
 C_te        = [100.0,400.0] #starting concentration of elements in ppm (ug/g)
 KDs_dtb     = create_custom_KDs_database(el, ph, KDs)
@@ -665,26 +665,26 @@ which gives:
 Similarily we can plot the fraction of zircon crystallized from the melt
 
 ```julia
-Zrn_wt = [Out_TE_XY[i].zrc_wt for i in 1:max_step if !isnothing(Out_TE_XY[i].zrc_wt)]
+zrc_wt = [Out_TE_XY[i].zrc_wt for i in 1:max_step if !isnothing(Out_TE_XY[i].zrc_wt)]
 T       = [T0[i] for i in 1:max_step if !isnothing(Out_TE_XY[i].zrc_wt)]
 
-plot(   T,  Zrn_wt,
-        label   = "Zrn fraction",
+plot(   T,  zrc_wt,
+        label   = "zrc fraction",
         xlabel  = "T [°C]",
         ylabel  = "wt%",
-        title   = "Fractional crystallization of Zrn",
+        title   = "Fractional crystallization of zrc",
         marker  =  :circle,
         legend  =  :topleft,
         grid    =  true,
         xflip   =  true)
 
 plot!(size=(640,400))
-savefig("MAGEMin_C_LLD_Zrn.png")
+savefig("MAGEMin_C_LLD_zrc.png")
 ```
 
 
 which gives:
-<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMin_C_LLD_Zrn.png?raw=true" alt="Zircon" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMin_C_LLD_zrc.png?raw=true" alt="Zircon" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
 
 
 #### Plot Zr saturation and Zr concentration in melt {#Plot-Zr-saturation-and-Zr-concentration-in-melt}
