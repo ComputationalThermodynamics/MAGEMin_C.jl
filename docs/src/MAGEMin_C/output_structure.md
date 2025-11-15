@@ -325,17 +325,22 @@ This sub-structure stores the properties of the metastable assemblage i.e., the 
 This sub-structure stores the properties of the trace elements and accessory minerals.
 
 ```julia
-├─ elements :: Union{Nothing, Vector{String}}       # [-]       trace-elements names
 ├─ C0 :: Union{Nothing, Vector{Float64}}            # [ug/g]    trace-elements concentration
-├─ Cliq :: Union{Nothing, Vector{Float64}}          # [ug/g]    trace-elements concentration in the melt
 ├─ Csol :: Union{Nothing, Vector{Float64}}          # [ug/g]    trace-elements concentration in the solid
+├─ Cliq :: Union{Nothing, Vector{Float64}}          # [ug/g]    trace-elements concentration in the melt
 ├─ Cmin :: Union{Nothing, Matrix{Float64}}          # [ug/g]    trace-elements concentration in the stable phases
+├─ Sat_P2O5_liq :: Union{Nothing, Float64}          # [ug/g]    zirconium saturation of the melt (computed using several saturation models)
+├─ Sat_S_liq :: Union{Nothing, Float64}             # [ug/g]    zirconium saturation of the melt (computed using several saturation models)
+├─ Sat_Zr_liq :: Union{Nothing, Float64}            # [ug/g]    zirconium saturation of the melt (computed using several saturation models)
+├─ bulk_D :: Union{Nothing, Float64}                # [-]       bulk partition coefficient
+├─ bulk_cor_wt :: Union{Nothing, Vector{Float64}}   # [wt_i]    wt fraction corrected bulk rock composition after phase crystallization from saturation models
+├─ bulk_cor_mol :: Union{Nothing, Vector{Float64}}  # [mol_i]   mol fraction corrected bulk rock composition after phase crystallization from saturation models
+├─ elements :: Union{Nothing, Vector{String}}       # [-]       trace-elements names
+├─ liq_wt_norm :: Union{Nothing, Float64}           # [wt_i]    normalized weight melt fraction
+
 ├─ ph_TE :: Union{Nothing, Vector{String}}          # [-]       names of the trace-elements-bearing phases (defined when settings the KDs)
 ├─ ph_wt_norm :: Union{Nothing, Vector{Float64}}    # [wt_i]    normalized weight fraction of the trace-elements-bearing phases (renormalized as KDs are not necessarily given for all phases)
-├─ liq_wt_norm :: Union{Nothing, Float64}           # [wt_i]    normalized weight melt fraction
-├─ Cliq_Zr :: Union{Nothing, Float64}               # [ug/g]    zirconium concentration in the liq (if Zr provided)
-├─ Sat_zr_liq :: Union{Nothing, Float64}            # [ug/g]    zirconium saturation of the melt (computed using several saturation models)
-├─ zrc_wt :: Union{Nothing, Float64}                # [wt%]     calculated zircon weight%
-├─ bulk_cor_wt :: Union{Nothing, Vector{Float64}}   # [wt_i]    corrected bulk rock composition after zircon crystallization
+├─ fapt_wt :: Union{Nothing, Float64}               # [wt%]     calculated fluorapatite weight fraction
+├─ sulf_wt :: Union{Nothing, Float64}               # [wt%]     calculated sulfide weight fraction
+├─ zrc_wt :: Union{Nothing, Float64}                # [wt%]     calculated zircon weight fraction
 ```
-
