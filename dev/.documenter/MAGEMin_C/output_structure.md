@@ -249,8 +249,8 @@ The main structure stores the properties of the system.
 ├─ bulkModulus_M :: Float64     # [GPa]     melt bulk modulus
 ├─ bulkModulus_S :: Float64     # [GPa]     solid bulk modulus
 ├─ shearModulus_S :: Float64    # [GPa]     solid shear modulus
-├─ entropy :: Float64           # [J/K]     system entropy
-├─ enthalpy :: Float64          # [J]       system enthalpy
+├─ entropy :: Float64           # [kJ/K]    system entropy
+├─ enthalpy :: Float64          # [kJ/mol]  system enthalpy
 ├─ iter :: Int64                # [-]       number of iterations to reach convergence
 ├─ bulk_res_norm :: Float64     # [-]       bulk rock composition residual
 ├─ time_ms :: Float64           # [ms]      solution time
@@ -269,8 +269,8 @@ This sub-structure stores the properties of the stable solution phases.
     ├─ deltaG :: Float64        # [kJ]      driving force (distance from the Gibbs hyperplane)
     ├─ V :: Float64             # [cm^3/mol]volume
     ├─ alpha :: Float64         # [1/K]     thermal expansivity
-    ├─ entropy :: Float64       # [J/K]     entropy
-    ├─ enthalpy :: Float64      # [J]       enthalpy
+    ├─ entropy :: Float64       # [kJ/K]    entropy
+    ├─ enthalpy :: Float64      # [kJ/mol]  enthalpy
     ├─ cp :: Float64            # [kJ/K/Kg] specific heat capacity
     ├─ rho :: Float64           # [kg/m^3]  density
     ├─ bulkMod :: Float64       # [GPa]     bulk modulus
@@ -305,8 +305,8 @@ This sub-structure stores the properties of the stable pure phases.
     ├─ deltaG :: Float64    # [kJ]      distance from the Gibbs hyperplane
     ├─ V :: Float64         # [cm^3/mol]volume
     ├─ alpha :: Float64     # [1/K]     thermal expansivity
-    ├─ entropy :: Float64   # [J/K]     entropy
-    ├─ enthalpy :: Float64  # [J]       enthalpy
+    ├─ entropy :: Float64   # [kJ/K]    entropy
+    ├─ enthalpy :: Float64  # [kJ/mol]  enthalpy
     ├─ cp :: Float64        # [kJ/K/Kg] specific heat capacity
     ├─ rho :: Float64       # [kg/m^3]  density
     ├─ bulkMod :: Float64   # [GPa]     bulk modulus

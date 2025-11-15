@@ -21,19 +21,21 @@ const navTemp = {
 { text: 'MAGEMinApp.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMinApp/MAGEMinApp' },
 { text: 'Installation', link: '/MAGEMinApp/installation' },
+{ text: 'Interface', link: '/MAGEMinApp/interface' },
 { text: 'Tutorials - Bulk input file', link: '/MAGEMinApp/bulk_rock' },
+{ text: 'Tutorials - Partition coeficient file', link: '/MAGEMinApp/partition_coef' },
 { text: 'Tutorials - Phase diagrams', link: '/MAGEMinApp/PD_tutorials' },
 { text: 'Tutorials - P-T-X paths', link: '/MAGEMinApp/PTX_tutorials' },
 { text: 'Tutorials - Isentropic paths', link: '/MAGEMinApp/isoS_tutorials' },
-{ text: 'Citation', link: '/MAGEMinApp/citation' },
-{ text: 'Interface', link: '/MAGEMinApp/interface' }]
+{ text: 'Tutorials - Citations', link: '/MAGEMinApp/citation' }]
  },
 { text: 'MAGEMin_C.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMin_C/MAGEMin_C' },
 { text: 'Installation', link: '/MAGEMin_C/installation' },
+{ text: 'Tutorials - Quickstart', link: '/MAGEMin_C/tutorials' },
 { text: 'Tutorials - Output structure', link: '/MAGEMin_C/output_structure' },
-{ text: 'Tutorials - Step by step', link: '/MAGEMin_C/tutorials' },
-{ text: 'Tutorials - Quick examples', link: '/MAGEMin_C/examples' },
+{ text: 'Tutorials - Saturation models', link: '/MAGEMin_C/saturation_models' },
+{ text: 'Tutorials - Other examples', link: '/MAGEMin_C/examples' },
 { text: 'API', link: '/api' }]
  },
 { text: 'MAGEMin', collapsed: false, items: [
@@ -118,19 +120,21 @@ export default defineConfig({
 { text: 'MAGEMinApp.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMinApp/MAGEMinApp' },
 { text: 'Installation', link: '/MAGEMinApp/installation' },
+{ text: 'Interface', link: '/MAGEMinApp/interface' },
 { text: 'Tutorials - Bulk input file', link: '/MAGEMinApp/bulk_rock' },
+{ text: 'Tutorials - Partition coeficient file', link: '/MAGEMinApp/partition_coef' },
 { text: 'Tutorials - Phase diagrams', link: '/MAGEMinApp/PD_tutorials' },
 { text: 'Tutorials - P-T-X paths', link: '/MAGEMinApp/PTX_tutorials' },
 { text: 'Tutorials - Isentropic paths', link: '/MAGEMinApp/isoS_tutorials' },
-{ text: 'Citation', link: '/MAGEMinApp/citation' },
-{ text: 'Interface', link: '/MAGEMinApp/interface' }]
+{ text: 'Tutorials - Citations', link: '/MAGEMinApp/citation' }]
  },
 { text: 'MAGEMin_C.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMin_C/MAGEMin_C' },
 { text: 'Installation', link: '/MAGEMin_C/installation' },
+{ text: 'Tutorials - Quickstart', link: '/MAGEMin_C/tutorials' },
 { text: 'Tutorials - Output structure', link: '/MAGEMin_C/output_structure' },
-{ text: 'Tutorials - Step by step', link: '/MAGEMin_C/tutorials' },
-{ text: 'Tutorials - Quick examples', link: '/MAGEMin_C/examples' },
+{ text: 'Tutorials - Saturation models', link: '/MAGEMin_C/saturation_models' },
+{ text: 'Tutorials - Other examples', link: '/MAGEMin_C/examples' },
 { text: 'API', link: '/api' }]
  },
 { text: 'MAGEMin', collapsed: false, items: [
