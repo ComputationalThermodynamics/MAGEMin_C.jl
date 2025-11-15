@@ -343,7 +343,7 @@ This sub-structure stores the properties of the metastable assemblage i.e., the 
 
 ## out_TE_struct {#outTEstruct}
 
-This sub-structure stores the properties of the trace elements and accessory minerals.
+This structure stores the properties of the trace elements and accessory minerals.
 
 ```julia
 ├─ C0 :: Union{Nothing, Vector{Float64}}            # [ug/g]    trace-elements concentration
@@ -358,11 +358,10 @@ This sub-structure stores the properties of the trace elements and accessory min
 ├─ bulk_cor_mol :: Union{Nothing, Vector{Float64}}  # [mol_i]   mol fraction corrected bulk rock composition after phase crystallization from saturation models
 ├─ elements :: Union{Nothing, Vector{String}}       # [-]       trace-elements names
 ├─ liq_wt_norm :: Union{Nothing, Float64}           # [wt_i]    normalized weight melt fraction
-
 ├─ ph_TE :: Union{Nothing, Vector{String}}          # [-]       names of the trace-elements-bearing phases (defined when settings the KDs)
 ├─ ph_wt_norm :: Union{Nothing, Vector{Float64}}    # [wt_i]    normalized weight fraction of the trace-elements-bearing phases (renormalized as KDs are not necessarily given for all phases)
-├─ fapt_wt :: Union{Nothing, Float64}               # [wt%]     calculated fluorapatite weight fraction
-├─ sulf_wt :: Union{Nothing, Float64}               # [wt%]     calculated sulfide weight fraction
-├─ zrc_wt :: Union{Nothing, Float64}                # [wt%]     calculated zircon weight fraction
+├─ fapt_wt :: Union{Nothing, Float64}               # [wt]     calculated fluorapatite weight fraction
+├─ sulf_wt :: Union{Nothing, Float64}               # [wt]     calculated sulfide weight fraction
+├─ zrc_wt :: Union{Nothing, Float64}                # [wt]     calculated zircon weight fraction
 ```
 
