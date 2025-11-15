@@ -62,7 +62,7 @@ Note that fS2 is calculated after Bockrath et al. (2024) and that fO2 is retriev
 
 | `Element`  | `phase`  | `acronym` | `formula` | `correction` | `TE_prediction(; arg)` |
 |------|------|------|------|------|------|
-| Zr   | zircon | zrn  | ZrSiO4 | SiO2 and O | ZrSat_model = "CB", "B", "WH"|
+| Zr   | zircon | zrc  | ZrSiO4 | SiO2 and O | ZrSat_model = "CB", "B", "WH"|
 | S    | sulfide | sulf  | FeS | FeO and O | SSat_model = "Oneill21", "Liu07" |
 | P2O5   | fluorapatite |fapt  | Ca5(PO4)3F | CaO (F is omitted) | P2O5Sat_model = "Tollari05"|
 
@@ -84,13 +84,13 @@ Subsequently, we need to define the element, phase, partiton coefficient and ini
 
 ```julia
 el      = ["Zr"]
-ph      = ["zrn"]
+ph      = ["zrc"]
 KDs     = ["0.0"]   # phase crystallized from saturation models have 0.0 KDs
 C0      = [400.0]   # starting concentration of elements in ppm (ug/g)
 ```
 
 !!! note 
-    - Although `Zr` is not partitioned into `zrn`, it is necessary to declare the main Zr-bearing phase and assign a "dummy" KD value of 0. This ensures that `zrn` will be crystallized by stoichiometry when the `Zr` concentration in the liquid exceeds the saturation threshold.
+    - Although `Zr` is not partitioned into `zrc`, it is necessary to declare the main Zr-bearing phase and assign a "dummy" KD value of 0. This ensures that `zrc` will be crystallized by stoichiometry when the `Zr` concentration in the liquid exceeds the saturation threshold.
 
 Then create the partition coefficient database:
 
@@ -143,7 +143,7 @@ X       = [58.509,  1.022,   14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 1
 sys_in  = "wt"
 
 el      = ["Zr","S"]
-ph      = ["zrn","sulf"]
+ph      = ["zrc","sulf"]
 KDs     = ["0.0" "0.0"; "0.0" "0.0"]   # phase crystallized from saturation models have 0.0 KDs
 
 C0      = [400.0, 100.0]   # starting concentration of elements in ppm (ug/g)
@@ -174,7 +174,7 @@ X_mol, Xoxides  = convertBulk4MAGEMin(X, Xoxides,"wt","mp"); sys_in   = "mol"
 X_mol ./= sum(X_mol)                                                    # normalize to 1.0
 
 el      = ["Zr","S"]
-ph      = ["zrn","sulf"]
+ph      = ["zrc","sulf"]
 KDs     = [ "0.0" "0.0";
             "0.0" "0.0"]                                          # phase crystallized from saturation models have 0.0 KDs
 
