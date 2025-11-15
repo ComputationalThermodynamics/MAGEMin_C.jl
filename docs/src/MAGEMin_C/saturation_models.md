@@ -40,7 +40,7 @@
 ```@raw html
 
 <ul>
-    <li>Tollari et al., 05 - P2O5Sat_model = "Tollari06"</li> [dry systems only]
+    <li>Tollari et al., 2006 - P2O5Sat_model = "Tollari06"</li> [dry systems only]
     <li>Harrison & Watson, 1984 with Bea et al., 1992 correction - P2O5Sat_model = "HWBea92"</li>
 </ul>
 ```
