@@ -1,7 +1,7 @@
 name = "MAGEMin_C"
 uuid = "e5d170eb-415a-4524-987b-12f1bce1ddab"
-authors = ["Nicolas Riel <riel@uni-mainz.de>  & Boris Kaus <kaus@uni-mainz.de>"]
 version = "2.0.7"
+authors = ["Nicolas Riel <riel@uni-mainz.de>  & Boris Kaus <kaus@uni-mainz.de>"]
 
 [deps]
 CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
@@ -12,6 +12,7 @@ Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 MAGEMin_jll = "763ebaa8-b0d2-5f6b-90ef-4fc23b5db1c4"
 NLopt_jll = "079eb43e-fd8e-5478-9966-2cf3e3edb778"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
@@ -22,5 +23,6 @@ DataFrames = "1 - 1.7.1"
 MAGEMin_jll = "1.8.5 - 1.8.5"
 NLopt_jll = "2.8.0 - 2.8.0"
 ProgressMeter = "1"
+SpecialFunctions = "2.6.1"
 TOML = "1.0.3"
 julia = "1.10"

@@ -14,24 +14,26 @@ makedocs(;
     ),
     pages = [
         "Home"          => "index.md",
-        "Methods"        => "problem.md",
+        "Methods"       => "problem.md",
         "MAGEMinApp.jl" => [
                 "Introduction"  => "MAGEMinApp/MAGEMinApp.md",
                 "Installation"  => "MAGEMinApp/installation.md",
+                "Interface"     => "MAGEMinApp/interface.md",
                 "Tutorials - Bulk input file"   => "MAGEMinApp/bulk_rock.md",
+                "Tutorials - Partition coeficient file"   => "MAGEMinApp/partition_coef.md",
                 "Tutorials - Phase diagrams"    => "MAGEMinApp/PD_tutorials.md",
                 "Tutorials - P-T-X paths"       => "MAGEMinApp/PTX_tutorials.md",
                 "Tutorials - Isentropic paths"  => "MAGEMinApp/isoS_tutorials.md",
-                "Citation"      => "MAGEMinApp/citation.md",
-                "Interface"     => "MAGEMinApp/interface.md",
+                "Tutorials - Citations"         => "MAGEMinApp/citation.md",
+
         ],
         "MAGEMin_C.jl" => [
                 "Introduction"  => "MAGEMin_C/MAGEMin_C.md",
                 "Installation"  => "MAGEMin_C/installation.md",
-                "Tutorials - Output structure"  => "MAGEMin_C/output_structure.md",
-                "Tutorials - Step by step"      => "MAGEMin_C/tutorials.md",
-                "Tutorials - Quick examples"    => "MAGEMin_C/examples.md",
-
+                "Tutorials - Quickstart"            => "MAGEMin_C/tutorials.md",
+                "Tutorials - Output structure"      => "MAGEMin_C/output_structure.md",
+                "Tutorials - Saturation models"     => "MAGEMin_C/saturation_models.md",
+                "Tutorials - Other examples"     => "MAGEMin_C/examples.md",
                 "API"           => "api.md",
         ],
         "MAGEMin" => [
