@@ -40,7 +40,7 @@
 ```@raw html
 
 <ul>
-    <li>Tollari et al., 05 - P2O5Sat_model = "Tollari05"</li> [dry systems only]
+    <li>Tollari et al., 2006 - P2O5Sat_model = "Tollari06"</li> [dry systems only]
     <li>Harrison & Watson, 1984 with Bea et al., 1992 correction - P2O5Sat_model = "HWBea92"</li>
 </ul>
 ```
@@ -64,7 +64,7 @@ Note that fS2 is calculated after Bockrath et al. (2024) and that fO2 is retriev
 |------|------|------|------|------|------|
 | Zr   | zircon | zrc  | ZrSiO4 | SiO2 and O | ZrSat_model = "CB", "B", "WH"|
 | S    | sulfide | sulf  | FeS | FeO and O | SSat_model = "Oneill21", "Liu07" |
-| P2O5   | fluorapatite |fapt  | Ca5(PO4)3F | CaO (F is omitted) | P2O5Sat_model = "Tollari05"|
+| P2O5   | fluorapatite |fapt  | Ca5(PO4)3F | CaO (F is omitted) | P2O5Sat_model = "Tollari06"|
 
 ## E.1 Zirconium saturation
 
