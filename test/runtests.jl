@@ -11,6 +11,10 @@ if endswith(cur_dir, "test")
     cd("../")           # change to main directory if we are in /test
 end
 
+# Test MAGEMin read function ("test_MAGEMin_read.jl")
+@testset "serial" begin
+    include(joinpath(@__DIR__,"test_MAGEMin_read.jl"))
+end
 
 @testset "serial" begin
     include(joinpath(@__DIR__, "tests.jl"))
