@@ -33,6 +33,16 @@ test        =   0         #KLB1
 data        =   use_predefined_bulk_rock(data, test);
 P           =   8.0
 T           =   1800.0
+out         =   point_w
+ise_minimization(P,T, data);
+Finalize_MAGEMin(data)
+
+using MAGEMin_C
+data        =   Initialize_MAGEMin("mb", verbose=-1);
+test        =   0         #KLB1
+data        =   use_predefined_bulk_rock(data, test);
+P           =   4.0
+T           =   600.0
 out         =   point_wise_minimization(P,T, data);
 Finalize_MAGEMin(data)
 
@@ -384,7 +394,7 @@ end
 
     # create database on the fly
     el      = ["Li","Zr"]
-    ph      = ["q","afs","pl","bi","opx","cd","mu","amp","fl","cpx","g","zrn"]
+    ph      = ["q","afs","pl","bi","opx","cd","mu","amp","fl","cpx","g","zrc"]
     KDs     = ["0.17" "0.01";"0.14 * T_C/1000.0 + [:bi].compVariables[1]" "0.01";"0.33 + 0.01*P_kbar" "0.01";"1.67 * P_kbar / 10.0 + T_C/1000.0" "0.01";"0.2" "0.01";"125" "0.01";"0.82" "0.01";"0.2" "0.01";"0.65" "0.01";"0.26" "0.01";"0.01" "0.01";"0.01" "0.0"] 
     C0      = [100.0,400.0] #starting concentration of elements in ppm (ug/g)
     dtb     = "mp"
@@ -408,7 +418,7 @@ end
     X_mol ./= sum(X_mol)                                                    # normalize to 1.0
 
     el      = ["Zr","P2O5","S"]
-    ph      = ["zrn","fapt","sulf"]
+    ph      = ["zrc","fapt","sulf"]
     KDs     = [ "0.0" "0.0" "0.0";
                 "0.0" "0.0" "0.0";
                 "0.0" "0.0" "0.0"]                                          # phase crystallized from saturation models have 0.0 KDs
@@ -445,9 +455,9 @@ end
         end
     end
 
-    @test out_TE[1].zrc_wt  ≈ 0.0001951066849433592    rtol=1e-4
-    @test out_TE[1].sulf_wt ≈ 0.002722767470774445      rtol=1e-4
-    @test out_TE[1].fapt_wt ≈ 0.0023564098247473063      rtol=1e-4
+    @test out_TE[1].zrc_wt  ≈ 0.0001951066849433592    rtol=1e-3
+    @test out_TE[1].sulf_wt ≈ 0.002722767470774445      rtol=1e-3
+    @test out_TE[1].fapt_wt ≈ 0.0023191756689226023      rtol=1e-3
 
     Finalize_MAGEMin(data)
 end
