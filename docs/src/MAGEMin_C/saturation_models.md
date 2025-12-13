@@ -225,6 +225,8 @@ Iteration 1: residual = 3.909415504073306e-7
 
 - Watson, E. B., & Harrison, T. M. (1983). Zircon saturation revisited: temperature and composition effects in a variety of crustal magma types. earth and planetary science letters, 64(2), 295-304.
 
+- Harrison, T. M., & Watson, E. B. (1984). The behavior of apatite during crustal anatexis: equilibrium and kinetic considerations. Geochimica et cosmochimica acta, 48(7), 1467-1477.
+
 - Bea, F., Fershtater, G., & Corretgé, L. G. (1992). The geochemistry of phosphorus in granite rocks and the effect of aluminium. Lithos, 29(1-2), 43-56
 
 - Boehnke, P., Watson, E. B., Trail, D., Harrison, T. M., & Schmitt, A. K. (2013). Zircon saturation re-revisited. Chemical Geology, 351, 324-334.
