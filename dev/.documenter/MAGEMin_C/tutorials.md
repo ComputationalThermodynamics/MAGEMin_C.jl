@@ -343,7 +343,7 @@ where `n` is the total number of phases and `m` is the total number of trace ele
 
 :::
 
-We now need to define the starting concentration of the trace elements (ppm or ug/g):
+We now need to define the starting mass fraction of the trace elements (ppm or ug/g):
 
 ```julia
 C0      = [100.0,400.0]
@@ -385,15 +385,15 @@ ph_TE        ph_wt_norm   zrc_wt
 
 
 ::: tip Note
-- `C0` -&gt; the starting concentrations of the trace element
+- `C0` -&gt; the starting mass fractions of the trace element
   
-- `Cliq` -&gt; the trace element concentrations in the liquid
+- `Cliq` -&gt; the trace element mass fractions in the liquid
   
-- `Cliq_Zr` -&gt; the zirconium concentration of melt
+- `Cliq_Zr` -&gt; the zirconium mass fraction of melt
   
-- `Cmin` -&gt; the trace element concentrations in the phases
+- `Cmin` -&gt; the trace element mass fractions in the phases
   
-- `Csol` -&gt; the trace element concentrations of the solid part, 
+- `Csol` -&gt; the trace element mass fractions of the solid part, 
   
 - `Sat_zr_liq` -&gt; the melt saturation value of zirconium
   
@@ -492,7 +492,7 @@ ZrSat_model = "CB"
 el          = ["Li","Zr"]
 ph          = ["q","afs","pl","bi","opx","cd","mu","amp","fl","cpx","g","zrc"]
 KDs         = ["0.17" "0.01";"0.14 * T_C/1000.0 + [:afs].compVariables[1]" "0.01";"0.33 + 0.01*P_kbar" "0.01";"1.67 * P_kbar / 10.0 + T_C/1000.0" "0.01";"0.2" "0.01";"125" "0.01";"0.82" "0.01";"0.2" "0.01";"0.65" "0.01";"0.26" "0.01";"0.01" "0.01";"0.01" "0.0"] 
-C_te        = [100.0,400.0] #starting concentration of elements in ppm (ug/g)
+C_te        = [100.0,400.0] #starting mass fraction of elements in ppm (ug/g)
 KDs_dtb     = create_custom_KDs_database(el, ph, KDs)
 ```
 
@@ -537,9 +537,9 @@ Available zirconium saturation models are:
 
 :::
 
-#### Plot Li concentration {#Plot-Li-concentration}
+#### Plot Li mass fraction {#Plot-Li-mass-fraction}
 
-Let&#39;s now plot the evolution of `Li` concentration in the melt and save the figure.
+Let&#39;s now plot the evolution of `Li` mass fraction in the melt and save the figure.
 
 ```julia
 Li_id   = findfirst(isequal("Li"), el)
@@ -558,7 +558,7 @@ T       = [T0[i] for i in 1:nsteps if !isnothing(Out_TE_XY[i].Cliq)]
 plot(   T,  Li_melt,
         label   = "Li melt",
         xlabel  = "T [°C]",
-        ylabel  = "Concentration [ug/g]",
+        ylabel  = "mass fraction [ug/g]",
         title   = "Batch crystallization of Li in a melt",
         marker  =  :circle,
         legend  =  :topleft,
@@ -617,7 +617,7 @@ end
 ```
 
 
-#### Plot Li concentration {#Plot-Li-concentration-2}
+#### Plot Li mass fraction {#Plot-Li-mass-fraction-2}
 
 We can then plot and save the results:
 
@@ -638,7 +638,7 @@ T       = [T0[i] for i in 1:max_step if !isnothing(Out_TE_XY[i].Cliq)]
 plot(   T,  Li_melt,
         label   = "Li melt",
         xlabel  = "T [°C]",
-        ylabel  = "Concentration [ug/g]",
+        ylabel  = "mass fraction [ug/g]",
         title   = "Fractional crystallization of Li in a melt",
         marker  =  :circle,
         legend  =  :topleft,
@@ -687,9 +687,9 @@ which gives:
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMin_C_LLD_zrc.png?raw=true" alt="Zircon" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
 
 
-#### Plot Zr saturation and Zr concentration in melt {#Plot-Zr-saturation-and-Zr-concentration-in-melt}
+#### Plot Zr saturation and Zr mass fraction in melt {#Plot-Zr-saturation-and-Zr-mass-fraction-in-melt}
 
-We can also plot `Zr` concentration and saturation of the melt as:
+We can also plot `Zr` mass fraction and saturation of the melt as:
 
 ```julia
 
