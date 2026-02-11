@@ -1,4 +1,6 @@
 
+# MAGEMin_C.jl: Saturation models {#MAGEMin_C.jl:-Saturation-models}
+
 ::: tip Info
 - [Saturation models](/MAGEMin_C/saturation_models#Saturation-models)
   
@@ -11,7 +13,7 @@
 
 :::
 
-## Saturation models {#Saturation-models}
+## Introduction {#Introduction}
 - When the concentration of the element in the melt increases above the saturation threshold the key phase carrying the element (see Table below) is crystallized (when the bulk-rock composition allows it) which brings back the concentration of the element in the melt to saturation.
   
 - Although trace elements are not currently partitioned among mineral phases under subsolidus conditions, accessory minerals predicted by saturation models are still incorporated into the simulation. As a result, the model keeps track of the modal abundance and evolution of these accessory phases even below the solidus. This allows for  modeling of element sequestration and mineral stability, and ensures that accessory mineral fractions are accurately represented for instance during fractional crystallization.

@@ -34,9 +34,14 @@ const navTemp = {
 { text: 'MAGEMin_C.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMin_C/MAGEMin_C' },
 { text: 'Installation', link: '/MAGEMin_C/installation' },
-{ text: 'Tutorials - Quickstart', link: '/MAGEMin_C/tutorials' },
+{ text: 'Tutorials - Quickstart', link: '/MAGEMin_C/quickstart' },
 { text: 'Tutorials - Output structure', link: '/MAGEMin_C/output_structure' },
+{ text: 'Tutorials - Trace-elements', link: '/MAGEMin_C/trace_elements' },
 { text: 'Tutorials - Saturation models', link: '/MAGEMin_C/saturation_models' },
+{ text: 'Tutorials - Fractional crystallization', link: '/MAGEMin_C/fractional_crystallization' },
+{ text: 'Tutorials - Threaded fractional cryst.', link: '/MAGEMin_C/threaded_fractional_crystallization' },
+{ text: 'Tutorials - Isentropic path', link: '/MAGEMin_C/isentropic_path' },
+{ text: 'Tutorials - Initial guess', link: '/MAGEMin_C/initial_guess' },
 { text: 'Tutorials - Other examples', link: '/MAGEMin_C/examples' },
 { text: 'API', link: '/api' }]
  },
@@ -136,9 +141,14 @@ export default defineConfig({
 { text: 'MAGEMin_C.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMin_C/MAGEMin_C' },
 { text: 'Installation', link: '/MAGEMin_C/installation' },
-{ text: 'Tutorials - Quickstart', link: '/MAGEMin_C/tutorials' },
+{ text: 'Tutorials - Quickstart', link: '/MAGEMin_C/quickstart' },
 { text: 'Tutorials - Output structure', link: '/MAGEMin_C/output_structure' },
+{ text: 'Tutorials - Trace-elements', link: '/MAGEMin_C/trace_elements' },
 { text: 'Tutorials - Saturation models', link: '/MAGEMin_C/saturation_models' },
+{ text: 'Tutorials - Fractional crystallization', link: '/MAGEMin_C/fractional_crystallization' },
+{ text: 'Tutorials - Threaded fractional cryst.', link: '/MAGEMin_C/threaded_fractional_crystallization' },
+{ text: 'Tutorials - Isentropic path', link: '/MAGEMin_C/isentropic_path' },
+{ text: 'Tutorials - Initial guess', link: '/MAGEMin_C/initial_guess' },
 { text: 'Tutorials - Other examples', link: '/MAGEMin_C/examples' },
 { text: 'API', link: '/api' }]
  },
