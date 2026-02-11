@@ -1,3 +1,4 @@
+# MAGEMin_C.jl: Saturation models
 
 !!! info
 
@@ -6,7 +7,7 @@
     - [E.2 Zirconium and sulfur saturation models](#E.2-Zirconium-and-sulfur-saturation-models)
     - [E.3 Saturation models and bulk correction](#E.3-Saturation-models-and-bulk-correction)
 
-## Saturation models
+## Introduction
 
 - When the concentration of the element in the melt increases above the saturation threshold the key phase carrying the element (see Table below) is crystallized (when the bulk-rock composition allows it) which brings back the concentration of the element in the melt to saturation.
 

@@ -339,7 +339,7 @@ function compute_TE_partitioning(   KDs_database:: custom_KDs_database,
                                                                                     ph, ph_wt, liq_wt; norm_TE=norm_TE)
     elseif liq_wt == 0.0
         Csol        = C0
-        Cliq, Cmin, ph_TE, ph_wt_norm, liq_wt_norm, bulk_D = NaN, NaN, nothing, NaN, NaN, NaN
+        Cliq, Cmin, ph_TE, ph_wt_norm, liq_wt_norm, bulk_D = C0.*0.0, NaN, nothing, NaN, NaN, NaN
 
     elseif liq_wt == 1.0 || (sol_wt == 0.0 && liq_wt > 0.0) #latter means there is fluid + melt
         Cliq        = C0
