@@ -30,10 +30,15 @@ makedocs(;
         "MAGEMin_C.jl" => [
                 "Introduction"  => "MAGEMin_C/MAGEMin_C.md",
                 "Installation"  => "MAGEMin_C/installation.md",
-                "Tutorials - Quickstart"            => "MAGEMin_C/tutorials.md",
+                "Tutorials - Quickstart"            => "MAGEMin_C/quickstart.md",
                 "Tutorials - Output structure"      => "MAGEMin_C/output_structure.md",
+                "Tutorials - Trace-elements"        => "MAGEMin_C/trace_elements.md",
                 "Tutorials - Saturation models"     => "MAGEMin_C/saturation_models.md",
-                "Tutorials - Other examples"     => "MAGEMin_C/examples.md",
+                "Tutorials - Fractional crystallization"     => "MAGEMin_C/fractional_crystallization.md",
+                "Tutorials - Threaded fractional cryst."     => "MAGEMin_C/threaded_fractional_crystallization.md",
+                "Tutorials - Isentropic path"                => "MAGEMin_C/isentropic_path.md",
+                "Tutorials - Initial guess"                  => "MAGEMin_C/initial_guess.md",
+                "Tutorials - Other examples"        => "MAGEMin_C/examples.md",
                 "API"           => "api.md",
         ],
         "MAGEMin" => [

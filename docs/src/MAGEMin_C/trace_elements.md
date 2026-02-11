@@ -1,9 +1,8 @@
-# MAGEMin_C.jl: Tutorials
+# MAGEMin_C.jl: Trace-element partitioning
 
-This page provides a set of detailed tutorials showing how to use MAGEMin_C.jl to perform phase equilibrium calculations.
+This page provides a set of detailed tutorials showing how to use MAGEMin_C.jl to perform trace element partitioning, including single-point predictions, batch crystallization, and fractional crystallization paths.
 
 !!! info
-    - [Iterative phase equilibrium calculation](#Iterative-phase-equilibrium-calculation )
     - [Single point trace element partitioning](#Single-point-trace-element-partitioning)
     - [Trace element partitioning](#Trace-element-partitioning)
 
@@ -311,7 +310,7 @@ The `out_TE`structure contains:
 ```
 out_TE.
 C0           Cliq         Cliq_Zr
-Cmin         Csol         Sat_zr_liq
+Cmin         Csol         Sat_Zr_liq
 bulk_cor_wt  elements     liq_wt_norm
 ph_TE        ph_wt_norm   zrc_wt
 ```
@@ -322,7 +321,7 @@ ph_TE        ph_wt_norm   zrc_wt
     - `Cliq_Zr` -> the zirconium mass fraction of melt
     - `Cmin` -> the trace element mass fractions in the phases
     - `Csol` -> the trace element mass fractions of the solid part, 
-    - `Sat_zr_liq` -> the melt saturation value of zirconium
+    - `Sat_Zr_liq` -> the melt saturation value of zirconium
     - `bulk_cor_wt` -> the corrected bulk rock composition from crystallized zircon
     - `elements` -> names of thr trace elements
     - `liq_wt_norm` -> the normalized wt fraction of melt
@@ -574,7 +573,7 @@ We can also plot `Zr` mass fraction and saturation of the melt as:
 
 Zr_id   = findfirst(isequal("Zr"), el)
 Zr_melt = [Out_TE_XY[i].Cliq[Zr_id] for i in 1:max_step if !isnothing(Out_TE_XY[i].Cliq)]
-Zr_melt_sat = [Out_TE_XY[i].Sat_zr_liq for i in 1:max_step if !isnothing(Out_TE_XY[i].Cliq)]
+Zr_melt_sat = [Out_TE_XY[i].Sat_Zr_liq for i in 1:max_step if !isnothing(Out_TE_XY[i].Cliq)]
 T       = [T0[i] for i in 1:max_step if !isnothing(Out_TE_XY[i].Cliq)]
 
 plot(   T,  Zr_melt,
