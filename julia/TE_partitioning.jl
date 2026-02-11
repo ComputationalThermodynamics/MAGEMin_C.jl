@@ -343,7 +343,7 @@ function compute_TE_partitioning(   KDs_database:: custom_KDs_database,
 
     elseif liq_wt == 1.0 || (sol_wt == 0.0 && liq_wt > 0.0) #latter means there is fluid + melt
         Cliq        = C0
-        Csol, Cmin, ph_TE, ph_wt_norm, bulk_D  = NaN, NaN, nothing, NaN, NaN
+        Csol, Cmin, ph_TE, ph_wt_norm, bulk_D  = C0.*0.0, NaN, nothing, NaN, NaN
         liq_wt_norm = 1.0
     else
         println("unrecognized case!")
@@ -609,6 +609,7 @@ function TE_prediction( out, C0, KDs_database, dtb;
             id_Zr           = findfirst(KDs_database.element_name .== "Zr")
             Sat_Zr_liq      = zirconium_saturation(     out; 
                                                         model = ZrSat_model)   
+
             if Cliq[id_Zr] > Sat_Zr_liq
                 Cliq[id_Zr] = Sat_Zr_liq
                 Csol[id_Zr] = (C0[id_Zr] - Sat_Zr_liq*liq_wt_norm) / (1.0 - liq_wt_norm)
