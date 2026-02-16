@@ -56,6 +56,15 @@ out         =   point_wise_minimization(P,T, data);
 @test sort(out.ph) == sort(["gtmj", "hpcpx", "ol" ,"cpx"])
 Finalize_MAGEMin(data)
 
+data        =   Initialize_MAGEMin("sb24", verbose=-1);
+test        =   1         #Pyrolite
+data        =   use_predefined_bulk_rock(data, test);
+P           =   80.0
+T           =   800.0
+out         =   point_wise_minimization(P,T, data);
+@test sort(out.ph) == sort(["gtmj", "hpcpx", "ol" ,"cpx"])
+Finalize_MAGEMin(data)
+
 # generic test for thermocalc database
 data        =   Initialize_MAGEMin("ig", verbose=-1);
 test        =   0         #KLB1
@@ -527,6 +536,16 @@ end
     bulk_rock,ox  = convertBulk4MAGEMin(bulk_in,bulk_in_ox,"wt","mp");
 
     @test bulk_rock ≈ [76.57038397179574, 8.914984523583415, 2.0849576977131403, 2.835783318610597, 4.30275071755529, 1.8302970975627948, 2.568605789798099, 0.6615823604771729, 0.16546809116073818, 0.06518643174302832, 0.0]
+end
+
+@testset "FeO + Oᵉˣᵗʳᵃ -> Feᵀᵒᵗᵃˡ + Oᵀᵒᵗᵃˡ" begin
+
+    bulk_in_ox  =  ["SiO2"; "CaO"; "Al2O3"; "MgO"; "Na2O"; "FeO"; "Cr2O3"; "O"]
+    bulk_in     = [38.83, 2.94, 2.03, 50.02, 0.11, 5.69, 0.19, 0.18] # Pyrolite
+    bulk_mod, bulk_ox    = FeO2Fe_O(bulk_in, bulk_in_ox)
+    @test bulk_mod ≈ [38.83, 2.94, 2.03, 50.02, 0.11, 5.87, 0.19, 5.81]
+    @test bulk_ox == ["SiO2"; "CaO"; "Al2O3"; "MgO"; "Na2O"; "O"; "Cr2O3"; "Fe"]
+
 end
 
 
