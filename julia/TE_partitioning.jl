@@ -34,7 +34,7 @@ end
 function mineral_classification(    out             :: MAGEMin_C.gmin_struct{Float64, Int64},
                                     dtb             :: String  )
 
-    @warn "Breaking changes in v2.1.3 by disambiguation of solvus names: 'spl': 'sp' > 'spl'; 'sp': 'mt' > 'smt'."
+    # @warn "Breaking changes in v2.1.3 by disambiguation of solvus names: 'spl': 'sp' > 'spl'; 'sp': 'mt' > 'smt'."
 
     ph      = Array{String}(undef, out.n_SS + out.n_PP) 
     ph_wt   = Array{Float64}(undef, out.n_SS + out.n_PP) 
