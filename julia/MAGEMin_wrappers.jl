@@ -29,7 +29,7 @@ export  anhydrous_renormalization, retrieve_solution_phase_information, remove_p
         
         Initialize_MAGEMin, Finalize_MAGEMin
 
-export wt2mol, mol2wt, get_molar_mass, vec_norm
+export wt2mol, mol2wt, get_molar_mass, vec_norm, FeO2Fe_O
 export compute_melt_viscosity_G08
 
 export TE_prediction, adjust_bulk_4_zircon, create_custom_KDs_database, get_TE_database, adjust_chemical_system
