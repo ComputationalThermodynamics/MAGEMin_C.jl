@@ -1024,11 +1024,12 @@ function FeO2Fe_O(    bulk_mol     :: AbstractVector{Float64},
     (!("FeO" in bulk_ox) || !("O" in bulk_ox)) && return bulk_mol, bulk_ox
 
     # Recompute FeO + O -> Fe + O (negative O for reduced systems, positive for oxidized systems)
-    bulk_mod, bulk_ox_mod = copy(bulk_mol), copy(bulk_ox)
-    tmp_idFeO, tmp_idO = findfirst(bulk_ox .== "FeO"), findfirst(bulk_ox .== "O")
-    nFeᵀ, nOᵀ = (2bulk_mod[tmp_idO]/3 + bulk_mod[tmp_idFeO]), (bulk_mod[tmp_idFeO] + bulk_mod[tmp_idO])
-    bulk_mod[tmp_idO] = nOᵀ; bulk_mod[tmp_idFeO] = nFeᵀ;
-    bulk_ox_mod[tmp_idFeO] = "Fe"
+    bulk_mod, bulk_ox_mod   = copy(bulk_mol), copy(bulk_ox)
+    tmp_idFeO, tmp_idO      = findfirst(bulk_ox .== "FeO"), findfirst(bulk_ox .== "O")
+    nFeᵀ, nOᵀ               = (2.0*bulk_mod[tmp_idO]/3.0 + bulk_mod[tmp_idFeO]), (bulk_mod[tmp_idFeO] + bulk_mod[tmp_idO])
+    bulk_mod[tmp_idO]       = nOᵀ; bulk_mod[tmp_idFeO] = nFeᵀ;
+    bulk_ox_mod[tmp_idFeO]  = "Fe"
+    
     return bulk_mod, bulk_ox_mod
 end
 
