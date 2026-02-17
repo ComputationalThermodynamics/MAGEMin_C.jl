@@ -1017,19 +1017,17 @@ end
 
     Converts bulk-rock composition using FeO + extra oxygen to total Fe + total O (used for SB24)
 """
-function FeO2Fe_O(    bulk_mol     :: AbstractVector{Float64},
-                      bulk_ox      :: AbstractVector{String}) 
+function FeO2Fe_O!(    bulk_mol     :: AbstractVector{Float64},
+                       bulk_ox      :: AbstractVector{String}) 
 
     # Don't call if composition is already being passed as Fe + O
     (!("FeO" in bulk_ox) || !("O" in bulk_ox)) && return bulk_mol, bulk_ox
 
     # Recompute FeO + O -> Fe + O (negative O for reduced systems, positive for oxidized systems)
-    bulk_mod, bulk_ox_mod = copy(bulk_mol), copy(bulk_ox)
     tmp_idFeO, tmp_idO = findfirst(bulk_ox .== "FeO"), findfirst(bulk_ox .== "O")
-    nFeᵀ, nOᵀ = (2bulk_mod[tmp_idO]/3 + bulk_mod[tmp_idFeO]), (bulk_mod[tmp_idFeO] + bulk_mod[tmp_idO])
-    bulk_mod[tmp_idO] = nOᵀ; bulk_mod[tmp_idFeO] = nFeᵀ;
-    bulk_ox_mod[tmp_idFeO] = "Fe"
-    return bulk_mod, bulk_ox_mod
+    nFeᵀ, nOᵀ = (2bulk_mol[tmp_idO]/3 + bulk_mol[tmp_idFeO]), (bulk_mol[tmp_idFeO] + bulk_mol[tmp_idO])
+    bulk_mol[tmp_idO] = nOᵀ; bulk_mol[tmp_idFeO] = nFeᵀ;
+    bulk_ox[tmp_idFeO] = "Fe"
 end
 
 """
@@ -1073,7 +1071,6 @@ function convertBulk4MAGEMin(   bulk_in     :: T1,
     elseif db   == "sb24"
         # Recompute FeO + O -> Fe + O (negative O for reduced systems, positive for oxidized systems)
         MAGEMin_ox      = ["SiO2"; "CaO"; "Al2O3"; "MgO"; "Na2O"; "O"; "Cr2O3"; "Fe"];
-        bulk_in, bulk_in_ox      = FeO2Fe_O(bulk_in, bulk_in_ox)
     else
         print("Database not implemented...\n")
     end
@@ -1082,7 +1079,7 @@ function convertBulk4MAGEMin(   bulk_in     :: T1,
     filter = setdiff(bulk_in_ox,MAGEMin_ox)
     keep_ids = []
     if !isempty(filter)
-        tmp_id    = findall(filter .!= "Fe2O3")
+        tmp_id    = findall(filter .!= "Fe2O3" .&& filter .!= "FeO" .&& filter .!= "Fe")
         if !isempty(tmp_id)
             filter = filter[tmp_id]
             
@@ -1115,6 +1112,7 @@ function convertBulk4MAGEMin(   bulk_in     :: T1,
         println("System unit not implemented -> use 'mol' or 'wt' -> falling back to 'mol'")
 	end
 
+    (db=="sb24") && (bulk, bulk_in_ox = FeO2Fe_O!(bulk, bulk_in_ox))
 	bulk = normalize(bulk);
 
 	for i=1:length(MAGEMin_ox)

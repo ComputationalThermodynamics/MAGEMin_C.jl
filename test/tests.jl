@@ -540,10 +540,10 @@ end
 
 @testset "FeO + Oᵉˣᵗʳᵃ -> Feᵀᵒᵗᵃˡ + Oᵀᵒᵗᵃˡ" begin
 
-    bulk_in_ox  =  ["SiO2"; "CaO"; "Al2O3"; "MgO"; "Na2O"; "FeO"; "Cr2O3"; "O"]
-    bulk_in     = [38.83, 2.94, 2.03, 50.02, 0.11, 5.69, 0.19, 0.18] # Pyrolite
-    bulk_mod, bulk_ox    = FeO2Fe_O(bulk_in, bulk_in_ox)
-    @test bulk_mod ≈ [38.83, 2.94, 2.03, 50.02, 0.11, 5.87, 0.19, 5.81]
+    bulk_in_ox  =  ["SiO2"; "CaO"; "Al2O3"; "MgO"; "Na2O"; "FeO"; "Cr2O3"; "O"]    
+    bulk_in     = [38.83, 2.94, 2.03, 50.03, 0.11, 5.69, 0.19, 0.17] # Pyrolite
+    bulk_mod, bulk_ox  = convertBulk4MAGEMin(bulk_in,bulk_in_ox,"mol","sb24");
+    @test bulk_mod ≈ [36.70363601991304, 2.7790030877812084, 1.9188354653727389, 47.29031444955574, 0.10397630600541938, 5.539101392652341, 0.17959543764572436, 5.485537841073792]
     @test bulk_ox == ["SiO2"; "CaO"; "Al2O3"; "MgO"; "Na2O"; "O"; "Cr2O3"; "Fe"]
 
 end
