@@ -8,7 +8,9 @@
   
 - [E.2 Zirconium and sulfur saturation models](/MAGEMin_C/saturation_models#E.2-Zirconium-and-sulfur-saturation-models)
   
-- [E.3 Saturation models and bulk correction](/MAGEMin_C/saturation_models#E.3-Saturation-models-and-bulk-correction)
+- [E.3 P2O5 saturation model example](/MAGEMin_C/saturation_models#E.3-P2O5-saturation%20model-example)
+  
+- [E.4 Saturation models and bulk correction](/MAGEMin_C/saturation_models#E.4-Saturation-models-and-bulk-correction)
   
 
 :::
@@ -45,6 +47,7 @@ For instance, if P2O5 concentration in the melt is greater than the saturation l
 == Phosphate (P2O5)
 
 <ul>
+    <li>Klein et al., 2026 - P2O5Sat_model = "Klein26"</li>
     <li>Tollari et al., 2006 - P2O5Sat_model = "Tollari06"</li> [dry systems only]
     <li>Harrison & Watson, 1984 with Bea et al., 1992 correction - P2O5Sat_model = "HWBea92"</li>
 </ul>
@@ -66,7 +69,7 @@ Note that fS2 is calculated after Bockrath et al. (2024) and that fO2 is retriev
 | ---------:| ------------:| ---------:| ----------:| ------------------:| -----------------------------------------------------------:|
 |        Zr |       zircon |       zrc |     ZrSiO4 |         SiO2 and O | ZrSat_model = &quot;CB&quot;, &quot;B&quot;, &quot;WH&quot; |
 |         S |      sulfide |      sulf |        FeS |          FeO and O |        SSat_model = &quot;Oneill21&quot;, &quot;Liu07&quot; |
-|      P2O5 | fluorapatite |      fapt | Ca5(PO4)3F | CaO (F is omitted) |                       P2O5Sat_model = &quot;Tollari06&quot; |
+|      P2O5 | fluorapatite |      fapt | Ca5(PO4)3F | CaO (F is omitted) |                         P2O5Sat_model = &quot;Klein26&quot; |
 
 
 ## E.1 Zirconium saturation {#E.1-Zirconium-saturation}
@@ -179,7 +182,37 @@ Finalize_MAGEMin(data)
 ```
 
 
-## E.3 Saturation models and bulk correction {#E.3-Saturation-models-and-bulk-correction}
+## E.3 P2O5 saturation model example {#E.3-P2O5-saturation-model-example}
+
+```julia
+
+using MAGEMin_C
+dtb     = "mp"
+data    = Initialize_MAGEMin(dtb, verbose=-1, solver=0);
+P,T     = 6.0, 800.0
+Xoxides = ["SiO2";  "TiO2";  "Al2O3";  "FeO";   "MnO";   "MgO";   "CaO";   "Na2O";  "K2O"; "H2O"; "O"];
+X       = [58.509,  1.022,   14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 10.0, 0.2];
+sys_in  = "wt"
+
+el      = ["P2O5"]
+ph      = ["fapt"]  #phase bearing P2O5 is fluor-apatite
+KDs     = ["0.0"]   # phase crystallized from saturation models have 0.0 KDs
+C0      = [400.0]   # starting concentration of elements in ppm (ug/g)
+
+KDs_dtb = create_custom_KDs_database(el, ph, KDs)
+
+
+out    = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in, name_solvus=true);
+
+out_TE  = TE_prediction(out, C0, KDs_dtb, dtb; 
+                        P2O5Sat_model     = "Klein26",)
+
+Finalize_MAGEMin(data)
+
+```
+
+
+## E.4 Saturation models and bulk correction {#E.4-Saturation-models-and-bulk-correction}
 
 This example shows how to correct the bulk-rock composition in a iterative manner when accessory phase crystallized when saturation is exceeded.
 
@@ -253,15 +286,17 @@ Iteration 1: residual = 3.909415504073306e-7
   
 - Bea, F., Fershtater, G., &amp; Corretgé, L. G. (1992). The geochemistry of phosphorus in granite rocks and the effect of aluminium. Lithos, 29(1-2), 43-56
   
-- Boehnke, P., Watson, E. B., Trail, D., Harrison, T. M., &amp; Schmitt, A. K. (2013). Zircon saturation re-revisited. Chemical Geology, 351, 324-334.
-  
-- Crisp, L. J., &amp; Berry, A. J. (2022). A new model for zircon saturation in silicate melts. Contributions to Mineralogy and Petrology, 177(7), 71.
+- Bockrath, C., Ballhaus, C., &amp; Holzheid, A. (2004). Stabilities of laurite RuS2 and monosulfide liquid solution at magmatic temperature. Chemical Geology, 208(1-4), 265-271.
   
 - Tollari, N., Toplis, M. J., &amp; Barnes, S. J. (2006). Predicting phosphate saturation in silicate magmas: an experimental study of the effects of melt composition and temperature. Geochimica et Cosmochimica Acta, 70(6), 1518-1536.
   
 - Liu, Y., Samaha, N. T., &amp; Baker, D. R. (2007). Sulfur concentration at sulfide saturation (SCSS) in magmatic silicate melts. Geochimica et Cosmochimica Acta, 71(7), 1783-1799.
   
+- Boehnke, P., Watson, E. B., Trail, D., Harrison, T. M., &amp; Schmitt, A. K. (2013). Zircon saturation re-revisited. Chemical Geology, 351, 324-334.
+  
 - O&#39;Neill, H. S. C. (2021). The thermodynamic controls on sulfide saturation in silicate melts with application to ocean floor basalts. Magma redox geochemistry, 177-213.
   
-- Bockrath, C., Ballhaus, C., &amp; Holzheid, A. (2004). Stabilities of laurite RuS2 and monosulfide liquid solution at magmatic temperature. Chemical Geology, 208(1-4), 265-271.
+- Crisp, L. J., &amp; Berry, A. J. (2022). A new model for zircon saturation in silicate melts. Contributions to Mineralogy and Petrology, 177(7), 71.
+  
+- Klein, B. Z., Müntener, O., Gillespie, J., &amp; Marxer, F. (2026). Apatite saturation revisited: new model formulations and applications to igneous rocks. Contributions to Mineralogy and Petrology, 181(3), 18.
   
