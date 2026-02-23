@@ -1112,16 +1112,17 @@ function convertBulk4MAGEMin(   bulk_in     :: T1,
         println("System unit not implemented -> use 'mol' or 'wt' -> falling back to 'mol'")
 	end
 
-    (db=="sb24") && (bulk, bulk_in_ox = FeO2Fe_O!(bulk, bulk_in_ox))
-	bulk = normalize(bulk);
+    Xox_cp = copy(bulk_in_ox) # Use copy of oxide list to avoid in-place modification
+    (db=="sb24") && (FeO2Fe_O!(bulk, Xox_cp))
+    bulk = normalize(bulk);
 
-	for i=1:length(MAGEMin_ox)
-        id = findall(bulk_in_ox .== MAGEMin_ox[i]);
-		if ~isempty(id)
-			MAGEMin_bulk[i] = bulk[id[1]];
-		end
-	end
-    idFe2O3 = findall(bulk_in_ox .== "Fe2O3");
+    for i=1:length(MAGEMin_ox)
+        id = findall(Xox_cp .== MAGEMin_ox[i]);
+        if ~isempty(id)
+            MAGEMin_bulk[i] = bulk[id[1]];
+        end
+    end
+    idFe2O3 = findall(Xox_cp .== "Fe2O3");
 
     if ~isempty(idFe2O3)
         idFeO = findall(MAGEMin_ox .== "FeO");
