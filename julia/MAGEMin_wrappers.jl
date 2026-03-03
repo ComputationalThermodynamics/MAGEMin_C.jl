@@ -1019,15 +1019,24 @@ end
 """
 function FeO2Fe_O!(    bulk_mol     :: AbstractVector{Float64},
                        bulk_ox      :: AbstractVector{String}) 
-
-    # Don't call if composition is already being passed as Fe + O
-    (!("FeO" in bulk_ox) || !("O" in bulk_ox)) && return bulk_mol, bulk_ox
-
-    # Recompute FeO + O -> Fe + O (negative O for reduced systems, positive for oxidized systems)
-    tmp_idFeO, tmp_idO  = findfirst(bulk_ox .== "FeO"), findfirst(bulk_ox .== "O")
-    nFeᵀ, nOᵀ           = (2bulk_mol[tmp_idO]/3 + bulk_mol[tmp_idFeO]), (bulk_mol[tmp_idFeO] + bulk_mol[tmp_idO])
-    bulk_mol[tmp_idO]   = nOᵀ; bulk_mol[tmp_idFeO] = nFeᵀ;
-    bulk_ox[tmp_idFeO]  = "Fe"
+    
+    if ("Fe" in bulk_ox && "O" in bulk_ox) # Don't call if composition is already being passed as Fe + O
+        # nothing to do
+    elseif ("FeO" in bulk_ox && "Fe2O3" in bulk_ox) # If FeO and Fe2O3 are given, deduce bulk
+        tmp_idFeO, tmp_idFe2O3  = findfirst(bulk_ox .== "FeO"), findfirst(bulk_ox .== "Fe2O3")
+        nFeᵀ, nOᵀ = (bulk_mol[tmp_idFeO] + 2bulk_mol[tmp_idFe2O3]), (bulk_mol[tmp_idFeO] + 3bulk_mol[tmp_idFe2O3])
+        bulk_mol[tmp_idFeO] = nFeᵀ; bulk_mol[tmp_idFe2O3]   = nOᵀ; 
+        bulk_ox[tmp_idFeO]  = "Fe"; bulk_ox[tmp_idFe2O3]  = "O"
+    elseif ("FeO" in bulk_ox && !("O" in bulk_ox)) # If only FeO is present, assume excess oxygen to be zero
+        push!(bulk_ox, "O"); push!(bulk_mol, 0.0);
+    else # Recompute FeO + O -> Fe + O (negative O for reduced systems, positive for oxidized systems)
+        tmp_idFeO, tmp_idO  = findfirst(bulk_ox .== "FeO"), findfirst(bulk_ox .== "O")
+        XFe2O3 = bulk_mol[tmp_idO]; XFeO = bulk_mol[tmp_idFeO] - 2XFe2O3
+        nFeᵀ, nOᵀ           = (2XFe2O3 + XFeO), (XFeO + 3XFe2O3)
+        bulk_mol[tmp_idO]   = nOᵀ; bulk_mol[tmp_idFeO] = nFeᵀ;
+        bulk_ox[tmp_idFeO]  = "Fe"
+    end
+    return bulk_mol, bulk_ox
 end
 
 """
@@ -1124,7 +1133,7 @@ function convertBulk4MAGEMin(   bulk_in     :: T1,
     end
     idFe2O3 = findall(Xox_cp .== "Fe2O3");
 
-    if ~isempty(idFe2O3)
+    if (~isempty(idFe2O3) && db!="sb24") # sb24 -> done in FeO2Fe_O!()
         idFeO = findall(MAGEMin_ox .== "FeO");
         MAGEMin_bulk[idFeO[1]] += bulk[idFe2O3[1]]*2.0;
 
