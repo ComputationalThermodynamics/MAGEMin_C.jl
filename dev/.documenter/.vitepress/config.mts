@@ -20,20 +20,21 @@ const navTemp = {
   nav: [
 { text: 'Home', link: '/index' },
 { text: 'Methods', link: '/problem' },
+{ text: 'Databases', link: '/database' },
 { text: 'MAGEMinApp.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMinApp/MAGEMinApp' },
-{ text: 'Installation', link: '/MAGEMinApp/installation' },
+{ text: 'Installation & update', link: '/MAGEMinApp/installation' },
 { text: 'Interface', link: '/MAGEMinApp/interface' },
 { text: 'Tutorials - Bulk input file', link: '/MAGEMinApp/bulk_rock' },
 { text: 'Tutorials - Partition coeficient file', link: '/MAGEMinApp/partition_coef' },
 { text: 'Tutorials - Phase diagrams', link: '/MAGEMinApp/PD_tutorials' },
 { text: 'Tutorials - P-T-X paths', link: '/MAGEMinApp/PTX_tutorials' },
-{ text: 'Tutorials - Isentropic paths', link: '/MAGEMinApp/isoS_tutorials' },
 { text: 'Tutorials - Citations', link: '/MAGEMinApp/citation' }]
  },
 { text: 'MAGEMin_C.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMin_C/MAGEMin_C' },
-{ text: 'Installation', link: '/MAGEMin_C/installation' },
+{ text: 'Installation & update', link: '/MAGEMin_C/installation' },
+{ text: 'Important options', link: '/MAGEMin_C/options' },
 { text: 'Tutorials - Quickstart', link: '/MAGEMin_C/quickstart' },
 { text: 'Tutorials - Output structure', link: '/MAGEMin_C/output_structure' },
 { text: 'Tutorials - Trace-elements', link: '/MAGEMin_C/trace_elements' },
@@ -49,6 +50,16 @@ const navTemp = {
 { text: 'Introduction', link: '/MAGEMin/MAGEMin' },
 { text: 'Compilation', link: '/MAGEMin/installation' },
 { text: 'Tutorials', link: '/MAGEMin/tutorials' }]
+ },
+{ text: 'Workshops', collapsed: false, items: [
+{ text: 'Beijing 2026', collapsed: false, items: [
+{ text: 'Overview', link: '/WS_Bejing_2026/overview' },
+{ text: '1 — Introduction', link: '/WS_Bejing_2026/MAGEMin_C_intro' },
+{ text: '2 — Iterative calculations', link: '/WS_Bejing_2026/MAGEMin_C_iterative_calculations' },
+{ text: '3 — Fractional melting', link: '/WS_Bejing_2026/MAGEMin_C_fractional_melting' },
+{ text: '4 — Li partitioning', link: '/WS_Bejing_2026/MAGEMin_C_Li_partitioning' },
+{ text: '5 — Li partitioning (frac. melt.)', link: '/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting' }]
+ }]
  }
 ]
 ,
@@ -127,20 +138,21 @@ export default defineConfig({
     sidebar: [
 { text: 'Home', link: '/index' },
 { text: 'Methods', link: '/problem' },
+{ text: 'Databases', link: '/database' },
 { text: 'MAGEMinApp.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMinApp/MAGEMinApp' },
-{ text: 'Installation', link: '/MAGEMinApp/installation' },
+{ text: 'Installation & update', link: '/MAGEMinApp/installation' },
 { text: 'Interface', link: '/MAGEMinApp/interface' },
 { text: 'Tutorials - Bulk input file', link: '/MAGEMinApp/bulk_rock' },
 { text: 'Tutorials - Partition coeficient file', link: '/MAGEMinApp/partition_coef' },
 { text: 'Tutorials - Phase diagrams', link: '/MAGEMinApp/PD_tutorials' },
 { text: 'Tutorials - P-T-X paths', link: '/MAGEMinApp/PTX_tutorials' },
-{ text: 'Tutorials - Isentropic paths', link: '/MAGEMinApp/isoS_tutorials' },
 { text: 'Tutorials - Citations', link: '/MAGEMinApp/citation' }]
  },
 { text: 'MAGEMin_C.jl', collapsed: false, items: [
 { text: 'Introduction', link: '/MAGEMin_C/MAGEMin_C' },
-{ text: 'Installation', link: '/MAGEMin_C/installation' },
+{ text: 'Installation & update', link: '/MAGEMin_C/installation' },
+{ text: 'Important options', link: '/MAGEMin_C/options' },
 { text: 'Tutorials - Quickstart', link: '/MAGEMin_C/quickstart' },
 { text: 'Tutorials - Output structure', link: '/MAGEMin_C/output_structure' },
 { text: 'Tutorials - Trace-elements', link: '/MAGEMin_C/trace_elements' },
@@ -156,6 +168,16 @@ export default defineConfig({
 { text: 'Introduction', link: '/MAGEMin/MAGEMin' },
 { text: 'Compilation', link: '/MAGEMin/installation' },
 { text: 'Tutorials', link: '/MAGEMin/tutorials' }]
+ },
+{ text: 'Workshops', collapsed: false, items: [
+{ text: 'Beijing 2026', collapsed: false, items: [
+{ text: 'Overview', link: '/WS_Bejing_2026/overview' },
+{ text: '1 — Introduction', link: '/WS_Bejing_2026/MAGEMin_C_intro' },
+{ text: '2 — Iterative calculations', link: '/WS_Bejing_2026/MAGEMin_C_iterative_calculations' },
+{ text: '3 — Fractional melting', link: '/WS_Bejing_2026/MAGEMin_C_fractional_melting' },
+{ text: '4 — Li partitioning', link: '/WS_Bejing_2026/MAGEMin_C_Li_partitioning' },
+{ text: '5 — Li partitioning (frac. melt.)', link: '/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting' }]
+ }]
  }
 ]
 ,

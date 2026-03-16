@@ -9,7 +9,7 @@
 <ul>
     <li>Pressure-Temperature iso-chemical phase diagrams (P-T phase diagrams)</li>
     <li>Pressure and/or Temperature versus variable composition diagrams (P-X, T-X, PT-X, T-T polymetamorphic phase diagrams)</li>
-    <li>Trace-element partitioning at suprasolidus conditions (includind models of Zr saturation)</li>
+    <li>Trace-element partitioning at suprasolidus conditions (including models of Zr saturation)</li>
     <li>Display iso-contour of phase fractions, densities, seismic velocities etc.</li>
     <li>Automatic labeling of the phase fields including listing the stable phase assemblage when the field is too small.</li>
     <li>Pressure-Temperature-Composition paths e.g., fractional melting and crystallization (with assimilation and extraction threshold).</li>
@@ -39,7 +39,7 @@ P-T phase diagram produced using the metabasite dataset (Green et al., 2016) usi
 <img src="../assets/T101_d1.png" alt="MAGEMin framework" style="width: 50%; height: auto; display: block; margin: 0 auto;">
 
 
-P-T phase diagram produced using the Igneous dataset (Green et al., 2015 udpated from Holland et al., 2018) using fixed composition. The `liq` reaction line is highlighted and the `liq` fraction is contoured using a step of 0.1 mol fraction`.
+P-T phase diagram produced using the Igneous dataset (Green et al., 2015 updated from Holland et al., 2018) using fixed composition. The `liq` reaction line is highlighted and the `liq` fraction is contoured using a step of 0.1 mol fraction`.
 
 == Ijolite (W24)
 <img src="../assets/Ijolite_d1.png" alt="MAGEMin framework" style="width: 50%; height: auto; display: block; margin: 0 auto;">

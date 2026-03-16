@@ -18,7 +18,7 @@ Test 3;Coin & Kwak, 1984;mb;wt;[SiO2, Al2O3, CaO, MgO, Fe2O3, K2O,Na2O, TiO2, Fe
   
 - Either `FeO` and `O` **or** `FeO` and `Fe2O3` can be provided. In the first case `FeO` = `FeOt`.
   
-- To provide two bulk-rock comnposition for `P-X` or `T-X` diagrams, simply paste a second array of oxdes content as show for bulk-rock composition `Test 2`.
+- To provide two bulk-rock composition for `P-X` or `T-X` diagrams, simply paste a second array of oxdes content as show for bulk-rock composition `Test 2`.
   
 - If you want to use different thermodynamic database for the same bulk rock, copy and paste the line and change the database acronym
   
@@ -43,6 +43,8 @@ Thermodynamic dataset acronym are the following:
 - `sb11` -&gt; Stixrude &amp; Lithgow-Bertelloni (2011)
   
 - `sb21` -&gt; Stixrude &amp; Lithgow-Bertelloni (2021)
+  
+- `sb24` -&gt; Stixrude &amp; Lithgow-Bertelloni (2024)
   
 - `ume` -&gt; ultramafic extended (Green et al., 2016 + Evans &amp; Frost, 2021)
   

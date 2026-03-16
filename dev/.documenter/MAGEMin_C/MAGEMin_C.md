@@ -1,11 +1,11 @@
 
 ## MAGEMin_C.jl {#MAGEMin_C.jl}
 
-`MAGEMin_C` is designed to simplify single and multipoint phase equilibrium modelling using `Julia` programming language. The main objective is to provide a set of routine to initialize MAGEMin, perform a set of calculation, store the results of the phase equilibrium modelling in an output structure and free (deallocate) MAGEMin. This approach allow to easily create custom script to perform advanced phas equilibrium modelling calculations but also to offer an interface with geodynamic modelling (such as reactive two-phase modelling of magma transport).
+`MAGEMin_C` is designed to simplify single and multipoint phase equilibrium modelling using `Julia` programming language. The main objective is to provide a set of routine to initialize MAGEMin, perform a set of calculation, store the results of the phase equilibrium modelling in an output structure and free (deallocate) MAGEMin. This approach allow to easily create custom script to perform advanced phase equilibrium modelling calculations but also to offer an interface with geodynamic modelling (such as reactive two-phase modelling of magma transport).
 
 ## Quick start {#Quick-start}
 
-The most convinient way to use `MAGEMin_C.jl` is by first creating a `Julia` script. To do so, simply create a new text file and change the extension to `.jl`, e.g., `MAGEMin_C_script.jl`.
+The most convenient way to use `MAGEMin_C.jl` is by first creating a `Julia` script. To do so, simply create a new text file and change the extension to `.jl`, e.g., `MAGEMin_C_script.jl`.
 
 The following example shows you how to perform a **single point calculation** with the following parameters:
 <ul>
@@ -57,6 +57,8 @@ Thermodynamic dataset acronym are the following:
 - `sb11` -&gt; Stixrude &amp; Lithgow-Bertelloni (2011)
   
 - `sb21` -&gt; Stixrude &amp; Lithgow-Bertelloni (2021)
+  
+- `sb24` -&gt; Stixrude &amp; Lithgow-Bertelloni (2024)
   
 - `ume` -&gt; ultramafic extended (Green et al., 2016 + Evans &amp; Frost, 2021)
   

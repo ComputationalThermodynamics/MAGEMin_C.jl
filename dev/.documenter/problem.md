@@ -79,7 +79,7 @@ A solvus is a boundary that defines the limit of solid solubility (miscibility) 
 
 
 
-Properly naming demixed phases is important as it allows to differentiate multiple stable instances of the same solution model e.g., plagioclase and alkali-felspar (feldspar) or muscovite and paragonite (muscovite) etc. While for some solution models, naming (or classifying) the demixed phases is relatively straigthforward (e.g., for feldspar) for other solution phases, such as amphibole, the classification rules are more complex and sometimes not fully accurate.
+Properly naming demixed phases is important as it allows to differentiate multiple stable instances of the same solution model e.g., plagioclase and alkali-felspar (feldspar) or muscovite and paragonite (muscovite) etc. While for some solution models, naming (or classifying) the demixed phases is relatively straightforward (e.g., for feldspar) for other solution phases, such as amphibole, the classification rules are more complex and sometimes not fully accurate.
 
 ### Igneous, igneous alkali dry (ig, igad) {#Igneous,-igneous-alkali-dry-ig,-igad}
 
@@ -187,7 +187,7 @@ else
     else                    mineral_name = "amp"
 ```
 
-- ilmenitem: `ilmm`
+- ilmenite: `ilmm`
   
 
 ```julia
@@ -263,7 +263,7 @@ else                        mineral_name = "ged"
 |        pig |                 Pigeonite |
 |         pl |               Plagioclase |
 |        sid |                  Siderite |
-|     sp/spl |                    Spinel |
+| sp/spl/spi |                    Spinel |
 |         tr |                 Tremolite |
 |        usp |                Ulvöspinel |
 
