@@ -2318,7 +2318,7 @@ out2    = point_wise_metastability(out, Pmeta, Tmeta, data)
 
 which gives:
 
-````
+```
 julia> out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
 Pressure          : 6.0      [kbar]
 Temperature       : 630.0    [Celsius]
@@ -2377,7 +2377,7 @@ Temperature       : 500.0    [Celsius]
 Gibbs free energy : -791.460287  (0 iterations; 0.04 ms)
 Oxygen fugacity          : 11.256905434522107
 Delta QFM                : 34.26950061699225
-````
+```
 
 """
 function point_wise_metastability(  out     :: MAGEMin_C.gmin_struct{Float64, Int64},
