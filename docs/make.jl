@@ -15,21 +15,23 @@ makedocs(;
     pages = [
         "Home"          => "index.md",
         "Methods"       => "problem.md",
+        "Databases"      => "database.md",
         "MAGEMinApp.jl" => [
                 "Introduction"  => "MAGEMinApp/MAGEMinApp.md",
-                "Installation"  => "MAGEMinApp/installation.md",
+                "Installation & update"  => "MAGEMinApp/installation.md",
                 "Interface"     => "MAGEMinApp/interface.md",
                 "Tutorials - Bulk input file"   => "MAGEMinApp/bulk_rock.md",
                 "Tutorials - Partition coeficient file"   => "MAGEMinApp/partition_coef.md",
                 "Tutorials - Phase diagrams"    => "MAGEMinApp/PD_tutorials.md",
                 "Tutorials - P-T-X paths"       => "MAGEMinApp/PTX_tutorials.md",
-                "Tutorials - Isentropic paths"  => "MAGEMinApp/isoS_tutorials.md",
+                # "Tutorials - Isentropic paths"  => "MAGEMinApp/isoS_tutorials.md",
                 "Tutorials - Citations"         => "MAGEMinApp/citation.md",
 
         ],
         "MAGEMin_C.jl" => [
-                "Introduction"  => "MAGEMin_C/MAGEMin_C.md",
-                "Installation"  => "MAGEMin_C/installation.md",
+                "Introduction"                      => "MAGEMin_C/MAGEMin_C.md",
+                "Installation & update"             => "MAGEMin_C/installation.md",
+                "Important options"                 => "MAGEMin_C/options.md",
                 "Tutorials - Quickstart"            => "MAGEMin_C/quickstart.md",
                 "Tutorials - Output structure"      => "MAGEMin_C/output_structure.md",
                 "Tutorials - Trace-elements"        => "MAGEMin_C/trace_elements.md",
@@ -45,6 +47,16 @@ makedocs(;
                 "Introduction"  => "MAGEMin/MAGEMin.md",
                 "Compilation"   => "MAGEMin/installation.md",
                 "Tutorials"     => "MAGEMin/tutorials.md",
+        ],
+        "Workshops" => [
+                "Beijing 2026" => [
+                        "Overview"                          => "WS_Bejing_2026/overview.md",
+                        "1 — Introduction"                  => "WS_Bejing_2026/MAGEMin_C_intro.md",
+                        "2 — Iterative calculations"        => "WS_Bejing_2026/MAGEMin_C_iterative_calculations.md",
+                        "3 — Fractional melting"            => "WS_Bejing_2026/MAGEMin_C_fractional_melting.md",
+                        "4 — Li partitioning"               => "WS_Bejing_2026/MAGEMin_C_Li_partitioning.md",
+                        "5 — Li partitioning (frac. melt.)" => "WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting.md",
+                ],
         ],
 
     ],
