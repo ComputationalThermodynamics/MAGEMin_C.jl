@@ -7,10 +7,10 @@ The function receives bulk-rock composition, pressure and temperature to compute
 The list of all available thermodynamic datasets is presented below.
 
 !!! note
-    Presently, only thermodynamic datasets from `THERMOCALC` are available in MAGEMin. However, our approach is not resctricted to a single formalism and we are working on adding the Stixrude & Lithgow-Bertelloni thermodynamic datasets for the mantle. 
+    Presently, only thermodynamic datasets from `THERMOCALC` are available in MAGEMin. However, our approach is not restricted to a single formalism and we are working on adding the Stixrude & Lithgow-Bertelloni thermodynamic datasets for the mantle. 
 
 !!! warning
-    The `C` backend of `MAGEMin` is not the most user-friendly way to use `MAGEMin` toolset. We strongly encourage users to try out `MAGEMinApp.jl` and `MAGEMin_C.jl`. The only case where using the `C` backend of `MAGEMin` possibly the best solution is when trying to call `MAGEMin` as an extarnal library for a pre-existing `C`, `C++` code.
+    The `C` backend of `MAGEMin` is not the most user-friendly way to use `MAGEMin` toolset. We strongly encourage users to try out `MAGEMinApp.jl` and `MAGEMin_C.jl`. The only case where using the `C` backend of `MAGEMin` possibly the best solution is when trying to call `MAGEMin` as an external library for a pre-existing `C`, `C++` code.
 
 ## Available thermodynamic database
 
