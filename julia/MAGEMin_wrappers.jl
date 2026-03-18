@@ -1630,21 +1630,29 @@ function convertBulk4MAGEMin(   bulk_in     :: T1,
     oxide_config = Dict(
         "mp"   => (core=["SiO2", "Al2O3", "CaO", "MgO", "FeO", "K2O", "Na2O"],  
                    optional=["TiO2", "O", "MnO", "H2O"]),
+
         "mb"   => (core=["SiO2", "Al2O3", "CaO", "MgO", "FeO", "K2O", "Na2O", "H2O"],
                    optional=["TiO2", "O"]),
+
         "mbe"  => (core=["SiO2", "Al2O3", "CaO", "MgO", "FeO", "K2O", "Na2O", "H2O"],
                    optional=["TiO2", "O"]),
-        "ig"   => (core=["SiO2", "Al2O3", "CaO", "MgO", "FeO", "Na2O", "H2O"],
-                   optional=["K2O", "Cr2O3", "TiO2", "O"]),
-        "igad" => (core=["SiO2", "Al2O3", "CaO", "MgO", "FeO", "K2O", "Na2O", "H2O"],
-                   optional=["Cr2O3", "TiO2", "O"]),
-        "um"   => (core=["SiO2", "Al2O3", "MgO", "FeO", "H2O", "S"],
-                   optional=["O"]),
-        "ume"  => (core=["SiO2", "Al2O3", "MgO", "FeO", "H2O", "Na2O", "CaO"],
-                   optional=["S", "O", "Cr2O3", "CO2"]),
-        "mpe"  => (core=["SiO2", "Al2O3", "CaO", "MgO", "FeO", "K2O", "Na2O", "H2O"],
-                   optional=["CO2", "S", "TiO2", "O", "MnO"]),
+
+        "ig"   => (core=["SiO2", "Al2O3", "CaO", "MgO", "FeO", "Na2O"],
+                   optional=["K2O", "Cr2O3", "TiO2", "O", "H2O"]),
+
+        "igad" => (core=["SiO2", "Al2O3", "CaO", "MgO", "FeO", "K2O", "Na2O"],
+                   optional=["Cr2O3", "TiO2", "O", "H2O"]),
+
+        "um"   => (core=["SiO2", "Al2O3", "MgO", "FeO"],
+                   optional=["S", "O", "H2O"]),
+
+        "ume"  => (core=["SiO2", "Al2O3", "MgO", "FeO", "Na2O", "CaO"],
+                   optional=["S", "O", "Cr2O3", "CO2", "H2O"]),
+                   
+        "mpe"  => (core=["SiO2", "Al2O3", "CaO", "MgO", "FeO", "K2O", "Na2O"],
+                   optional=["CO2", "S", "TiO2", "O", "MnO", "H2O"]),
     )
+
 
     # Get core and optional indices for current database
     config  = get(oxide_config, db, (core=1:length(MAGEMin_ox), optional=Int64[]))
