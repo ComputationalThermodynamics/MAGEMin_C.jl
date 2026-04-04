@@ -3,15 +3,41 @@
 
 ## Bulk-rock input file {#Bulk-rock-input-file}
 
-`MAGEMinApp` relies on using a bulk-rock input file (`.dat`) where the user can provide a list of bulk-rock compositions, the system unit and the thermodynamic database to be used. Such file has to be formatted as follow:
+`MAGEMinApp` relies on using a bulk-rock input file (`.csv` or .`dat`) where the user can provide a list of bulk-rock compositions, the system unit and the thermodynamic database to be used. Such file has to be formatted as follow:
 
-```
-# this is a commented line
-title; comments; db; sysUnit; oxide; frac; frac2
-Test 2;Moo et al., 2000;ig;mol;[SiO2, Al2O3, CaO, MgO, FeO, K2O, Na2O, TiO2, O, Cr2O3, H2O];[48.97, 11.76, 13.87, 4.21, 8.97, 1.66, 10.66, 1.36, 1.66, 0.01, 0.0];[48.97, 11.76, 13.87, 4.21, 8.97, 1.66, 10.66, 1.36, 1.66, 0.01, 5.0]
-Test 3;Coin & Kwak, 1984;mb;wt;[SiO2, Al2O3, CaO, MgO, Fe2O3, K2O,Na2O, TiO2, FeO, H2O];[55.12, 12.76, 4.32, 5.21, 2.45, 1.66, 10.66, 1.36, 1.66, 2.0];
-```
+### CSV-type Bulk-rock input file {#CSV-type-Bulk-rock-input-file}
 
+MAGEMinApp  bulk-rock input in CSV format. The CSV file should have columns for each oxide and relevant metadata. Below is an example of the expected format:
+
+|        title |   comments |   db | sysUnit |   SiO2 |  Al2O3 |    CaO |    MgO |    FeO | Fe2O3 |   K2O |   Na2O | TiO2 |    O |  MnO |  H2O | P2O5 | SiO2_frac2 |
+| ------------:| ----------:| ----:| -------:| ------:| ------:| ------:| ------:| ------:| -----:| -----:| ------:| ----:| ----:| ----:| ----:| ----:| ----------:|
+|  Basalt_Xu08 |  bulk test | sb21 |     mol | 0.5175 | 0.1019 | 0.1388 | 0.1494 | 0.0706 |       |       | 0.0218 |      |      |      |      |      |         55 |
+| Basalt_Xu08l |      testy | sb21 |     mol | 0.5175 | 0.1019 | 0.1388 | 0.1494 | 0.0706 |       |       | 0.0218 |      |      |      |      |      |         55 |
+|       title1 | comment,2l |   um |      wt |  35.66 |   6.51 |   5.12 |  26.62 |        |       | 14.56 |   0.08 | 0.04 | 3.78 | 0.52 | 0.47 |      |         32 |
+|     Renato_2 |      test2 |   mb |      wt |  50.91 |   10.1 |  11.56 |  13.89 |  11.02 |       |  0.09 |    1.4 | 0.77 | 0.06 | 0.19 |    0 |      |         45 |
+
+
+**Column descriptions:**
+- `title`: Sample name or identifier
+  
+- `comments`: Any comments or notes
+  
+- `db`: Thermodynamic database acronym (see above)
+  
+- `sysUnit`: Unit system (e.g., `mol`, `wt`)
+  
+- Oxide columns (e.g., `SiO2`, `Al2O3`, ...): Content of each oxide in the specified unit
+  
+- Additional columns (e.g., `SiO2_frac2`): Optional. Columns ending with `_frac2` are used to specify a second bulk-rock composition for P-X, T-X, or PT-X diagrams. When provided, the value in an `_frac2` column will override the corresponding oxide value from the main composition for that specific diagram calculation. This allows you to easily define compositional variations between two endmembers in a single file.
+  
+
+**Notes:**
+- The CSV file must have a header row with column names.
+  
+- Missing values can be left empty; they will be treated as zero.
+  
+- You can add or remove oxide columns as needed, but the header must match the data.
+  
 
 ::: tip Note
 - If one oxide included in the thermodynamic database is not provided in the bulk-rock input file, the content of the oxide will be automatically be set to 0.0.
@@ -55,7 +81,17 @@ Thermodynamic dataset acronym are the following:
 
 :::
 
-and for trace-elements:
+### DAT-type Bulk-rock input file {#DAT-type-Bulk-rock-input-file}
+
+```
+# this is a commented line
+title; comments; db; sysUnit; oxide; frac; frac2
+Test 2;Moo et al., 2000;ig;mol;[SiO2, Al2O3, CaO, MgO, FeO, K2O, Na2O, TiO2, O, Cr2O3, H2O];[48.97, 11.76, 13.87, 4.21, 8.97, 1.66, 10.66, 1.36, 1.66, 0.01, 0.0];[48.97, 11.76, 13.87, 4.21, 8.97, 1.66, 10.66, 1.36, 1.66, 0.01, 5.0]
+Test 3;Coin & Kwak, 1984;mb;wt;[SiO2, Al2O3, CaO, MgO, Fe2O3, K2O,Na2O, TiO2, FeO, H2O];[55.12, 12.76, 4.32, 5.21, 2.45, 1.66, 10.66, 1.36, 1.66, 2.0];
+```
+
+
+## Bulk-trace-element input file {#Bulk-trace-element-input-file}
 
 ```
 # this is a commented line
