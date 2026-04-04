@@ -190,6 +190,7 @@ The main structure stores the properties of the system.
 ├─ frac_F_vol :: Float64        # [vol_i]   fluid volume fraction
 ├─ alpha :: Vector{Float64}     # [1/K]     thermal expansivity
 ├─ V :: Float64                 # [cm^3/mol]system volume
+├─ V_cm3 :: Float64             # [cm^3]system volume (for 1 kg)
 ├─ s_cp :: Vector{Float64}      # [kJ/K/kg] specific heat capacity
 ├─ rho :: Float64               # [kg/m^3]  system density
 ├─ rho_M :: Float64             # [kg/m^3]  melt density
