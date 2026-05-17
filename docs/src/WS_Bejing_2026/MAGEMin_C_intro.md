@@ -2,23 +2,23 @@
 
 ## Table of Contents
 
-- [Requirements](#requirements)
-- [Installation & Setup](#installation--setup)
-  - [1. Create the working directory](#1-create-the-working-directory)
-  - [2. Install packages](#2-install-packages)
-- [First minimization script](#first-minimization-script)
-  - [1. Create a new Julia script](#1-create-a-new-julia-script)
-  - [2. Load MAGEMin_C and Plots packages](#2-load-magemin_c-and-plots-packages)
-  - [3. Initialize MAGEMin](#3-initialize-magemin)
-  - [4. Provide system information](#4-provide-system-information)
-  - [5. Call single point minimization routine](#5-call-single-point-minimization-routine)
-  - [6. Perform the stable phase equilibrium calculation](#6-perform-the-stable-phase-equilibrium-calculation)
-  - [7. Access minimization results](#7-access-minimization-results)
-  - [8. Retrieve garnet composition in wt](#8-retrieve-garnet-composition-in-wt)
-  - [9. Plot garnet composition](#9-plot-garnet-composition)
-  - [10. Plot melt and solid bulk composition](#10-plot-melt-and-solid-bulk-composition)
-- [Exercises](#exercises)
-  - [E.1. Calculate residual composition](#e1-calculate-residual-composition)
+- [Requirements](#Requirements)
+- [Installation & Setup](#Installation-and-Setup)
+  - [1. Create the working directory](#1.-Create-the-working-directory)
+  - [2. Install packages](#2.-Install-packages)
+- [First minimization script](#First-minimization-script)
+  - [1. Create a new Julia script](#1.-Create-a-new-Julia-script)
+  - [2. Load MAGEMin_C and Plots packages](#2.-Load-MAGEMin_C-and-Plots-packages)
+  - [3. Initialize MAGEMin](#3.-Initialize-MAGEMin)
+  - [4. Provide system information](#4.-Provide-system-information)
+  - [5. Call single point minimization routine](#5.-Call-single-point-minimization-routine)
+  - [6. Perform the stable phase equilibrium calculation](#6.-Perform-the-stable-phase-equilibrium-calculation)
+  - [7. Access minimization results](#7.-Access-minimization-results)
+  - [8. Retrieve garnet composition in wt](#8.-Retrieve-garnet-composition-in-wt)
+  - [9. Plot garnet composition](#9.-Plot-garnet-composition)
+  - [10. Plot melt and solid bulk composition](#10.-Plot-melt-and-solid-bulk-composition)
+- [Exercises](#Exercises)
+  - [E.1. Calculate residual composition](#E.1.-Calculate-residual-composition)
 
 ## Requirements
 
@@ -33,8 +33,8 @@ Create a dedicated local folder for `MAGEMin_C` to live in its own environment. 
 
 ```shell
 cd /where_you_want_your_folder
-mkdir 2026_Beijing_MAGEMin
-cd 2026_Beijing_MAGEMin
+mkdir MAGEMin_tutorial
+cd MAGEMin_tutorial
 julia
 ```
 
@@ -63,14 +63,14 @@ add MAGEMin_C, Plots
 This installs both `MAGEMin_C` and `Plots`, the latter being the visualization package used throughout this tutorial. More advanced alternatives such as `Makie` or `PlotlyJS` exist but are beyond the scope of this introduction.
 
 !!! note
-    `activate .` creates a local Julia environment in `2026_Beijing_MAGEMin/` where `MAGEMin_C` and `Plots` are installed.
+    `activate .` creates a local Julia environment in `MAGEMin_tutorial/` where `MAGEMin_C` and `Plots` are installed.
     If you close the terminal, you will need to re-activate it (`] activate .`) to reload the local environment.
 
 ## First minimization script
 
 ### 1. Create a new Julia script
 
-Simply open a new terminal in the `2026_Beijing_MAGEMin` folder and type:
+Simply open a new terminal in the `MAGEMin_tutorial` folder and type:
 
 ```
 code first_minimization.jl

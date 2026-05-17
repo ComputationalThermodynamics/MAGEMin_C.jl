@@ -2,20 +2,20 @@
 
 ## Table of Contents
 
-- [Batch melting](#batch-melting)
-  - [1. Create a new script](#1-create-a-new-script)
-  - [2. Load and initialize](#2-load-and-initialize)
-  - [3. Define pressure-temperature conditions](#3-define-pressure-temperature-conditions)
-  - [4. Pre-allocate a vector of output structures](#4-pre-allocate-a-vector-of-output-structures)
-  - [5. Perform the calculations](#5-perform-the-calculations)
-  - [6. Accessing the results](#6-accessing-the-results)
-  - [7. Plot the evolution of melt fraction](#7-plot-the-evolution-of-melt-fraction)
-  - [8. Add other phase fractions](#8-add-other-phase-fractions)
-- [Exercises](#exercises)
-  - [E.1. Add other mineral fraction evolution](#e1-add-other-mineral-fraction-evolution)
-  - [E.2. Create plot for the evolution of heat capacity](#e2-create-plot-for-the-evolution-of-heat-capacity)
-  - [E.3. Taking into account latent heat of reaction](#e3-taking-into-account-latent-heat-of-reaction)
-  - [E.4. Double y-axis plot](#e4-double-y-axis-plot)
+- [Batch melting](#Batch-melting)
+  - [1. Create a new script](#1.-Create-a-new-script)
+  - [2. Load and initialize](#2.-Load-and-initialize)
+  - [3. Define pressure-temperature conditions](#3.-Define-pressure-temperature-conditions)
+  - [4. Pre-allocate a vector of output structures](#4.-Pre-allocate-a-vector-of-output-structures)
+  - [5. Perform the calculations](#5.-Perform-the-calculations)
+  - [6. Accessing the results](#6.-Accessing-the-results)
+  - [7. Plot the evolution of melt fraction](#7.-Plot-the-evolution-of-melt-fraction)
+  - [8. Add other phase fractions](#8.-Add-other-phase-fractions)
+- [Exercises](#Exercises)
+  - [E.1. Add other mineral fraction evolution](#E.1.-Add-other-mineral-fraction-evolution)
+  - [E.2. Create plot for the evolution of heat capacity](#E.2.-Create-plot-for-the-evolution-of-heat-capacity)
+  - [E.3. Taking into account latent heat of reaction](#E.3.-Taking-into-account-latent-heat-of-reaction)
+  - [E.4. Double y-axis plot](#E.4.-Double-y-axis-plot)
 
 In the introduction, we have seen how to perform a single point calculation, how to access the results, and briefly how to visualize them. In this second part, we will focus on performing several calculations at fixed pressure and increasing temperature.
 
