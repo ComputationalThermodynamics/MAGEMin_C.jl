@@ -1,7 +1,7 @@
 
-# Workshop — Beijing 9-13.03.2026 {#Workshop-—-Beijing-9-13.03.2026}
+# Trace-element partitioning workshop {#Trace-element-partitioning-workshop}
 
-Welcome to the MAGEMin hands-on workshop material. This workshop introduces the `MAGEMin_C.jl` Julia interface through a series of progressive tutorials, from basic phase equilibrium calculations to trace-element partitioning during fractional melting.
+This set of tutorials introduces the `MAGEMin_C.jl` Julia interface through a series of progressive tutorials,from basic phase equilibrium calculations to trace-element partitioning during fractional melting.
 
 ## Prerequisites {#Prerequisites}
 - **Julia** installed (≥ 1.10 recommended)

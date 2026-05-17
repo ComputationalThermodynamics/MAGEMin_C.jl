@@ -2,18 +2,18 @@
 # MAGEMin_C Li partitioning, fractional melting {#MAGEMin_C-Li-partitioning,-fractional-melting}
 
 ## Table of contents {#Table-of-contents}
-- [1. Create a new script](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#1-create-a-new-script)
+- [1. Create a new script](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#1.-Create-a-new-script)
   
-- [2. Use partitioning_batch_melting.jl as starting point](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#2-use-partitioning_batch_meltingjl-as-starting-point)
+- [2. Use partitioning_batch_melting.jl as starting point](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#2.-Use-partitioningbatchmelting.jl-as-starting-point)
   
-- [3. Fractional melting](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#3-fractional-melting)
+- [3. Fractional melting](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#3.-Fractional-melting)
   
-- [Exercises](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#exercises)
-  - [E.1. Lithium partitioning](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#e1-lithium-partitioning)
+- [Exercises](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#Exercises)
+  - [E.1. Lithium partitioning](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#E.1.-Lithium-partitioning)
     
-  - [E.2. Visualization](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#e2-visualization)
+  - [E.2. Visualization](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#E.2.-Visualization)
     
-  - [E.3. Role of partition coefficient set and pressure](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#e3-role-of-partition-coefficient-set-and-pressure)
+  - [E.3. Role of partition coefficient set and pressure](/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting#E.3.-Role-of-partition-coefficient-set-and-pressure)
     
   
 - The objective of this tutorial is to build upon the batch melting lithium partitioning example and update it to model fractional melting.

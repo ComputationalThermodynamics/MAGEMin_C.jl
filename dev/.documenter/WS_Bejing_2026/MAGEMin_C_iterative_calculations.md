@@ -2,32 +2,32 @@
 # MAGEMin_C iterative phase equilibrium calculations {#MAGEMin_C-iterative-phase-equilibrium-calculations}
 
 ## Table of Contents {#Table-of-Contents}
-- [Batch melting](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#batch-melting)
-  - [1. Create a new script](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#1-create-a-new-script)
+- [Batch melting](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#Batch-melting)
+  - [1. Create a new script](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#1.-Create-a-new-script)
     
-  - [2. Load and initialize](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#2-load-and-initialize)
+  - [2. Load and initialize](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#2.-Load-and-initialize)
     
-  - [3. Define pressure-temperature conditions](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#3-define-pressure-temperature-conditions)
+  - [3. Define pressure-temperature conditions](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#3.-Define-pressure-temperature-conditions)
     
-  - [4. Pre-allocate a vector of output structures](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#4-pre-allocate-a-vector-of-output-structures)
+  - [4. Pre-allocate a vector of output structures](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#4.-Pre-allocate-a-vector-of-output-structures)
     
-  - [5. Perform the calculations](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#5-perform-the-calculations)
+  - [5. Perform the calculations](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#5.-Perform-the-calculations)
     
-  - [6. Accessing the results](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#6-accessing-the-results)
+  - [6. Accessing the results](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#6.-Accessing-the-results)
     
-  - [7. Plot the evolution of melt fraction](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#7-plot-the-evolution-of-melt-fraction)
+  - [7. Plot the evolution of melt fraction](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#7.-Plot-the-evolution-of-melt-fraction)
     
-  - [8. Add other phase fractions](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#8-add-other-phase-fractions)
+  - [8. Add other phase fractions](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#8.-Add-other-phase-fractions)
     
   
-- [Exercises](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#exercises)
-  - [E.1. Add other mineral fraction evolution](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#e1-add-other-mineral-fraction-evolution)
+- [Exercises](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#Exercises)
+  - [E.1. Add other mineral fraction evolution](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#E.1.-Add-other-mineral-fraction-evolution)
     
-  - [E.2. Create plot for the evolution of heat capacity](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#e2-create-plot-for-the-evolution-of-heat-capacity)
+  - [E.2. Create plot for the evolution of heat capacity](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#E.2.-Create-plot-for-the-evolution-of-heat-capacity)
     
-  - [E.3. Taking into account latent heat of reaction](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#e3-taking-into-account-latent-heat-of-reaction)
+  - [E.3. Taking into account latent heat of reaction](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#E.3.-Taking-into-account-latent-heat-of-reaction)
     
-  - [E.4. Double y-axis plot](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#e4-double-y-axis-plot)
+  - [E.4. Double y-axis plot](/WS_Bejing_2026/MAGEMin_C_iterative_calculations#E.4.-Double-y-axis-plot)
     
   
 

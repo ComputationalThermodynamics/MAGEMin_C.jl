@@ -53,7 +53,7 @@ const navTemp = {
 { text: 'Tutorials', link: '/MAGEMin/tutorials' }]
  },
 { text: 'Workshops', collapsed: false, items: [
-{ text: 'Beijing 2026', collapsed: false, items: [
+{ text: 'Trace-element partitioning', collapsed: false, items: [
 { text: 'Overview', link: '/WS_Bejing_2026/overview' },
 { text: '1 — Introduction', link: '/WS_Bejing_2026/MAGEMin_C_intro' },
 { text: '2 — Iterative calculations', link: '/WS_Bejing_2026/MAGEMin_C_iterative_calculations' },
@@ -172,7 +172,7 @@ export default defineConfig({
 { text: 'Tutorials', link: '/MAGEMin/tutorials' }]
  },
 { text: 'Workshops', collapsed: false, items: [
-{ text: 'Beijing 2026', collapsed: false, items: [
+{ text: 'Trace-element partitioning', collapsed: false, items: [
 { text: 'Overview', link: '/WS_Bejing_2026/overview' },
 { text: '1 — Introduction', link: '/WS_Bejing_2026/MAGEMin_C_intro' },
 { text: '2 — Iterative calculations', link: '/WS_Bejing_2026/MAGEMin_C_iterative_calculations' },

@@ -2,30 +2,30 @@
 # MAGEMin_C Li partitioning {#MAGEMin_C-Li-partitioning}
 
 ## Table of contents {#Table-of-contents}
-- [Batch melting equations](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#batch-melting-equations)
-  - [1. Create a new script](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#1-create-a-new-script)
+- [Batch melting equations](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#Batch-melting-equations)
+  - [1. Create a new script](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#1.-Create-a-new-script)
     
-  - [2. Initialize](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#2-initialize)
+  - [2. Initialize](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#2.-Initialize)
     
-  - [3. Define partition coefficients](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#3-define-partition-coefficients)
+  - [3. Define partition coefficients](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#3.-Define-partition-coefficients)
     
-  - [4. Define starting mass fraction and partition coefficient database](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#4-define-starting-mass-fraction-and-partition-coefficient-database)
+  - [4. Define starting mass fraction and partition coefficient database](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#4.-Define-starting-mass-fraction-and-partition-coefficient-database)
     
-  - [5. Perform stable phase equilibrium calculation](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#5-perform-stable-phase-equilibrium-calculation)
+  - [5. Perform stable phase equilibrium calculation](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#5.-Perform-stable-phase-equilibrium-calculation)
     
-  - [6. Perform trace-element prediction modelling](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#6-perform-trace-element-prediction-modelling)
+  - [6. Perform trace-element prediction modelling](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#6.-Perform-trace-element-prediction-modelling)
     
-  - [7. Access result of trace-element partitioning](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#7-access-result-of-trace-element-partitioning)
+  - [7. Access result of trace-element partitioning](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#7.-Access-result-of-trace-element-partitioning)
     
-  - [8. Visualize Li enrichment](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#8-visualize-li-enrichment)
+  - [8. Visualize Li enrichment](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#8.-Visualize-Li-enrichment)
     
   
-- [Exercises](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#exercises)
-  - [E.1. Batch melting](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#e1-batch-melting)
+- [Exercises](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#Exercises)
+  - [E.1. Batch melting](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#E.1.-Batch-melting)
     
-  - [E.2. Extract mineral Li enrichment](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#e2-extract-mineral-li-enrichment)
+  - [E.2. Extract mineral Li enrichment](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#E.2.-Extract-mineral-Li-enrichment)
     
-  - [E.3. Different set of partition coefficients](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#e3-different-set-of-partition-coefficients)
+  - [E.3. Different set of partition coefficients](/WS_Bejing_2026/MAGEMin_C_Li_partitioning#E.3.-Different-set-of-partition-coefficients)
     
   
 - The objective of this tutorial is to demonstrate how to add trace-element partitioning to stable phase equilibrium predictions. As an example, we will model Li partitioning during partial melting of a metapelite using the metapelite `mp` database (White et al., 2014).

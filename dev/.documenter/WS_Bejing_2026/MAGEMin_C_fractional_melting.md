@@ -2,22 +2,22 @@
 # MAGEMin_C fractional melting {#MAGEMin_C-fractional-melting}
 
 ## Table of Contents {#Table-of-Contents}
-- [Fractional melting](/WS_Bejing_2026/MAGEMin_C_fractional_melting#fractional-melting)
-  - [1. Create a new script](/WS_Bejing_2026/MAGEMin_C_fractional_melting#1-create-a-new-script)
+- [Fractional melting](/WS_Bejing_2026/MAGEMin_C_fractional_melting#Fractional-melting)
+  - [1. Create a new script](/WS_Bejing_2026/MAGEMin_C_fractional_melting#1.-Create-a-new-script)
     
-  - [2. Load and initialize](/WS_Bejing_2026/MAGEMin_C_fractional_melting#2-load-and-initialize)
+  - [2. Load and initialize](/WS_Bejing_2026/MAGEMin_C_fractional_melting#2.-Load-and-initialize)
     
-  - [3. Fractional melting](/WS_Bejing_2026/MAGEMin_C_fractional_melting#3-fractional-melting)
+  - [3. Fractional melting](/WS_Bejing_2026/MAGEMin_C_fractional_melting#3.-Fractional-melting)
     
-  - [4. Display melt volume fraction evolution](/WS_Bejing_2026/MAGEMin_C_fractional_melting#4-display-melt-volume-fraction-evolution)
+  - [4. Display melt volume fraction evolution](/WS_Bejing_2026/MAGEMin_C_fractional_melting#4.-Display-melt-volume-fraction-evolution)
     
-  - [5. Tracking the evolution of the system mass](/WS_Bejing_2026/MAGEMin_C_fractional_melting#5-tracking-the-evolution-of-the-system-mass)
+  - [5. Tracking the evolution of the system mass](/WS_Bejing_2026/MAGEMin_C_fractional_melting#5.-Tracking-the-evolution-of-the-system-mass)
     
   
-- [Exercises](/WS_Bejing_2026/MAGEMin_C_fractional_melting#exercises)
-  - [E.1. Visualize the results](/WS_Bejing_2026/MAGEMin_C_fractional_melting#e1-visualize-the-results)
+- [Exercises](/WS_Bejing_2026/MAGEMin_C_fractional_melting#Exercises)
+  - [E.1. Visualize the results](/WS_Bejing_2026/MAGEMin_C_fractional_melting#E.1.-Visualize-the-results)
     
-  - [E.2. Fractional melting using metabasite database](/WS_Bejing_2026/MAGEMin_C_fractional_melting#e2-fractional-melting-using-metabasite-database)
+  - [E.2. Fractional melting using metabasite database](/WS_Bejing_2026/MAGEMin_C_fractional_melting#E.2.-Fractional-melting-using-metabasite-database)
     
   
 

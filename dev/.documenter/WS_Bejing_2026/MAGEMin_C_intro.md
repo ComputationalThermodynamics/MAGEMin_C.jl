@@ -2,38 +2,38 @@
 # Introduction to MAGEMin_C {#Introduction-to-MAGEMin_C}
 
 ## Table of Contents {#Table-of-Contents}
-- [Requirements](/WS_Bejing_2026/MAGEMin_C_intro#requirements)
+- [Requirements](/WS_Bejing_2026/MAGEMin_C_intro#Requirements)
   
-- [Installation &amp; Setup](/WS_Bejing_2026/MAGEMin_C_intro#installation--setup)
-  - [1. Create the working directory](/WS_Bejing_2026/MAGEMin_C_intro#1-create-the-working-directory)
+- [Installation &amp; Setup](/WS_Bejing_2026/MAGEMin_C_intro#Installation-and-Setup)
+  - [1. Create the working directory](/WS_Bejing_2026/MAGEMin_C_intro#1.-Create-the-working-directory)
     
-  - [2. Install packages](/WS_Bejing_2026/MAGEMin_C_intro#2-install-packages)
-    
-  
-- [First minimization script](/WS_Bejing_2026/MAGEMin_C_intro#first-minimization-script)
-  - [1. Create a new Julia script](/WS_Bejing_2026/MAGEMin_C_intro#1-create-a-new-julia-script)
-    
-  - [2. Load MAGEMin_C and Plots packages](/WS_Bejing_2026/MAGEMin_C_intro#2-load-magemin_c-and-plots-packages)
-    
-  - [3. Initialize MAGEMin](/WS_Bejing_2026/MAGEMin_C_intro#3-initialize-magemin)
-    
-  - [4. Provide system information](/WS_Bejing_2026/MAGEMin_C_intro#4-provide-system-information)
-    
-  - [5. Call single point minimization routine](/WS_Bejing_2026/MAGEMin_C_intro#5-call-single-point-minimization-routine)
-    
-  - [6. Perform the stable phase equilibrium calculation](/WS_Bejing_2026/MAGEMin_C_intro#6-perform-the-stable-phase-equilibrium-calculation)
-    
-  - [7. Access minimization results](/WS_Bejing_2026/MAGEMin_C_intro#7-access-minimization-results)
-    
-  - [8. Retrieve garnet composition in wt](/WS_Bejing_2026/MAGEMin_C_intro#8-retrieve-garnet-composition-in-wt)
-    
-  - [9. Plot garnet composition](/WS_Bejing_2026/MAGEMin_C_intro#9-plot-garnet-composition)
-    
-  - [10. Plot melt and solid bulk composition](/WS_Bejing_2026/MAGEMin_C_intro#10-plot-melt-and-solid-bulk-composition)
+  - [2. Install packages](/WS_Bejing_2026/MAGEMin_C_intro#2.-Install-packages)
     
   
-- [Exercises](/WS_Bejing_2026/MAGEMin_C_intro#exercises)
-  - [E.1. Calculate residual composition](/WS_Bejing_2026/MAGEMin_C_intro#e1-calculate-residual-composition)
+- [First minimization script](/WS_Bejing_2026/MAGEMin_C_intro#First-minimization-script)
+  - [1. Create a new Julia script](/WS_Bejing_2026/MAGEMin_C_intro#1.-Create-a-new-Julia-script)
+    
+  - [2. Load MAGEMin_C and Plots packages](/WS_Bejing_2026/MAGEMin_C_intro#2.-Load-MAGEMin_C-and-Plots-packages)
+    
+  - [3. Initialize MAGEMin](/WS_Bejing_2026/MAGEMin_C_intro#3.-Initialize-MAGEMin)
+    
+  - [4. Provide system information](/WS_Bejing_2026/MAGEMin_C_intro#4.-Provide-system-information)
+    
+  - [5. Call single point minimization routine](/WS_Bejing_2026/MAGEMin_C_intro#5.-Call-single-point-minimization-routine)
+    
+  - [6. Perform the stable phase equilibrium calculation](/WS_Bejing_2026/MAGEMin_C_intro#6.-Perform-the-stable-phase-equilibrium-calculation)
+    
+  - [7. Access minimization results](/WS_Bejing_2026/MAGEMin_C_intro#7.-Access-minimization-results)
+    
+  - [8. Retrieve garnet composition in wt](/WS_Bejing_2026/MAGEMin_C_intro#8.-Retrieve-garnet-composition-in-wt)
+    
+  - [9. Plot garnet composition](/WS_Bejing_2026/MAGEMin_C_intro#9.-Plot-garnet-composition)
+    
+  - [10. Plot melt and solid bulk composition](/WS_Bejing_2026/MAGEMin_C_intro#10.-Plot-melt-and-solid-bulk-composition)
+    
+  
+- [Exercises](/WS_Bejing_2026/MAGEMin_C_intro#Exercises)
+  - [E.1. Calculate residual composition](/WS_Bejing_2026/MAGEMin_C_intro#E.1.-Calculate-residual-composition)
     
   
 
@@ -51,8 +51,8 @@ Create a dedicated local folder for `MAGEMin_C` to live in its own environment. 
 
 ```shell
 cd /where_you_want_your_folder
-mkdir 2026_Beijing_MAGEMin
-cd 2026_Beijing_MAGEMin
+mkdir MAGEMin_tutorial
+cd MAGEMin_tutorial
 julia
 ```
 
@@ -80,7 +80,7 @@ This installs both `MAGEMin_C` and `Plots`, the latter being the visualization p
 
 ::: tip Note
 
-`activate .` creates a local Julia environment in `2026_Beijing_MAGEMin/` where `MAGEMin_C` and `Plots` are installed. If you close the terminal, you will need to re-activate it (`] activate .`) to reload the local environment.
+`activate .` creates a local Julia environment in `MAGEMin_tutorial/` where `MAGEMin_C` and `Plots` are installed. If you close the terminal, you will need to re-activate it (`] activate .`) to reload the local environment.
 
 :::
 
@@ -88,7 +88,7 @@ This installs both `MAGEMin_C` and `Plots`, the latter being the visualization p
 
 ### 1. Create a new Julia script {#1.-Create-a-new-Julia-script}
 
-Simply open a new terminal in the `2026_Beijing_MAGEMin` folder and type:
+Simply open a new terminal in the `MAGEMin_tutorial` folder and type:
 
 ```
 code first_minimization.jl
