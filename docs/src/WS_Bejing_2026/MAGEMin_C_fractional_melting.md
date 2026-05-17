@@ -2,15 +2,15 @@
 
 ## Table of Contents
 
-- [Fractional melting](#fractional-melting)
-  - [1. Create a new script](#1-create-a-new-script)
-  - [2. Load and initialize](#2-load-and-initialize)
-  - [3. Fractional melting](#3-fractional-melting)
-  - [4. Display melt volume fraction evolution](#4-display-melt-volume-fraction-evolution)
-  - [5. Tracking the evolution of the system mass](#5-tracking-the-evolution-of-the-system-mass)
-- [Exercises](#exercises)
-  - [E.1. Visualize the results](#e1-visualize-the-results)
-  - [E.2. Fractional melting using metabasite database](#e2-fractional-melting-using-metabasite-database)
+- [Fractional melting](#Fractional-melting)
+  - [1. Create a new script](#1.-Create-a-new-script)
+  - [2. Load and initialize](#2.-Load-and-initialize)
+  - [3. Fractional melting](#3.-Fractional-melting)
+  - [4. Display melt volume fraction evolution](#4.-Display-melt-volume-fraction-evolution)
+  - [5. Tracking the evolution of the system mass](#5.-Tracking-the-evolution-of-the-system-mass)
+- [Exercises](#Exercises)
+  - [E.1. Visualize the results](#E.1.-Visualize-the-results)
+  - [E.2. Fractional melting using metabasite database](#E.2.-Fractional-melting-using-metabasite-database)
 
 Now that we have introduced how to perform iterative calculations, we can dynamically update the active bulk-rock composition during the iterations. 
 

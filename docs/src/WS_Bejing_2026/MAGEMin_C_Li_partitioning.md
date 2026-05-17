@@ -1,19 +1,19 @@
 # MAGEMin_C Li partitioning
 
 ## Table of contents
-- [Batch melting equations](#batch-melting-equations)
-    - [1. Create a new script](#1-create-a-new-script)
-    - [2. Initialize](#2-initialize)
-    - [3. Define partition coefficients](#3-define-partition-coefficients)
-    - [4. Define starting mass fraction and partition coefficient database](#4-define-starting-mass-fraction-and-partition-coefficient-database)
-    - [5. Perform stable phase equilibrium calculation](#5-perform-stable-phase-equilibrium-calculation)
-    - [6. Perform trace-element prediction modelling](#6-perform-trace-element-prediction-modelling)
-    - [7. Access result of trace-element partitioning](#7-access-result-of-trace-element-partitioning)
-    - [8. Visualize Li enrichment](#8-visualize-li-enrichment)
-- [Exercises](#exercises)
-    - [E.1. Batch melting](#e1-batch-melting)
-    - [E.2. Extract mineral Li enrichment](#e2-extract-mineral-li-enrichment)
-    - [E.3. Different set of partition coefficients](#e3-different-set-of-partition-coefficients)
+- [Batch melting equations](#Batch-melting-equations)
+    - [1. Create a new script](#1.-Create-a-new-script)
+    - [2. Initialize](#2.-Initialize)
+    - [3. Define partition coefficients](#3.-Define-partition-coefficients)
+    - [4. Define starting mass fraction and partition coefficient database](#4.-Define-starting-mass-fraction-and-partition-coefficient-database)
+    - [5. Perform stable phase equilibrium calculation](#5.-Perform-stable-phase-equilibrium-calculation)
+    - [6. Perform trace-element prediction modelling](#6.-Perform-trace-element-prediction-modelling)
+    - [7. Access result of trace-element partitioning](#7.-Access-result-of-trace-element-partitioning)
+    - [8. Visualize Li enrichment](#8.-Visualize-Li-enrichment)
+- [Exercises](#Exercises)
+    - [E.1. Batch melting](#E.1.-Batch-melting)
+    - [E.2. Extract mineral Li enrichment](#E.2.-Extract-mineral-Li-enrichment)
+    - [E.3. Different set of partition coefficients](#E.3.-Different-set-of-partition-coefficients)
 
 - The objective of this tutorial is to demonstrate how to add trace-element partitioning to stable phase equilibrium predictions. As an example, we will model Li partitioning during partial melting of a metapelite using the metapelite `mp` database (White et al., 2014).
 

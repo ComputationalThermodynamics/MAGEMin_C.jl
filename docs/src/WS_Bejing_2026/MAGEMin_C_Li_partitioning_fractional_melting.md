@@ -1,13 +1,13 @@
 # MAGEMin_C Li partitioning, fractional melting
 
 ## Table of contents
-- [1. Create a new script](#1-create-a-new-script)
-- [2. Use partitioning_batch_melting.jl as starting point](#2-use-partitioning_batch_meltingjl-as-starting-point)
-- [3. Fractional melting](#3-fractional-melting)
-- [Exercises](#exercises)
-    - [E.1. Lithium partitioning](#e1-lithium-partitioning)
-    - [E.2. Visualization](#e2-visualization)
-    - [E.3. Role of partition coefficient set and pressure](#e3-role-of-partition-coefficient-set-and-pressure)
+- [1. Create a new script](#1.-Create-a-new-script)
+- [2. Use partitioning_batch_melting.jl as starting point](#2.-Use-partitioningbatchmelting.jl-as-starting-point)
+- [3. Fractional melting](#3.-Fractional-melting)
+- [Exercises](#Exercises)
+    - [E.1. Lithium partitioning](#E.1.-Lithium-partitioning)
+    - [E.2. Visualization](#E.2.-Visualization)
+    - [E.3. Role of partition coefficient set and pressure](#E.3.-Role-of-partition-coefficient-set-and-pressure)
 
 - The objective of this tutorial is to build upon the batch melting lithium partitioning example and update it to model fractional melting.
 
