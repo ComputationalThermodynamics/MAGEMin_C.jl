@@ -32,7 +32,7 @@ using MAGEMin_C, Plots
 ```
 
 
-First let&#39;s first initialize MAGEMin with the metapelite database (White et al ., 2014)
+First let's first initialize MAGEMin with the metapelite database (White et al ., 2014)
 
 ```julia
 data        =   Initialize_MAGEMin("mp", verbose=false);
@@ -116,7 +116,7 @@ Delta QFM                : 2.4956538482297375
 ```
 
 
-Instead, of using a single pressure and temperature conditions let&#39;s now keep the pressure fixed and vary the temperature
+Instead, of using a single pressure and temperature conditions let's now keep the pressure fixed and vary the temperature
 
 ```julia
 n = 50
@@ -197,7 +197,7 @@ julia> frac_M_vol = [out[i].frac_M_vol for i=1:n]
 ```
 
 
-To retrieve the vol fraction of a solid phase, the process is slightly more complex as we have to check in the phase is present in the mineral assemblage first. Let&#39;s first allocate an array for the volume fraction of quartz (`q`):
+To retrieve the vol fraction of a solid phase, the process is slightly more complex as we have to check in the phase is present in the mineral assemblage first. Let's first allocate an array for the volume fraction of quartz (`q`):
 
 ```julia
 q_vol = zeros(Float64,n)
@@ -218,7 +218,7 @@ end
 
 ::: tip Note
 
-We first here check if &quot;q&quot; is in the phase assemblage. Then the command `id_q = findfirst(out[i].ph .== "q")`find the position of &quot;quartz&quot; in the array to be able to retrieve to right value.
+We first here check if "q" is in the phase assemblage. Then the command `id_q = findfirst(out[i].ph .== "q")`find the position of "quartz" in the array to be able to retrieve to right value.
 
 :::
 
@@ -259,12 +259,12 @@ end
 ```
 
 
-Here, we first look for the id of &quot;H2O&quot; pure phase. Then, we get the water fraction in `wt`. Subsequently, we retrieve the composition of &quot;H2O&quot;.  This part is slightly more complex as the information of solution models (`SS_vec`) are stored in a different substructure with respect to pure phases (`PP_vec`). In order to find the right id for &quot;H2O&quot; in the the `PP_vec`substructure we do `id_h2o - out[i].n_SS` where `out[i].n_SS` is the total number of solution models in the stable assemblage.
+Here, we first look for the id of "H2O" pure phase. Then, we get the water fraction in `wt`. Subsequently, we retrieve the composition of "H2O".  This part is slightly more complex as the information of solution models (`SS_vec`) are stored in a different substructure with respect to pure phases (`PP_vec`). In order to find the right id for "H2O" in the the `PP_vec`substructure we do `id_h2o - out[i].n_SS` where `out[i].n_SS` is the total number of solution models in the stable assemblage.
 
 ::: tip Note
 - The previous code snipped has to be placed after calling `single_point_minimization()`
   
-- Mind that for the igneous database, there is a fluid model &quot;fl&quot; instead of pure water (&quot;H2O&quot;).
+- Mind that for the igneous database, there is a fluid model "fl" instead of pure water ("H2O").
   
 
 :::

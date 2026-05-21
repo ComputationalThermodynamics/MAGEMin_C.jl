@@ -18,7 +18,7 @@ pkg> test MAGEMin_C
 ```
 
 
-...and that&#39;s it!
+...and that's it!
 
 ::: tip Note
 
@@ -39,7 +39,7 @@ pkg> up MAGEMin_C      # sometimes needed to update to the last version
 ```
 
 
-If you cannot update to the last `MAGEMin_C` version, try to set the `Julia` registry to &quot;eager&quot; using the following command, then redo the update process.
+If you cannot update to the last `MAGEMin_C` version, try to set the `Julia` registry to "eager" using the following command, then redo the update process.
 
 ```julia
 julia> ENV["JULIA_PKG_SERVER_REGISTRY_PREFERENCE"] = "eager"

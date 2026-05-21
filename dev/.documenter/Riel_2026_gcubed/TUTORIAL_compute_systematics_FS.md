@@ -7,7 +7,7 @@
 > 
 
 
-While `compute_P-H2O_systematics.jl` sweeps a synthetic 2D grid of (pressure, H₂O) conditions for a **single average pelite**, this script takes the opposite approach: it fixes pressure and uses **hundreds of real pelite bulk compositions** from the Forshaw &amp; Pattison (2023) natural database. Each rock sample is an independent fractional melting simulation. The result is a cloud of data points in geochemical composition space, colored by Li enrichment — showing which rock chemistries are most prone to producing Li-rich granites.
+While `compute_P-H2O_systematics.jl` sweeps a synthetic 2D grid of (pressure, H₂O) conditions for a **single average pelite**, this script takes the opposite approach: it fixes pressure and uses **hundreds of real pelite bulk compositions** from the Forshaw & Pattison (2023) natural database. Each rock sample is an independent fractional melting simulation. The result is a cloud of data points in geochemical composition space, colored by Li enrichment — showing which rock chemistries are most prone to producing Li-rich granites.
 
 The script is the computational backbone of:
 > 
@@ -52,7 +52,7 @@ plot_figures_FS.jl              ← FS-specific plots: scatter, ternary, Herron 
 
 ## Key Concepts Before Diving In {#Key-Concepts-Before-Diving-In}
 
-### The Forshaw &amp; Pattison (2023) Database {#The-Forshaw-and-Pattison-2023-Database}
+### The Forshaw & Pattison (2023) Database {#The-Forshaw-and-Pattison-2023-Database}
 
 This is a published compilation of major-element geochemistry from natural pelitic rocks. Each row in the database is one rock sample with its full oxide composition (SiO₂, Al₂O₃, CaO, MgO, FeO, K₂O, Na₂O, TiO₂, O, MnO). The database is stored as an Excel file and read at runtime.
 
@@ -231,7 +231,7 @@ Each thread reads a unique row of `FS_bulks` and writes to a unique index of `Ou
 
 ### Per-Sample Water Saturation — Computed Inside the Thread {#Per-Sample-Water-Saturation-—-Computed-Inside-the-Thread}
 
-This is the key architectural difference. Rather than calling a precomputed interpolant, each thread runs a full bisection to find the solidus temperature of its sample&#39;s bulk composition, then extracts the saturation H₂O:
+This is the key architectural difference. Rather than calling a precomputed interpolant, each thread runs a full bisection to find the solidus temperature of its sample's bulk composition, then extracts the saturation H₂O:
 
 ```julia
 H_ = water_saturation_curve_FS(
@@ -317,7 +317,7 @@ The post-processing loop is 1D (`for i = 1:np`) rather than 2D. For each sample 
     Dbi[i] = Base.invokelatest(expr, out)       # evaluate at this P-T-X
     ```
     
-    This gives the actual KD value that biotite had for each rock sample, which varies because the MM model&#39;s biotite KD depends on composition and temperature.
+    This gives the actual KD value that biotite had for each rock sample, which varies because the MM model's biotite KD depends on composition and temperature.
     
   
 5. **Saves everything to a JLD2 file**: `out_struct.jld2` — including the full MAGEMin outputs for later analysis.
@@ -373,7 +373,7 @@ For each group, the **mean bulk composition, mean Li enrichment, mean temperatur
 ```
 
 
-This tells you: &quot;what does a typical high-Li pelite look like chemically, compared to a typical low-Li one?&quot;
+This tells you: "what does a typical high-Li pelite look like chemically, compared to a typical low-Li one?"
 
 
 ---
@@ -420,7 +420,7 @@ The **ASM ternary plots** (SiO₂–Al₂O₃–MgO) are produced with PlotlyJS,
 
 ### The Herron Diagram {#The-Herron-Diagram}
 
-The **Herron classification** plots log₁₀(SiO₂/Al₂O₃) on the x-axis vs log₁₀(Fe₂O₃/K₂O) on the y-axis, dividing the space into sedimentary rock types (Shale, Wacke, Litharenite, Fe Sand, Sublitharenite). The boundary lines are hardcoded as PlotlyJS scatter traces. Each sample is a dot colored by Li enrichment, letting you read off &quot;which sedimentary rock type melts to produce the most Li-rich granites.&quot;
+The **Herron classification** plots log₁₀(SiO₂/Al₂O₃) on the x-axis vs log₁₀(Fe₂O₃/K₂O) on the y-axis, dividing the space into sedimentary rock types (Shale, Wacke, Litharenite, Fe Sand, Sublitharenite). The boundary lines are hardcoded as PlotlyJS scatter traces. Each sample is a dot colored by Li enrichment, letting you read off "which sedimentary rock type melts to produce the most Li-rich granites."
 
 
 ---

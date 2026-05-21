@@ -34,7 +34,7 @@ code MAGEMin_C_fractional_melting.jl
 
 ### 2. Load and initialize {#2.-Load-and-initialize}
 
-Like previously, let&#39;s load the necessary packages, initialize MAGEMin using the metapelite &quot;mp&quot; database, and define a similar pressure and temperature range:
+Like previously, let's load the necessary packages, initialize MAGEMin using the metapelite "mp" database, and define a similar pressure and temperature range:
 
 ```julia
 using MAGEMin_C, Plots, ProgressMeter
@@ -54,7 +54,7 @@ Out_XY      = Vector{out_struct}(undef,n_calc)
 ```
 
 
-We can then define the connectivity threshold using the standard 7.0 vol% value (Rosenberg &amp; Handy, 2005):
+We can then define the connectivity threshold using the standard 7.0 vol% value (Rosenberg & Handy, 2005):
 
 ```julia
 MCT = 0.07
@@ -65,7 +65,7 @@ As in the first example, this value will be used to recompute the bulk-rock comp
 
 ### 3. Fractional melting {#3.-Fractional-melting}
 
-Let&#39;s now modify the calculation loop to update the bulk-rock composition dynamically by extracting any melt volume &gt; MCT:
+Let's now modify the calculation loop to update the bulk-rock composition dynamically by extracting any melt volume &gt; MCT:
 
 ```julia
 residual_comp_wt = copy(X)
@@ -93,7 +93,7 @@ end
 ```
 
 
-The &quot;if, else&quot; statement allows updating the residual bulk-rock composition when the MCT is reached. Note that we don&#39;t renormalize here — this is done internally within `MAGEMin`.
+The "if, else" statement allows updating the residual bulk-rock composition when the MCT is reached. Note that we don't renormalize here — this is done internally within `MAGEMin`.
 
 ### 4. Display melt volume fraction evolution {#4.-Display-melt-volume-fraction-evolution}
 
@@ -215,7 +215,7 @@ This should give:
     X       = [50.7870, 15.3030, 9.4917, 6.7515, 11.3462, 0.4942, 2.7868, 1.3137, 0.3285, 1.4210]
 ```
 
-- Don&#39;t forget to change how MAGEMin is initialized:
+- Don't forget to change how MAGEMin is initialized:
   
 
 ```julia

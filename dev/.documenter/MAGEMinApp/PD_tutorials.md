@@ -78,7 +78,7 @@ Stable phase mineral fractions and composition can be accessed for any point of 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_pie_chart.png?raw=true" alt="MAGEMinApp pie chart" style="max-width: 20%; height: auto; display: block; margin: 0 auto;">
 
 
-clicking on a mineral of the pie chart will display it&#39;s composition:
+clicking on a mineral of the pie chart will display it's composition:
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_pie_chart_composition.png?raw=true" alt="MAGEMinApp pie chart composition" style="max-width: 20%; height: auto; display: block; margin: 0 auto;">
 
@@ -143,7 +143,7 @@ To export single point data, first click on any point of the grid, then modify t
 
 #### Reaction lines {#Reaction-lines}
 
-Using the previously computed KLB-1 phase diagram, let&#39;s now change the `liq` in reaction line and add isocontours for `melt` fraction. First make sure you are in the `Diagram` sub-tab and that you have the `Display options` panel selected (on the right).
+Using the previously computed KLB-1 phase diagram, let's now change the `liq` in reaction line and add isocontours for `melt` fraction. First make sure you are in the `Diagram` sub-tab and that you have the `Display options` panel selected (on the right).
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_display_options_panel.png?raw=true" alt="MAGEMinApp display panel" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 
@@ -170,7 +170,7 @@ which gives:
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_klb1_with_isopleths.png?raw=true" alt="MAGEMinApp klb1 isopleths" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 
 
-Let&#39;s now add isocontour for the `Mg#` of the `liq`. Change `Field = mode` to `Field = Calculator apfu` which allow you to generate custom atom per formule unit isocontours. In the newly displayed option `Calculator (apfu)` keep the default value `Mg / (Mg + Fe)`. Then change the `Range` `Step`to 0.01 and the line style and color to your liking:
+Let's now add isocontour for the `Mg#` of the `liq`. Change `Field = mode` to `Field = Calculator apfu` which allow you to generate custom atom per formule unit isocontours. In the newly displayed option `Calculator (apfu)` keep the default value `Mg / (Mg + Fe)`. Then change the `Range` `Step`to 0.01 and the line style and color to your liking:
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_apfu_setup.png?raw=true" alt="MAGEMinApp isopleth setup" style="max-width: 30%; height: auto; display: block; margin: 0 auto;">
 
@@ -242,12 +242,12 @@ Which gives for instance:
 
 In some cases, it is useful to deactivate a solution model (activity-composition model) or a pure phase. 
 
-Let&#39;s first select the thermodynamic database to be `Metapelite` (White et al., 2014) and use the default bulk-rock composition `FPWorldMedian pelite - water oversaturated`. Keep the default diagram type `P-T Diagram` and pressure range and update the temperature range from 400 to 1000 °C. in the top-left `Phase diagram parameters` panel, simply click on the rounded button of the `Phase selection` option, to display the list of available phases for the selection thermodynamic database:
+Let's first select the thermodynamic database to be `Metapelite` (White et al., 2014) and use the default bulk-rock composition `FPWorldMedian pelite - water oversaturated`. Keep the default diagram type `P-T Diagram` and pressure range and update the temperature range from 400 to 1000 °C. in the top-left `Phase diagram parameters` panel, simply click on the rounded button of the `Phase selection` option, to display the list of available phases for the selection thermodynamic database:
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_phase_selection.png?raw=true" alt="MAGEMinApp phase selection" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 
 
-Once the `Phase selection` panels are unfolded you can provide your custom selection of phases. For instance let&#39;s unselect `liq`, `mt` and `ilmm`, and then perform the calculation. Refining the phase diagram twice gives:
+Once the `Phase selection` panels are unfolded you can provide your custom selection of phases. For instance let's unselect `liq`, `mt` and `ilmm`, and then perform the calculation. Refining the phase diagram twice gives:
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_phase_selection_pd.png?raw=true" alt="MAGEMinApp phase selection pd" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 
@@ -298,7 +298,7 @@ Similarly activity can be fixed for the following oxides
 - `aSiO2` -&gt; using quartz/coesite as reference phase
   
 
-Let&#39;s compute a P-T diagram using the `qfm` buffer. For instance, select the thermodynamic database to be `Metabasite` (Green et al., 2016). Choose the pressure-temperature range of your choice. Select `SQA synthethic amphibolitic composition` in the middle `Bulk-rock composition` panel, then in the `Phase diagram parameters` left panel, select `Buffer = QFM`. Finally, make sure you saturate the bulk-rock in `O` by changing the value to 3.0:
+Let's compute a P-T diagram using the `qfm` buffer. For instance, select the thermodynamic database to be `Metabasite` (Green et al., 2016). Choose the pressure-temperature range of your choice. Select `SQA synthethic amphibolitic composition` in the middle `Bulk-rock composition` panel, then in the `Phase diagram parameters` left panel, select `Buffer = QFM`. Finally, make sure you saturate the bulk-rock in `O` by changing the value to 3.0:
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_buffer_QFM_setup.png?raw=true" alt="MAGEMinApp QFM setup" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 
@@ -364,7 +364,7 @@ Using the metapelite database and the `FPWorldMedian pelite - oversaturated` com
 
 ### 8. Trace element modelling {#8.-Trace-element-modelling}
 
-Let&#39;s predict trace-element partitioning together with a new phase diagram using the metapelite database (White et al., 2014) and the pre-defined World Median Pelite oversaturated.
+Let's predict trace-element partitioning together with a new phase diagram using the metapelite database (White et al., 2014) and the pre-defined World Median Pelite oversaturated.
 
 ::: details
 - Thermodynamic database -&gt; Metapelite
@@ -431,7 +431,7 @@ In order to display trace-element spectrum from any suprasolids point of the com
 
 ### 9. Solidus H2O saturated phase diagram {#9.-Solidus-H2O-saturated-phase-diagram}
 
-To compute solidus H₂O-saturated phase diagram, let&#39;s (for instance) change the thermodynamic database to Metabasite (Green et al., 2016), choose `Solidus H₂O-saturated = true`, select `clinopyroxene = aug`:
+To compute solidus H₂O-saturated phase diagram, let's (for instance) change the thermodynamic database to Metabasite (Green et al., 2016), choose `Solidus H₂O-saturated = true`, select `clinopyroxene = aug`:
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_H2O_solidus_sat_setup.png?raw=true" alt="MAGEMinApp H₂O solidus sat setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
 
@@ -492,9 +492,9 @@ Compute the diagram with `Initial grid subdivision = 5` and `Refinement levels =
 
 #### T-X buffer {#T-X-buffer}
 
-Previously we changed the composition from `Ijolite` to `Ne-Syenite`. Let&#39;s instead vary the `qfm` buffer offset for `Ijolite` composition from -5 to 5.
+Previously we changed the composition from `Ijolite` to `Ne-Syenite`. Let's instead vary the `qfm` buffer offset for `Ijolite` composition from -5 to 5.
 
-In the `Phase diagram parameters` left panel, select `Buffer = QFM`, then in the middle `Bulk-rock composition` panel, select `Ijolite` for both left and right composition. Then change `Buffer offset` to -5 for the left entry, and to 5 for the right entry. Don&#39;t forget to increase the `O` content, for isntance to 3.0:
+In the `Phase diagram parameters` left panel, select `Buffer = QFM`, then in the middle `Bulk-rock composition` panel, select `Ijolite` for both left and right composition. Then change `Buffer offset` to -5 for the left entry, and to 5 for the right entry. Don't forget to increase the `O` content, for isntance to 3.0:
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_TX_buffer_setup.png?raw=true" alt="MAGEMinApp TX buffer setup" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 
@@ -519,7 +519,7 @@ Fixing the `O` content and contouring $\Delta_{QFM}$ gives the desired result:
 
 PT-X diagrams differ from P-X and T-X diagrams in the sense that both pressure and temperature can be varied along a pressure-temperature path. This option can be particularily useful when modelling subduction geotherm for instance.
 
-To perform a PT-X diagram, let&#39;s first select the `Metapelite` database (White et al., 2014) and set `Diagram type = PT-X diagram`. When `PT-X diagram` is selected, a new panel with a list of pressure-temperature points becomes available. Let us define a few point as to roughly simulate a subduction pressure-temperature path:
+To perform a PT-X diagram, let's first select the `Metapelite` database (White et al., 2014) and set `Diagram type = PT-X diagram`. When `PT-X diagram` is selected, a new panel with a list of pressure-temperature points becomes available. Let us define a few point as to roughly simulate a subduction pressure-temperature path:
 
 | Pressure | Temperature |
 | --------:| -----------:|
@@ -556,7 +556,7 @@ During the first metamorphic event, the starting bulk-rock composition is used t
 
 :::
 
-Let&#39;s try it out! First, select the `Metabasite` database (Green et al., 2016) and the `FWorldMedian metabasite oversaturated` pre-defined composition. Then `Diagram type = T-T (poly-metamorphic)`, and `clinopyroxene = Augite`. You can keep the default values for the fixed pressure (10.0 kbar) and the temperature range of metamorphic events 1 and 2 (400 - 1000 and 400 - 1000 °C):
+Let's try it out! First, select the `Metabasite` database (Green et al., 2016) and the `FWorldMedian metabasite oversaturated` pre-defined composition. Then `Diagram type = T-T (poly-metamorphic)`, and `clinopyroxene = Augite`. You can keep the default values for the fixed pressure (10.0 kbar) and the temperature range of metamorphic events 1 and 2 (400 - 1000 and 400 - 1000 °C):
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_TT_setup.png?raw=true" alt="MAGEMinApp TT setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
 

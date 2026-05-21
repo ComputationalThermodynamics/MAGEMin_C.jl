@@ -36,7 +36,7 @@ plot_figures.jl          ← retrieve_outputs (not used here, but included)
 
 Unlike the P–H₂O script (2D grid) and the FS script (bulk composition sweep), this script has a **single loop axis: pressure**. For each of the `np = 100` pressure points between 2 and 16 kbar, one complete fractional melting simulation is run at the water-saturated condition for that pressure.
 
-### What Is an &quot;Extraction Curve&quot;? {#What-Is-an-"Extraction-Curve"?}
+### What Is an "Extraction Curve"? {#What-Is-an-"Extraction-Curve"?}
 
 Each fractional melting simulation produces up to `n_ee = 15` extraction events. Each event has a temperature — the temperature at which the melt volume fraction first reaches `e1_liq = 7%`. After collecting all 100 pressure points, we have:
 
@@ -50,7 +50,7 @@ P = 16 kbar [ T₁,   T₂,   T₃, ..., T₁₅ ]
 ```
 
 
-Plotting column 1 vs. pressure gives the P–T curve of &quot;when does the first melt pulse form?&quot;, column 2 gives the second pulse, and so on. Together these 15 curves show how melting progresses through P–T space as the rock heats up.
+Plotting column 1 vs. pressure gives the P–T curve of "when does the first melt pulse form?", column 2 gives the second pulse, and so on. Together these 15 curves show how melting progresses through P–T space as the rock heats up.
 
 
 ---
@@ -70,7 +70,7 @@ Ex_H2O_sat  = 0.03        # excess H₂O above saturation
 ```
 
 
-The bulk composition is the dry Forshaw &amp; Pattison median pelite (H₂O = 0.0 initially). Water is added automatically per pressure point by `perform_threaded_calc_EE()` using the water-saturation logic.
+The bulk composition is the dry Forshaw & Pattison median pelite (H₂O = 0.0 initially). Water is added automatically per pressure point by `perform_threaded_calc_EE()` using the water-saturation logic.
 
 ```julia
 P = collect(range(2.0, 16.0, 100))   # 100 equally spaced pressures
@@ -113,7 +113,7 @@ Out_all = perform_threaded_calc_EE(
 ```
 
 
-This is a **1D parallel loop** over pressure, identical in structure to the FS script&#39;s loop over bulk compositions. Each thread gets a contiguous block of pressure points. No synchronization needed since each thread writes to a unique index of `Out_all`.
+This is a **1D parallel loop** over pressure, identical in structure to the FS script's loop over bulk compositions. Each thread gets a contiguous block of pressure points. No synchronization needed since each thread writes to a unique index of `Out_all`.
 
 ### Water Saturation Per Pressure Point {#Water-Saturation-Per-Pressure-Point}
 
@@ -231,7 +231,7 @@ savefig("wat_phase_stability_EE-T_+0.03.svg")
 ```
 
 
-Each column of `T_curves` is a curve in P–T space. Column 1 is the **wet solidus curve** (the temperature at which the first 7% melt forms), column 2 is the second extraction threshold, and so on. NaN values cause automatic gaps in the curves where events didn&#39;t converge.
+Each column of `T_curves` is a curve in P–T space. Column 1 is the **wet solidus curve** (the temperature at which the first 7% melt forms), column 2 is the second extraction threshold, and so on. NaN values cause automatic gaps in the curves where events didn't converge.
 
 ### What the Plot Looks Like {#What-the-Plot-Looks-Like}
 

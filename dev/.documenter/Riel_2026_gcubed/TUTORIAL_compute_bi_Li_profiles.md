@@ -7,7 +7,7 @@
 > 
 
 
-This is a focused diagnostic script. It does not run the full fractional melting pipeline. Instead, it sweeps a grid of **pressure × temperature** conditions, runs a single equilibrium calculation at each point, and directly evaluates the **Morris &amp; Beard (2024) expression** for the biotite–melt Li partition coefficient (D_bi). The output is a set of curves showing how D_bi evolves with temperature at several crustal pressures — a key input to understanding the sensitivity of Li enrichment predictions to the KD model.
+This is a focused diagnostic script. It does not run the full fractional melting pipeline. Instead, it sweeps a grid of **pressure × temperature** conditions, runs a single equilibrium calculation at each point, and directly evaluates the **Morris & Beard (2024) expression** for the biotite–melt Li partition coefficient (D_bi). The output is a set of curves showing how D_bi evolves with temperature at several crustal pressures — a key input to understanding the sensitivity of Li enrichment predictions to the KD model.
 
 
 ---
@@ -28,7 +28,7 @@ Unlike the other scripts in this project, this one has **no includes** and does 
 
 ## Key Concept: The Biotite KD Expression {#Key-Concept:-The-Biotite-KD-Expression}
 
-In the `"MM"` model used by the main scripts, biotite&#39;s Li partition coefficient is not a fixed number — it is a **thermodynamic expression** that depends on three quantities evaluated at each P–T point:
+In the `"MM"` model used by the main scripts, biotite's Li partition coefficient is not a fixed number — it is a **thermodynamic expression** that depends on three quantities evaluated at each P–T point:
 
 |     Variable |                                Meaning |                              Source |
 | ------------:| --------------------------------------:| -----------------------------------:|
@@ -37,7 +37,7 @@ In the `"MM"` model used by the main scripts, biotite&#39;s Li partition coeffic
 | `NaK_Almelt` | (Na + K) / Al ratio in the melt (apfu) |       Melt composition from MAGEMin |
 
 
-The full expression (Morris &amp; Beard, 2024):
+The full expression (Morris & Beard, 2024):
 
 ```
 ln(D_bi) = c9 + c10 × XMFe3p + c11 × (NaK/Al)_melt + c12 × 10⁴ / (T + 273.15)
@@ -71,7 +71,7 @@ bulk    = norm2one([0.67153, 0.12111, 0.00729, 0.03762, 0.05998, 0.02638, 0.0140
 ```
 
 
-The bulk composition is the Forshaw &amp; Pattison (2023) world-median pelite in mol fractions, normalized to sum to 1. Note that **H₂O is set to 0.2** (20 mol%), which is intentionally high to ensure the rock is water-saturated and biotite coexists with melt across the entire temperature range explored.
+The bulk composition is the Forshaw & Pattison (2023) world-median pelite in mol fractions, normalized to sum to 1. Note that **H₂O is set to 0.2** (20 mol%), which is intentionally high to ensure the rock is water-saturated and biotite coexists with melt across the entire temperature range explored.
 
 ```julia
 P  = [4.0, 8.0, 12.0]   # kbar
@@ -138,7 +138,7 @@ D_bi[i,j] = exp(ln_D_Li)
 ```
 
 
-`bi` and `liq` are integer indices into `out.SS_vec`. The relevant quantities are extracted directly from MAGEMin&#39;s output structs:
+`bi` and `liq` are integer indices into `out.SS_vec`. The relevant quantities are extracted directly from MAGEMin's output structs:
 - `siteFractions[4]` — the 4th site in the biotite model corresponds to the Fe³⁺ M-site fraction
   
 - `Comp_apfu[6]` and `[7]` — Na and K in atoms per formula unit in the melt
@@ -161,7 +161,7 @@ D_bi[i,j] = exp(ln_D_Li)
 ```
 
 
-Each non-NaN cell holds `exp(ln_D_Li)` computed from MAGEMin&#39;s equilibrium assemblage at that (P, T). The NaN cells below the solidus (no melt) or above biotite stability are simply not plotted.
+Each non-NaN cell holds `exp(ln_D_Li)` computed from MAGEMin's equilibrium assemblage at that (P, T). The NaN cells below the solidus (no melt) or above biotite stability are simply not plotted.
 
 
 ---
@@ -228,7 +228,7 @@ Plot
 
 ## Connection to the Main Scripts {#Connection-to-the-Main-Scripts}
 
-This script exists to **validate and visualize** the biotite KD that is used internally by the `"MM"` model in `compute_P-H2O_systematics.jl` and `compute_systematics_FS.jl`. In those scripts, the same expression is encoded as a string and evaluated at runtime by MAGEMin&#39;s trace-element engine. Here it is computed explicitly in Julia for transparency and plotting.
+This script exists to **validate and visualize** the biotite KD that is used internally by the `"MM"` model in `compute_P-H2O_systematics.jl` and `compute_systematics_FS.jl`. In those scripts, the same expression is encoded as a string and evaluated at runtime by MAGEMin's trace-element engine. Here it is computed explicitly in Julia for transparency and plotting.
 
 The main scripts retrieve `Dbi[i]` in `retrieve_outputs_FS()` via:
 

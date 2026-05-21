@@ -7,11 +7,38 @@
 
 ```julia
 AMR_data
+
+Mutable structure holding the state of an Adaptive Mesh Refinement (AMR) grid.
+
+Fields
+------
+cells : Vector{Vector{Int64}}
+    Current quadrilateral cells, each defined by 4 point indices (counter-clockwise).
+ncells : Vector{Vector{Int64}}
+    Newly generated cells from the last refinement step.
+points : Vector{Vector{Float64}}
+    All grid point coordinates [X, Y].
+npoints : Vector{Vector{Float64}}
+    Newly generated point coordinates from the last refinement step.
+npoints_ig : Vector{Tuple}
+    Parent point index tuples for each new point (used for initial guess interpolation).
+hash_map : Dict{Vector{Float64}, Int}
+    Map from point coordinates to their index, used to avoid duplicate points.
+bnd_cells : Vector{Tuple}
+    Boundary information for kept cells: tuples of (cell_index, midpoint_indices...).
+split_cell_list : Vector{Int64}
+    Indices of cells to be split in the next refinement pass.
+keep_cell_list : Vector{Int64}
+    Indices of cells to be kept unchanged in the next refinement pass.
+Xrange : Vector{Float64}
+    X-axis bounds of the domain [Xmin, Xmax].
+Yrange : Vector{Float64}
+    Y-axis bounds of the domain [Ymin, Ymax].
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/AMR.jl#L15-L17" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/AMR.jl#L15-L44" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -41,7 +68,7 @@ splx_data : TypeSplxData
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L500-L517" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L622-L639" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -71,7 +98,7 @@ Ws : Matrix{T}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L526-L543" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L648-L665" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -81,12 +108,25 @@ Ws : Matrix{T}
 
 
 ```julia
-Holds the partitioning coefficient database
+custom_KDs_database
+
+Structure holding a trace element partitioning coefficient (KD) database.
+
+Fields
+------
+infos : String
+    Description or citation for the database.
+element_name : Vector{String}
+    Names of the trace elements.
+phase_name : Vector{String}
+    Names of the mineral phases for which KDs are defined.
+KDs_expr : Matrix{Function}
+    Matrix of compiled KD functions (phases × elements). Each function takes a `gmin_struct` as input and returns a Float64.
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/TE_partitioning.jl#L160-L162" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L229-L244" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -120,7 +160,7 @@ data_pp : Array{String}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L467-L488" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L589-L610" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -201,7 +241,9 @@ entropy_F : T
 alpha : Vector{T}
     Thermal expansivity.
 V : T
-    Volume.
+    Volume [J/bar].
+V_cm3 : T
+    Volume [cm³].
 s_cp : Vector{T}
     Heat capacity.
 rho : T
@@ -302,7 +344,119 @@ status : I
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L126-L295" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L126-L297" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.light_gmin_struct' href='#MAGEMin_C.light_gmin_struct'><span class="jlbinding">MAGEMin_C.light_gmin_struct</span></a> <Badge type="info" class="jlObjectType jlType" text="Type" /></summary>
+
+
+
+```julia
+light_gmin_struct{T, I, S}
+
+Lightweight structure holding a reduced set of MAGEMin minimization outputs (Float32/Int8 types) for memory-efficient storage.
+
+Fields
+------
+P_kbar : T
+    Pressure [kbar].
+T_C : T
+    Temperature [°C].
+ph_frac_wt : Vector{T}
+    Phase fractions [wt].
+ph_name : Vector{S}
+    Phase names.
+frac_S_wt : T
+    Solid fraction [wt].
+frac_F_wt : T
+    Fluid fraction [wt].
+frac_M_wt : T
+    Melt fraction [wt].
+bulk_S_wt : Vector{T}
+    Bulk solid composition [wt].
+bulk_F_wt : Vector{T}
+    Bulk fluid composition [wt].
+bulk_M_wt : Vector{T}
+    Bulk melt composition [wt].
+rho_S : T
+    Solid density [kg/m³].
+rho_F : T
+    Fluid density [kg/m³].
+rho_M : T
+    Melt density [kg/m³].
+eta_M : T
+    Melt viscosity [Pa·s].
+s_cp : Vector{T}
+    Heat capacity.
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L410-L447" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.light_gmin_struct_ig' href='#MAGEMin_C.light_gmin_struct_ig'><span class="jlbinding">MAGEMin_C.light_gmin_struct_ig</span></a> <Badge type="info" class="jlObjectType jlType" text="Type" /></summary>
+
+
+
+```julia
+light_gmin_struct_ig{T, I, S}
+
+Lightweight structure holding a reduced set of MAGEMin minimization outputs for igneous databases (Float32/Int8 types). Extends `light_gmin_struct` with volumetric fractions, metastable solution phase data, and convergence information.
+
+Fields
+------
+P_kbar : T
+    Pressure [kbar].
+T_C : T
+    Temperature [°C].
+ph_frac_wt : Vector{T}
+    Phase fractions [wt].
+ph_name : Vector{S}
+    Phase names.
+frac_S_wt : T
+    Solid fraction [wt].
+frac_F_wt : T
+    Fluid fraction [wt].
+frac_M_wt : T
+    Melt fraction [wt].
+frac_S_vol : T
+    Solid fraction [vol].
+frac_F_vol : T
+    Fluid fraction [vol].
+frac_M_vol : T
+    Melt fraction [vol].
+bulk_S_wt : Vector{T}
+    Bulk solid composition [wt].
+bulk_F_wt : Vector{T}
+    Bulk fluid composition [wt].
+bulk_M_wt : Vector{T}
+    Bulk melt composition [wt].
+rho_S : T
+    Solid density [kg/m³].
+rho_F : T
+    Fluid density [kg/m³].
+rho_M : T
+    Melt density [kg/m³].
+eta_M : T
+    Melt viscosity [Pa·s].
+s_cp : Vector{T}
+    Heat capacity.
+mSS_vec : Vector{LibMAGEMin.mSS_data}
+    Metastable solution phase data.
+bulk_res_norm : T
+    Bulk residual norm.
+status : I
+    Status of calculations (0 = converged, 5 = not converged).
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L472-L521" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -312,12 +466,51 @@ status : I
 
 
 ```julia
-Holds the output of the TE partitioning routine
+out_tepm
+
+Structure holding the output of the trace element (TE) partitioning routine.
+
+Fields
+------
+elements : Vector{String}
+    Names of the trace elements.
+C0 : Vector{Float64}
+    Initial bulk trace element composition [ppm].
+Cliq : Vector{Float64}
+    Trace element concentrations in the melt phase [ppm].
+Csol : Vector{Float64}
+    Trace element concentrations in the bulk solid [ppm].
+Cmin : Matrix{Float64}
+    Trace element concentrations in each individual mineral phase [ppm] (phases × elements).
+ph_TE : Vector{String}
+    Names of the phases included in the partitioning calculation.
+ph_wt_norm : Vector{Float64}
+    Normalized weight fractions of the solid phases.
+liq_wt_norm : Float64
+    Normalized weight fraction of the melt.
+bulk_D : Float64
+    Bulk partition coefficient.
+bulk_cor_wt : Vector{Float64}
+    Corrected bulk oxide weight fractions (accounting for saturation phases).
+bulk_cor_mol : Vector{Float64}
+    Corrected bulk oxide molar fractions.
+Sat_Zr_liq : Float64
+    Zirconium saturation concentration in the melt [ppm] (NaN if not computed).
+zrc_wt : Float64
+    Weight fraction of zircon precipitated (NaN if not computed).
+Sat_S_liq : Float64
+    Sulfur saturation concentration in the melt [ppm] (NaN if not computed).
+sulf_wt : Float64
+    Weight fraction of sulfide precipitated (NaN if not computed).
+Sat_P2O5_liq : Float64
+    P₂O₅ saturation concentration in the melt [ppm] (NaN if not computed).
+fapt_wt : Float64
+    Weight fraction of fluorapatite precipitated (NaN if not computed).
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/TE_partitioning.jl#L132-L134" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L162-L203" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -353,7 +546,7 @@ ss_sf : Vector{String}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L432-L455" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L554-L577" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -364,11 +557,40 @@ ss_sf : Vector{String}
 
 ```julia
 AMR(data)
+
+Perform one adaptive mesh refinement step on the quadrilateral grid.
+
+Each cell in `data.split_cell_list` is subdivided into four child cells by
+inserting five new points: one at the cell centroid and one at each edge
+midpoint. Duplicate midpoints shared by adjacent cells are detected via
+`data.hash_map` and reused rather than duplicated. Cells in
+`data.keep_cell_list` are retained unchanged; their edge midpoints that were
+created by neighbouring splits are recorded in `data.bnd_cells` for use in
+the next `split_and_keep` call.
+
+Parameters
+----------
+data : AMR_data
+    AMR state structure. `data.cells`, `data.points`, `data.hash_map`,
+    `data.split_cell_list`, and `data.keep_cell_list` are read and updated.
+
+Returns
+-------
+data : AMR_data
+    Updated AMR state with:
+    - `data.cells`     — combined list of kept cells followed by new child cells.
+    - `data.points`    — extended point list including all new midpoints.
+    - `data.ncells`    — child cells generated in this step.
+    - `data.npoints`   — new point coordinates generated in this step.
+    - `data.npoints_ig`— parent-point index tuples for each new point, used for
+                         initial-guess interpolation.
+    - `data.bnd_cells` — boundary midpoint records for each kept cell.
+    - `data.hash_map`  — updated coordinate-to-index map.
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/AMR.jl#L135-L137" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/AMR.jl#L231-L262" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -441,7 +663,7 @@ out         = AMR_minimization(init_sub, ref_lvl, Prange, Trange, data, X=X, Xox
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L1135-L1195" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L1412-L1472" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -472,7 +694,7 @@ bulk_ox : AbstractVector{String}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L1487-L1505" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L1764-L1782" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -498,7 +720,7 @@ nothing
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L723-L736" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L845-L858" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -547,7 +769,7 @@ data : MAGEMin_Data
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L625-L661" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L747-L783" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -556,15 +778,37 @@ data : MAGEMin_Data
 
 
 
-MAGEMin_data2dataframe( out:: Union{Vector{MAGEMin_C.gmin_struct{Float64, Int64}}, MAGEMin_C.gmin_struct{Float64, Int64}})
+```julia
+MAGEMin_data2dataframe(out, dtb, fileout)
 
+Export MAGEMin minimization results to a CSV file in long (stacked) format,
+writing one row per phase per point.
+
+Each row contains point index, X fraction, P [kbar], T [°C], phase name,
+modal abundances (mol%, wt%, vol%), system thermodynamic properties
+(ρ, Vp, Vs, Cp, α, S, H, K, G), activity/fugacity variables, and oxide
+compositions (mol% and wt%) plus apfu element compositions for each phase.
+System-level rows (`"system"`) additionally carry fO₂, ΔQFM, and melt
+viscosity. A companion metadata file is written at `fileout_metadata.txt`.
+
+Parameters
+----------
+out : Union{Vector{gmin_struct{Float64, Int64}}, gmin_struct{Float64, Int64}}
+    MAGEMin minimization output for one or more points.
+dtb : String
+    Database identifier used to retrieve database metadata (e.g., `"ig"`, `"mp"`).
+fileout : String
+    Base path for output files. Two files are created: `fileout.csv` and
+    `fileout_metadata.txt`.
+
+Returns
+-------
+nothing
 ```
-Transform MAGEMin output into a dataframe for quick(ish) save
-```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/export2CSV.jl#L174-L179" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/export2CSV.jl#L198-L224" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -573,15 +817,39 @@ Transform MAGEMin output into a dataframe for quick(ish) save
 
 
 
-MAGEMin_data2dataframe( out:: Union{Vector{MAGEMin_C.gmin_struct{Float64, Int64}}, MAGEMin_C.gmin_struct{Float64, Int64}})
+```julia
+MAGEMin_data2dataframe_inlined(out, dtb, fileout)
 
+Export MAGEMin minimization results to a CSV file in wide (inlined) format,
+with one row per point and all phase data spread across columns.
+
+The output DataFrame is built in three blocks that are horizontally
+concatenated: system-level properties (`sys_*` prefix), solution-phase
+columns (`<ph>_*` prefix, `NaN`-filled when a phase is absent at a given
+point), and pure-phase columns (same convention). Column groups per phase
+include modal fractions (mol%, wt%, vol%), thermodynamic properties
+(ρ, Vp, Vs, Cp, α, S, H, K, G), and oxide compositions (mol%, wt%) plus
+apfu element compositions. A companion metadata file is written at
+`fileout_metadata.txt`; the CSV is written to `fileout_inlined.csv`.
+
+Parameters
+----------
+out : Union{Vector{gmin_struct{Float64, Int64}}, gmin_struct{Float64, Int64}}
+    MAGEMin minimization output for one or more points.
+dtb : String
+    Database identifier used to retrieve database metadata (e.g., `"ig"`, `"mp"`).
+fileout : String
+    Base path for output files. Two files are created: `fileout_inlined.csv`
+    and `fileout_metadata.txt`.
+
+Returns
+-------
+nothing
 ```
-Transform MAGEMin output into a dataframe for quick(ish) save
-```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/export2CSV.jl#L427-L432" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/export2CSV.jl#L487-L515" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -590,15 +858,40 @@ Transform MAGEMin output into a dataframe for quick(ish) save
 
 
 
-MAGEMin_dataTE2dataframe( out:: Union{Vector{out_tepm}, out_tepm},dtb,fileout)
+```julia
+MAGEMin_dataTE2dataframe(out, out_te, dtb, fileout)
 
+Export MAGEMin minimization results together with trace element partitioning
+output to a CSV file, writing one row per phase per point.
+
+The CSV contains columns for P, T, X, phase name, mode [wt%], Zr saturation
+[μg/g], corrected bulk oxide composition [wt%], and per-element concentrations
+[μg/g]. A companion metadata text file recording the MAGEMin version, database,
+date, and time is written alongside the CSV.
+
+Rows are written for the bulk system (`"system"`), the melt (`"liq"`), the
+bulk solid aggregate (`"sol"`), and each individual mineral phase.
+
+Parameters
+----------
+out : Union{Vector{gmin_struct{Float64, Int64}}, gmin_struct{Float64, Int64}}
+    MAGEMin minimization output for one or more points.
+out_te : Union{Vector{out_tepm}, out_tepm}
+    Trace element partitioning output corresponding to each point in `out`.
+dtb : String
+    Database identifier used to retrieve database metadata (e.g., `"ig"`, `"mp"`).
+fileout : String
+    Base path for output files. Two files are created: `fileout.csv` and
+    `fileout_metadata.txt`.
+
+Returns
+-------
+nothing
 ```
-Transform MAGEMin trace-element output into a dataframe for quick(ish) save
-```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/export2CSV.jl#L12-L17" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/export2CSV.jl#L12-L41" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -608,18 +901,176 @@ Transform MAGEMin trace-element output into a dataframe for quick(ish) save
 
 
 ```julia
-out_TE = TE_prediction(  out, C0, KDs_database, dtb;
-                ZrSat_model   :: String = "CB",
-                SSat_model    :: String = "1000ppm",)
+TE_prediction(out, C0, KDs_database, dtb; ZrSat_model="none", SSat_model="none", P2O5Sat_model="none", norm_TE=false)
+
+Perform trace element partitioning, optionally with zircon, sulfide, and/or apatite saturation corrections.
+
+Phases are classified via `mineral_classification`, elements are partitioned using the batch melting equation, and saturation corrections are applied when the corresponding model is not `"none"`. The corrected bulk composition (accounting for precipitated saturation phases) is also returned.
+
+Parameters
+----------
+out : MAGEMin_C.gmin_struct{Float64, Int64}
+    MAGEMin minimization output.
+C0 : Vector{Float64}
+    Initial bulk trace element composition [ppm], in the order of `KDs_database.element_name`.
+KDs_database : custom_KDs_database
+    Compiled trace element partitioning coefficient database.
+dtb : String
+    Database identifier used for mineral classification (e.g., "ig", "mp").
+ZrSat_model : String, optional
+    Zirconium saturation model — "none" disables Zr correction (default: "none"). Valid options: "CB", "W85", "BD92", "RZ93", "CZLD08".
+SSat_model : String, optional
+    Sulfur saturation model — "none" disables S correction (default: "none"). Valid option: "1000ppm".
+P2O5Sat_model : String, optional
+    Phosphate saturation model — "none" disables P₂O₅ correction (default: "none"). Valid options: "Klein26", "HWBea92", "Tollari06".
+norm_TE : Bool, optional
+    Normalize phase fractions before computing KDs (default: false).
+
+Returns
+-------
+out_TE : out_tepm
+    Structure containing melt/solid/mineral TE concentrations, saturation values, and corrected bulk compositions.
 ```
 
 
-Perform TE partitioning and zircon saturation calculation.
 
-This function computes the partitioning of elements into different phases based on the provided KDs database and the initial composition C0. It also checks for zircon saturation and adjusts the composition if necessary.
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L814-L844" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.adjust_bulk_4_fapatite-Tuple{Float64, Float64, Float64}' href='#MAGEMin_C.adjust_bulk_4_fapatite-Tuple{Float64, Float64, Float64}'><span class="jlbinding">MAGEMin_C.adjust_bulk_4_fapatite</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/TE_partitioning.jl#L528-L537" target="_blank" rel="noreferrer">source</a></Badge>
+
+```julia
+adjust_bulk_4_fapatite(P2O5_liq, sat_liq, liq_wt)
+
+Compute the weight fractions of fluorapatite and CaO returned to the bulk when the melt exceeds P₂O₅ saturation.
+
+Parameters
+----------
+P2O5_liq : Float64
+    P₂O₅ concentration in the melt [ppm].
+sat_liq : Float64
+    P₂O₅ saturation concentration in the melt [ppm].
+liq_wt : Float64
+    Melt weight fraction.
+
+Returns
+-------
+fapt_wt : Float64
+    Weight fraction of precipitated fluorapatite (scaled by `liq_wt`).
+CaO_wt : Float64
+    CaO weight returned to the bulk (scaled by `liq_wt`).
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_saturation_models.jl#L235-L255" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.adjust_bulk_4_sulfide-Tuple{Float64, Float64, Float64}' href='#MAGEMin_C.adjust_bulk_4_sulfide-Tuple{Float64, Float64, Float64}'><span class="jlbinding">MAGEMin_C.adjust_bulk_4_sulfide</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+adjust_bulk_4_sulfide(S_liq, sat_liq, liq_wt)
+
+Compute the weight fractions of sulfide, FeO, and O returned to the bulk when the melt exceeds sulfur saturation.
+
+Parameters
+----------
+S_liq : Float64
+    Sulfur concentration in the melt [ppm].
+sat_liq : Float64
+    Sulfur saturation concentration in the melt [ppm].
+liq_wt : Float64
+    Melt weight fraction.
+
+Returns
+-------
+sulfide_wt : Float64
+    Weight fraction of precipitated sulfide (scaled by `liq_wt`).
+FeO_wt : Float64
+    FeO weight returned to the bulk (scaled by `liq_wt`).
+O_wt : Float64
+    O weight correction (negative, scaled by `liq_wt`).
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_saturation_models.jl#L446-L468" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.adjust_bulk_4_zircon-Tuple{Float64, Float64, Float64}' href='#MAGEMin_C.adjust_bulk_4_zircon-Tuple{Float64, Float64, Float64}'><span class="jlbinding">MAGEMin_C.adjust_bulk_4_zircon</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+adjust_bulk_4_zircon(zr_liq, sat_liq, liq_wt)
+
+Compute the weight fractions of zircon, SiO₂, and O returned to the bulk when the melt exceeds Zr saturation.
+
+Parameters
+----------
+zr_liq : Float64
+    Zr concentration in the melt [ppm].
+sat_liq : Float64
+    Zr saturation concentration in the melt [ppm].
+liq_wt : Float64
+    Melt weight fraction.
+
+Returns
+-------
+zircon_wt : Float64
+    Weight fraction of precipitated zircon (scaled by `liq_wt`).
+SiO2_wt : Float64
+    SiO₂ weight returned to the bulk (scaled by `liq_wt`).
+O2_wt : Float64
+    O weight returned to the bulk (scaled by `liq_wt`).
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_saturation_models.jl#L119-L141" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.adjust_chemical_system-Tuple{MAGEMin_C.custom_KDs_database, Vector{Float64}, Vector{String}}' href='#MAGEMin_C.adjust_chemical_system-Tuple{MAGEMin_C.custom_KDs_database, Vector{Float64}, Vector{String}}'><span class="jlbinding">MAGEMin_C.adjust_chemical_system</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+adjust_chemical_system(KDs_dtb, bulk_TE, elem_TE)
+
+Reorder and subset a bulk trace element composition vector to match the element order defined in a KD database.
+
+Elements present in `KDs_dtb` but absent from `elem_TE` are set to zero.
+
+Parameters
+----------
+KDs_dtb : custom_KDs_database
+    KD database whose `element_name` field defines the target element order.
+bulk_TE : Vector{Float64}
+    Input bulk trace element concentrations [ppm].
+elem_TE : Vector{String}
+    Element names corresponding to `bulk_TE`.
+
+Returns
+-------
+C0_TE : Vector{Float64}
+    Bulk trace element concentrations reordered to match `KDs_dtb.element_name` [ppm].
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L308-L328" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -630,11 +1081,23 @@ This function computes the partitioning of elements into different phases based 
 
 ```julia
 all_identical(arr::Vector{UInt64})
+
+Check whether all elements in a `UInt64` vector are identical.
+
+Parameters
+----------
+arr : Vector{UInt64}
+    Vector of hash values to compare.
+
+Returns
+-------
+result : Bool
+    `true` if all elements equal `arr[1]`, `false` otherwise.
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/AMR.jl#L83-L86" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/AMR.jl#L144-L158" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -661,7 +1124,7 @@ output : Vector{gmin_struct{Float64, Int64}}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L70-L84" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L70-L84" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -690,7 +1153,92 @@ bulk_dry : Vector{Float64}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L93-L109" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L93-L109" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.bi_Li_CB_model-Tuple{Float64, Float64, Float64}' href='#MAGEMin_C.bi_Li_CB_model-Tuple{Float64, Float64, Float64}'><span class="jlbinding">MAGEMin_C.bi_Li_CB_model</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+bi_Li_CB_model(y, f, T)
+
+Compute the Li partition coefficient between biotite and melt, after Beard (2025).
+
+Parameters
+----------
+y : Float64
+    Biotite Al-content compositional variable (Al on T site).
+f : Float64
+    Biotite Fe/(Fe+Mg) compositional variable.
+T : Float64
+    Temperature [°C].
+
+Returns
+-------
+KD_Li : Float64
+    Li partition coefficient (biotite/melt).
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_ph_models.jl#L11-L29" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.bi_Li_IL_model-Tuple{Float64}' href='#MAGEMin_C.bi_Li_IL_model-Tuple{Float64}'><span class="jlbinding">MAGEMin_C.bi_Li_IL_model</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+bi_Li_IL_model(T)
+
+Compute the Li partition coefficient between biotite and melt using a linear temperature model (Imai & Liang, unpublished).
+
+Parameters
+----------
+T : Float64
+    Temperature [°C].
+
+Returns
+-------
+KD_Li : Float64
+    Li partition coefficient (biotite/melt).
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_ph_models.jl#L42-L56" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.cd_Li_IL_model-Tuple{Float64}' href='#MAGEMin_C.cd_Li_IL_model-Tuple{Float64}'><span class="jlbinding">MAGEMin_C.cd_Li_IL_model</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+cd_Li_IL_model(T)
+
+Compute the Li partition coefficient between cordierite and melt using a linear temperature model (Imai & Liang, unpublished).
+
+Parameters
+----------
+T : Float64
+    Temperature [°C].
+
+Returns
+-------
+KD_Li : Float64
+    Li partition coefficient (cordierite/melt).
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_ph_models.jl#L61-L75" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -700,25 +1248,42 @@ bulk_dry : Vector{Float64}
 
 
 ```julia
-compute_P_sat_n_part(           out         :: MAGEMin_C.gmin_struct{Float64, Int64},
-                                KDs_database:: custom_KDs_database,
-                                Cliq, Csol, Cmin, ph_TE, ph_wt_norm, liq_wt_norm, bulk_D, bulk_cor_wt,
-                                C0          :: Vector{Float64},
-                                ph          :: Vector{String},
-                                ph_wt       :: Vector{Float64}, 
-                                liq_wt      :: Float64,
-                                sol_wt      :: Float64;
-                                P2O5Sat_model  :: String = "Klein26",
-                                norm_TE     :: Bool = true)
+compute_P2O5_sat_n_part(out, KDs_database, Cliq, bulk_cor_wt, C0, liq_wt; P2O5Sat_model="Klein26")
+
+Check phosphate saturation and adjust the corrected bulk composition if the melt exceeds the P₂O₅ saturation limit.
+
+If P₂O₅ in the melt exceeds the saturation concentration, the excess is removed and the corresponding CaO is returned to the bulk. If there is no melt, all P₂O₅ is assumed to have precipitated as fluorapatite.
+
+Parameters
+----------
+out : MAGEMin_C.gmin_struct{Float64, Int64}
+    MAGEMin minimization output.
+KDs_database : custom_KDs_database
+    Trace element partitioning coefficient database (must include "P2O5").
+Cliq : Vector{Float64}
+    Current trace element concentrations in the melt [ppm].
+bulk_cor_wt : Vector{Float64}
+    Corrected bulk oxide weight fractions (modified in place).
+C0 : Vector{Float64}
+    Initial bulk trace element composition [ppm].
+liq_wt : Float64
+    Melt weight fraction.
+P2O5Sat_model : String, optional
+    Phosphate saturation model (default: "Klein26"). Passed to `phosphate_saturation`.
+
+Returns
+-------
+Sat_P2O5_liq : Float64
+    P₂O₅ saturation concentration in the melt [ppm].
+fapt_wt : Float64
+    Weight fraction of precipitated fluorapatite.
+bulk_cor_wt : Vector{Float64}
+    Updated corrected bulk oxide weight fractions.
 ```
 
 
-Compute phosphate saturation and adjust bulk composition if necessary.
 
-This function checks if the P2O5 content in the liquid phase exceeds the saturation limit. If it does, it adjusts the bulk composition by removing the excess P2O5 and adds a new phase for fapt.
-
-
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/TE_partitioning.jl#L475-L491" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L745-L777" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -728,25 +1293,42 @@ This function checks if the P2O5 content in the liquid phase exceeds the saturat
 
 
 ```julia
-compute_S_sat_n_part(           out         :: MAGEMin_C.gmin_struct{Float64, Int64},
-                                KDs_database:: custom_KDs_database,
-                                Cliq, Csol, Cmin, ph_TE, ph_wt_norm, liq_wt_norm, bulk_D, bulk_cor_wt,
-                                C0          :: Vector{Float64},
-                                ph          :: Vector{String},
-                                ph_wt       :: Vector{Float64}, 
-                                liq_wt      :: Float64,
-                                sol_wt      :: Float64;
-                                SSat_model  :: String = "1000ppm",
-                                norm_TE     :: Bool = true)
+compute_S_sat_n_part(out, KDs_database, Cliq, bulk_cor_wt, C0, liq_wt; SSat_model="1000ppm")
+
+Check sulfur saturation and adjust the corrected bulk composition if the melt exceeds the S saturation limit.
+
+If S in the melt exceeds the saturation concentration, the excess is removed and the corresponding FeO and O are returned to the bulk. If there is no melt, all S is assumed to have precipitated as sulfide.
+
+Parameters
+----------
+out : MAGEMin_C.gmin_struct{Float64, Int64}
+    MAGEMin minimization output.
+KDs_database : custom_KDs_database
+    Trace element partitioning coefficient database (must include "S").
+Cliq : Vector{Float64}
+    Current trace element concentrations in the melt [ppm].
+bulk_cor_wt : Vector{Float64}
+    Corrected bulk oxide weight fractions (modified in place).
+C0 : Vector{Float64}
+    Initial bulk trace element composition [ppm].
+liq_wt : Float64
+    Melt weight fraction.
+SSat_model : String, optional
+    Sulfur saturation model (default: "1000ppm"). Passed to `sulfur_saturation`.
+
+Returns
+-------
+Sat_S_liq : Float64
+    S saturation concentration in the melt [ppm].
+sulf_wt : Float64
+    Weight fraction of precipitated sulfide.
+bulk_cor_wt : Vector{Float64}
+    Updated corrected bulk oxide weight fractions.
 ```
 
 
-Compute sulfur saturation and adjust bulk composition if necessary.
 
-This function checks if the sulfur content in the liquid phase exceeds the saturation limit. If it does, it adjusts the bulk composition by removing the excess sulfur and adds a new phase for FeS.
-
-
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/TE_partitioning.jl#L419-L435" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L673-L705" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -756,21 +1338,52 @@ This function checks if the sulfur content in the liquid phase exceeds the satur
 
 
 ```julia
-compute_TE_partitioning(    KDs_database:: custom_KDs_database,
-                            C0          :: Vector{Float64},
-                            ph          :: Vector{String},
-                            ph_wt       :: Vector{Float64}, 
-                            liq_wt      :: Float64,
-                            sol_wt      :: Float64)
+compute_TE_partitioning(KDs_database, out, C0, ph, ph_wt, liq_wt, sol_wt; norm_TE=true)
+
+Partition trace elements between melt and solid phases using the supplied KD database.
+
+Handles three end-member cases: fully molten (`liq_wt == 1.0`), fully solid (`liq_wt == 0.0`), and mixed (`0 < liq_wt < 1`). In the mixed case the batch melting equation is applied.
+
+Parameters
+----------
+KDs_database : custom_KDs_database
+    Compiled trace element partitioning coefficient database.
+out : MAGEMin_C.gmin_struct{Float64, Int64}
+    MAGEMin minimization output used to evaluate P-T-composition-dependent KDs.
+C0 : Vector{Float64}
+    Initial bulk trace element composition [ppm].
+ph : Vector{String}
+    Phase names from `mineral_classification`.
+ph_wt : Vector{Float64}
+    Weight fractions of each phase.
+liq_wt : Float64
+    Melt weight fraction.
+sol_wt : Float64
+    Solid weight fraction.
+norm_TE : Bool, optional
+    Normalize phase fractions before computing KDs (default: true).
+
+Returns
+-------
+Cliq : Vector{Float64}
+    Trace element concentrations in the melt [ppm].
+Csol : Vector{Float64}
+    Trace element concentrations in the bulk solid [ppm].
+Cmin : Matrix{Float64}
+    Trace element concentrations in each mineral phase [ppm].
+ph_TE : Vector{String}
+    Phase names included in the calculation.
+ph_wt_norm : Vector{Float64}
+    Normalized solid phase weight fractions.
+liq_wt_norm : Float64
+    Normalized melt weight fraction.
+bulk_D : Float64
+    Bulk partition coefficient.
 ```
 
 
-Compute the partitioning of elements into different phases based on the provided KDs database and the initial composition C0.
 
-This function partitions the elements into liquid, solid, and other phases based on the provided KDs database and the initial composition C0. It returns the partitioned compositions along with normalized phase weights.
-
-
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/TE_partitioning.jl#L321-L333" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L528-L570" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -780,24 +1393,42 @@ This function partitions the elements into liquid, solid, and other phases based
 
 
 ```julia
-compute_Zr_sat_n_part(          out         :: MAGEMin_C.gmin_struct{Float64, Int64},
-                                KDs_database:: custom_KDs_database,
-                                Cliq,
-                                C0          :: Vector{Float64},
-                                ph          :: Vector{String},
-                                ph_wt       :: Vector{Float64}, 
-                                liq_wt      :: Float64,
-                                sol_wt      :: Float64;
-                                ZrSat_model :: String = "CB")
+compute_Zr_sat_n_part(out, KDs_database, Cliq, bulk_cor_wt, C0, liq_wt; ZrSat_model="CB")
+
+Check zircon saturation and adjust the corrected bulk composition if the melt exceeds the Zr saturation limit.
+
+If Zr in the melt exceeds the saturation concentration, the excess is removed from the melt and the corresponding SiO₂ and O are returned to the bulk. If there is no melt (`liq_wt == 0`), all Zr is assumed to have precipitated as zircon.
+
+Parameters
+----------
+out : MAGEMin_C.gmin_struct{Float64, Int64}
+    MAGEMin minimization output.
+KDs_database : custom_KDs_database
+    Trace element partitioning coefficient database (must include "Zr").
+Cliq : Vector{Float64}
+    Current trace element concentrations in the melt [ppm].
+bulk_cor_wt : Vector{Float64}
+    Corrected bulk oxide weight fractions (modified in place).
+C0 : Vector{Float64}
+    Initial bulk trace element composition [ppm].
+liq_wt : Float64
+    Melt weight fraction.
+ZrSat_model : String, optional
+    Zirconium saturation model (default: "CB"). Passed to `zirconium_saturation`.
+
+Returns
+-------
+Sat_Zr_liq : Float64
+    Zr saturation concentration in the melt [ppm].
+zrc_wt : Float64
+    Weight fraction of precipitated zircon.
+bulk_cor_wt : Vector{Float64}
+    Updated corrected bulk oxide weight fractions.
 ```
 
 
-Compute zircon saturation and adjust bulk composition if necessary.
 
-This function checks if the zirconium content in the liquid phase exceeds the saturation limit. If it does, it adjusts the bulk composition by removing the excess zirconium and adds a new phase for zircon.
-
-
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/TE_partitioning.jl#L366-L381" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L603-L635" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -808,11 +1439,27 @@ This function checks if the zirconium content in the liquid phase exceeds the sa
 
 ```julia
 compute_index(value, min_value, delta)
+
+Compute the 1-based grid index of a coordinate value along one axis.
+
+Parameters
+----------
+value : Float64
+    Coordinate value to index.
+min_value : Float64
+    Minimum value of the axis.
+delta : Float64
+    Grid spacing along the axis.
+
+Returns
+-------
+index : Int64
+    1-based index of `value` in the uniform grid.
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/AMR.jl#L32-L34" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/AMR.jl#L59-L77" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -824,19 +1471,36 @@ compute_index(value, min_value, delta)
 ```julia
 compute_melt_viscosity_G08(oxides, M_mol, T_C; A = -4.55)
 
-Takes as input arguments:
-    oxides :: Vector{String}    -> oxide list of the melt composition
-    M_mol  :: Vector{Float64}   -> melt composition in mol
-    T_C    :: Float64           -> temperature in °C
+Compute melt viscosity using the Giordano, Russell & Dingwell (2008) model.
 
-returns melt viscosity in Pa.s
+Oxide compositions are mapped onto the 12-component GRD08 system
+(SiO₂, Al₂O₃, TiO₂, FeO, CaO, MgO, MnO, Na₂O, K₂O, P₂O₅, H₂O, F₂O₋₁),
+re-normalised to 100 mol%, and combined via the VTF equation:
 
-Formulation after Giordano et al., 2008
+    log₁₀(η) = A + B / (T_K − C)
+
+Viscosity is capped at 10¹⁴ Pa·s.
+
+Parameters
+----------
+oxides : Vector{String}
+    Oxide names for the melt composition (MAGEMin ordering).
+M_mol : Vector{Float64}
+    Melt composition in mol fractions, indexed to match `oxides`.
+T_C : Float64
+    Temperature [°C].
+A : Float64
+    Pre-exponential constant (default: −4.55, after Giordano et al. 2008).
+
+Returns
+-------
+eta : Float64
+    Melt viscosity [Pa·s], capped at 10¹⁴ Pa·s.
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/External_routines.jl#L19-L30" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/External_routines.jl#L19-L47" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -871,7 +1535,36 @@ MAGEMin_ox : Vector{String}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L1529-L1551" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L1806-L1828" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.convert_SS_eval_TE-Tuple{Any}' href='#MAGEMin_C.convert_SS_eval_TE-Tuple{Any}'><span class="jlbinding">MAGEMin_C.convert_SS_eval_TE</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+convert_SS_eval_TE(str)
+
+Rewrite `[:phase]` subscript tokens in a KD expression string to fully-qualified `gmin_struct` accessor calls.
+
+The pattern `[:name]` is replaced with `out.SS_vec[out.SS_syms[:name]]`, allowing KD expressions to reference solution phase data by short name (e.g., `[:liq].compVariables[1]` → `out.SS_vec[out.SS_syms[:liq]].compVariables[1]`).
+
+Parameters
+----------
+str : String
+    KD expression string potentially containing `[:phase]` tokens.
+
+Returns
+-------
+str : String
+    Expression string with all `[:phase]` tokens replaced.
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L275-L291" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -881,19 +1574,32 @@ MAGEMin_ox : Vector{String}
 
 
 ```julia
-KDs_database = custom_KDs_database(infos::String, 
-                    element_name::Vector{String}, 
-                    phase_name::Vector{String}, 
-                    KDs_expr::Matrix{Expr})
+create_custom_KDs_database(el_name, phase_name, KDs_expr_str; info="Custom KDs database")
+
+Create a custom trace element partitioning coefficient (KD) database from string expressions.
+
+Each expression in `KDs_expr_str` may reference `T_C`, `P_kbar`, `oxides`, and solution phase compositional variables using the syntax `[:phase_name]` (e.g., `[:liq].compVariables[1]`). These are resolved against the `gmin_struct` output at evaluation time.
+
+Parameters
+----------
+el_name : Vector{String}
+    Names of the trace elements.
+phase_name : Vector{String}
+    Names of the mineral phases.
+KDs_expr_str : Union{Matrix{String}, Vector{String}}
+    Matrix (phases × elements) or vector of KD expressions as strings.
+info : String, optional
+    Description or citation for the database (default: "Custom KDs database").
+
+Returns
+-------
+db : custom_KDs_database
+    Compiled KD database ready for use in `TE_prediction`.
 ```
 
 
-Create a custom KDs database from the given information.
 
-returns a custom_KDs_database object that can be used in the TE_partitioning.jl module.
-
-
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/TE_partitioning.jl#L207-L217" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L346-L368" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -926,7 +1632,7 @@ out : gmin_struct{Float64, Int64}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L2246-L2266" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L2573-L2593" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -949,13 +1655,42 @@ gv : LibMAGEMin.global_variables
 
 Returns
 -------
-out : light_gmin_struct{Float32, Int8}
+out : light_gmin_struct{Float32, Int8, String}
     Lightweight structure containing essential minimization results.
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L2426-L2442" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L2753-L2769" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.create_light_gmin_struct_ig-Tuple{Any, Any}' href='#MAGEMin_C.create_light_gmin_struct_ig-Tuple{Any, Any}'><span class="jlbinding">MAGEMin_C.create_light_gmin_struct_ig</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+create_light_gmin_struct_ig(DB, gv)
+
+Extract a lightweight output of a pointwise MAGEMin optimization into a Julia structure (Float32/Int8 types).
+
+Parameters
+----------
+DB : LibMAGEMin.Database
+    Database structure.
+gv : LibMAGEMin.global_variables
+    Global variables structure.
+
+Returns
+-------
+out : light_gmin_struct_ig{Float32, Int8, String}
+    Lightweight extended structure containing essential minimization results for igneous databases.
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L2833-L2849" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -990,7 +1725,7 @@ gv : LibMAGEMin.global_variables
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L1376-L1398" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L1653-L1675" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1020,7 +1755,7 @@ nothing
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L890-L907" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L1012-L1029" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1030,12 +1765,24 @@ nothing
 
 
 ```julia
-This routine stores the TE partitioning coefficients
+get_TE_database(tedb="OL12")
+
+Return the built-in trace element (TE) partitioning coefficient database.
+
+Parameters
+----------
+tedb : String, optional
+    Database identifier (default: "OL12"). Currently only "OL12" is supported (Laurent, 2012).
+
+Returns
+-------
+db : custom_KDs_database
+    Trace element partitioning coefficient database containing element names, phase names, and partition coefficient expressions.
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/TE_partitioning.jl#L16-L18" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L16-L30" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1045,17 +1792,65 @@ This routine stores the TE partitioning coefficients
 
 
 ```julia
-get_all_stable_phases(out:: Union{Vector{gmin_struct{Float64, Int64}}, gmin_struct{Float64, Int64}})
-return ph_name
+get_all_stable_phases(out)
 
-The function receives as an input a single/Vector of MAGEMin_C output structure and returns the list (Vector{String}) of unique stable phases
-    - Note that first the sorted solution phase names are provided, followed by the sorted pure phase names
-      e.g., ["amp", "bi", "chl", "cpx", "ep", "fl", "fsp", "liq", "opx", "sph"]
+Collect the unique set of stable phase names across all minimization points.
+
+Solution phases are sorted alphabetically and listed first; pure phases follow
+in their own sorted block. For example:
+`["amp", "bi", "chl", "cpx", "ep", "fl", "fsp", "liq", "opx", "sph", "q", "ru"]`
+
+Parameters
+----------
+out : Union{Vector{gmin_struct{Float64, Int64}}, gmin_struct{Float64, Int64}}
+    MAGEMin minimization output for one or more points.
+
+Returns
+-------
+ph_names : Vector{String}
+    Sorted unique phase names (solution phases first, then pure phases).
+n_ss : Int64
+    Number of unique solution phases.
+n_pp : Int64
+    Number of unique pure phases.
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/export2CSV.jl#L390-L397" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/export2CSV.jl#L435-L457" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.get_mineral_name-Tuple{Any, Any, Any}' href='#MAGEMin_C.get_mineral_name-Tuple{Any, Any, Any}'><span class="jlbinding">MAGEMin_C.get_mineral_name</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+get_mineral_name(db, ss, SS_vec)
+
+Return a mineralogically meaningful name for a solution phase based on its compositional variables (solvus disambiguation).
+
+For solution phases that straddle a solvus (e.g., feldspar → plagioclase or alkali feldspar; spinel → spinel, magnetite, or ulvöspinel), the returned name reflects the dominant endmember rather than the generic solution phase label.
+
+Parameters
+----------
+db : String
+    Database identifier (e.g., "ig", "igad", "mp", "mpe", "mb", "ume", "mbe").
+ss : String
+    Solution phase short name (e.g., "fsp", "spl", "amp", "ilm").
+SS_vec : LibMAGEMin.SS_data
+    Solution phase data structure containing `compVariables`.
+
+Returns
+-------
+mineral_name : String
+    Disambiguated mineral name (e.g., "pl", "afs", "mgt", "ilm", "hem").
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/name_solvus.jl#L11-L31" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1082,7 +1877,7 @@ molar_mass : Float64
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L45-L59" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L45-L59" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1092,12 +1887,57 @@ molar_mass : Float64
 
 
 ```julia
-This function returns the solution phase name given the mineral name (handling solvus -> solution phase)
+get_ss_from_mineral(db, mrl, mbCpx)
+
+Return the solution phase name corresponding to a disambiguated mineral name (inverse of `get_mineral_name`).
+
+Parameters
+----------
+db : String
+    Database identifier (e.g., "ig", "igad", "mp", "mpe", "mb", "ume", "mbe").
+mrl : String
+    Disambiguated mineral name (e.g., "pl", "afs", "mgt", "hem", "omph").
+mbCpx : Int64
+    Metabasite clinopyroxene model flag. Controls whether omphacite/diopside maps to "dio" (0) or "aug" (1).
+
+Returns
+-------
+ss : String
+    Solution phase short name (e.g., "fsp", "spl", "amp", "ilm").
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/name_solvus.jl#L101-L103" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/name_solvus.jl#L118-L136" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.health_check_TE-Tuple{Any, Any}' href='#MAGEMin_C.health_check_TE-Tuple{Any, Any}'><span class="jlbinding">MAGEMin_C.health_check_TE</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+health_check_TE(C0, KDs_database)
+
+Validate that the initial composition vector and KD database are consistent before running TE partitioning.
+
+Parameters
+----------
+C0 : Vector{Float64}
+    Initial bulk trace element composition [ppm].
+KDs_database : custom_KDs_database
+    KD database to validate against `C0`.
+
+Returns
+-------
+status : Int64
+    1 if all checks pass, 0 if any check fails (errors are also thrown).
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L487-L503" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1152,7 +1992,7 @@ splx_data : simplex_data
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L746-L788" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L868-L910" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1162,12 +2002,57 @@ splx_data : simplex_data
 
 
 ```julia
-compute_hash_map(data)
+initialize_AMR(Xrange, Yrange, igs)
+
+Create an initial uniform quadrilateral grid for Adaptive Mesh Refinement.
+
+The grid has `2^igs` cells per dimension, covering the rectangular domain defined by `Xrange` and `Yrange`.
+
+Parameters
+----------
+Xrange : Union{Tuple{Float64,Float64}, Vector{Float64}}
+    X-axis bounds of the domain [Xmin, Xmax].
+Yrange : Union{Tuple{Float64,Float64}, Vector{Float64}}
+    Y-axis bounds of the domain [Ymin, Ymax].
+igs : Int64
+    Initial subdivision level; produces `2^igs × 2^igs` cells.
+
+Returns
+-------
+data : AMR_data
+    Initialized AMR data structure with the uniform grid.
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/AMR.jl#L40-L42" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/AMR.jl#L83-L103" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.logish-Tuple{Float64}' href='#MAGEMin_C.logish-Tuple{Float64}'><span class="jlbinding">MAGEMin_C.logish</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+logish(x)
+
+Safe natural logarithm that returns 0.0 for non-positive inputs instead of `-Inf` or `NaN`.
+
+Parameters
+----------
+x : Float64
+    Input value.
+
+Returns
+-------
+Float64
+    `log(x)` if `x > 0`, otherwise `0.0`.
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_saturation_models.jl#L276-L290" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1177,12 +2062,30 @@ compute_hash_map(data)
 
 
 ```julia
-Classify the mineral output from MAGEMin to be able to be compared with partitioning coefficient database
+mineral_classification(out, dtb)
+
+Classify the stable phases from a MAGEMin minimization result into mineralogical names compatible with the trace element partitioning coefficient database.
+
+Solution phases that straddle a solvus (e.g., feldspar, spinel, ilmenite) are disambiguated using their compositional variables. Duplicate phases resulting from solvus splitting are merged by summing their weight fractions.
+
+Parameters
+----------
+out : MAGEMin_C.gmin_struct{Float64, Int64}
+    MAGEMin minimization output structure.
+dtb : String
+    Database identifier (e.g., "ig", "igad", "mp", "mpe", "mb", "ume", "mbe").
+
+Returns
+-------
+ph : Vector{String}
+    Classified phase names compatible with the TE partitioning database.
+ph_wt : Vector{Float64}
+    Weight fractions corresponding to each phase.
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/TE_partitioning.jl#L31-L33" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L43-L63" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1211,7 +2114,51 @@ bulk_wt : Vector{Float64}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L1451-L1467" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L1728-L1744" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.multi_point_minimization-Tuple{AbstractMatrix{Float64}, AbstractMatrix{Float64}, MAGEMin_Data}' href='#MAGEMin_C.multi_point_minimization-Tuple{AbstractMatrix{Float64}, AbstractMatrix{Float64}, MAGEMin_Data}'><span class="jlbinding">MAGEMin_C.multi_point_minimization</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+````julia
+multi_point_minimization(P, T, MAGEMin_db; X=nothing, ...)
+
+Matrix overload for 2D model grids. `P` and `T` are matrices of the same
+size (e.g. `(nx, ny)`) representing a spatial grid of pressures [kbar] and
+temperatures [°C]. They are flattened internally, computed in parallel, and
+the results are returned as a matrix of the same shape.
+
+The bulk-rock composition `X` can be:
+- `nothing` (use a built-in test case, set via `test=`)
+- `Vector{Float64}` of length `noxides` — same composition for every node
+- `Matrix{Float64}` of size `(nx*ny, noxides)` — per-node composition,
+  where row `i` corresponds to the linearised index of the grid
+
+All other keyword arguments are forwarded to the vector-based method.
+
+Examples
+--------
+```julia
+data    = Initialize_MAGEMin("ig", verbose=false);
+Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","Fe2O3","K2O","Na2O","TiO2","Cr2O3","H2O"]
+X       = [48.43, 15.19, 11.57, 10.13, 6.65, 1.64, 0.59, 1.87, 0.68, 0.0, 3.0]
+
+# 2-D P-T grid (uniform bulk)
+P_grid  = [8.0  9.0; 10.0 11.0]   # (2×2)
+T_grid  = [800.0 850.0; 900.0 950.0]
+out     = multi_point_minimization(P_grid, T_grid, data, X=X, Xoxides=Xoxides, sys_in="wt")
+# out is a (2×2) Matrix{gmin_struct}
+
+Finalize_MAGEMin(data)
+```
+````
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L1157-L1188" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1291,7 +2238,90 @@ Finalize_MAGEMin(data)
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L969-L1036" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L1237-L1304" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.partition_TE-Tuple{MAGEMin_C.custom_KDs_database, out_struct, Vector{Float64}, Vector{String}, Vector{Float64}, Float64}' href='#MAGEMin_C.partition_TE-Tuple{MAGEMin_C.custom_KDs_database, out_struct, Vector{Float64}, Vector{String}, Vector{Float64}, Float64}'><span class="jlbinding">MAGEMin_C.partition_TE</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+partition_TE(KDs_database, out, C0, ph, ph_wt, liq_wt; norm_TE=true)
+
+Apply the batch melting equation to partition trace elements between melt and solid phases for the subset of phases present in both the MAGEMin output and the KD database.
+
+Parameters
+----------
+KDs_database : custom_KDs_database
+    Compiled KD database.
+out : MAGEMin_C.gmin_struct{Float64, Int64}
+    MAGEMin minimization output used to evaluate P-T-composition-dependent KDs.
+C0 : Vector{Float64}
+    Initial bulk trace element composition [ppm].
+ph : Vector{String}
+    Phase names from `mineral_classification`.
+ph_wt : Vector{Float64}
+    Weight fractions of each phase.
+liq_wt : Float64
+    Melt weight fraction.
+norm_TE : Bool, optional
+    Normalize phase fractions to the phases present in the KD database (default: true).
+
+Returns
+-------
+Cliq : Vector{Float64}
+    Trace element concentrations in the melt [ppm].
+Cmin : Matrix{Float64}
+    Trace element concentrations in each mineral phase [ppm] (phases × elements).
+Csol : Vector{Float64}
+    Trace element concentrations in the bulk solid [ppm].
+ph_TE : Vector{String}
+    Names of phases included in the calculation.
+ph_wt_norm : Vector{Float64}
+    Normalized solid phase weight fractions.
+liq_wt_norm : Float64
+    Normalized melt weight fraction.
+bulk_D : Float64
+    Bulk partition coefficient.
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L396-L434" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.phosphate_saturation-Tuple{out_struct}' href='#MAGEMin_C.phosphate_saturation-Tuple{out_struct}'><span class="jlbinding">MAGEMin_C.phosphate_saturation</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+phosphate_saturation(out; model="Klein26")
+
+Compute the P₂O₅ saturation concentration in the melt phase [ppm].
+
+Parameters
+----------
+out : MAGEMin_C.gmin_struct{Float64, Int64}
+    MAGEMin minimization output (must contain a melt phase with a "liq" solution phase).
+model : String, optional
+    Saturation model (default: "Klein26"). Valid options:
+    - "Klein26"  — Klein et al. (2026)
+    - "HWBea92"  — Harrison & Watson (1984) + correction from Bea et al. (1992); for hydrous systems
+    - "Tollari06" — Tollari et al. (2006); calibrated for dry systems
+
+Returns
+-------
+C_P2O5_liq : Float64
+    P₂O₅ saturation concentration in the melt [ppm], or -1 if the model is unrecognized.
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_saturation_models.jl#L159-L178" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1344,7 +2374,7 @@ out2    = point_wise_metastability(out, Pmeta, Tmeta, data)
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L2870-L2910" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L3310-L3350" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1374,6 +2404,8 @@ splx_data : LibMAGEMin.simplex_datas
     Simplex data structure.
 light : Bool, optional
     Return a lightweight output structure (default: false).
+light_ig : Bool, optional
+    Return an extended lightweight structure for igneous databases (default: false).
 name_solvus : Bool, optional
     Resolve solvus naming (default: false).
 fixed_bulk : Bool, optional
@@ -1430,7 +2462,7 @@ finalize_MAGEMin(gv, DB)
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L1689-L1762" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L1961-L2036" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1461,7 +2493,7 @@ out : gmin_struct{Float64, Int64}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L2077-L2095" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L2367-L2385" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1500,7 +2532,7 @@ out : gmin_struct{Float64, Int64}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L2728-L2754" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L3170-L3196" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1522,7 +2554,7 @@ g : gmin_struct
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L2505-L2514" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L2947-L2956" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1581,7 +2613,56 @@ out     = pwm_run(gv, z_b, DB, splx_data);
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L2146-L2192" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L2436-L2482" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.pwm_run-NTuple{4, Any}' href='#MAGEMin_C.pwm_run-NTuple{4, Any}'><span class="jlbinding">MAGEMin_C.pwm_run</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+````julia
+pwm_run(gv, z_b, DB, splx_data; name_solvus=false)
+
+Run the equilibrium computation and post-processing after `pwm_init`. Intended for thermodynamic database inversion/calibration workflows.
+
+Parameters
+----------
+gv : LibMAGEMin.global_variables
+    Global variables structure (initialized via `pwm_init`).
+z_b : LibMAGEMin.bulk_infos
+    Bulk rock information structure.
+DB : LibMAGEMin.Database
+    Database structure.
+splx_data : LibMAGEMin.simplex_datas
+    Simplex data structure.
+name_solvus : Bool, optional
+    Resolve solvus naming (default: false).
+
+Returns
+-------
+out : gmin_struct{Float64, Int64}
+    Structure containing the minimization results.
+
+Examples
+--------
+```julia
+dtb     = "mp"
+gv, z_b, DB, splx_data = init_MAGEMin(dtb);
+Xoxides = ["SiO2"; "TiO2"; "Al2O3"; "FeO"; "MnO"; "MgO"; "CaO"; "Na2O"; "K2O"; "H2O"; "O"];
+X       = [58.509, 1.022, 14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 10.0, 0.0];
+sys_in  = "wt"
+gv      = define_bulk_rock(gv, X, Xoxides, sys_in, dtb);
+P, T    = 6.0, 500.0
+gv, z_b, DB, splx_data = pwm_init(P, T, gv, z_b, DB, splx_data);
+out     = pwm_run(gv, z_b, DB, splx_data);
+```
+````
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L2513-L2549" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1610,7 +2691,33 @@ rm_list : Union{Nothing, Vector{Int64}}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L576-L592" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L698-L714" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.retrieve_eval_rules_TE-Tuple{}' href='#MAGEMin_C.retrieve_eval_rules_TE-Tuple{}'><span class="jlbinding">MAGEMin_C.retrieve_eval_rules_TE</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+retrieve_eval_rules_TE()
+
+Return the token substitution rules used when compiling KD expression strings.
+
+Plain tokens such as `T_C` and `P_kbar` are replaced with their fully-qualified counterparts on a `gmin_struct` (e.g., `out.T_C`), so that compiled functions can be called with a single `out` argument.
+
+Returns
+-------
+in_eval_TE : Vector{String}
+    Tokens to search for in the expression string.
+out_eval_TE : Vector{String}
+    Replacement strings referencing the `out` argument.
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_partitioning.jl#L252-L265" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1637,7 +2744,84 @@ db_inf : db_infos
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L552-L566" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L674-L688" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.single_point_minimization-Union{Tuple{T1}, Tuple{T1, T1, MAGEMin_Data}} where T1<:Float64' href='#MAGEMin_C.single_point_minimization-Union{Tuple{T1}, Tuple{T1, T1, MAGEMin_Data}} where T1<:Float64'><span class="jlbinding">MAGEMin_C.single_point_minimization</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+````julia
+single_point_minimization(P, T, MAGEMin_db; light=false, light_ig=false, name_solvus=false, fixed_bulk=false, test=0, X=nothing, B=nothing, G=nothing, scp=0, dT=2.0, iguess=false, rm_list=nothing, W=nothing, Xoxides=Vector{String}, sys_in="mol", rg="tc", progressbar=true)
+
+Perform a MAGEMin Gibbs energy minimization at a single pressure-temperature point.
+
+This is a convenience wrapper around `multi_point_minimization` for scalar `P` and `T` inputs.
+
+Parameters
+----------
+P : Float64
+    Pressure [kbar].
+T : Float64
+    Temperature [°C].
+MAGEMin_db : MAGEMin_Data
+    Initialized MAGEMin data structure.
+light : Bool, optional
+    Return a lightweight output structure (default: false).
+light_ig : Bool, optional
+    Return an extended lightweight structure for igneous databases (default: false).
+name_solvus : Bool, optional
+    Resolve solvus naming (default: false).
+fixed_bulk : Bool, optional
+    Use fixed bulk composition (default: false).
+test : Int64, optional
+    Built-in test case number (default: 0).
+X : VecOrMat, optional
+    Bulk rock composition. Single vector of length `noxides` (default: nothing).
+B : Union{Nothing, Float64}, optional
+    Buffer value (default: nothing).
+G : Union{Nothing, Vector{LibMAGEMin.mSS_data}}, optional
+    Initial guess data (default: nothing).
+scp : Int64, optional
+    Sub-solidus computation parameter (default: 0).
+dT : Float64, optional
+    Temperature increment for sub-solidus detection (default: 2.0).
+iguess : Bool, optional
+    Whether to use initial guess (default: false).
+rm_list : Union{Nothing, Vector{Int64}}, optional
+    List of phase indexes to remove (default: nothing).
+W : Union{Nothing, Vector{W_data{Float64, Int64}}}, optional
+    Overriding Margules parameters (default: nothing).
+Xoxides : Vector{String}
+    Oxide names corresponding to `X`.
+sys_in : String, optional
+    Input system units, "mol" or "wt" (default: "mol").
+rg : String, optional
+    Research group, "tc" or "sb" (default: "tc").
+progressbar : Bool, optional
+    Show progress bar (default: true).
+
+Returns
+-------
+out : gmin_struct{Float64, Int64}
+    Structure containing the minimization result at the given P-T point.
+
+Examples
+--------
+```julia
+data    = Initialize_MAGEMin("ig", verbose=false);
+Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","Fe2O3","K2O","Na2O","TiO2","Cr2O3","H2O"]
+X       = [48.43, 15.19, 11.57, 10.13, 6.65, 1.64, 0.59, 1.87, 0.68, 0.0, 3.0]
+out     = single_point_minimization(10.0, 1100.0, data, X=X, Xoxides=Xoxides, sys_in="wt")
+Finalize_MAGEMin(data)
+```
+````
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L1036-L1100" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1647,17 +2831,101 @@ db_inf : db_infos
 
 
 ```julia
-split_and_keep(data)
+split_and_keep(data, Hash_XY)
+
+Categorise cells into the split or keep list based on phase assembly uniformity.
+
+For each cell in `data.keep_cell_list` (from the previous refinement step) and
+any remaining cells beyond that list, the function collects the phase-assembly
+hash values at all corner points (and any boundary midpoints already stored in
+`data.bnd_cells`). If all hashes are identical the cell is stable and added to
+`keep_cell_list`; otherwise it straddles a reaction boundary and is added to
+`split_cell_list`.
+
+Parameters
+----------
+data : AMR_data
+    AMR state structure. `data.cells`, `data.keep_cell_list`, and
+    `data.bnd_cells` are read; `data.split_cell_list` and
+    `data.keep_cell_list` are overwritten.
+Hash_XY : Vector{UInt64}
+    Per-point phase-assembly hash values, indexed by point index.
+
+Returns
+-------
+data : AMR_data
+    Updated AMR state with refreshed `split_cell_list` and `keep_cell_list`.
 ```
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/AMR.jl#L91-L94" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/AMR.jl#L164-L189" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.sulfur_saturation-Tuple{out_struct}' href='#MAGEMin_C.sulfur_saturation-Tuple{out_struct}'><span class="jlbinding">MAGEMin_C.sulfur_saturation</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+sulfur_saturation(out; model="1000ppm")
+
+Compute the sulfur concentration at sulfide saturation (SCSS) in the melt phase [ppm].
+
+Parameters
+----------
+out : MAGEMin_C.gmin_struct{Float64, Int64}
+    MAGEMin minimization output (must contain a melt phase with a "liq" solution phase).
+model : String, optional
+    Saturation model (default: "1000ppm"). Valid options:
+    - `"<N>ppm"`   — Fixed saturation value of N ppm (e.g., "1000ppm", "500ppm")
+    - "Liu07"      — Liu et al. (2007); SCSS model, may be unreliable for anhydrous conditions
+    - "Oneill21"   — O'Neill (2021); thermodynamic SCSS model using fO₂ from the minimization
+
+Returns
+-------
+C_s_liq : Float64
+    Sulfur saturation concentration in the melt [ppm].
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_saturation_models.jl#L299-L318" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
 <details class='jldocstring custom-block' open>
 <summary><a id='MAGEMin_C.use_predefined_bulk_rock' href='#MAGEMin_C.use_predefined_bulk_rock'><span class="jlbinding">MAGEMin_C.use_predefined_bulk_rock</span></a> <Badge type="info" class="jlObjectType jlFunction" text="Function" /></summary>
+
+
+
+```julia
+use_predefined_bulk_rock(data::MAGEMin_Data, test=0)
+
+Return the pre-defined bulk rock composition for a given built-in test case (multi-threaded version).
+
+Parameters
+----------
+data : MAGEMin_Data
+    Initialized MAGEMin data structure.
+test : Int64, optional
+    Built-in test case number (default: 0).
+
+Returns
+-------
+data : MAGEMin_Data
+    Updated MAGEMin data structure with bulk rock composition set for all threads.
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L1628-L1644" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.use_predefined_bulk_rock-2' href='#MAGEMin_C.use_predefined_bulk_rock-2'><span class="jlbinding">MAGEMin_C.use_predefined_bulk_rock</span></a> <Badge type="info" class="jlObjectType jlFunction" text="Function" /></summary>
 
 
 
@@ -1683,36 +2951,7 @@ gv : LibMAGEMin.global_variables
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L1275-L1293" target="_blank" rel="noreferrer">source</a></Badge>
-
-</details>
-
-<details class='jldocstring custom-block' open>
-<summary><a id='MAGEMin_C.use_predefined_bulk_rock-2' href='#MAGEMin_C.use_predefined_bulk_rock-2'><span class="jlbinding">MAGEMin_C.use_predefined_bulk_rock</span></a> <Badge type="info" class="jlObjectType jlFunction" text="Function" /></summary>
-
-
-
-```julia
-use_predefined_bulk_rock(data::MAGEMin_Data, test=0)
-
-Return the pre-defined bulk rock composition for a given built-in test case (multi-threaded version).
-
-Parameters
-----------
-data : MAGEMin_Data
-    Initialized MAGEMin data structure.
-test : Int64, optional
-    Built-in test case number (default: 0).
-
-Returns
--------
-data : MAGEMin_Data
-    Updated MAGEMin data structure with bulk rock composition set for all threads.
-```
-
-
-
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L1351-L1367" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L1552-L1570" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -1741,7 +2980,39 @@ bulk_mol : Vector{Float64}
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/dd3f733bf9bc31f65ce0e360024fc7d5c1737a34/julia/MAGEMin_wrappers.jl#L1414-L1430" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/MAGEMin_wrappers.jl#L1691-L1707" target="_blank" rel="noreferrer">source</a></Badge>
+
+</details>
+
+<details class='jldocstring custom-block' open>
+<summary><a id='MAGEMin_C.zirconium_saturation-Tuple{out_struct}' href='#MAGEMin_C.zirconium_saturation-Tuple{out_struct}'><span class="jlbinding">MAGEMin_C.zirconium_saturation</span></a> <Badge type="info" class="jlObjectType jlMethod" text="Method" /></summary>
+
+
+
+```julia
+zirconium_saturation(out; model="WH")
+
+Compute the zirconium saturation concentration in the melt phase [ppm].
+
+Parameters
+----------
+out : MAGEMin_C.gmin_struct{Float64, Int64}
+    MAGEMin minimization output (must contain a melt phase).
+model : String, optional
+    Saturation model (default: "WH"). Valid options:
+    - "WH"  — Watson & Harrison (1983)
+    - "B"   — Boehnke et al. (2013)
+    - "CB"  — Crisp & Berry (2022)
+
+Returns
+-------
+C_zr_liq : Float64
+    Zr saturation concentration in the melt [ppm], or -1 if no melt is present.
+```
+
+
+
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/blob/065d7e6a5df12c9e3300d280637b2a1e899bb6b1/julia/TE_saturation_models.jl#L13-L32" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 

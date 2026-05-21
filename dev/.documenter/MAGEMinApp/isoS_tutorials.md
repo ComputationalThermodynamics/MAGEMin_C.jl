@@ -3,7 +3,7 @@
 
 ## Isentropic path (MAGEMinApp v0.8.6) {#Isentropic-path-MAGEMinApp-v0.8.6}
 
-Isentropic path typically represent a process where a rock or material undergoes changes in pressure and temperature without any exchange of heat with its surroundings (adiabatic process) and without any entropy production (reversible process). This type of path is often used to model processes like mantle convection or adiabatic decompression melting, where material moves through the Earth&#39;s interior under conditions that approximate constant entropy.
+Isentropic path typically represent a process where a rock or material undergoes changes in pressure and temperature without any exchange of heat with its surroundings (adiabatic process) and without any entropy production (reversible process). This type of path is often used to model processes like mantle convection or adiabatic decompression melting, where material moves through the Earth's interior under conditions that approximate constant entropy.
 
 ### 1. Quick start - first isentropic path {#1.-Quick-start-first-isentropic-path}
 

@@ -80,15 +80,15 @@ Thermodynamic dataset acronym are the following:
   
 - `igad` -&gt; igneous alkaline dry (Weller et al., 2024)
   
-- `um` -&gt; ultramafic (Evans &amp; Frost, 2021)
+- `um` -&gt; ultramafic (Evans & Frost, 2021)
   
-- `sb11` -&gt; Stixrude &amp; Lithgow-Bertelloni (2011)
+- `sb11` -&gt; Stixrude & Lithgow-Bertelloni (2011)
   
-- `sb21` -&gt; Stixrude &amp; Lithgow-Bertelloni (2021)
+- `sb21` -&gt; Stixrude & Lithgow-Bertelloni (2021)
   
-- `sb24` -&gt; Stixrude &amp; Lithgow-Bertelloni (2024)
+- `sb24` -&gt; Stixrude & Lithgow-Bertelloni (2024)
   
-- `ume` -&gt; ultramafic extended (Green et al., 2016 + Evans &amp; Frost, 2021)
+- `ume` -&gt; ultramafic extended (Green et al., 2016 + Evans & Frost, 2021)
   
 - `mpe` -&gt; extended metapelite (White et al., 2014 + Green et al., 2016 + Franzolin et al., 2011 + Diener et al., 2007)
   
@@ -186,7 +186,7 @@ out.oxides
 ```
 
 
-The composition in `wt` of the first listed solution phase (&quot;liq&quot;) can be accessed as
+The composition in `wt` of the first listed solution phase ("liq") can be accessed as
 
 ```julia
 out.SS_vec[1].Comp_wt
@@ -321,7 +321,7 @@ MAGEMin_data2dataframe_inlined(out,dtb,"filename")
 
 
 ::: tip Note
-- You don&#39;t have to add the file extension `.csv`
+- You don't have to add the file extension `.csv`
   
 - The output path (MAGEMin_C directory) is displayed in the Julia terminal
   
@@ -546,19 +546,19 @@ By default, this will show a progressbar (which you can deactivate with the `pro
 You can also specify a custom bulk rock for all points (see above), or a custom bulk rock for every point.
 
 ## References {#References}
-- Green, ECR, Holland, TJB, Powell, R, Weller, OM, &amp; Riel, N (2025). Journal of Petrology, 66, doi: 10.1093/petrology/egae079
+- Green, ECR, Holland, TJB, Powell, R, Weller, OM, & Riel, N (2025). Journal of Petrology, 66, doi: 10.1093/petrology/egae079
   
-- Weller, OM, Holland, TJB, Soderman, CR, Green, ECR, Powell, R, Beard, CD &amp; Riel, N (2024). New Thermodynamic Models for Anhydrous Alkaline-Silicate Magmatic Systems. Journal of Petrology, 65, doi: 10.1093/petrology/egae098
+- Weller, OM, Holland, TJB, Soderman, CR, Green, ECR, Powell, R, Beard, CD & Riel, N (2024). New Thermodynamic Models for Anhydrous Alkaline-Silicate Magmatic Systems. Journal of Petrology, 65, doi: 10.1093/petrology/egae098
   
-- Holland, TJB, Green, ECR &amp; Powell, R (2022). A thermodynamic modelfor feldspars in KAlSi3O8-NaAlSi3O8-CaAl2Si2O8 for mineral equilibrium calculations. Journal of Metamorphic Geology, 40, 587-600, doi: 10.1111/jmg.12639
+- Holland, TJB, Green, ECR & Powell, R (2022). A thermodynamic modelfor feldspars in KAlSi3O8-NaAlSi3O8-CaAl2Si2O8 for mineral equilibrium calculations. Journal of Metamorphic Geology, 40, 587-600, doi: 10.1111/jmg.12639
   
-- Tomlinson, EL &amp; Holland, TJB (2021). A Thermodynamic Model for the Subsolidus Evolution and Melting of Peridotite. Journal of Petrology,62, doi: 10.1093/petrology/egab012
+- Tomlinson, EL & Holland, TJB (2021). A Thermodynamic Model for the Subsolidus Evolution and Melting of Peridotite. Journal of Petrology,62, doi: 10.1093/petrology/egab012
   
-- Holland, TJB, Green, ECR &amp; Powell, R (2018). Melting of Peridotitesthrough to Granites: A Simple Thermodynamic Model in the System KNCFMASHTOCr. Journal of Petrology, 59, 881-900, doi: 10.1093/petrology/egy048
+- Holland, TJB, Green, ECR & Powell, R (2018). Melting of Peridotitesthrough to Granites: A Simple Thermodynamic Model in the System KNCFMASHTOCr. Journal of Petrology, 59, 881-900, doi: 10.1093/petrology/egy048
   
-- Green, ECR, White, RW, Diener, JFA, Powell, R, Holland, TJB &amp; Palin, RM (2016). Activity-composition relations for the calculationof partial melting equilibria in metabasic rocks. Journal of Metamorphic Geology, 34, 845-869, doi: 10.1111/jmg12211
+- Green, ECR, White, RW, Diener, JFA, Powell, R, Holland, TJB & Palin, RM (2016). Activity-composition relations for the calculationof partial melting equilibria in metabasic rocks. Journal of Metamorphic Geology, 34, 845-869, doi: 10.1111/jmg12211
   
-- White, RW, Powell, R, Holland, TJB, Johnson, TE &amp; Green, ECR (2014). New mineral activity-composition relations for thermodynamic calculations in metapelitic systems. Journal of Metamorphic Geology, 32, 261-286, doi: 10.1111/jmg.12071
+- White, RW, Powell, R, Holland, TJB, Johnson, TE & Green, ECR (2014). New mineral activity-composition relations for thermodynamic calculations in metapelitic systems. Journal of Metamorphic Geology, 32, 261-286, doi: 10.1111/jmg.12071
   
-- Holland, TJB &amp; Powell, RW (2011). An improved and extended internally consistent thermodynamic dataset for phases of petrological interest, involving a new equation of state for solids. Journal of Metamorphic Geology, 29, 333-383, doi: 10.1111/j.1525-1314.2010.00923.x
+- Holland, TJB & Powell, RW (2011). An improved and extended internally consistent thermodynamic dataset for phases of petrological interest, involving a new equation of state for solids. Journal of Metamorphic Geology, 29, 333-383, doi: 10.1111/j.1525-1314.2010.00923.x
   

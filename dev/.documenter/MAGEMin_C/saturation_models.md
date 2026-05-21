@@ -65,16 +65,16 @@ Note that fS2 is calculated after Bockrath et al. (2024) and that fO2 is retriev
 
 :::
 
-| `Element` |      `phase` | `acronym` |  `formula` |       `correction` |                                      `TE_prediction(; arg)` |
-| ---------:| ------------:| ---------:| ----------:| ------------------:| -----------------------------------------------------------:|
-|        Zr |       zircon |       zrc |     ZrSiO4 |         SiO2 and O | ZrSat_model = &quot;CB&quot;, &quot;B&quot;, &quot;WH&quot; |
-|         S |      sulfide |      sulf |        FeS |          FeO and O |        SSat_model = &quot;Oneill21&quot;, &quot;Liu07&quot; |
-|      P2O5 | fluorapatite |      fapt | Ca5(PO4)3F | CaO (F is omitted) |                         P2O5Sat_model = &quot;Klein26&quot; |
+| `Element` |      `phase` | `acronym` |  `formula` |       `correction` |           `TE_prediction(; arg)` |
+| ---------:| ------------:| ---------:| ----------:| ------------------:| --------------------------------:|
+|        Zr |       zircon |       zrc |     ZrSiO4 |         SiO2 and O |    ZrSat_model = "CB", "B", "WH" |
+|         S |      sulfide |      sulf |        FeS |          FeO and O | SSat_model = "Oneill21", "Liu07" |
+|      P2O5 | fluorapatite |      fapt | Ca5(PO4)3F | CaO (F is omitted) |        P2O5Sat_model = "Klein26" |
 
 
 ## E.1 Zirconium saturation {#E.1-Zirconium-saturation}
 
-Let&#39;s first model zirconium saturation using Crisp and Berry (2022) model. Start as usual by load MAGEMin_C, declaring the database, pressure and temperature conditions, bulk-rock composition and system unit:
+Let's first model zirconium saturation using Crisp and Berry (2022) model. Start as usual by load MAGEMin_C, declaring the database, pressure and temperature conditions, bulk-rock composition and system unit:
 
 ```julia
 using MAGEMin_C
@@ -98,7 +98,7 @@ C0      = [400.0]   # starting concentration of elements in ppm (ug/g)
 
 
 ::: tip Note
-- Although `Zr` is not partitioned into `zrc`, it is necessary to declare the main Zr-bearing phase and assign a &quot;dummy&quot; KD value of 0. This ensures that `zrc` will be crystallized by stoichiometry when the `Zr` concentration in the liquid exceeds the saturation threshold.
+- Although `Zr` is not partitioned into `zrc`, it is necessary to declare the main Zr-bearing phase and assign a "dummy" KD value of 0. This ensures that `zrc` will be crystallized by stoichiometry when the `Zr` concentration in the liquid exceeds the saturation threshold.
   
 
 :::
@@ -280,23 +280,23 @@ Iteration 1: residual = 3.909415504073306e-7
 :::
 
 ## References {#References}
-- Watson, E. B., &amp; Harrison, T. M. (1983). Zircon saturation revisited: temperature and composition effects in a variety of crustal magma types. earth and planetary science letters, 64(2), 295-304.
+- Watson, E. B., & Harrison, T. M. (1983). Zircon saturation revisited: temperature and composition effects in a variety of crustal magma types. earth and planetary science letters, 64(2), 295-304.
   
-- Harrison, T. M., &amp; Watson, E. B. (1984). The behavior of apatite during crustal anatexis: equilibrium and kinetic considerations. Geochimica et cosmochimica acta, 48(7), 1467-1477.
+- Harrison, T. M., & Watson, E. B. (1984). The behavior of apatite during crustal anatexis: equilibrium and kinetic considerations. Geochimica et cosmochimica acta, 48(7), 1467-1477.
   
-- Bea, F., Fershtater, G., &amp; Corretgé, L. G. (1992). The geochemistry of phosphorus in granite rocks and the effect of aluminium. Lithos, 29(1-2), 43-56
+- Bea, F., Fershtater, G., & Corretgé, L. G. (1992). The geochemistry of phosphorus in granite rocks and the effect of aluminium. Lithos, 29(1-2), 43-56
   
-- Bockrath, C., Ballhaus, C., &amp; Holzheid, A. (2004). Stabilities of laurite RuS2 and monosulfide liquid solution at magmatic temperature. Chemical Geology, 208(1-4), 265-271.
+- Bockrath, C., Ballhaus, C., & Holzheid, A. (2004). Stabilities of laurite RuS2 and monosulfide liquid solution at magmatic temperature. Chemical Geology, 208(1-4), 265-271.
   
-- Tollari, N., Toplis, M. J., &amp; Barnes, S. J. (2006). Predicting phosphate saturation in silicate magmas: an experimental study of the effects of melt composition and temperature. Geochimica et Cosmochimica Acta, 70(6), 1518-1536.
+- Tollari, N., Toplis, M. J., & Barnes, S. J. (2006). Predicting phosphate saturation in silicate magmas: an experimental study of the effects of melt composition and temperature. Geochimica et Cosmochimica Acta, 70(6), 1518-1536.
   
-- Liu, Y., Samaha, N. T., &amp; Baker, D. R. (2007). Sulfur concentration at sulfide saturation (SCSS) in magmatic silicate melts. Geochimica et Cosmochimica Acta, 71(7), 1783-1799.
+- Liu, Y., Samaha, N. T., & Baker, D. R. (2007). Sulfur concentration at sulfide saturation (SCSS) in magmatic silicate melts. Geochimica et Cosmochimica Acta, 71(7), 1783-1799.
   
-- Boehnke, P., Watson, E. B., Trail, D., Harrison, T. M., &amp; Schmitt, A. K. (2013). Zircon saturation re-revisited. Chemical Geology, 351, 324-334.
+- Boehnke, P., Watson, E. B., Trail, D., Harrison, T. M., & Schmitt, A. K. (2013). Zircon saturation re-revisited. Chemical Geology, 351, 324-334.
   
-- O&#39;Neill, H. S. C. (2021). The thermodynamic controls on sulfide saturation in silicate melts with application to ocean floor basalts. Magma redox geochemistry, 177-213.
+- O'Neill, H. S. C. (2021). The thermodynamic controls on sulfide saturation in silicate melts with application to ocean floor basalts. Magma redox geochemistry, 177-213.
   
-- Crisp, L. J., &amp; Berry, A. J. (2022). A new model for zircon saturation in silicate melts. Contributions to Mineralogy and Petrology, 177(7), 71.
+- Crisp, L. J., & Berry, A. J. (2022). A new model for zircon saturation in silicate melts. Contributions to Mineralogy and Petrology, 177(7), 71.
   
-- Klein, B. Z., Müntener, O., Gillespie, J., &amp; Marxer, F. (2026). Apatite saturation revisited: new model formulations and applications to igneous rocks. Contributions to Mineralogy and Petrology, 181(3), 18.
+- Klein, B. Z., Müntener, O., Gillespie, J., & Marxer, F. (2026). Apatite saturation revisited: new model formulations and applications to igneous rocks. Contributions to Mineralogy and Petrology, 181(3), 18.
   

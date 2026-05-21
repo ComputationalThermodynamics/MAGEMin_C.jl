@@ -13,7 +13,7 @@ Out_TE_XY   = Vector{out_TE_struct}(undef,n_calc)
 
 where `n_calc` is the number of calculations you want to perform (e.g., the number of steps of a fractional crystallization experiment).
 
-In the most simple form (where we don&#39;t pre-allocate), the output structure `out` is simply returned when the `single_point_minimization()` function is called:
+In the most simple form (where we don't pre-allocate), the output structure `out` is simply returned when the `single_point_minimization()` function is called:
 
 ```julia
 using MAGEMin_C

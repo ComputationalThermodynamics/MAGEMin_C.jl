@@ -40,7 +40,7 @@ julia> App()
 
 Now you can open `127.0.0.1:8050` in your favorite web browser.
 
-...and that&#39;s it!
+...and that's it!
 
 ## Update to newest version {#Update-to-newest-version}
 
@@ -57,7 +57,7 @@ pkg> up MAGEMinApp      # sometimes needed to update to the last version
 ```
 
 
-If you cannot update to the last `MAGEMinApp` version, try to set the `Julia` registry to &quot;eager&quot; using the following command, then redo the update process.
+If you cannot update to the last `MAGEMinApp` version, try to set the `Julia` registry to "eager" using the following command, then redo the update process.
 
 ```julia
 julia> ENV["JULIA_PKG_SERVER_REGISTRY_PREFERENCE"] = "eager"

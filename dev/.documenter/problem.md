@@ -269,7 +269,7 @@ else                        mineral_name = "ged"
 
 
 ## References {#References}
-- Holland, T. J. B., Green, E. C. R., &amp; Powell, R. (2021). A thermodynamic model for feldspars in KAlSi3O8-NaAlSi3O8-CaAl2Si2O8 for mineral equilibrium calculations.
+- Holland, T. J. B., Green, E. C. R., & Powell, R. (2021). A thermodynamic model for feldspars in KAlSi3O8-NaAlSi3O8-CaAl2Si2O8 for mineral equilibrium calculations.
   
 - Riel N., Kaus B.J.P., Green E.C.R., Berlie N., (2022) MAGEMin, an Efficient Gibbs Energy Minimizer: Application to Igneous Systems. _Geochemistry, Geophysics, Geosystems_ 23, e2022GC010427 [https://doi.org/10.1029/2022GC010427](https://doi.org/10.1029/2022GC010427)
   

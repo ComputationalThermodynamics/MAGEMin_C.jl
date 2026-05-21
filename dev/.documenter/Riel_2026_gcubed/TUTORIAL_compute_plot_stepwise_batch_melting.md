@@ -197,7 +197,7 @@ end
 ```
 
 
-`KDs_database.KDs_expr` holds the compiled Julia functions for each phase&#39;s KD expression — the same expressions encoded as strings in `get_Kds()`. `Base.invokelatest()` calls them safely after runtime compilation. The index mapping is:
+`KDs_database.KDs_expr` holds the compiled Julia functions for each phase's KD expression — the same expressions encoded as strings in `get_Kds()`. `Base.invokelatest()` calls them safely after runtime compilation. The index mapping is:
 - `KDs_expr[1]` → muscovite (Dms)
   
 - `KDs_expr[2]` → biotite (Dbi)

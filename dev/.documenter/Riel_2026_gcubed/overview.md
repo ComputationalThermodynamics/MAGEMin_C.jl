@@ -12,7 +12,7 @@ When crustal rocks partially melt, Li is redistributed between minerals and the 
   
 - The number and size of successive melt extraction events (fractional melting)
   
-- The natural variability of pelite bulk compositions (Forshaw &amp; Pattison 2023 database)
+- The natural variability of pelite bulk compositions (Forshaw & Pattison 2023 database)
   
 
 ## Tutorial overview {#Tutorial-overview}
@@ -39,7 +39,7 @@ The tutorials are organized from single-condition diagnostics to large multi-sam
 
 ::: tip Tip
 
-Tutorials 1–4 work on a single representative pelite composition and are good starting points. Tutorials 6–7 require the Forshaw &amp; Pattison (2023) database and are computationally heavier (multi-threaded, ~600 samples).
+Tutorials 1–4 work on a single representative pelite composition and are good starting points. Tutorials 6–7 require the Forshaw & Pattison (2023) database and are computationally heavier (multi-threaded, ~600 samples).
 
 :::
 
@@ -92,32 +92,32 @@ All scripts are available for download below. The shared helper files (`TE_funct
 
 ### Main scripts {#Main-scripts}
 
-|                                                                                                                                                                                                                                 Script |   Tutorial |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:| ----------:|
-|                     &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_P-H2O_systematics.jl&quot; download&gt;`compute_P-H2O_systematics.jl`&lt;/a&gt; | Tutorial 1 |
-|                                     &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_PT_curves.jl&quot; download&gt;`compute_PT_curves.jl`&lt;/a&gt; | Tutorial 2 |
-| &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_plot_stepwise_batch_melting.jl&quot; download&gt;`compute_plot_stepwise_batch_melting.jl`&lt;/a&gt; | Tutorial 3 |
-|                           &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_bi_Li_profiles.jl&quot; download&gt;`compute_bi_Li_profiles.jl`&lt;/a&gt; | Tutorial 4 |
-|               &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_plot_phase_stability.jl&quot; download&gt;`compute_plot_phase_stability.jl`&lt;/a&gt; | Tutorial 5 |
-|                                   &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_solidus_FS.jl&quot; download&gt;`compute_solidus_FS.jl`&lt;/a&gt; | Tutorial 6 |
-|                           &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_systematics_FS.jl&quot; download&gt;`compute_systematics_FS.jl`&lt;/a&gt; | Tutorial 7 |
+|                                                                                                                                                                                                                       Script |   Tutorial |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:| ----------:|
+|                     &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_P-H2O_systematics.jl" download&gt;`compute_P-H2O_systematics.jl`&lt;/a&gt; | Tutorial 1 |
+|                                     &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_PT_curves.jl" download&gt;`compute_PT_curves.jl`&lt;/a&gt; | Tutorial 2 |
+| &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_plot_stepwise_batch_melting.jl" download&gt;`compute_plot_stepwise_batch_melting.jl`&lt;/a&gt; | Tutorial 3 |
+|                           &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_bi_Li_profiles.jl" download&gt;`compute_bi_Li_profiles.jl`&lt;/a&gt; | Tutorial 4 |
+|               &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_plot_phase_stability.jl" download&gt;`compute_plot_phase_stability.jl`&lt;/a&gt; | Tutorial 5 |
+|                                   &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_solidus_FS.jl" download&gt;`compute_solidus_FS.jl`&lt;/a&gt; | Tutorial 6 |
+|                           &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/compute_systematics_FS.jl" download&gt;`compute_systematics_FS.jl`&lt;/a&gt; | Tutorial 7 |
 
 
 ### Shared helper files {#Shared-helper-files}
 
-|                                                                                                                                                                                         Script |                                                                     Role |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:| ------------------------------------------------------------------------:|
-|       &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/TE_functions.jl&quot; download&gt;`TE_functions.jl`&lt;/a&gt; | Core trace-element functions (KD setup, water saturation, batch melting) |
-| &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/TE_functions_FS.jl&quot; download&gt;`TE_functions_FS.jl`&lt;/a&gt; |   Forshaw–Pattison-specific helpers (mol bulk conversion, threaded loop) |
-|     &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/TE_fractional.jl&quot; download&gt;`TE_fractional.jl`&lt;/a&gt; |                                       Threaded fractional melting engine |
-|       &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/plot_figures.jl&quot; download&gt;`plot_figures.jl`&lt;/a&gt; |                                                  Shared plotting helpers |
-| &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/plot_figures_FS.jl&quot; download&gt;`plot_figures_FS.jl`&lt;/a&gt; |                           Forshaw–Pattison scatter and FS-specific plots |
-|       &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/plot_bulk_FS.jl&quot; download&gt;`plot_bulk_FS.jl`&lt;/a&gt; |                              Herron diagram and IDW heatmap (Tutorial 6) |
+|                                                                                                                                                                               Script |                                                                     Role |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:| ------------------------------------------------------------------------:|
+|       &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/TE_functions.jl" download&gt;`TE_functions.jl`&lt;/a&gt; | Core trace-element functions (KD setup, water saturation, batch melting) |
+| &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/TE_functions_FS.jl" download&gt;`TE_functions_FS.jl`&lt;/a&gt; |   Forshaw–Pattison-specific helpers (mol bulk conversion, threaded loop) |
+|     &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/TE_fractional.jl" download&gt;`TE_fractional.jl`&lt;/a&gt; |                                       Threaded fractional melting engine |
+|       &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/plot_figures.jl" download&gt;`plot_figures.jl`&lt;/a&gt; |                                                  Shared plotting helpers |
+| &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/plot_figures_FS.jl" download&gt;`plot_figures_FS.jl`&lt;/a&gt; |                           Forshaw–Pattison scatter and FS-specific plots |
+|       &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/plot_bulk_FS.jl" download&gt;`plot_bulk_FS.jl`&lt;/a&gt; |                              Herron diagram and IDW heatmap (Tutorial 6) |
 
 
 ### Environment file {#Environment-file}
 
-|                                                                                                                                                                               File |                                                                                    Description |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:| ----------------------------------------------------------------------------------------------:|
-| &lt;a href=&quot;https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/Project.toml&quot; download&gt;`Project.toml`&lt;/a&gt; | Julia package environment — lists all dependencies (MAGEMin_C, Plots, PlotlyJS, DataFrames, …) |
+|                                                                                                                                                                     File |                                                                                    Description |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------:| ----------------------------------------------------------------------------------------------:|
+| &lt;a href="https://raw.githubusercontent.com/ComputationalThermodynamics/MAGEMin_C.jl/main/docs/src/Riel_2026_gcubed/Project.toml" download&gt;`Project.toml`&lt;/a&gt; | Julia package environment — lists all dependencies (MAGEMin_C, Plots, PlotlyJS, DataFrames, …) |
 

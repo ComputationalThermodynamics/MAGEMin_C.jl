@@ -57,7 +57,7 @@
 
 ## Batch melting equations {#Batch-melting-equations}
 
-To predict the mass content of Li in both the solid and liquid phases, MAGEMin uses trace-element batch melting equations (Shaw, 1970; Hertogen &amp; Gijbels, 1976; Zou, 2001):
+To predict the mass content of Li in both the solid and liquid phases, MAGEMin uses trace-element batch melting equations (Shaw, 1970; Hertogen & Gijbels, 1976; Zou, 2001):
 
 $$C_i^{\text{melt}} = \frac{C_i^0}{F^{\text{melt}} + D_i^{\text{wr}}(1 - F^{\text{melt}})}$$
 
@@ -82,7 +82,7 @@ code MAGEMin_C_Li_partitioning.jl
 
 ### 2. Initialize {#2.-Initialize}
 
-Let&#39;s first initialize MAGEMin using the world median pelite composition:
+Let's first initialize MAGEMin using the world median pelite composition:
 
 ```julia
 using MAGEMin_C, Plots, ProgressMeter
@@ -100,7 +100,7 @@ T           = 700.0
 
 ### 3. Define partition coefficients {#3.-Define-partition-coefficients}
 
-Let&#39;s now define the lithium partition coefficients between minerals and melt using Koopmans et al. (2024) values:
+Let's now define the lithium partition coefficients between minerals and melt using Koopmans et al. (2024) values:
 
 ```julia
 el          = ["Li"]
@@ -133,7 +133,7 @@ KDs_dtb     = create_custom_KDs_database(el, ph, KDs)
 
 ### 5. Perform stable phase equilibrium calculation {#5.-Perform-stable-phase-equilibrium-calculation}
 
-Let&#39;s now compute the stable equilibrium (without trace-element prediction):
+Let's now compute the stable equilibrium (without trace-element prediction):
 
 ```julia
 out  = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_unit, name_solvus = true)
@@ -199,7 +199,7 @@ out_TE.ph_TE
 
 ### 8. Visualize Li enrichment {#8.-Visualize-Li-enrichment}
 
-The variations in lithium mass fractions are best visualized by normalizing to the starting mass `out_TE.C0`. To achieve this, let&#39;s create a `bar` graph:
+The variations in lithium mass fractions are best visualized by normalizing to the starting mass `out_TE.C0`. To achieve this, let's create a `bar` graph:
 
 First, combine phase names and melt:
 
@@ -279,7 +279,7 @@ end
   
 
 ### E.3. Different set of partition coefficients {#E.3.-Different-set-of-partition-coefficients}
-- Let&#39;s now use a different set of partition coefficients. Modify your script to add an option for choosing between KO (Koopmans et al., 2024) and BA (Ballouard et al., 2023)
+- Let's now use a different set of partition coefficients. Modify your script to add an option for choosing between KO (Koopmans et al., 2024) and BA (Ballouard et al., 2023)
   
 - Perform the calculation using BA set of partition coefficients
   

@@ -34,7 +34,7 @@ using MAGEMin_C, Plots
 ```
 
 
-First let&#39;s first initialize MAGEMin with the metapelite database (White et al ., 2014)
+First let's first initialize MAGEMin with the metapelite database (White et al ., 2014)
 
 ```julia
 data        =   Initialize_MAGEMin("mp", verbose=false);
@@ -118,7 +118,7 @@ Delta QFM                : 2.4956538482297375
 ```
 
 
-Instead, of using a single pressure and temperature conditions let&#39;s now keep the pressure fixed and vary the temperature
+Instead, of using a single pressure and temperature conditions let's now keep the pressure fixed and vary the temperature
 
 ```julia
 n = 50
@@ -199,7 +199,7 @@ julia> frac_M_vol = [out[i].frac_M_vol for i=1:n]
 ```
 
 
-To retrieve the vol fraction of a solid phase, the process is slightly more complex as we have to check in the phase is present in the mineral assemblage first. Let&#39;s first allocate an array for the volume fraction of quartz (`q`):
+To retrieve the vol fraction of a solid phase, the process is slightly more complex as we have to check in the phase is present in the mineral assemblage first. Let's first allocate an array for the volume fraction of quartz (`q`):
 
 ```julia
 q_vol = zeros(Float64,n)
@@ -220,7 +220,7 @@ end
 
 ::: tip Note
 
-We first here check if &quot;q&quot; is in the phase assemblage. Then the command `id_q = findfirst(out[i].ph .== "q")`find the position of &quot;quartz&quot; in the array to be able to retrieve to right value.
+We first here check if "q" is in the phase assemblage. Then the command `id_q = findfirst(out[i].ph .== "q")`find the position of "quartz" in the array to be able to retrieve to right value.
 
 :::
 
@@ -261,12 +261,12 @@ end
 ```
 
 
-Here, we first look for the id of &quot;H2O&quot; pure phase. Then, we get the water fraction in `wt`. Subsequently, we retrieve the composition of &quot;H2O&quot;.  This part is slightly more complex as the information of solution models (`SS_vec`) are stored in a different substructure with respect to pure phases (`PP_vec`). In order to find the right id for &quot;H2O&quot; in the the `PP_vec`substructure we do `id_h2o - out[i].n_SS` where `out[i].n_SS` is the total number of solution models in the stable assemblage.
+Here, we first look for the id of "H2O" pure phase. Then, we get the water fraction in `wt`. Subsequently, we retrieve the composition of "H2O".  This part is slightly more complex as the information of solution models (`SS_vec`) are stored in a different substructure with respect to pure phases (`PP_vec`). In order to find the right id for "H2O" in the the `PP_vec`substructure we do `id_h2o - out[i].n_SS` where `out[i].n_SS` is the total number of solution models in the stable assemblage.
 
 ::: tip Note
 - The previous code snipped has to be placed after calling `single_point_minimization()`
   
-- Mind that for the igneous database, there is a fluid model &quot;fl&quot; instead of pure water (&quot;H2O&quot;).
+- Mind that for the igneous database, there is a fluid model "fl" instead of pure water ("H2O").
   
 
 :::
@@ -275,7 +275,7 @@ Here, we first look for the id of &quot;H2O&quot; pure phase. Then, we get the w
 
 The following example shows how to perform a single point equilibrium calculation and compute trace-element partitioning, using constant, linear and non-linear values.
 
-Let&#39;s first compute a phase equilibrium using the metapelite database:
+Let's first compute a phase equilibrium using the metapelite database:
 
 ```julia
 dtb     = "mp"
@@ -311,7 +311,7 @@ ph      = ["q","afs","pl","bi","opx","cd","mu","amp","fl","cpx","g","zrc"]
 
 ### Partitioning coefficient Matrix {#Partitioning-coefficient-Matrix}
 
-Subsequently, we need to define the partitioning coefficients. For instance let&#39;s define some arbitrary formulations for the KD&#39;s:
+Subsequently, we need to define the partitioning coefficients. For instance let's define some arbitrary formulations for the KD's:
 
 ```julia
 KDs     = ["0.17" "0.01";"0.14 * T_C/1000.0 + [:afs].compVariables[1]" "0.01";"0.33 + 0 01*P_kbar" "0.01";"1.67 * P_kbar / 10.0 + T_C/1000.0" "0.01";"0.2" "0.01";"125" "0.01";"0.82" "0.01";"0.2" "0.01";"0.65" "0.01";"0.26" "0.01";"0.01" "0.01";"0.01" "0.0"] 
@@ -321,7 +321,7 @@ KDs     = ["0.17" "0.01";"0.14 * T_C/1000.0 + [:afs].compVariables[1]" "0.01";"0
 ::: tip Note
 - Here `KDs` is a Matrix of `String` of size (n_ph, n_el). 
   
-- Each line of the Matrix correspond to the partitioning coefficient formulation per phase and for all elements. For instance the first line `"0.17" "0.01"` indicates that `Li` and `Zr` have KD&#39;s of `"0.17"` and `"0.01"` for `q`.
+- Each line of the Matrix correspond to the partitioning coefficient formulation per phase and for all elements. For instance the first line `"0.17" "0.01"` indicates that `Li` and `Zr` have KD's of `"0.17"` and `"0.01"` for `q`.
   
 
 | `KDs` |  el_1 |  el_2 |  el_m |
@@ -415,7 +415,7 @@ ph_TE        ph_wt_norm   zrc_wt
 Available zirconium saturation models are:
 - `"none"` -&gt; deactivate the call to zirconium saturation model
   
-- `"WH"` -&gt; Watson &amp; Harrison (1983)
+- `"WH"` -&gt; Watson & Harrison (1983)
   
 - `"B"` -&gt; Boehnke et al. (2013)
   
@@ -435,7 +435,7 @@ using ProgressMeter, Plots, MAGEMin_C
 ```
 
 
-Such as previous example let&#39;s initialize `MAGEMin` using the `metapelite` dataset (White et al., 2014):
+Such as previous example let's initialize `MAGEMin` using the `metapelite` dataset (White et al., 2014):
 
 ```julia
 dtb     = "mp"
@@ -483,7 +483,7 @@ Out_TE_XY   = Vector{out_TE_struct}(undef,nsteps)
 
 #### Trace element definition {#Trace-element-definition}
 
-Let&#39;s now define the trace element starting conditions (as in previous example):
+Let's now define the trace element starting conditions (as in previous example):
 
 ```julia
 ZrSat_model = "CB"
@@ -526,7 +526,7 @@ end
 Available zirconium saturation models are:
 - `"none"` -&gt; deactivate the call to zirconium saturation model
   
-- `"WH"` -&gt; Watson &amp; Harrison (1983)
+- `"WH"` -&gt; Watson & Harrison (1983)
   
 - `"B"` -&gt; Boehnke et al. (2013)
   
@@ -537,7 +537,7 @@ Available zirconium saturation models are:
 
 #### Plot Li mass fraction {#Plot-Li-mass-fraction}
 
-Let&#39;s now plot the evolution of `Li` mass fraction in the melt and save the figure.
+Let's now plot the evolution of `Li` mass fraction in the melt and save the figure.
 
 ```julia
 Li_id   = findfirst(isequal("Li"), el)
@@ -574,7 +574,7 @@ which gives:
 
 ### Fractional crystallization {#Fractional-crystallization}
 
-Let&#39;s now adapt the previous code to extract cummulates during cooling. 
+Let's now adapt the previous code to extract cummulates during cooling. 
 
 We first need to create an additional `Xoxides0` array. This is done in order to be able to update the bulk rock composition. Note that we also create a `max_step` variable that will record when no melt is stable anymore.
 

@@ -7,7 +7,7 @@
 > 
 
 
-This script computes **mineral stability fields in P–T space** for the average Forshaw &amp; Pattison pelite. For each pressure step along the wet solidus (2 to 16 kbar), it runs a dense temperature sweep from the solidus up to 1000 °C, records at which temperatures each mineral (muscovite, biotite, cordierite, quartz, plagioclase, alkali feldspar, paragonite) is stable, and reduces that to a `[T_min, T_max]` stability window. The result is a P–T diagram where each mineral appears as a **filled stability polygon** — the geologist&#39;s equivalent of a pseudosection slice.
+This script computes **mineral stability fields in P–T space** for the average Forshaw & Pattison pelite. For each pressure step along the wet solidus (2 to 16 kbar), it runs a dense temperature sweep from the solidus up to 1000 °C, records at which temperatures each mineral (muscovite, biotite, cordierite, quartz, plagioclase, alkali feldspar, paragonite) is stable, and reduces that to a `[T_min, T_max]` stability window. The result is a P–T diagram where each mineral appears as a **filled stability polygon** — the geologist's equivalent of a pseudosection slice.
 
 A secondary output is a 2D matrix `Z[pressure, temperature]` counting how many melt extraction events have occurred at each (P, T) point, showing where in P–T space cumulative melt extraction progresses.
 

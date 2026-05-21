@@ -128,7 +128,7 @@ and `TAS diagram` (Total Alkali Silica):
 
 ### E.4. Assimilation {#E.4.-Assimilation}
 
-In this example we are going to compute an equilibrium batch crystallization path of a wet basalt, and, progressive assimilation of tonalitic composition. Let&#39;s first select the `Igneous` database (Green et al., 2025, after Holland et al., 2018) and define the P-T path as follow:
+In this example we are going to compute an equilibrium batch crystallization path of a wet basalt, and, progressive assimilation of tonalitic composition. Let's first select the `Igneous` database (Green et al., 2025, after Holland et al., 2018) and define the P-T path as follow:
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_PTX_assimilation_path.png?raw=true" alt="PTX assimilation path" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
 
@@ -156,7 +156,7 @@ and the following TAS diagram:
 
 ### E.5. Variable buffer {#E.5.-Variable-buffer}
 
-To simulate a change in oxydation/reduction state of the system you can also provide variable buffer offsets. Let&#39;s start from previous assimilation example 4, and select `Buffer = QFM` and `Variable buffer = true` in the `Configuration` panel. 
+To simulate a change in oxydation/reduction state of the system you can also provide variable buffer offsets. Let's start from previous assimilation example 4, and select `Buffer = QFM` and `Variable buffer = true` in the `Configuration` panel. 
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_PTX_var_buffer_path_selec.png?raw=true" alt="PTX var buffer path" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
 
@@ -168,7 +168,7 @@ A new column named `Buffer` is now available in the `Path definition` panel and 
 
 ::: tip Tip
 
-Don&#39;t forget to oversaturate the `O` content of the bulk-rock compositions.
+Don't forget to oversaturate the `O` content of the bulk-rock compositions.
 
 :::
 
@@ -184,7 +184,7 @@ and the following TAS diagram:
 
 ## Isentropic path (MAGEMinApp v1.2.1) {#Isentropic-path-MAGEMinApp-v1.2.1}
 
-Isentropic path typically represent a process where a rock or material undergoes changes in pressure and temperature without any exchange of heat with its surroundings (adiabatic process) and without any entropy production (reversible process). This type of path is often used to model processes like mantle convection or adiabatic decompression melting, where material moves through the Earth&#39;s interior under conditions that approximate constant entropy.
+Isentropic path typically represent a process where a rock or material undergoes changes in pressure and temperature without any exchange of heat with its surroundings (adiabatic process) and without any entropy production (reversible process). This type of path is often used to model processes like mantle convection or adiabatic decompression melting, where material moves through the Earth's interior under conditions that approximate constant entropy.
 
 ::: tip Note
 

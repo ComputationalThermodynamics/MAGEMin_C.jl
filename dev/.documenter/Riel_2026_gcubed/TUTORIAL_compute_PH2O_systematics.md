@@ -86,11 +86,11 @@ The saturation curve shifts to higher H₂O content at lower pressures: rocks at
 
 ### Fractional Melting vs. Batch Melting {#Fractional-Melting-vs.-Batch-Melting}
 
-In **batch melting**, all melt stays in contact with the rock until it is extracted at once. In **fractional melting**, small melt batches are extracted repeatedly as temperature rises. This script uses fractional melting: each &quot;extraction event&quot; removes a pulse of melt from the system, leaving an evolved residual bulk composition for the next event.
+In **batch melting**, all melt stays in contact with the rock until it is extracted at once. In **fractional melting**, small melt batches are extracted repeatedly as temperature rises. This script uses fractional melting: each "extraction event" removes a pulse of melt from the system, leaving an evolved residual bulk composition for the next event.
 
 ### What Is a KD? {#What-Is-a-KD?}
 
-A partition coefficient KD = C_mineral / C_melt. A KD &gt; 1 means the mineral concentrates Li relative to the melt (e.g., biotite with KD ≈ 1.67 in Koopmans&#39; model). A KD &lt; 1 means Li prefers the melt.
+A partition coefficient KD = C_mineral / C_melt. A KD &gt; 1 means the mineral concentrates Li relative to the melt (e.g., biotite with KD ≈ 1.67 in Koopmans' model). A KD &lt; 1 means Li prefers the melt.
 
 
 ---
@@ -113,15 +113,15 @@ e1_remain   = [7.0]     # vol% melt left behind after extraction
 
 Key parameters explained:
 
-|    Parameter |                                                                                  Meaning |
-| ------------:| ----------------------------------------------------------------------------------------:|
-|         `np` |                                             Grid resolution — `np×np` total calculations |
-|        `Pin` |                                                 Pressure range in kbar (e.g., 2–16 kbar) |
-| `Li_content` |                                         Starting Li concentration in the bulk rock (ppm) |
-|     `e1_liq` |                                        Volume % of melt at which extraction is triggered |
-|  `e1_remain` |                              Volume % of melt retained in the rock after each extraction |
-|      `model` |                                                      Which KD dataset to use (see below) |
-|          `b` | Bulk composition: `"FS"` = Forshaw &amp; Pattison 2023 pelite, `"K"` = Knoll et al. 2023 |
+|    Parameter |                                                                              Meaning |
+| ------------:| ------------------------------------------------------------------------------------:|
+|         `np` |                                         Grid resolution — `np×np` total calculations |
+|        `Pin` |                                             Pressure range in kbar (e.g., 2–16 kbar) |
+| `Li_content` |                                     Starting Li concentration in the bulk rock (ppm) |
+|     `e1_liq` |                                    Volume % of melt at which extraction is triggered |
+|  `e1_remain` |                          Volume % of melt retained in the rock after each extraction |
+|      `model` |                                                  Which KD dataset to use (see below) |
+|          `b` | Bulk composition: `"FS"` = Forshaw & Pattison 2023 pelite, `"K"` = Knoll et al. 2023 |
 
 
 The outer loop iterates over model variants and calls `main()` for each.
@@ -165,7 +165,7 @@ KDs_database = get_Kds(; model = model)
 ```
 
 
-Loads the mineral–melt partition coefficients for Li into MAGEMin&#39;s internal format. (See Step 4 for a detailed explanation.)
+Loads the mineral–melt partition coefficients for Li into MAGEMin's internal format. (See Step 4 for a detailed explanation.)
 
 ### Stage D: MAGEMin Initialization {#Stage-D:-MAGEMin-Initialization}
 
@@ -210,7 +210,7 @@ The water content at which a rock is exactly saturated in H₂O changes with pre
 ### How It Works (Bisection on the Solidus) {#How-It-Works-Bisection-on-the-Solidus}
 
 For each pressure point:
-1. **Find the solidus temperature** — using a bisection algorithm that brackets the temperature at which &quot;liq&quot; first appears in the stable phase assemblage. The loop halves the temperature interval `[a, b]` until convergence within `tolerance = 1e-4 °C`.
+1. **Find the solidus temperature** — using a bisection algorithm that brackets the temperature at which "liq" first appears in the stable phase assemblage. The loop halves the temperature interval `[a, b]` until convergence within `tolerance = 1e-4 °C`.
   
 2. **Remove excess free water** — at the solidus, compute the equilibrium assemblage. If a free water phase (`H2O` or `fl`) is stable, subtract its contribution from the bulk.
   
@@ -240,16 +240,16 @@ The interpolant `pChip_wat` can then be called as a function: `pChip_wat(8.5)` r
 
 Several published KD datasets are implemented as named models:
 
-| Model key |                       Source |                                                                                 Notes |
-| ---------:| ----------------------------:| -------------------------------------------------------------------------------------:|
-|    `"MM"` |    Morris &amp; Beard (2024) | **Default.** Biotite KD is temperature- and composition-dependent (expression string) |
-|    `"KM"` |       Koopmans et al. (2022) |                                                  Fixed KDs, includes garnet near zero |
-|    `"BA"` |      Ballouard et al. (2023) |                                                                 Different mineral set |
-|    `"HO"` |        Horányi et al. (2025) |                                                                   Includes staurolite |
-|  `"MM_F"` | Morris &amp; Beard (fake bi) |                                          Biotite KD = 32.8 — extreme sensitivity test |
+| Model key |                   Source |                                                                                 Notes |
+| ---------:| ------------------------:| -------------------------------------------------------------------------------------:|
+|    `"MM"` |    Morris & Beard (2024) | **Default.** Biotite KD is temperature- and composition-dependent (expression string) |
+|    `"KM"` |   Koopmans et al. (2022) |                                                  Fixed KDs, includes garnet near zero |
+|    `"BA"` |  Ballouard et al. (2023) |                                                                 Different mineral set |
+|    `"HO"` |    Horányi et al. (2025) |                                                                   Includes staurolite |
+|  `"MM_F"` | Morris & Beard (fake bi) |                                          Biotite KD = 32.8 — extreme sensitivity test |
 
 
-The **biotite KD in model &quot;MM&quot;** is notably encoded as an **expression string**:
+The **biotite KD in model "MM"** is notably encoded as an **expression string**:
 
 ```julia
 bi_exp = "c9 = -7.01; c10 = -4.29; c11 = 4.18; c12 = 0.407;
@@ -262,7 +262,7 @@ bi_exp = "c9 = -7.01; c10 = -4.29; c11 = 4.18; c12 = 0.407;
 
 This means MAGEMin evaluates a thermodynamic expression at runtime, using the current biotite Fe³⁺ site fraction and the melt Na+K/Al ratio and temperature. This captures the strong compositional and temperature dependence of Li in biotite.
 
-The function `get_Kds()` creates the KD database in MAGEMin&#39;s internal format; `get_Kds_data()` just returns the raw strings (used for sensitivity analysis).
+The function `get_Kds()` creates the KD database in MAGEMin's internal format; `get_Kds_data()` just returns the raw strings (used for sensitivity analysis).
 
 
 ---
@@ -272,7 +272,7 @@ The function `get_Kds()` creates the KD database in MAGEMin&#39;s internal forma
 
 **File:** `TE_functions.jl`, `perform_threaded_calc()`, lines 366–422
 
-This is the heart of the parallel computation. Understanding it requires understanding Julia&#39;s threading model.
+This is the heart of the parallel computation. Understanding it requires understanding Julia's threading model.
 
 ### The Problem: 22,500 Independent Calculations {#The-Problem:-22,500-Independent-Calculations}
 
@@ -288,7 +288,7 @@ end
 ```
 
 
-Julia&#39;s `@threads :static` divides the loop iterations evenly among available threads at compile time. If Julia is started with `JULIA_NUM_THREADS=8`, each thread gets approximately `22500 / 8 ≈ 2812` iterations.
+Julia's `@threads :static` divides the loop iterations evenly among available threads at compile time. If Julia is started with `JULIA_NUM_THREADS=8`, each thread gets approximately `22500 / 8 ≈ 2812` iterations.
 
 ### Thread-Local MAGEMin State {#Thread-Local-MAGEMin-State}
 

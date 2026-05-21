@@ -4,7 +4,7 @@
 ## Table of Contents {#Table-of-Contents}
 - [Requirements](/WS_Bejing_2026/MAGEMin_C_intro#Requirements)
   
-- [Installation &amp; Setup](/WS_Bejing_2026/MAGEMin_C_intro#Installation-and-Setup)
+- [Installation & Setup](/WS_Bejing_2026/MAGEMin_C_intro#Installation-and-Setup)
   - [1. Create the working directory](/WS_Bejing_2026/MAGEMin_C_intro#1.-Create-the-working-directory)
     
   - [2. Install packages](/WS_Bejing_2026/MAGEMin_C_intro#2.-Install-packages)
@@ -43,7 +43,7 @@
 - Detailed documentation is provided [here](https://computationalthermodynamics.github.io/MAGEMin_C.jl/dev/)
   
 
-## Installation &amp; Setup {#Installation-and-Setup}
+## Installation & Setup {#Installation-and-Setup}
 
 Create a dedicated local folder for `MAGEMin_C` to live in its own environment. This avoids potential conflicts with other packages such as `MAGEMinApp`.
 
@@ -113,24 +113,24 @@ data        =   Initialize_MAGEMin("mp", verbose=false);
 ```
 
 
-This command initializes `MAGEMin` using the &quot;mp&quot; database (or a-x set of models) which stands for &quot;metapelite&quot; (White et al., 2014).
+This command initializes `MAGEMin` using the "mp" database (or a-x set of models) which stands for "metapelite" (White et al., 2014).
 
 Available thermodynamic a-x sets:
 
-| Acronym |                           Dataset |                                                                              Reference |
-| -------:| ---------------------------------:| --------------------------------------------------------------------------------------:|
-|   `mtl` |                            Mantle |                                                                   Holland et al., 2013 |
-|    `mp` |                        Metapelite |                                                                     White et al., 2014 |
-|    `mb` |                        Metabasite |                                                                     Green et al., 2016 |
-|    `ig` |                           Igneous |                                 Green et al., 2025 (updated from Holland et al., 2018) |
-|  `igad` |              Igneous alkaline dry |                                                                    Weller et al., 2024 |
-|    `um` |                        Ultramafic |                                                                Evans &amp; Frost, 2021 |
-|  `sb11` | Stixrude &amp; Lithgow-Bertelloni |                                                                                   2011 |
-|  `sb21` | Stixrude &amp; Lithgow-Bertelloni |                                                                                   2021 |
-|  `sb24` | Stixrude &amp; Lithgow-Bertelloni |                                                                                   2024 |
-|   `ume` |               Ultramafic extended |                                           Green et al., 2016 + Evans &amp; Frost, 2021 |
-|   `mpe` |               Extended metapelite | White et al., 2014 + Green et al., 2016 + Franzolin et al., 2011 + Diener et al., 2007 |
-|   `mbe` |               Extended metabasite |                          Green et al., 2016 + Diener et al., 2007 + Rebay et al., 2022 |
+| Acronym |                       Dataset |                                                                              Reference |
+| -------:| -----------------------------:| --------------------------------------------------------------------------------------:|
+|   `mtl` |                        Mantle |                                                                   Holland et al., 2013 |
+|    `mp` |                    Metapelite |                                                                     White et al., 2014 |
+|    `mb` |                    Metabasite |                                                                     Green et al., 2016 |
+|    `ig` |                       Igneous |                                 Green et al., 2025 (updated from Holland et al., 2018) |
+|  `igad` |          Igneous alkaline dry |                                                                    Weller et al., 2024 |
+|    `um` |                    Ultramafic |                                                                    Evans & Frost, 2021 |
+|  `sb11` | Stixrude & Lithgow-Bertelloni |                                                                                   2011 |
+|  `sb21` | Stixrude & Lithgow-Bertelloni |                                                                                   2021 |
+|  `sb24` | Stixrude & Lithgow-Bertelloni |                                                                                   2024 |
+|   `ume` |           Ultramafic extended |                                               Green et al., 2016 + Evans & Frost, 2021 |
+|   `mpe` |           Extended metapelite | White et al., 2014 + Green et al., 2016 + Franzolin et al., 2011 + Diener et al., 2007 |
+|   `mbe` |           Extended metabasite |                          Green et al., 2016 + Diener et al., 2007 + Rebay et al., 2022 |
 
 
 ### 4. Provide system information {#4.-Provide-system-information}
@@ -144,7 +144,7 @@ sys_unit    = "wt"
 ```
 
 
-Here, we use a water oversaturated average pelite composition. Note that `sys_unit` can be &quot;wt&quot; or &quot;mol&quot;. 
+Here, we use a water oversaturated average pelite composition. Note that `sys_unit` can be "wt" or "mol". 
 
 Define pressure and temperature:
 
@@ -224,7 +224,7 @@ The quick output shows you a summary of the results of the calculation, providin
 
 ### 7. Access minimization results {#7.-Access-minimization-results}
 
-The full output of the calculation is saved in the `out` structure. The different fields can be accessed in the terminal by typing `out.` and pressing &quot;tab&quot;:
+The full output of the calculation is saved in the `out` structure. The different fields can be accessed in the terminal by typing `out.` and pressing "tab":
 
 ```julia
 out.
@@ -294,11 +294,11 @@ out.frac_M_vol
 ```
 
 
-where &quot;M&quot;, stands for melt and can be replaced by &quot;S&quot; solid, and &quot;F&quot; for fluid.
+where "M", stands for melt and can be replaced by "S" solid, and "F" for fluid.
 
 ### 8. Retrieve garnet composition in wt {#8.-Retrieve-garnet-composition-in-wt}
 
-To extract the composition of garnet, one needs to access the properties of the &quot;g&quot; phase which are stored in `out.SS_vec`. 
+To extract the composition of garnet, one needs to access the properties of the "g" phase which are stored in `out.SS_vec`. 
 - Note that `SS_vec` is a sub structure of `out` that stores all the information about the stable solution phases. Instead, the information about the pure phases are accessed in `PP_vec` sub-structure.
   
 

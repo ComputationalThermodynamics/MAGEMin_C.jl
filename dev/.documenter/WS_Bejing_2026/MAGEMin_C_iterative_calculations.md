@@ -44,7 +44,7 @@ code MAGEMin_C_iterative_calculations.jl
 
 ### 2. Load and initialize {#2.-Load-and-initialize}
 
-Like previously, let&#39;s load the necessary packages and initialize MAGEMin using the metapelite &quot;mp&quot; database:
+Like previously, let's load the necessary packages and initialize MAGEMin using the metapelite "mp" database:
 
 ```julia
 using MAGEMin_C, Plots
@@ -59,14 +59,14 @@ sys_unit    = "wt"
 
 ### 3. Define pressure-temperature conditions {#3.-Define-pressure-temperature-conditions}
 
-Let&#39;s first define a fixed pressure:
+Let's first define a fixed pressure:
 
 ```julia
 P = 5.0
 ```
 
 
-Now let&#39;s define the temperature range over which we want to model batch partial melting:
+Now let's define the temperature range over which we want to model batch partial melting:
 
 ```julia
 T_step = 10.0
@@ -74,13 +74,13 @@ T = [600:T_step:1000;]
 ```
 
 
-Here, the &quot;;&quot; at the end of the range directly converts the range into a vector!
+Here, the ";" at the end of the range directly converts the range into a vector!
 
 ### 4. Pre-allocate a vector of output structures {#4.-Pre-allocate-a-vector-of-output-structures}
 
 In order to improve efficiency and collect all the outputs from the temperature steps, we can pre-allocate the memory space.
 
-First let&#39;s find the number of points we plan to calculate:
+First let's find the number of points we plan to calculate:
 
 ```julia
 n_calc = length(T)
@@ -96,7 +96,7 @@ Out_XY      = Vector{out_struct}(undef,n_calc)
 
 ### 5. Perform the calculations {#5.-Perform-the-calculations}
 
-Let&#39;s now create a loop of single point minimization to iterate over the defined temperature range:
+Let's now create a loop of single point minimization to iterate over the defined temperature range:
 
 ```julia
 for i in 1:n_calc
@@ -114,18 +114,18 @@ Out_XY[i]
 ```
 
 
-where &quot;i&quot; is the index of the calculation.
+where "i" is the index of the calculation.
 
 Because the results of each calculation are stored in a vector of structures, we need a way to extract the needed information and create vectors/matrices out of them. 
 
-Let&#39;s first extract the evolution of the melt fraction across the temperature range:
+Let's first extract the evolution of the melt fraction across the temperature range:
 
 ```julia
 melt_wt = [Out_XY[i].frac_M_wt for i=1:n_calc]
 ```
 
 
-The previous command simply creates a vector by accessing &quot;frac_M_wt&quot; for every index of the output vector. Other possible and perhaps more explicit ways to achieve the same goal could be:
+The previous command simply creates a vector by accessing "frac_M_wt" for every index of the output vector. Other possible and perhaps more explicit ways to achieve the same goal could be:
 
 ```julia
 melt_wt = []
@@ -170,7 +170,7 @@ which gives:
 
 ### 8. Add other phase fractions {#8.-Add-other-phase-fractions}
 
-For instance, let&#39;s retrieve the evolution of the muscovite wt fraction:
+For instance, let's retrieve the evolution of the muscovite wt fraction:
 
 ```julia
 mu_wt = zeros(Float64, n_calc)
@@ -304,7 +304,7 @@ plot!(twinx(p), T, melt_wt,
     color       = :red)
 ```
 
-- Notice that here we add the plot in &quot;p&quot; variable. This allow to save the plot using:
+- Notice that here we add the plot in "p" variable. This allow to save the plot using:
   
 
 ```julia

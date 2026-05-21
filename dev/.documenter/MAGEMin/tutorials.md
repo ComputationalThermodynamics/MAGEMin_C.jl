@@ -5,32 +5,32 @@ MAGEMin is run using command line arguments when executing the binary file.
 
 ## Valid Command Line Arguments {#Valid-Command-Line-Arguments}
 
-|        Arguments |                                                                                                                                                                                                                               Application |
-| ----------------:| -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-|      `--version` |                                                                                                                                                                                                                  Displays MAGEMin version |
-|         `--help` |                                                                                                                                                                                                                             Displays help |
-|       `--Verb=x` |                                                                                                                                                                                                    Verbose option, 0: inactive, 1: active |
-|    `--File=path` |                                                                                                                                                                                                 Given file for multiple point calculation |
-|   `--n_points=x` |                                                                                                                                                                                               Number of points when using _File_ argument |
-|       `--test=x` |                                                                                                                                                                                             Run calculation on included test compositions |
-|       `--Pres=y` |                                                                                                                                                                                                                       Pressure in kilobar |
-|       `--Temp=y` |                                                                                                                                                                                                                    Temperature in Celsius |
-|     `--Bulk=[y]` |                                                                                                                                                                                                     Bulk rock composition in molar amount |
-|      `--Gam=[y]` |                                                                                                                                                                                                     Gamma, when a guess of gamma is known |
-|     `--solver=x` |                                                                                                                                                                                                     Legacy, 0; PGE, 1; 2 Hybrid (default) |
-|        `--db=""` |                                                                                                                                                                     Database, &quot;ig&quot; or &quot;mp&quot;, default is &quot;ig&quot; |
-|         `--ds=x` |                                                                                                                                                                                               Dataset selection: 62, 633, 634, 635 or 636 |
-|    `--sys_in=""` |                                                                                                                                                         System composition: &quot;mol&quot; or &quot;wt&quot;, default is &quot;mol&quot; |
-| `--out_matlab=x` |                                                                                                                                                                                                     Matlab output, 0: inactive, 1: active |
-|      `--mbCpx=x` |                                                                                                                                                                                                        Metabasite database Dio, 0; Aug, 1 |
-|      `--mbIlm=x` |                                                                                                                                                                                                       Metabasite database Ilm, 0; Ilmm, 1 |
-|       `--mpSp=x` |                                                                                                                                                                                                         Metapelite database Sp, 0; Spl, 1 |
-|      `--mpIlm=x` |                                                                                                                                                                                                       Metapelite database Ilm, 0; Ilmm, 1 |
-|    `--buffer=""` | Oxygen buffer, &quot;qfm&quot;, &quot;mw&quot;, &quot;qif&quot;, &quot;nno&quot;, &quot;hm&quot;, &quot;iw&quot;, &quot;cco&quot;, &quot;aH2O&quot;, &quot;aO2&quot;, &quot;aMgO&quot;, &quot;aFeO&quot;, &quot;aAl2O3&quot;, &quot;aTiO2 |
-|   `--buffer_n=x` |                                                                                                                                                                                                          Buffer offset in the RTlog scale |
+|        Arguments |                                                                                                  Application |
+| ----------------:| ------------------------------------------------------------------------------------------------------------:|
+|      `--version` |                                                                                     Displays MAGEMin version |
+|         `--help` |                                                                                                Displays help |
+|       `--Verb=x` |                                                                       Verbose option, 0: inactive, 1: active |
+|    `--File=path` |                                                                    Given file for multiple point calculation |
+|   `--n_points=x` |                                                                  Number of points when using _File_ argument |
+|       `--test=x` |                                                                Run calculation on included test compositions |
+|       `--Pres=y` |                                                                                          Pressure in kilobar |
+|       `--Temp=y` |                                                                                       Temperature in Celsius |
+|     `--Bulk=[y]` |                                                                        Bulk rock composition in molar amount |
+|      `--Gam=[y]` |                                                                        Gamma, when a guess of gamma is known |
+|     `--solver=x` |                                                                        Legacy, 0; PGE, 1; 2 Hybrid (default) |
+|        `--db=""` |                                                                      Database, "ig" or "mp", default is "ig" |
+|         `--ds=x` |                                                                  Dataset selection: 62, 633, 634, 635 or 636 |
+|    `--sys_in=""` |                                                          System composition: "mol" or "wt", default is "mol" |
+| `--out_matlab=x` |                                                                        Matlab output, 0: inactive, 1: active |
+|      `--mbCpx=x` |                                                                           Metabasite database Dio, 0; Aug, 1 |
+|      `--mbIlm=x` |                                                                          Metabasite database Ilm, 0; Ilmm, 1 |
+|       `--mpSp=x` |                                                                            Metapelite database Sp, 0; Spl, 1 |
+|      `--mpIlm=x` |                                                                          Metapelite database Ilm, 0; Ilmm, 1 |
+|    `--buffer=""` | Oxygen buffer, "qfm", "mw", "qif", "nno", "hm", "iw", "cco", "aH2O", "aO2", "aMgO", "aFeO", "aAl2O3", "aTiO2 |
+|   `--buffer_n=x` |                                                                             Buffer offset in the RTlog scale |
 
 
-where _x_ is an `integer`, _y_ a `float`/`double`, _&quot;&quot;_ is a `string` and _[]_ a comma-separated list of size _number of oxides_.
+where _x_ is an `integer`, _y_ a `float`/`double`, _""_ is a `string` and _[]_ a comma-separated list of size _number of oxides_.
 
 ## Order of Oxides {#Order-of-Oxides}
 
@@ -63,7 +63,7 @@ Using the previously defined arguments, a valid command to run a single point ca
 Here:
 - Verbose mode is active.
   
-- The selected database is &quot;ig&quot; (Igneous).
+- The selected database is "ig" (Igneous).
   
 - The bulk rock composition of _test 0_ is selected.
   
@@ -161,7 +161,7 @@ mpiexec -n 8 ./MAGEMin --File=/path_to_file/MAGEMin_input.dat --n_points=4 --db=
 ```
 
 
-where `8` is the number of cores. The results will be stored in an output file gathering all points&#39; results.
+where `8` is the number of cores. The results will be stored in an output file gathering all points' results.
 
 !!! note In parallel mode:     - Verbose should be deactivated (`--Verb=0` or `--Verb=-1`).     - Matlab output can still be generated (`--out_matlab=1`).
 
