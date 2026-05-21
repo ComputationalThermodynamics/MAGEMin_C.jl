@@ -58,18 +58,18 @@ makedocs(;
                         "5 — Li partitioning (frac. melt.)" => "WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting.md",
                 ],
         ],
-        # "Applications" => [
-        #         "Li enrichment — Riel et al. 2026" => [
-        #                 "Overview"                              => "Riel_2026_gcubed/overview.md",
-        #                 "1 — P–H₂O systematics"                => "Riel_2026_gcubed/TUTORIAL_compute_PH2O_systematics.md",
-        #                 "2 — P–T extraction curves"            => "Riel_2026_gcubed/TUTORIAL_compute_PT_curves.md",
-        #                 "3 — Stepwise batch melting"           => "Riel_2026_gcubed/TUTORIAL_compute_plot_stepwise_batch_melting.md",
-        #                 "4 — Biotite Li profiles"              => "Riel_2026_gcubed/TUTORIAL_compute_bi_Li_profiles.md",
-        #                 "5 — Phase stability"                  => "Riel_2026_gcubed/TUTORIAL_compute_plot_phase_stability.md",
-        #                 "6 — Solidus across pelites"           => "Riel_2026_gcubed/TUTORIAL_compute_solidus_FS.md",
-        #                 "7 — Li systematics across pelites"    => "Riel_2026_gcubed/TUTORIAL_compute_systematics_FS.md",
-        #         ],
-        # ],
+        "Applications" => [
+                "Li enrichment — Riel et al. 2026" => [
+                        "Overview"                              => "Riel_2026_gcubed/overview.md",
+                        "1 — P–H₂O systematics"                => "Riel_2026_gcubed/TUTORIAL_compute_PH2O_systematics.md",
+                        "2 — P–T extraction curves"            => "Riel_2026_gcubed/TUTORIAL_compute_PT_curves.md",
+                        "3 — Stepwise batch melting"           => "Riel_2026_gcubed/TUTORIAL_compute_plot_stepwise_batch_melting.md",
+                        "4 — Biotite Li profiles"              => "Riel_2026_gcubed/TUTORIAL_compute_bi_Li_profiles.md",
+                        "5 — Phase stability"                  => "Riel_2026_gcubed/TUTORIAL_compute_plot_phase_stability.md",
+                        "6 — Solidus across pelites"           => "Riel_2026_gcubed/TUTORIAL_compute_solidus_FS.md",
+                        "7 — Li systematics across pelites"    => "Riel_2026_gcubed/TUTORIAL_compute_systematics_FS.md",
+                ],
+        ],
 
     ],
 )
