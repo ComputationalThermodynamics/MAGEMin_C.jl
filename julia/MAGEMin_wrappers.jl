@@ -1829,7 +1829,8 @@ end
 function convertBulk4MAGEMin(   bulk_in     :: T1,
                                 bulk_in_ox  :: Vector{String},
                                 sys_in      :: String,
-                                db          :: String ) where {T1 <: AbstractVector{Float64}}
+                                db          :: String;
+                                oxMinGuard  ::  Bool = true ) where {T1 <: AbstractVector{Float64}}
 
     bulk_in = normalize(bulk_in);                            
 
@@ -1952,11 +1953,18 @@ function convertBulk4MAGEMin(   bulk_in     :: T1,
         MAGEMin_bulk[c[id0]] .= 1e-4;
     end
 
+    # Set optional oxides to 0 if near zero
+    if oxMinGuard
+        id1 = findall(MAGEMin_bulk[d] .< 2e-5 .&& MAGEMin_bulk[d] .> -2e-5)
+        if ~isempty(id1)
+            MAGEMin_bulk[d[id1]] .= 0.0;
+        end
+    end
+
     MAGEMin_bulk .= normalize(MAGEMin_bulk).*100.0
 
     return MAGEMin_bulk, MAGEMin_ox;
 end
-
 
 """
     point_wise_minimization(P, T, gv, z_b, DB, splx_data; light=false, name_solvus=false, fixed_bulk=false, buffer_n=0.0, Gi=nothing, scp=0, dT=2.0, iguess=false, rm_list=nothing, W=nothing)
