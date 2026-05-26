@@ -32,7 +32,8 @@ export  anhydrous_renormalization, retrieve_solution_phase_information, remove_p
 export wt2mol, mol2wt, get_molar_mass, vec_norm, FeO2Fe_O
 export compute_melt_viscosity_G08
 
-export TE_prediction, adjust_bulk_4_zircon, create_custom_KDs_database, get_TE_database, adjust_chemical_system
+export TE_prediction, adjust_bulk_4_zircon, create_custom_KDs_database, get_TE_database, get_CO_KDs_database, adjust_chemical_system
+export custom_KDs_database, TE_names
 export zirconium_saturation, sulfur_saturation, phosphate_saturation
 
 
@@ -1966,6 +1967,7 @@ function convertBulk4MAGEMin(   bulk_in     :: T1,
     return MAGEMin_bulk, MAGEMin_ox;
 end
 
+
 """
     point_wise_minimization(P, T, gv, z_b, DB, splx_data; light=false, name_solvus=false, fixed_bulk=false, buffer_n=0.0, Gi=nothing, scp=0, dT=2.0, iguess=false, rm_list=nothing, W=nothing)
 
@@ -3534,6 +3536,7 @@ point_wise_metastability(           out     :: MAGEMin_C.gmin_struct{Float64, In
 
 # The following section add post-processing routines
 include("TE_ph_models.jl")
+include("lattice_strain.jl")
 include("TE_partitioning.jl")
 include("TE_saturation_models.jl")
 include("export2CSV.jl")
