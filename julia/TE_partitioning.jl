@@ -161,6 +161,35 @@ function mineral_classification(    out             :: MAGEMin_C.gmin_struct{Flo
 end
 
 """
+    SaturationConfig
+
+    Configuration struct for saturation models used in `TE_prediction` and `solve_with_saturation`.
+    All fields default to `"none"` (disabled).
+
+    Fields
+    ------
+    Zr   : String — zirconium saturation model. Options: "none", "CB", "WH", "B".
+    S    : String — sulfur saturation model. Options: "none", "Liu07", "Oneill21", "<N>ppm".
+    P2O5 : String — phosphate saturation model. Options: "none", "Klein26", "HWBea92", "Tollari06".
+    CO2  : String — CO₂ saturation model. Options: "none", "SY26".
+"""
+Base.@kwdef struct SaturationConfig
+    Zr   :: String = "none"
+    S    :: String = "none"
+    P2O5 :: String = "none"
+    CO2  :: String = "none"
+    # Optional per-element phase overrides.  Keys are element names (e.g. "Zr");
+    # values are (phase, adjust) NamedTuples where:
+    #   phase  :: String   — phase label used in the KDs database
+    #   adjust :: Function — bulk-correction function with signature
+    #                        (out, Cliq_el, Sat_el, liq_wt) -> (phase_wt, bulk_delta)
+    # Elements absent from this dict use the _SAT_PHASE default and the built-in
+    # adjust_bulk_4_* functions.
+    overrides :: Dict{String, @NamedTuple{phase::String, adjust::Function}} =
+                 Dict{String, @NamedTuple{phase::String, adjust::Function}}()
+end
+
+"""
     out_tepm
 
     Structure holding the output of the trace element (TE) partitioning routine.
@@ -201,6 +230,10 @@ end
         P₂O₅ saturation concentration in the melt [ppm] (NaN if not computed).
     fapt_wt : Float64
         Weight fraction of fluorapatite precipitated (NaN if not computed).
+    Sat_CO2_liq : Float64
+        CO₂ saturation concentration in the melt [ppm] (NaN if not computed).
+    fl_CO2_wt : Float64
+        Weight fraction of CO₂ fluid formed (NaN if not computed).
 """
 struct out_tepm
     elements        :: Union{Float64, Vector{String}}
@@ -224,6 +257,9 @@ struct out_tepm
 
     Sat_P2O5_liq    :: Union{Float64, Float64}
     fapt_wt         :: Union{Float64, Float64}
+
+    Sat_CO2_liq     :: Union{Float64, Float64}
+    fl_CO2_wt       :: Union{Float64, Float64}
 end
 
 
@@ -342,6 +378,36 @@ function adjust_chemical_system(    KDs_dtb     :: custom_KDs_database,
     end
 
     return C0_TE
+end
+
+"""
+    create_custom_KDs_database(el_name; info)
+
+    Create an elements-only KDs database with no phases. Phases (and zero KDs) are added
+    automatically by `_augment_KDs_for_saturation` when a `SaturationConfig` is provided
+    to `TE_prediction` or `solve_with_saturation`.
+"""
+function create_custom_KDs_database(el_name :: Vector{String};
+                                    info    :: String = "Custom KDs database")
+    return create_custom_KDs_database(el_name, String[],
+                                      Matrix{String}(undef, 0, length(el_name));
+                                      info = info)
+end
+
+"""
+    create_custom_KDs_database(el_name, phase_name; info)
+
+    Create a KDs database with the given elements and phases, all KDs set to zero.
+    Useful when phases are known but partition coefficients are saturation-controlled.
+"""
+function create_custom_KDs_database(el_name    :: Vector{String},
+                                    phase_name :: Vector{String};
+                                    info       :: String = "Custom KDs database")
+    n_ph = length(phase_name)
+    n_el = length(el_name)
+    return create_custom_KDs_database(el_name, phase_name,
+                                      fill("0.0", n_ph, n_el);
+                                      info = info)
 end
 
 """
@@ -600,6 +666,46 @@ function compute_TE_partitioning(   KDs_database:: custom_KDs_database,
 end
 
 
+# Default element → saturation phase mapping
+const _SAT_PHASE = Dict("Zr" => "zrc", "S" => "sulf", "P2O5" => "fapt", "CO2" => "fl")
+
+# Return the saturation phase for `el`: override → _SAT_PHASE default → nothing
+_sat_phase(sat::SaturationConfig, el::String) =
+    haskey(sat.overrides, el) ? sat.overrides[el].phase : get(_SAT_PHASE, el, nothing)
+
+"""
+    _augment_KDs_for_saturation(KDs_database, sat)
+
+Internal helper. When `sat` is a `SaturationConfig`, append a column of zero-KD
+functions for each active saturation phase that is not already present in
+`KDs_database.phase_name`.  Returns the (possibly augmented) database; the
+original is never mutated.
+"""
+function _augment_KDs_for_saturation(KDs_database :: custom_KDs_database,
+                                     sat          :: SaturationConfig)
+    extra = String[]
+    for field in ("Zr", "S", "P2O5", "CO2")
+        model = getfield(sat, Symbol(field))
+        phase = _sat_phase(sat, field)
+        if model != "none" && !isnothing(phase) && phase ∉ KDs_database.phase_name
+            push!(extra, phase)
+        end
+    end
+
+    isempty(extra) && return KDs_database
+
+    n_elem   = length(KDs_database.element_name)
+    zero_fn  = (_) -> 0.0
+    new_KDs  = vcat(KDs_database.KDs_expr, fill(zero_fn, length(extra), n_elem))
+
+    return custom_KDs_database(
+        KDs_database.infos,
+        KDs_database.element_name,
+        vcat(KDs_database.phase_name, extra),
+        new_KDs,
+    )
+end
+
 
 """
     compute_Zr_sat_n_part(out, KDs_database, Cliq, bulk_cor_wt, C0, liq_wt; ZrSat_model="CB")
@@ -813,6 +919,78 @@ end
 
 
 """
+    compute_CO2_sat_n_part(out, KDs_database, Cliq, bulk_cor_wt, C0, liq_wt; CO2Sat_model="SY26")
+
+    Check CO₂ saturation and adjust the corrected bulk composition if the melt exceeds the CO₂ saturation limit.
+
+    If CO₂ in the melt exceeds the saturation concentration, the excess degasses into a CO₂-bearing fluid and the
+    corresponding weight is added back to the bulk CO₂ oxide entry in `bulk_cor_wt`.  Unlike mineral saturation
+    phases, no stoichiometrically distinct oxide is returned — the excess CO₂ re-enters the CO₂ oxide budget directly.
+
+    Parameters
+    ----------
+    out : MAGEMin_C.gmin_struct{Float64, Int64}
+        MAGEMin minimization output.
+    KDs_database : custom_KDs_database
+        Trace element partitioning coefficient database (must include "CO2").
+    Cliq : Vector{Float64}
+        Current trace element concentrations in the melt [ppm].
+    bulk_cor_wt : Vector{Float64}
+        Corrected bulk oxide weight fractions (modified in place).
+    C0 : Vector{Float64}
+        Initial bulk trace element composition [ppm].
+    liq_wt : Float64
+        Melt weight fraction.
+    CO2Sat_model : String, optional
+        CO₂ saturation model (default: "SY26"). Passed to `co2_saturation`.
+
+    Returns
+    -------
+    Sat_CO2_liq : Float64
+        CO₂ saturation concentration in the melt [ppm].
+    fl_CO2_wt : Float64
+        Weight fraction of CO₂ fluid formed.
+    bulk_cor_wt : Vector{Float64}
+        Updated corrected bulk oxide weight fractions.
+"""
+function compute_CO2_sat_n_part(    out         :: MAGEMin_C.gmin_struct{Float64, Int64},
+                                    KDs_database:: custom_KDs_database,
+                                    Cliq, bulk_cor_wt, C0,
+                                    liq_wt      :: Float64;
+                                    CO2Sat_model :: String = "SY26",
+                                    CO2_phase    :: String = "fl")
+
+    Sat_CO2_liq = NaN
+    fl_CO2_wt   = 0.0
+    id_CO2      = findfirst(KDs_database.element_name .== "CO2")
+
+    if liq_wt > 0.0
+        Cliq_CO2    = Cliq[id_CO2]
+        Sat_CO2_liq = co2_saturation(out; model = CO2Sat_model)
+
+        if !isnan(Sat_CO2_liq) && Cliq_CO2 > Sat_CO2_liq
+            fl_CO2_wt, CO2_bulk_wt = adjust_bulk_4_fluid(Cliq_CO2, Sat_CO2_liq, liq_wt)
+
+            CO2_idx = findfirst(out.oxides .== "CO2")
+            if !isnothing(CO2_idx)
+                bulk_cor_wt[CO2_idx] += CO2_bulk_wt
+            end
+        end
+    elseif CO2_phase == "fl"
+        # No melt and phase is fluid: all CO2 goes to fl (same pattern as Zr → zrc when liq_wt == 0)
+        C0_CO2 = C0[id_CO2]
+        fl_CO2_wt, CO2_bulk_wt = adjust_bulk_4_fluid(C0_CO2, 0.0, 1.0)
+        CO2_idx = findfirst(out.oxides .== "CO2")
+        if !isnothing(CO2_idx)
+            bulk_cor_wt[CO2_idx] += CO2_bulk_wt
+        end
+    end
+
+    return Sat_CO2_liq, fl_CO2_wt, bulk_cor_wt
+end
+
+
+"""
     TE_prediction(out, C0, KDs_database, dtb; ZrSat_model="none", SSat_model="none", P2O5Sat_model="none", norm_TE=false)
 
     Perform trace element partitioning, optionally with zircon, sulfide, and/or apatite saturation corrections.
@@ -844,17 +1022,30 @@ end
         Structure containing melt/solid/mineral TE concentrations, saturation values, and corrected bulk compositions.
 """
 function TE_prediction( out, C0, KDs_database, dtb;
-                        ZrSat_model     :: String   = "none",
-                        SSat_model      :: String   = "none",
-                        P2O5Sat_model   :: String   = "none",
-                        norm_TE         :: Bool     = false )
+                        ZrSat_model     :: String                       = "none",
+                        SSat_model      :: String                       = "none",
+                        P2O5Sat_model   :: String                       = "none",
+                        CO2Sat_model    :: String                       = "none",
+                        sat             :: Union{Nothing,SaturationConfig} = nothing,
+                        norm_TE         :: Bool                         = false )
+
+    # New-style SaturationConfig overrides individual keyword args when provided.
+    # Old keyword args are kept for backward compatibility.
+    if !isnothing(sat)
+        ZrSat_model   = sat.Zr
+        SSat_model    = sat.S
+        P2O5Sat_model = sat.P2O5
+        CO2Sat_model  = sat.CO2
+        KDs_database  = _augment_KDs_for_saturation(KDs_database, sat)
+    end
 
     # Initialize output variables
     Cliq, Csol, Cmin, ph_TE, ph_wt_norm, liq_wt_norm = NaN, NaN, NaN, nothing, NaN, NaN
     Sat_Zr_liq, zrc_wt, bulk_cor_wt       = NaN, NaN, NaN
     Sat_S_liq, sulf_wt                    = NaN, NaN, NaN
     Sat_P2O5_liq, fapt_wt,                = NaN, NaN, NaN
-    
+    Sat_CO2_liq, fl_CO2_wt                = NaN, NaN
+
     # input data
     liq_wt      = out.frac_M_wt
     sol_wt      = out.frac_S_wt
@@ -907,6 +1098,16 @@ function TE_prediction( out, C0, KDs_database, dtb;
         push!(ph,"fapt")
         push!(ph_wt, fapt_wt)
     end
+    if !isnothing(findfirst(KDs_database.element_name .== "CO2")) && CO2Sat_model != "none"
+        Sat_CO2_liq, fl_CO2_wt, bulk_cor_wt = compute_CO2_sat_n_part(      out,
+                                                                            KDs_database,
+                                                                            Cliq, bulk_cor_wt, C0,
+                                                                            liq_wt;
+                                                                            CO2Sat_model = CO2Sat_model,
+                                                                            CO2_phase    = isnothing(sat) ? "fl" : something(_sat_phase(sat, "CO2"), "fl"))
+        push!(ph,"fl")
+        push!(ph_wt, fl_CO2_wt)
+    end
     sum_wt       = sum(ph_wt)
     bulk_cor_wt .= bulk_cor_wt  ./ sum_wt
     ph_wt        = ph_wt        ./ sum_wt
@@ -955,6 +1156,17 @@ function TE_prediction( out, C0, KDs_database, dtb;
                 Csol[id_P2O5] = 0.0
             end
         end
+        if !isnothing(findfirst(KDs_database.element_name .== "CO2"))   && CO2Sat_model != "none"
+            id_CO2          = findfirst(KDs_database.element_name .== "CO2")
+            Sat_CO2_liq     = co2_saturation(   out;
+                                                model = CO2Sat_model)
+            if !isnan(Sat_CO2_liq) && Cliq[id_CO2] > Sat_CO2_liq
+                Cliq[id_CO2] = Sat_CO2_liq
+                Csol[id_CO2] = (C0[id_CO2] - Sat_CO2_liq*liq_wt_norm) / (1.0 - liq_wt_norm)
+            else
+                Csol[id_CO2] = 0.0
+            end
+        end
     end
 
     # compute corrected bulk molar composition
@@ -969,10 +1181,85 @@ function TE_prediction( out, C0, KDs_database, dtb;
 
                         Sat_Zr_liq,     zrc_wt/ sum_wt,
                         Sat_S_liq,      sulf_wt/ sum_wt,
-                        Sat_P2O5_liq,   fapt_wt/ sum_wt)
+                        Sat_P2O5_liq,   fapt_wt/ sum_wt,
+                        Sat_CO2_liq,    fl_CO2_wt/ sum_wt)
 
     return out_TE
 end
+
+
+"""
+    solve_with_saturation(P, T, data, X_mol, Xoxides, C0, KDs_dtb, dtb; sat, sys_in, tol, max_iter)
+
+    Run the MAGEMin minimization + TE partitioning loop with saturation corrections
+    until the corrected bulk composition converges.
+
+    Parameters
+    ----------
+    P, T : Float64
+        Pressure [kbar] and temperature [°C].
+    data : MAGEMin data handle
+        Initialised with `Initialize_MAGEMin`.
+    X_mol : Vector{Float64}
+        Normalised bulk molar composition (will not be mutated).
+    Xoxides : Vector{String}
+        Oxide names matching `X_mol`.
+    C0 : Vector{Float64}
+        Initial bulk trace-element composition [ppm].
+    KDs_dtb : custom_KDs_database
+        Trace-element partitioning database (real mineral phases only;
+        saturation phases are appended automatically when `sat` is provided).
+    dtb : String
+        MAGEMin database identifier (e.g. "mp", "ig").
+    sat : SaturationConfig, optional
+        Saturation model selection. Defaults to all "none".
+    sys_in : String, optional
+        Composition input units for MAGEMin: "mol" (default) or "wt".
+    tol : Float64, optional
+        Convergence tolerance on the L2-norm of `bulk_cor_mol` (default 1e-6).
+    max_iter : Int, optional
+        Maximum number of iterations (default 32).
+
+    Returns
+    -------
+    out : MAGEMin output at convergence.
+    out_TE : out_tepm at convergence.
+    converged : Bool — true if `tol` was reached.
+    n_iter : Int — number of iterations performed.
+"""
+function solve_with_saturation( P           :: Float64,
+                                T           :: Float64,
+                                data,
+                                X_mol       :: Vector{Float64},
+                                Xoxides     :: Vector{String},
+                                C0          :: Vector{Float64},
+                                KDs_dtb     :: custom_KDs_database,
+                                dtb         :: String;
+                                sat         :: SaturationConfig = SaturationConfig(),
+                                sys_in      :: String  = "mol",
+                                tol         :: Float64 = 1e-6,
+                                max_iter    :: Int     = 32      )
+
+    X    = copy(X_mol)
+    n0   = 0.0
+    local out, out_TE
+    for ite in 1:max_iter
+        out    = single_point_minimization(P, T, data; X=X, Xoxides=Xoxides, sys_in=sys_in)
+        out_TE = TE_prediction(out, C0, KDs_dtb, dtb; sat=sat)
+
+        X   = X_mol .- out_TE.bulk_cor_mol
+        res = abs(n0 - vec_norm(out_TE.bulk_cor_mol))
+        n0  = vec_norm(out_TE.bulk_cor_mol)
+
+        if res < tol
+            return out, out_TE, true, ite
+        end
+    end
+
+    @warn "solve_with_saturation: did not converge in $max_iter iterations"
+    return out, out_TE, false, max_iter
+end
+
 
 # ---------------------------------------------------------------------------
 # CO database — lattice strain models (Cornet 2017, TEPM v02.02)
