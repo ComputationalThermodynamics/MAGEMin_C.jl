@@ -21,6 +21,7 @@ Here we provide a set of tutorials to generate various kind of phase diagrams, c
     - [11. PTX diagram](#11.-PTX-diagram)
     - [12. TT poly-metamorphic diagram](#12.-TT-polymetamorphic-diagram)
     - [13. LaMEM density diagram](#13.-LaMEM-density-diagram)
+    - [14. Draw a P-T path on the diagram](#14.-Draw-a-P-T-path-on-the-diagram)
 
 ### 1. First phase diagram 
 
@@ -78,6 +79,8 @@ clicking on a mineral of the pie chart will display it's composition:
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_pie_chart_composition.png?raw=true" alt="MAGEMinApp pie chart composition" style="max-width: 20%; height: auto; display: block; margin: 0 auto;">
 ```
+
+
 
 #### Refine diagram
 
@@ -638,3 +641,44 @@ This results in the following upper mantle density diagram that can be exported 
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_pyrolite.png?raw=true" alt="MAGEMinApp pyrolite" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 ```
+
+### 14. Draw a P-T path on the diagram
+
+The `Draw path` panel (available in the `Diagram` sub-tab, right sidebar) lets you manually trace a P-T path directly on the phase diagram by clicking on grid points, and then generates a stacked area chart of phase fractions along that path.
+
+#### Step 1 — Enable recording
+
+Open the `Draw path` panel on the right sidebar. Toggle `Record` to **on**. The point counter resets to `0 point(s)`.
+
+!!! note
+    Recording is automatically disabled when you switch away from the `Draw path` panel.
+
+#### Step 2 — Click points on the diagram
+
+With `Record` active, click on any location of the phase diagram. Each click appends a new row to the path table showing the coordinates of the selected point:
+
+| # | P [kbar] | T [°C] |
+|---|---|---|
+| 1 | … | … |
+| 2 | … | … |
+| … | … | … |
+
+- Use `Remove last` to delete the most recently added point.
+- Use `Clear` to discard the entire path and start over.
+
+!!! note
+    For P-X and T-X diagram types the table columns adapt accordingly (`X; P [kbar]` or `X; T [°C]`).
+
+#### Step 3 — Choose the output unit and generate
+
+Select the system unit for the phase fractions plot:
+
+| Unit | Description |
+|---|---|
+| `mol%` | Molar fractions |
+| `wt%` | Weight fractions |
+| `vol%` | Volume fractions |
+
+Click `Generate`. MAGEMinApp computes the stable phase equilibrium at each recorded point and displays a stacked area chart titled **Phase fractions along path** in the expandable canvas below the controls.
+
+The x-axis reports the path coordinates (`T [°C]; P [kbar]` for a P-T diagram) and the y-axis shows the phase fraction in the selected unit. The chart can be exported as an `svg` file using the camera icon in the top-right corner of the plot.
