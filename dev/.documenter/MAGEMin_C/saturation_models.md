@@ -12,6 +12,8 @@
   
 - [E.4 Saturation models and bulk correction](/MAGEMin_C/saturation_models#E.4-Saturation-models-and-bulk-correction)
   
+- [E.5 CO2 saturation model example](/MAGEMin_C/saturation_models#E.5-CO2-saturation-model-example)
+  
 
 :::
 
@@ -63,13 +65,25 @@ Note that fS2 is calculated after Bockrath et al. (2024) and that fO2 is retriev
 
 
 
+== CO₂
+<ul>
+    <li>Sun &amp; Yao, 2026 (M2Fluid) - CO2Sat_model = "SY26"</li>
+</ul>
+
+The SY26 model (Eq. 7–8) simultaneously predicts H₂O and CO₂ solubility in a binary H₂O–CO₂ fluid.
+P_H₂O is obtained by numerically inverting Eq. 7 from the dissolved H₂O in the melt, then P_CO₂ = P − P_H₂O.
+Unlike mineral saturation phases, excess CO₂ degasses into a CO₂-bearing fluid (phase acronym: flC) rather than crystallizing a solid.
+
+
+
 :::
 
-| `Element` |      `phase` | `acronym` |  `formula` |       `correction` |           `TE_prediction(; arg)` |
-| ---------:| ------------:| ---------:| ----------:| ------------------:| --------------------------------:|
-|        Zr |       zircon |       zrc |     ZrSiO4 |         SiO2 and O |    ZrSat_model = "CB", "B", "WH" |
-|         S |      sulfide |      sulf |        FeS |          FeO and O | SSat_model = "Oneill21", "Liu07" |
-|      P2O5 | fluorapatite |      fapt | Ca5(PO4)3F | CaO (F is omitted) |        P2O5Sat_model = "Klein26" |
+| `Element` |      `phase` | `acronym` |  `formula` |               `correction` |           `TE_prediction(; arg)` |
+| ---------:| ------------:| ---------:| ----------:| --------------------------:| --------------------------------:|
+|        Zr |       zircon |       zrc |     ZrSiO4 |                 SiO2 and O |    ZrSat_model = "CB", "B", "WH" |
+|         S |      sulfide |      sulf |        FeS |                  FeO and O | SSat_model = "Oneill21", "Liu07" |
+|      P2O5 | fluorapatite |      fapt | Ca5(PO4)3F |         CaO (F is omitted) |        P2O5Sat_model = "Klein26" |
+|       CO2 |    CO2 fluid |       flC |        CO2 | CO2 (re-enters CO2 budget) |            CO2Sat_model = "SY26" |
 
 
 ## E.1 Zirconium saturation {#E.1-Zirconium-saturation}
@@ -279,6 +293,53 @@ Iteration 1: residual = 3.909415504073306e-7
 
 :::
 
+## E.5 CO2 saturation model example {#E.5-CO2-saturation-model-example}
+
+This example shows how to use the CO₂ saturation model of Sun & Yao (2026, "SY26"). Unlike mineral saturation phases, excess CO₂ degasses into a CO₂-bearing fluid (`flC`) rather than crystallizing a solid. The saturation threshold is derived from the dissolved H₂O content of the melt by numerically inverting the SY26 H₂O solubility equation, then evaluating CO₂ solubility at P_CO₂ = P − P_H₂O (binary H₂O–CO₂ fluid assumption).
+
+```julia
+using MAGEMin_C
+dtb     = "mp"
+data    = Initialize_MAGEMin(dtb, verbose=-1, solver=0);
+P,T     = 6.0, 800.0
+Xoxides = ["SiO2";  "TiO2";  "Al2O3";  "FeO";   "MnO";   "MgO";   "CaO";   "Na2O";  "K2O"; "H2O"; "O"];
+X       = [58.509,  1.022,   14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 10.0, 0.2];
+sys_in  = "wt"
+
+el      = ["CO2"]
+ph      = ["flC"]   # CO2 degasses into a CO2-bearing fluid
+KDs     = ["0.0"]   # phase formed from saturation models have 0.0 KDs
+C0      = [5000.0]  # starting CO2 concentration in ppm (ug/g)
+
+KDs_dtb = create_custom_KDs_database(el, ph, KDs)
+
+out    = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in, name_solvus=true);
+
+out_TE  = TE_prediction(out, C0, KDs_dtb, dtb;
+                        CO2Sat_model = "SY26")
+
+Finalize_MAGEMin(data)
+```
+
+
+::: tip Note
+- `out_TE.Sat_CO2_liq` gives the CO₂ saturation concentration in the melt [ppm].
+  
+- `out_TE.fl_CO2_wt` gives the weight fraction of CO₂ fluid formed when saturation is exceeded.
+  
+- The saturation model requires a melt phase with dissolved H₂O. If no melt or no H₂O is present, `Sat_CO2_liq` and `fl_CO2_wt` are returned as `NaN`.
+  
+- Unlike zircon, sulfide and apatite, the excess CO₂ is not converted to a stoichiometrically distinct solid; it re-enters the CO₂ oxide budget in `out_TE.bulk_cor_wt`.
+  
+
+:::
+
+::: tip Important
+
+The SY26 model is calibrated over 1 bar – 6 GPa, 660 – 1924 °C, and covers compositions ranging from carbonatite to rhyolite. The model assumes a binary H₂O–CO₂ fluid; mixed fluids with other species (e.g., H₂S, SO₂) are not accounted for.
+
+:::
+
 ## References {#References}
 - Watson, E. B., & Harrison, T. M. (1983). Zircon saturation revisited: temperature and composition effects in a variety of crustal magma types. earth and planetary science letters, 64(2), 295-304.
   
@@ -299,4 +360,6 @@ Iteration 1: residual = 3.909415504073306e-7
 - Crisp, L. J., & Berry, A. J. (2022). A new model for zircon saturation in silicate melts. Contributions to Mineralogy and Petrology, 177(7), 71.
   
 - Klein, B. Z., Müntener, O., Gillespie, J., & Marxer, F. (2026). Apatite saturation revisited: new model formulations and applications to igneous rocks. Contributions to Mineralogy and Petrology, 181(3), 18.
+  
+- Sun, C., & Yao, L. (2026). A unified H₂O–CO₂ solubility–speciation model for magmatic liquids: Constraints on magma storage architecture in continental rifts. Earth and Planetary Science Letters, 689, 120115.
   

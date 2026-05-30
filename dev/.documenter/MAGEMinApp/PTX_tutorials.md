@@ -280,3 +280,106 @@ To modify a color, click the corresponding cell in the Change column, then chang
   
 
 :::
+
+## Trace-element partitioning (MAGEMinApp v1.5.1) {#Trace-element-partitioning-MAGEMinApp-v1.5.1}
+
+Trace-element (TE) partitioning can be computed simultaneously with any P-T-X path (batch melting, fractional melting, fractional crystallization, isentropic). The module uses lattice-strain parameterized Kd databases and optionally applies mineral or volatile saturation models (Zr, S, P₂O₅, CO₂).
+
+### E.9. Trace-element partitioning setup {#E.9.-Trace-element-partitioning-setup}
+
+#### Step 1 — Activate the TE predictive model {#Step-1-—-Activate-the-TE-predictive-model}
+
+In the `Path options` panel, set `TE predictive model = true`. This reveals the `Trace Elements` panel in the left sidebar.
+
+#### Step 2 — Configure KD model and saturation options {#Step-2-—-Configure-KD-model-and-saturation-options}
+
+In the `Trace Elements` panel, the following options are available:
+
+|              Option |                   Description |                                   Available values |
+| -------------------:| -----------------------------:| --------------------------------------------------:|
+|        **KD model** |    Lattice-strain Kd database | `OL` — O. Laurent (2012) ; `CO` — J. Cornet (2019) |
+|   **Zr saturation** |       Zircon saturation model |   `none` ; `Watson 1979` (WH) ; `Blundy 2022` (CB) |
+|    **S saturation** |      Sulfide saturation model |                        `none` ; `Liu 2021` (Liu07) |
+| **P₂O₅ saturation** | Fluorapatite saturation model |                            `none` ; `Tollari 2006` |
+|  **CO₂ saturation** |    CO₂ fluid saturation model |                 `none` ; `SY26` — Sun & Yao (2026) |
+
+
+::: tip Note
+- Saturation models only activate when the corresponding element is present in the TE bulk composition.
+  
+- The CO₂ saturation model (SY26) requires dissolved H₂O in the melt: it inverts the H₂O solubility equation to derive P_H₂O, then evaluates CO₂ solubility at P_CO₂ = P − P_H₂O.
+  
+
+:::
+
+#### Step 3 — Load the trace-element bulk composition {#Step-3-—-Load-the-trace-element-bulk-composition}
+
+Two options are available:
+- **Built-in database**: use the dropdown below the saturation options to select a predefined TE composition; the `Initial TE bulk composition [μg/g]` table updates automatically.
+  
+- **Custom file**: drag and drop a CSV file onto the upload area. The file must contain `element` and `μg/g` columns.
+  
+
+Values in the table are editable directly in the interface.
+
+When `Assimilation = true`, a second table (`Assimilant TE bulk composition [μg/g]`) is also displayed and follows the same loading logic.
+
+#### Step 4 — Compute the path {#Step-4-—-Compute-the-path}
+
+Click `Compute path`. Thermodynamic minimization and TE partitioning are performed simultaneously at each step along the path.
+
+### E.10. Visualizing trace-element results {#E.10.-Visualizing-trace-element-results}
+
+After computation, the `Trace Elements` tab becomes enabled. It contains:
+- **REE spectrum** (top panel): rare-earth element pattern at the selected path point, normalized to bulk or chondrite. Use the `Show` dropdown to switch between `ree` (REE only) and `all` (extended trace-element set).
+  
+- **Diagram** (bottom panel): P-T diagram colored by a user-selected TE or saturation field.
+  
+
+In the `Display options` panel (right side) use the `Field type` dropdown to choose what to display:
+
+|     Field type |                                                                        Available fields |
+| --------------:| ---------------------------------------------------------------------------------------:|
+|         Zircon |         `Sat_Zr_liq` [ug/g] — Zr saturation in melt ; `zrc_wt` — zircon weight fraction |
+|        Sulfide |         `Sat_S_liq` [ug/g] — S saturation in melt ; `sulf_wt` — sulfide weight fraction |
+|   Fluorapatite |   `Sat_P2O5_liq` [ug/g] — P₂O₅ saturation in melt ; `fapt_wt` — apatite weight fraction |
+| CO2 saturation | `Sat_CO2_liq` [ug/g] — CO₂ saturation in melt ; `fl_CO2_wt` — CO₂ fluid weight fraction |
+|  Trace element |                             Any TE concentration or user-defined expression (see below) |
+
+
+For the **Trace element** field type, the **Field builder** allows you to enter arbitrary expressions, for example:
+- `[M_Dy] / [M_Yb]` — Dy/Yb ratio in the melt
+  
+- `[M_La] / [M_Sm]` — La/Sm ratio
+  
+
+where `[M_X]` refers to element X in the melt. Set a normalization (`none`, `bulk`, `chondrite`) and click `Compute and display`.
+
+Isopleths (contour lines) for any field can be added from the `Isopleths` tab: select the field type and field, set the range and step, and click `Add`.
+
+### E.11. Exporting trace-element results to CSV {#E.11.-Exporting-trace-element-results-to-CSV}
+
+When `TE predictive model = true`, additional export buttons appear in the `Path options` panel:
+
+|                               Button |              Filename field |                                                                                     Content |
+| ------------------------------------:| ---------------------------:| -------------------------------------------------------------------------------------------:|
+|                **Save path** → `csv` |           `Save path` input | Full PTX path: P, T, phase fractions and oxide compositions at each step (one row per step) |
+|           **Save path** → `csv line` |           `Save path` input |            Same content but all steps written on a single row (useful for batch processing) |
+|       **Save cumulate** → `csv file` |       `Save cumulate` input |                                       Cumulate (extracted solid) composition along the path |
+| **Save trace elements** → `csv file` | `Save trace elements` input |        TE concentrations in the melt, bulk solid and individual mineral phases at each step |
+|    **Save cumulate TE** → `csv file` |    `Save cumulate TE` input |                                             Integrated cumulate TE composition at each step |
+
+
+::: tip Note
+- `Save trace elements` and `Save cumulate TE` are only active after trace elements have been computed. A warning badge is shown if you try to export beforehand.
+  
+- All CSV files are saved to the `output/` subdirectory of the working directory displayed in the Julia terminal.
+  
+
+:::
+
+::: tip Tip
+
+Use the `Export references → bibtex file` button to export a BibTeX file listing all references for the active KD model, saturation models and thermodynamic database.
+
+:::
