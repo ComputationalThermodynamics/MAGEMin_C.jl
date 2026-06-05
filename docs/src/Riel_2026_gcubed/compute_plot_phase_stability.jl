@@ -1,19 +1,29 @@
-#=
-10/04/2025
+#= Last modified: 12/05/2026
 
-Script to perform fractional crystallization together with `Li` partitioning
-The bulk-rock composition is after FWorldMedian pelite
+Thermodynamic modelling of lithium enrichment during partial melting: the importance of partition coefficients
+Riel el al., 2026, Geochemistry, Geophysics, Geosystems
 
-partitioning coefficients are from the EODC database
-ph     = ["mu"; "bi"; "cd"; "FeTiOx"; "g"; "afs"; "pl"; "q"; "ru"]  
-KDs    = [0.82; 1.67; 0.44; 1e-5; 0.01; 0.02; 0.01; 1e-5; 1e-5] 
+Set of scripts to perform fractional melting together with `Li` partitioning
+The bulk-rock composition are after:
+Forshaw, J.B., and Pattison, D.R.M., 2023, Major-element geochemistry of pelites: Geology,
+https://doi.org/10.1130/G50542.1
 
-After Koopmans et al., 2024, Geology
-Matt Morris and Charlie Beard
+partitioning coefficients are from:
+
+Ballouard, C., Couziné, S., Bouilhol, P., Harlaux, M., Mercadier, J., & Montel, J.-M. (2023).
+A felsic meta-igneous source for Li-F-rich peraluminous granites: insights from the Variscan
+Velay dome (French Massif Central) and implications for rare-metal magmatism.
+Contributions to Mineralogy and Petrology, 178(11), 75.
+
+Koopmans, L., Martins, T., Linnen, R., Gardiner, N. J., Breasley, C. M., Palin, R. M., . . . Robb, L. J.
+(2024). The formation of lithium-rich pegmatites through multi-stage melting. Geology, 52(1), 7–11.
+
+Morris, M. C., Weller, O. M., Soderman, C. R., Edmonds, M., Beard, C. D., & Yeomans, C. M. (2026).
+Melting of fluorine-rich biotite as a mechanism for generating lithium-rich granites.
+Communications Earth & Environment.
 
 =#
-# using Pkg
-# Pkg.activate(".") 
+
 using MAGEMin_C, Plots, ProgressMeter, JLD2, PCHIPInterpolation, XLSX, DataFrames
 using Base.Threads: @threads
 using LaTeXStrings
@@ -22,6 +32,32 @@ include("TE_functions.jl")
 include("TE_fractional.jl")
 include("plot_figures.jl")
 
+"""
+    main_fct(; model="MM", Prange=[1.0, 16.0], Pstep=0.5) ->
+        (mu_T_all, bi_T_all, cd_T_all, q_T_all, pl_T_all, afs_T_all, pat_T_all,
+         ext_event_all, Pall, Tall2)
+
+Compute the temperature stability ranges of key metamorphic minerals over a pressure sequence
+for the average Forshaw & Pattison (2023) pelite along the water-saturated solidus.
+
+For each pressure in `Prange[1]:Pstep:Prange[2]`, runs a dense T sequence (solidus → 1000°C)
+with stepwise melt extraction (e1_liq = 7%, e1_remain = 1%), records when each mineral is
+stable, and tracks cumulative extraction events.
+
+# Keyword Arguments
+- `model`: KD model identifier used to load the water-saturation interpolant and KD database
+  (default `"MM"`); `"MM_F"` loads the fluorine-rich biotite interpolant
+- `Prange`: `[P_min, P_max]` in kbar (default `[1.0, 16.0]`)
+- `Pstep`: Pressure step size [kbar] (default 0.5)
+
+# Returns
+- `mu_T_all`, `bi_T_all`, `cd_T_all`, `q_T_all`, `pl_T_all`, `afs_T_all`, `pat_T_all`:
+  Vectors of `[T_min, T_max]` stability ranges for muscovite, biotite, cordierite, quartz,
+  plagioclase, alkali feldspar, and paragonite at each pressure
+- `ext_event_all`: Cumulative extraction event count vectors at each pressure
+- `Pall`: Pressure values at which computations were performed
+- `Tall2`: Temperature vectors for each pressure
+"""
 function main_fct(; model = "MM", Prange = [1.0, 16.0], Pstep = 0.5)
     FC          = false             # if true, perform fractional crystallization
     dpi         = 300

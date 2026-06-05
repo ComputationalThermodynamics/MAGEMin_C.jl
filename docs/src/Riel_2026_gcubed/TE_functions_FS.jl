@@ -1,7 +1,40 @@
+#= Last modified: 12/05/2026
+
+Thermodynamic modelling of lithium enrichment during partial melting: the importance of partition coefficients
+Riel el al., 2026, Geochemistry, Geophysics, Geosystems
+
+Set of scripts to perform fractional melting together with `Li` partitioning
+The bulk-rock composition are after:
+Forshaw, J.B., and Pattison, D.R.M., 2023, Major-element geochemistry of pelites: Geology,
+https://doi.org/10.1130/G50542.1
+
+partitioning coefficients are from:
+
+Ballouard, C., Couziné, S., Bouilhol, P., Harlaux, M., Mercadier, J., & Montel, J.-M. (2023).
+A felsic meta-igneous source for Li-F-rich peraluminous granites: insights from the Variscan
+Velay dome (French Massif Central) and implications for rare-metal magmatism.
+Contributions to Mineralogy and Petrology, 178(11), 75.
+
+Koopmans, L., Martins, T., Linnen, R., Gardiner, N. J., Breasley, C. M., Palin, R. M., . . . Robb, L. J.
+(2024). The formation of lithium-rich pegmatites through multi-stage melting. Geology, 52(1), 7–11.
+
+Morris, M. C., Weller, O. M., Soderman, C. R., Edmonds, M., Beard, C. D., & Yeomans, C. M. (2026).
+Melting of fluorine-rich biotite as a mechanism for generating lithium-rich granites.
+Communications Earth & Environment.
+
+=#
 
 """
-    Function to saturate water + small excess value accross a pressure range
+    water_saturation_curve_FS(data_thread, P::Float64, bulk::Vector{Float64},
+                               Xoxides::Vector{String}, dtb::String, excess::Float64) -> Float64
 
+Compute the water content at the solidus for a single pressure point using thread-local MAGEMin data.
+
+Sets bulk H₂O to 40 mol% to guarantee saturation, then calls `get_wat_sat_function_FS` to
+determine the exact saturation content and adds `excess` on top.
+
+# Returns
+- H₂O molar fraction at saturation + excess for pressure `P`
 """
 function water_saturation_curve_FS( data_thread,
                                     P       :: Float64,
@@ -25,6 +58,26 @@ function water_saturation_curve_FS( data_thread,
     return H 
 end
 
+"""
+    get_wat_sat_function_FS(data_thread, P, bulk_ini, oxi, dtb, watsat_val) -> Float64
+
+Find the water-saturating H₂O content at the solidus for a single pressure point.
+
+Uses thread-local MAGEMin data and a bisection algorithm (32 iterations, 0.01°C tolerance) to
+locate the solidus. Removes any free-fluid phase from the bulk, normalizes, then adds
+`watsat_val` above saturation. Issues a warning if the result is negative.
+
+# Arguments
+- `data_thread`: Tuple `(gv, z_b, DB, splx_data)` of thread-local MAGEMin data
+- `P`: Pressure [kbar]
+- `bulk_ini`: Bulk composition with H₂O set high enough to guarantee saturation
+- `oxi`: Oxide labels
+- `dtb`: MAGEMin database identifier
+- `watsat_val`: Excess H₂O fraction to add above saturation [mol fraction]
+
+# Returns
+- H₂O content [mol fraction] on an anhydrous-normalized basis at the solidus + excess
+"""
 function get_wat_sat_function_FS(   data_thread,
                                     P,
                                     bulk_ini,
@@ -115,7 +168,29 @@ function get_wat_sat_function_FS(   data_thread,
 end
 
 
-function perform_threaded_calc_FS( 
+"""
+    perform_threaded_calc_FS(Out_all, Out_all_FC, data, dtb, P, T, np, e1_liq, e1_remain,
+                              sys_in, FS_bulks, Xoxides, KDs_database; ...) -> (Out_all, Out_all_FC, FS_bulks)
+
+Run threaded fractional melting for a suite of bulk rock compositions at a single pressure.
+
+For each composition (row of `FS_bulks`), computes the water-saturating H₂O content via
+`water_saturation_curve_FS`, calls `threaded_frac_melting`, and stores the computed H₂O
+back into the H₂O column of `FS_bulks`.
+
+# Keyword Arguments
+- `n_ee`: Number of extraction events (default 10)
+- `Li_content`: Initial bulk Li [µg/g] (default 100.0)
+- `FC`: Fractional crystallization flag (not filled, default true)
+- `Ex_H2O_sat`: Excess H₂O above saturation [mol fraction] (default 0.0)
+- `Ws`: Optional custom biotite W parameters
+- `norm_TE`: Normalize trace element concentrations (default true)
+- `solidus_calc`: Reserved flag (default false)
+
+# Returns
+- `(Out_all, Out_all_FC, FS_bulks)` with updated H₂O column in `FS_bulks`
+"""
+function perform_threaded_calc_FS(
                                 Out_all     :: Array{Li_infos},
                                 Out_all_FC  :: Array{Li_infos},
                                 data        :: MAGEMin_Data,
@@ -184,6 +259,18 @@ function perform_threaded_calc_FS(
 end
 
 
+"""
+    get_mol_bulks(data::DataFrame) -> Matrix{Float64}
+
+Convert a Forshaw & Pattison (2023) database DataFrame from oxide wt% to normalized molar fractions.
+
+Extracts 11 oxides (SiO2, Al2O3, CaO, MgO, FeO, K2O, Na2O, TiO2, O, MnO, H2O), converts
+each row from wt% to mol% via `wt2mol`, and normalizes to sum to 1 with `norm2one`.
+Missing oxide columns are filled with zeros and a warning is issued.
+
+# Returns
+- Matrix of size `(nb, 11)` with normalized molar fractions for each sample
+"""
 function get_mol_bulks( data )
     Xoxides     = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "MnO"; "H2O"];
     nox         = length(Xoxides)

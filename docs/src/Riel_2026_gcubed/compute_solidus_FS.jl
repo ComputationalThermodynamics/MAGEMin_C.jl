@@ -24,7 +24,6 @@ Communications Earth & Environment.
 
 =#
 
-
 using MAGEMin_C, Plots, ProgressMeter, JLD2, PCHIPInterpolation, XLSX, DataFrames, PlotlyJS, Statistics
 using Base.Threads: @threads
 using Plots.PlotMeasures
@@ -36,6 +35,24 @@ include("plot_figures.jl")
 include("plot_figures_FS.jl")
 include("plot_bulk_FS.jl")
 
+"""
+    main(; model, test, FC, dpi, fake_F_bi, out_dir, Li_content, P, Ex_H2O_sat,
+            n_ee, e1_liq, e1_remain, norm_TE) -> (ext_out, ext_out_te, np, KDs_database, FS_bulks)
+
+Compute a single-event fractional melting profile for each pelite composition from the
+Forshaw & Pattison (2023) database at a fixed pressure.
+
+Runs the melting loop inline (without `perform_threaded_calc_FS`) and stores the final
+extraction state in flat output vectors `ext_out` and `ext_out_te`.
+
+# Keyword Arguments
+Same as `compute_systematics_FS.main`.
+
+# Returns
+- `(ext_out, ext_out_te, np, KDs_database, FS_bulks)`: Phase equilibrium and trace element
+  output vectors for the final extraction step, number of samples, KD database, and bulk
+  compositions matrix with computed H₂O contents
+"""
 function main(;     model       = "BA",
                     test       = false,  # if true, only test on a small subset of the bulk-rock compositions
                     FC          = false,

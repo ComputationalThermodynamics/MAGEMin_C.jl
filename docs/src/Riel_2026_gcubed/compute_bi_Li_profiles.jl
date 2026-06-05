@@ -25,6 +25,11 @@ Communications Earth & Environment.
 =#
 
 
+"""
+    norm2one(vec::Vector{Float64}) -> Vector{Float64}
+
+Normalize `vec` so that its elements sum to 1. Local copy for standalone use in this script.
+"""
 # biotite Kd plot
 function norm2one( vec :: Vector{Float64})
     return vec ./ sum(vec)
