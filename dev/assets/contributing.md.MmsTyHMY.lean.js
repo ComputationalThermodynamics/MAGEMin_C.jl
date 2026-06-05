@@ -1,1 +1,0 @@
-import{c as t,S as e,j as n}from"./chunks/framework.Do5uFPHe.js";const _=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"contributing.md","filePath":"contributing.md","lastUpdated":null}'),a={name:"contributing.md"};function r(o,c,i,s,d,p){return e(),n("div")}const m=t(a,[["render",r]]);export{_ as __pageData,m as default};
