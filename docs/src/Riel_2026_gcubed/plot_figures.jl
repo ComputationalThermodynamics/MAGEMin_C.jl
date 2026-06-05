@@ -1,4 +1,55 @@
+#= Last modified: 12/05/2026
 
+Thermodynamic modelling of lithium enrichment during partial melting: the importance of partition coefficients
+Riel el al., 2026, Geochemistry, Geophysics, Geosystems
+
+Set of scripts to perform fractional melting together with `Li` partitioning
+The bulk-rock composition are after:
+Forshaw, J.B., and Pattison, D.R.M., 2023, Major-element geochemistry of pelites: Geology,
+https://doi.org/10.1130/G50542.1
+
+partitioning coefficients are from:
+
+Ballouard, C., Couziné, S., Bouilhol, P., Harlaux, M., Mercadier, J., & Montel, J.-M. (2023).
+A felsic meta-igneous source for Li-F-rich peraluminous granites: insights from the Variscan
+Velay dome (French Massif Central) and implications for rare-metal magmatism.
+Contributions to Mineralogy and Petrology, 178(11), 75.
+
+Koopmans, L., Martins, T., Linnen, R., Gardiner, N. J., Breasley, C. M., Palin, R. M., . . . Robb, L. J.
+(2024). The formation of lithium-rich pegmatites through multi-stage melting. Geology, 52(1), 7–11.
+
+Morris, M. C., Weller, O. M., Soderman, C. R., Edmonds, M., Beard, C. D., & Yeomans, C. M. (2026).
+Melting of fluorine-rich biotite as a mechanism for generating lithium-rich granites.
+Communications Earth & Environment.
+
+=#
+
+"""
+    get_subplot_T3(model, pChip_wat, H, P, field, scale, mat, Li_content, dpi;
+                   ylabel=false, label_on=false, discr=false) -> (f1, clb)
+
+Create a heatmap or contourf subplot of a scalar field in P–H₂O space with colorbar on the right
+and water-saturation boundary lines overlaid (±0.03 mol% and exact saturation).
+
+# Arguments
+- `model`: KD model label (for axis decisions)
+- `pChip_wat`: PCHIP interpolator for saturation H₂O vs. pressure
+- `H`: H₂O axis vector [mol fraction]
+- `P`: Pressure axis vector [kbar]
+- `field`: One of `"Li"`, `"LiMax"`, `"extraction"`, `"T"`, `"Δbi"`, `"Δcd"`, `"Δmu"`, `"eta_M"`
+- `scale`: `"fixed_"` for hard-coded color limits, otherwise `:auto`
+- `mat`: Data matrix (np × np)
+- `Li_content`: Initial bulk Li [µg/g] (used to normalize the `"Li"` field)
+- `dpi`: Figure resolution
+
+# Keyword Arguments
+- `ylabel`: Show pressure axis label if true
+- `label_on`: Show water-saturation line labels in legend if true
+- `discr`: Use discrete contourf levels (suitable for integer fields such as extraction count)
+
+# Returns
+- `(f1, clb)`: Main figure handle and dummy colorbar scatter handle
+"""
 function get_subplot_T3(model, pChip_wat, H, P, field, scale, mat, Li_content, dpi; ylabel = false, label_on = false, discr = false)
     rev = true
     if field == "Li"
@@ -164,6 +215,23 @@ function get_subplot_T3(model, pChip_wat, H, P, field, scale, mat, Li_content, d
     return f1, clb
 end
 
+"""
+    get_subplot_T2(model, pChip_wat, H, P, field, scale, mat, Li_content, dpi;
+                   ylabel=false, liqE=false, label_on=false, discr=false, e1_liq_in=7.0) -> (f1, nothing)
+
+Create a heatmap or contourf subplot of a scalar field in P–H₂O space. Colorbar is shown only
+for `model ∈ ("MM", "KMout")` with the default `e1_liq_in`; otherwise suppressed.
+
+Parameters and behavior are identical to `get_subplot_T3` except for colorbar placement.
+
+# Keyword Arguments
+- `liqE`: Reserved flag (currently unused)
+- `e1_liq_in`: Melt extraction threshold [vol%] used to decide whether to show the colorbar (default 7.0)
+- See `get_subplot_T3` for all other keyword arguments.
+
+# Returns
+- `(f1, nothing)`: Plot handle and `nothing` (no colorbar handle returned)
+"""
 function get_subplot_T2(model, pChip_wat, H, P, field, scale, mat, Li_content, dpi; ylabel = false, liqE = false, label_on = false, discr = false, e1_liq_in = 7.0)
     rev = true
     if field == "Li"
@@ -320,6 +388,15 @@ function get_subplot_T2(model, pChip_wat, H, P, field, scale, mat, Li_content, d
     return f1, nothing
 end
 
+"""
+    get_subplot_T(model, pChip_wat, H, P, field, scale, mat, Li_content, dpi;
+                  ylabel=false) -> (f1, clb)
+
+Create a heatmap subplot of a scalar field in P–H₂O space without an attached colorbar.
+Returns a separate dummy scatter handle `clb` for manual colorbar placement.
+
+See `get_subplot_T3` for full parameter descriptions.
+"""
 function get_subplot_T(model, pChip_wat, H, P, field, scale, mat, Li_content, dpi; ylabel = false)
     rev = true
     if field == "Li"
@@ -434,6 +511,15 @@ function get_subplot_T(model, pChip_wat, H, P, field, scale, mat, Li_content, dp
 end
 
 
+"""
+    get_subplot(model, pChip_wat, H, P, field, scale, mat, Li_content, dpi;
+                xlabel=false) -> (f1, clb)
+
+Create a heatmap subplot of a scalar field in P–H₂O space. The pressure axis label is shown
+only for `model ∈ ("MM", "KMout")`; the H₂O axis label is shown when `xlabel=true`.
+
+See `get_subplot_T3` for full parameter descriptions.
+"""
 function get_subplot(model, pChip_wat, H, P, field, scale, mat, Li_content, dpi; xlabel = false)
     rev = true
     if field == "Li"
@@ -550,7 +636,22 @@ end
 
 
 """
-This script is used to plot the output of the TE_MAGEMin_C_frac.jl script.
+    retrieve_outputs(Out_all::Array{Li_infos}, np::Int) ->
+        (point_infos, Cliq_max, Extract_epi, Extract_T, Δbi, Δcd, Δmu, Δst, eta_M)
+
+Post-process a 2D (np × np) array of `Li_infos` from P–H₂O grid calculations.
+
+For each grid point, identifies the extraction event with peak melt Li concentration and
+records the phase volume changes for biotite, cordierite, muscovite, and staurolite
+between the pre- and post-extraction MAGEMin outputs.
+
+# Returns
+- `point_infos`: Matrix of `(i, j, id_index)` tuples for the peak extraction event
+- `Cliq_max`: Maximum melt Li [µg/g] per grid point (NaN for invalid points)
+- `Extract_epi`: Extraction event index at peak Li
+- `Extract_T`: Temperature [°C] at peak extraction
+- `Δbi`, `Δcd`, `Δmu`, `Δst`: Volume fraction change of biotite, cordierite, muscovite, staurolite
+- `eta_M`: Melt viscosity [Pa·s] at peak extraction
 """
 function retrieve_outputs(Out_all, np)
 
@@ -674,7 +775,25 @@ end
 
 
 """
-This script is used to plot the output of the TE_MAGEMin_C_frac.jl script.
+    retrieve_outputs_sys(Out_all, np, nss, model, ph_list, off_diag) -> (dLidKD, d2LidKD2)
+
+Compute first- and second-order numerical sensitivities of maximum melt Li enrichment
+with respect to mineral–melt partition coefficients.
+
+Uses finite differences on the perturbed runs stored in `Out_all` (from
+`perform_threaded_calc_sensitivity`) to estimate ∂Li*/∂KD and ∂²Li*/∂KD_i∂KD_j.
+
+# Arguments
+- `Out_all`: Output array `np × (3*nss + off_diag)` from sensitivity calculations
+- `np`: Number of pressure points
+- `nss`: Number of phases with perturbed KDs
+- `model`: KD model identifier (used to retrieve base KD values for scaling)
+- `ph_list`: Phase abbreviation list whose KDs were perturbed
+- `off_diag`: Number of cross-term perturbation pairs
+
+# Returns
+- `dLidKD`: Matrix `(np × nss)` of first-order sensitivities ∂Li*/∂KD
+- `d2LidKD2`: Matrix `(np × (nss + off_diag))` of second-order sensitivities
 """
 function retrieve_outputs_sys(Out_all, np, nss, model, ph_list, off_diag)
 
@@ -760,6 +879,29 @@ function retrieve_outputs_sys(Out_all, np, nss, model, ph_list, off_diag)
 end
 
 
+"""
+    plot_output(field, Li_content, model, pChip_wat, H, P, mat, e1_liq, e1_remain;
+                dpi=300, output="output/", scale="")
+
+Plot a scalar field in P–H₂O space as a heatmap and save to disk.
+
+Field-specific color limits and transformations are applied (e.g., log10 for viscosity,
+C/C₀ normalization for Li). Water-saturation boundary lines are overlaid.
+
+# Arguments
+- `field`: One of `"Li"`, `"LiMax"`, `"extraction"`, `"T"`, `"Δbi"`, `"Δcd"`, `"Δmu"`, `"st"`, `"eta_M"`
+- `Li_content`: Initial bulk Li [µg/g] (for `"Li"` normalization)
+- `model`: KD model label (kept for interface consistency)
+- `pChip_wat`: PCHIP interpolator for saturation H₂O vs. pressure
+- `H`, `P`: H₂O and pressure axis vectors
+- `mat`: Data matrix to plot
+- `e1_liq`, `e1_remain`: Extraction parameters (used in the filename via `np`)
+
+# Keyword Arguments
+- `dpi`: Figure resolution (default 300)
+- `output`: Output directory (default `"output/"`)
+- `scale`: `"fixed_"` for hard-coded limits; otherwise `:auto`
+"""
 function plot_output(field, Li_content, model, pChip_wat, H, P, mat, e1_liq, e1_remain; dpi=300, output="output/", scale = "")
     rev = true
     if field == "Li"
@@ -916,6 +1058,24 @@ function plot_output(field, Li_content, model, pChip_wat, H, P, mat, e1_liq, e1_
 end
 
 
+"""
+    retrieve_frac_crys_outputs(Out_all_FC, np; k=1) -> (point_infos, Cliq_max, Extract_T)
+
+Extract Li concentration and temperature at a fixed extraction step `k` from a 2D array
+of fractional crystallization results.
+
+# Arguments
+- `Out_all_FC`: 2D array of `Li_infos` (np × np) from fractional crystallization calculations
+- `np`: Grid resolution
+
+# Keyword Arguments
+- `k`: Extraction step index to read (default 1)
+
+# Returns
+- `point_infos`: Matrix of `(i, j, k)` tuples for valid points
+- `Cliq_max`: Melt Li [µg/g] at step `k` (NaN where absent)
+- `Extract_T`: Temperature [°C] at step `k`
+"""
 function retrieve_frac_crys_outputs(Out_all_FC, np; k = 1)
 
     Cliq_max    = zeros(Float64, np, np);

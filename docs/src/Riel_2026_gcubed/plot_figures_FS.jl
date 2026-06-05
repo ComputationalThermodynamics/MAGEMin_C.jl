@@ -1,3 +1,43 @@
+#= Last modified: 12/05/2026
+
+Thermodynamic modelling of lithium enrichment during partial melting: the importance of partition coefficients
+Riel el al., 2026, Geochemistry, Geophysics, Geosystems
+
+Set of scripts to perform fractional melting together with `Li` partitioning
+The bulk-rock composition are after:
+Forshaw, J.B., and Pattison, D.R.M., 2023, Major-element geochemistry of pelites: Geology,
+https://doi.org/10.1130/G50542.1
+
+partitioning coefficients are from:
+
+Ballouard, C., Couziné, S., Bouilhol, P., Harlaux, M., Mercadier, J., & Montel, J.-M. (2023).
+A felsic meta-igneous source for Li-F-rich peraluminous granites: insights from the Variscan
+Velay dome (French Massif Central) and implications for rare-metal magmatism.
+Contributions to Mineralogy and Petrology, 178(11), 75.
+
+Koopmans, L., Martins, T., Linnen, R., Gardiner, N. J., Breasley, C. M., Palin, R. M., . . . Robb, L. J.
+(2024). The formation of lithium-rich pegmatites through multi-stage melting. Geology, 52(1), 7–11.
+
+Morris, M. C., Weller, O. M., Soderman, C. R., Edmonds, M., Beard, C. D., & Yeomans, C. M. (2026).
+Melting of fluorine-rich biotite as a mechanism for generating lithium-rich granites.
+Communications Earth & Environment.
+
+=#
+
+"""
+    get_Herron_plot(all, Pin, lstyle, shape) -> PlotlyJS.Plot
+
+Create a Herron (1988) sediment classification diagram in log(SiO₂/Al₂O₃)–log(Fe₂O₃/K₂O)
+space, color-coded by maximum Li enrichment, for multiple KD models.
+
+Overlays classification boundary lines and a diamond marker for the average Forshaw pelite.
+
+# Arguments
+- `all`: Nested array of PlotlyJS scatter traces; `all[i][j]` is the j-th trace for model i
+- `Pin`: Pressure vector [kbar]
+- `lstyle`: Plotly line dash styles for each model (e.g., `["dash", "solid", "dot", "longdash"]`)
+- `shape`: Plotly marker symbols for each model
+"""
 function get_Herron_plot( all, Pin, lstyle, shape )
         layout = Layout(
             xaxis = attr(
@@ -166,6 +206,20 @@ function get_Herron_plot( all, Pin, lstyle, shape )
 end
 
 
+"""
+    get_PTLi_plot(all_2, Pin, lstyle, shape) -> PlotlyJS.Plot
+
+Create a P–T diagram with maximum melt Li enrichment color-coded as circles for four KD models.
+
+Each model is a connected scatter trace with extraction temperature on the x-axis and pressure
+on the y-axis. Circle color encodes the enrichment factor (C/C₀); color scale fixed at 2–12.
+
+# Arguments
+- `all_2`: Array of length 4; each element is a `(T_vec, Li_vec)` tuple for pressures in `Pin`
+- `Pin`: Pressure vector [kbar]
+- `lstyle`: Plotly line dash styles for the four models
+- `shape`: Plotly marker symbols for the four models
+"""
 function get_PTLi_plot( all_2, Pin, lstyle, shape )
     txtfont = 10.0
     msize   = 24.0
@@ -334,6 +388,30 @@ function get_PTLi_plot( all_2, Pin, lstyle, shape )
     return PlotlyJS.plot([PTli_KM, PTli_BA, PTli_MM,PTli_MM_F],layout2)  
 end
 
+"""
+    recover_FS_pressure_diagram(min_Al, mean_Al, max_Al, min_Si, mean_Si, max_Si,
+                                 min_Fe, mean_Fe, max_Fe, min_Li, mean_Li, max_Li,
+                                 min_T, max_T, min_K, mean_K, max_K,
+                                 width, lstyle, PTmax, shape) -> (min, meann, max)
+
+Build three PlotlyJS scatter traces (low-Li, mean-Li, high-Li bulk populations) for the
+Forshaw pelite pressure diagram in log(SiO₂/Al₂O₃)–log(Fe₂O₃/K₂O) space.
+
+Each trace shows how bulk composition evolves with pressure for a given Li enrichment percentile.
+Outlier smoothing is applied when any Li value exceeds 20× C₀.
+
+# Arguments
+- `min_Al` … `max_K`: Wt% oxide vectors (one value per pressure) for the three Li populations
+- `min_Li`, `mean_Li`, `max_Li`: Corresponding maximum Li enrichment vectors
+- `min_T`, `max_T`: Temperature range vectors (used as point labels via `PTmax`)
+- `width`: Marker outline width
+- `lstyle`: Plotly line dash style string
+- `PTmax`: Label strings for pressure–temperature annotations on each marker
+- `shape`: Plotly marker symbol string
+
+# Returns
+- `(min, meann, max)`: Three PlotlyJS scatter trace objects for the three populations
+"""
 function recover_FS_pressure_diagram(min_Al, mean_Al, max_Al, min_Si, mean_Si, max_Si, min_Fe, mean_Fe, max_Fe, min_Li, mean_Li, max_Li, min_T, max_T,
                                       min_K, mean_K, max_K, width, lstyle,PTmax,shape)
      # options: "solid", "dot", "dash", "longdash", "dashdot", "longdashdot"
@@ -454,6 +532,33 @@ end
 
 
 
+"""
+    plot_custom_oxides(FS_bulks, Li_content, Xoxides, point_infos, Cliq_max, Extract_epi,
+                       Extract_T, Δbi, Δcd, Δmu, Dbi, afs, pl, e1_liq, e1_remain, P,
+                       Ex_H2O_sat, model; rev=true, clim=(2,6), output="./output/")
+
+Generate a comprehensive suite of compositional and ternary diagrams for the Forshaw pelite
+suite, color-coded by Li enrichment, and save all figures to `output`.
+
+Produces: Herron scatter, binary oxide plots (SiO₂-MgO vs. Al₂O₃, Al₂O₃–SiO₂, Al₂O₃–MgO),
+ASM ternary diagrams for Li, Δcd, Δbi, Δmu, afs, pl, extraction T and episode, biotite KD,
+and a Herron classification diagram. Population statistics (mean±σ groups) are saved as JLD2.
+
+# Arguments
+- `FS_bulks`: Matrix (np × n_ox) of molar bulk compositions
+- `Li_content`: Initial bulk Li [µg/g]
+- `Xoxides`: Oxide labels
+- `point_infos`, `Cliq_max`, `Extract_epi`, `Extract_T`: From `retrieve_outputs_FS`
+- `Δbi`, `Δcd`, `Δmu`: Phase volume changes at peak extraction
+- `Dbi`: Biotite KD at peak extraction conditions
+- `afs`, `pl`: Alkali-feldspar and plagioclase volumes at peak extraction
+- `e1_liq`, `e1_remain`, `P`, `Ex_H2O_sat`, `model`: Simulation parameters for plot titles
+
+# Keyword Arguments
+- `rev`: Reverse colorscale (default true)
+- `clim`: Color axis limits for Li enrichment (default `(2, 6)`)
+- `output`: Output directory (default `"./output/"`)
+"""
 function plot_custom_oxides(   FS_bulks, Li_content, Xoxides, point_infos, Cliq_max, Extract_epi, Extract_T, Δbi, Δcd, Δmu, Dbi, afs, pl,
                             e1_liq, e1_remain, P, Ex_H2O_sat, model; rev = true,clim = (2,6), output = "./output/")
 
@@ -1365,6 +1470,27 @@ function plot_custom_oxides(   FS_bulks, Li_content, Xoxides, point_infos, Cliq_
 end
 
 
+"""
+    plot_all_oxides(FS_bulks, Li_content, Xoxides, point_infos, Cliq_max, Extract_epi,
+                    Extract_T, Δbi, Δcd, Δmu, e1_liq, e1_remain, P, Ex_H2O_sat, model;
+                    rev=true, clim=(2,6), output="./output/")
+
+Generate an all-vs-all oxide scatter matrix for the Forshaw pelite suite, colored by Li
+enrichment factor (C/C₀), and save to `"$(output)Oxides_vs_oxides.png"`.
+
+Only samples with valid (non-NaN) Li results are shown. The matrix covers 10 major oxides
+(SiO2, Al2O3, CaO, MgO, FeO, K2O, Na2O, TiO2, MnO, H2O).
+
+# Arguments
+- `FS_bulks`: Matrix (np × n_ox) of molar bulk compositions
+- `Li_content`: Initial bulk Li [µg/g]
+- `Xoxides`: Oxide labels
+- `Cliq_max`: Maximum melt Li per sample from `retrieve_outputs_FS`
+- Remaining arguments are kept for interface consistency but not used in this function.
+
+# Keyword Arguments
+- `rev`, `clim`, `output`: See `plot_custom_oxides`
+"""
 function plot_all_oxides(   FS_bulks, Li_content, Xoxides, point_infos, Cliq_max, Extract_epi, Extract_T, Δbi, Δcd, Δmu,
                             e1_liq, e1_remain, P, Ex_H2O_sat, model; rev = true, clim = (2,6), output = "./output/")
 
@@ -1411,6 +1537,32 @@ end
 
 """
 This script is used to plot the output of the TE_MAGEMin_C_frac.jl script.
+"""
+"""
+    retrieve_outputs_FS(Out_all, np, KDs_database, output) ->
+        (point_infos, Cliq_max, Extract_epi, Extract_T, Δbi, Δcd, Δmu, eta_M, Dbi, afs, pl)
+
+Post-process a vector of `Li_infos` from Forshaw & Pattison pelite-suite calculations.
+
+For each sample, finds the extraction event with maximum melt Li (only samples with Li > 100 µg/g),
+computes phase volume changes, evaluates the temperature-dependent biotite KD expression, and
+saves all results to `"$(output)out_struct.jld2"`.
+
+# Arguments
+- `Out_all`: Vector of `Li_infos` (length np) from `perform_threaded_calc_FS`
+- `np`: Number of bulk rock samples
+- `KDs_database`: Li KD database (used to evaluate biotite KD expression at peak conditions)
+- `output`: Output directory; results saved to `"$(output)out_struct.jld2"`
+
+# Returns
+- `point_infos`: Vector of `(i, id_index)` tuples for peak extraction events
+- `Cliq_max`: Maximum melt Li [µg/g] per sample (NaN where invalid)
+- `Extract_epi`: Peak extraction event index per sample
+- `Extract_T`: Temperature [°C] at peak extraction
+- `Δbi`, `Δcd`, `Δmu`: Volume fraction change of biotite, cordierite, and muscovite at peak event
+- `eta_M`: Melt viscosity [Pa·s] at peak extraction
+- `Dbi`: Biotite–melt Li KD evaluated at peak extraction conditions
+- `afs`, `pl`: Alkali-feldspar and plagioclase volume fractions at peak extraction
 """
 function retrieve_outputs_FS(Out_all, np, KDs_database, output)
 

@@ -1,15 +1,26 @@
-#=
-10/04/2025
+#= Last modified: 12/05/2026
 
-Script to perform fractional crystallization together with `Li` partitioning
-The bulk-rock composition is after FWorldMedian pelite
+Thermodynamic modelling of lithium enrichment during partial melting: the importance of partition coefficients
+Riel el al., 2026, Geochemistry, Geophysics, Geosystems
 
-partitioning coefficients are from the EODC database
-ph     = ["mu"; "bi"; "cd"; "FeTiOx"; "g"; "afs"; "pl"; "q"; "ru"]  
-KDs    = [0.82; 1.67; 0.44; 1e-5; 0.01; 0.02; 0.01; 1e-5; 1e-5] 
+Set of scripts to perform fractional melting together with `Li` partitioning
+The bulk-rock composition are after:
+Forshaw, J.B., and Pattison, D.R.M., 2023, Major-element geochemistry of pelites: Geology,
+https://doi.org/10.1130/G50542.1
 
-After Koopmans et al., 2024, Geology
-Matt Morris and Charlie Beard
+partitioning coefficients are from:
+
+Ballouard, C., Couziné, S., Bouilhol, P., Harlaux, M., Mercadier, J., & Montel, J.-M. (2023).
+A felsic meta-igneous source for Li-F-rich peraluminous granites: insights from the Variscan
+Velay dome (French Massif Central) and implications for rare-metal magmatism.
+Contributions to Mineralogy and Petrology, 178(11), 75.
+
+Koopmans, L., Martins, T., Linnen, R., Gardiner, N. J., Breasley, C. M., Palin, R. M., . . . Robb, L. J.
+(2024). The formation of lithium-rich pegmatites through multi-stage melting. Geology, 52(1), 7–11.
+
+Morris, M. C., Weller, O. M., Soderman, C. R., Edmonds, M., Beard, C. D., & Yeomans, C. M. (2026).
+Melting of fluorine-rich biotite as a mechanism for generating lithium-rich granites.
+Communications Earth & Environment.
 
 =#
 

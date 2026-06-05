@@ -35,6 +35,30 @@ include("plot_figures.jl")
 include("plot_figures_FS.jl")
 
 
+"""
+    main(; model, test, FC, dpi, fake_F_bi, out_dir, Li_content, P, Ex_H2O_sat,
+            n_ee, e1_liq, e1_remain, norm_TE) -> (Out_all, np, KDs_database, FS_bulks)
+
+Run the full Li fractional melting systematics for the Forshaw & Pattison (2023) pelite database.
+
+Loads the bulk-rock database, initializes MAGEMin, runs `perform_threaded_calc_FS` over all
+compositions at pressure `P`, and generates compositional plots via `plot_all_oxides` and
+`plot_custom_oxides`. Figures and statistics are saved to `out_dir`.
+
+# Keyword Arguments
+- `model`: KD model (`"MM"`, `"BA"`, `"KM"`, `"MM_F"`, `"HO"`; default `"BA"`)
+- `test`: If true, subsamples every 50th composition for rapid testing (default false)
+- `FC`: Fractional crystallization flag (default false)
+- `dpi`: Figure resolution (default 300)
+- `fake_F_bi`: Apply custom biotite W parameters to extend stability (default false)
+- `out_dir`: Output directory (default `"./output_Li_v0.1/"`)
+- `Li_content`: Initial bulk Li [µg/g] (default 100.0)
+- `P`: Pressure [kbar] (default 4.0)
+- `Ex_H2O_sat`: Excess H₂O above saturation [mol fraction] (default 0.0)
+- `n_ee`: Number of extraction events (default 10)
+- `e1_liq`, `e1_remain`: Melt extraction and residual thresholds [vol%] (defaults 7.0 / 1.0)
+- `norm_TE`: Normalize trace element concentrations (default true)
+"""
 function main(;     model       = "BA",
                     test       = false,  # if true, only test on a small subset of the bulk-rock compositions
                     FC          = false,

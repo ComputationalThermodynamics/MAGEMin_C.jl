@@ -1,5 +1,64 @@
-# ==========================================================================================================
-# ==========================================================================================================
+#= Last modified: 12/05/2026
+
+Thermodynamic modelling of lithium enrichment during partial melting: the importance of partition coefficients
+Riel el al., 2026, Geochemistry, Geophysics, Geosystems
+
+Set of scripts to perform fractional melting together with `Li` partitioning
+The bulk-rock composition are after:
+Forshaw, J.B., and Pattison, D.R.M., 2023, Major-element geochemistry of pelites: Geology,
+https://doi.org/10.1130/G50542.1
+
+partitioning coefficients are from:
+
+Ballouard, C., Couziné, S., Bouilhol, P., Harlaux, M., Mercadier, J., & Montel, J.-M. (2023).
+A felsic meta-igneous source for Li-F-rich peraluminous granites: insights from the Variscan
+Velay dome (French Massif Central) and implications for rare-metal magmatism.
+Contributions to Mineralogy and Petrology, 178(11), 75.
+
+Koopmans, L., Martins, T., Linnen, R., Gardiner, N. J., Breasley, C. M., Palin, R. M., . . . Robb, L. J.
+(2024). The formation of lithium-rich pegmatites through multi-stage melting. Geology, 52(1), 7–11.
+
+Morris, M. C., Weller, O. M., Soderman, C. R., Edmonds, M., Beard, C. D., & Yeomans, C. M. (2026).
+Melting of fluorine-rich biotite as a mechanism for generating lithium-rich granites.
+Communications Earth & Environment.
+
+=#
+
+
+"""
+    threaded_frac_melting(data_thread, dtb, P, H, T, e1_liq, e1_remain, sys_in, bulk,
+                          Xoxides, KDs_database; ...) -> Li_infos
+
+Perform fractional melting with Li trace-element partitioning for a single (P, H₂O) condition.
+
+Starting from the solidus, iterates up to `n_ee` extraction events. At each event, a bisection
+algorithm finds the temperature at which the melt volume fraction reaches `e1_liq`%; the melt is
+extracted leaving `e1_remain`% behind, the residual bulk and Li budget are updated, and the
+loop continues. Pre- and post-extraction MAGEMin outputs are stored as paired entries.
+
+# Arguments
+- `data_thread`: Tuple `(gv, z_b, DB, splx_data)` of thread-local MAGEMin data
+- `dtb`: MAGEMin database identifier (e.g., `"mp"`)
+- `P`: Pressure [kbar]
+- `H`: H₂O molar fraction (overwrites the H₂O entry in `bulk`)
+- `T`: Temperature bounds `[T_min, T_max]` [°C]
+- `e1_liq`: Melt volume fraction threshold for extraction [vol%]
+- `e1_remain`: Residual melt fraction after extraction [vol%]
+- `sys_in`: Input unit system (e.g., `"mol"`)
+- `bulk`: Bulk rock composition (H₂O entry overwritten with `H`)
+- `Xoxides`: Oxide labels for `bulk`
+- `KDs_database`: Li partition coefficient database
+
+# Keyword Arguments
+- `n_ee`: Number of extraction events (default 10)
+- `Li_content`: Initial bulk Li [µg/g] (default 100.0)
+- `Ws`: Optional custom Margules W parameters for biotite
+- `norm_TE`: Normalize trace element concentrations to the melt (default true)
+
+# Returns
+- `Li_infos` with `ext_out` (phase equilibrium) and `ext_out_te` (trace element) vectors
+  storing results at each pre/post extraction step
+"""
 function threaded_frac_melting(     data_thread :: Tuple{Any, Any, Any, Any}, dtb :: String,
 
                                     P           :: Float64,

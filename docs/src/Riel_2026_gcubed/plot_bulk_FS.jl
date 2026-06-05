@@ -1,8 +1,50 @@
+#= Last modified: 12/05/2026
 
+Thermodynamic modelling of lithium enrichment during partial melting: the importance of partition coefficients
+Riel el al., 2026, Geochemistry, Geophysics, Geosystems
+
+Set of scripts to perform fractional melting together with `Li` partitioning
+The bulk-rock composition are after:
+Forshaw, J.B., and Pattison, D.R.M., 2023, Major-element geochemistry of pelites: Geology,
+https://doi.org/10.1130/G50542.1
+
+partitioning coefficients are from:
+
+Ballouard, C., Couziné, S., Bouilhol, P., Harlaux, M., Mercadier, J., & Montel, J.-M. (2023).
+A felsic meta-igneous source for Li-F-rich peraluminous granites: insights from the Variscan
+Velay dome (French Massif Central) and implications for rare-metal magmatism.
+Contributions to Mineralogy and Petrology, 178(11), 75.
+
+Koopmans, L., Martins, T., Linnen, R., Gardiner, N. J., Breasley, C. M., Palin, R. M., . . . Robb, L. J.
+(2024). The formation of lithium-rich pegmatites through multi-stage melting. Geology, 52(1), 7–11.
+
+Morris, M. C., Weller, O. M., Soderman, C. R., Edmonds, M., Beard, C. D., & Yeomans, C. M. (2026).
+Melting of fluorine-rich biotite as a mechanism for generating lithium-rich granites.
+Communications Earth & Environment.
+
+=#
 
 using ScatteredInterpolation
 
 # Create interpolated grid for plagioclase using inverse distance weighting
+"""
+    create_heatmap_data_scattered(x_vals, y_vals, z_vals, grid_size=50) ->
+        (x_range, y_range, Z_grid)
+
+Interpolate scattered 2D data onto a regular grid using inverse distance weighting (IDW).
+
+Filters NaN and Inf values, constructs a uniform grid over the data extent, and fills each
+cell with a distance-power-2 weighted average of the surrounding data points.
+
+# Arguments
+- `x_vals`, `y_vals`: Scattered coordinate vectors
+- `z_vals`: Scalar values at each (x, y) point
+- `grid_size`: Number of grid points per axis (default 50)
+
+# Returns
+- `x_range`, `y_range`: Regular axis vectors of length `grid_size`
+- `Z_grid`: Interpolated value matrix of size `(grid_size, grid_size)`
+"""
 function create_heatmap_data_scattered(x_vals, y_vals, z_vals, grid_size=50)
     # Remove any NaN or infinite values
     valid_idx = .!isnan.(x_vals) .& .!isnan.(y_vals) .& .!isnan.(z_vals) .& 
@@ -33,6 +75,24 @@ function create_heatmap_data_scattered(x_vals, y_vals, z_vals, grid_size=50)
     return collect(x_range), collect(y_range), Z_grid
 end
 
+"""
+    plot_bulk_FS(ext_out, P, np, FS_bulks, n_ee)
+
+Plot phase proportions of the Forshaw & Pattison pelite suite in Herron classification space
+(log SiO₂/Al₂O₃ vs. log FeO/K₂O), colored by total Q+A+P (quartz + alkali feldspar +
+plagioclase) volume fraction, and save as PNG files.
+
+Extracts quartz, plagioclase, alkali feldspar, garnet, biotite, muscovite, cordierite, and
+ilmenite fractions, sums Q+A+P, and produces both a scatter plot and an IDW-interpolated
+heatmap overlaid with Herron boundary lines.
+
+# Arguments
+- `ext_out`: Vector of MAGEMin equilibrium output structs (length np)
+- `P`: Pressure [kbar] (used in output filename)
+- `np`: Number of bulk compositions
+- `FS_bulks`: Matrix (np × n_ox) of molar bulk compositions
+- `n_ee`: Number of extraction events (used in output filename)
+"""
 function plot_bulk_FS(ext_out,  P,  np, FS_bulks, n_ee)
 
     # bulk_db     = load_Forshaw_mp()
