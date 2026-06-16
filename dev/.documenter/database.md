@@ -216,6 +216,8 @@ For most users, we recommend starting with the relevant single-system database (
   
 - Franzolin, E., Schmidt, M.W., & Poli, S. (2011). Ternary Ca–Fe–Mg carbonates: subsolidus phase relations at 3.5 GPa and a thermodynamic solid solution model including order/disorder. Contributions to Mineralogy and Petrology, 161(2), 213-227.
   
+- Warr, L.N. (2021). IMA-CNMNC approved mineral symbols. Mineralogical Magazine, 85, 291-320. [doi: 10.1180/mgm.2021.43](https://doi.org/10.1180/mgm.2021.43)
+  
 
 
 ---
@@ -227,6 +229,12 @@ Complete list of solution phases, end-members and pure phases for each supported
 
 ::: tip Note
 
+The **Warr (2021)** column lists the corresponding IMA-CNMNC approved mineral abbreviation from Warr (2021). Lower-case entries (e.g. `liq`, `fl`, `nal`, `cf`) have no official Warr equivalent and are composite, theoretical, or model-specific phases.
+
+:::
+
+::: tip Note
+
 The **Buffers** row lists oxygen fugacity reference assemblages available as constraints (qfm, mw, qif, nno, hm, iw, cco). The **Activities** row lists oxide activities that can be fixed as independent variables (aH2O, aO2, aMgO, aFeO, aAl2O3, aTiO2).
 
 :::
@@ -235,25 +243,25 @@ The **Buffers** row lists oxygen fugacity reference assemblages available as con
 
 == Metapelite (mp)
 
-|  Phase |    Model | em  |                                                 End-members |
-| ------:| --------:|:---:| -----------------------------------------------------------:|
-|  `liq` |  liq_W14 |  8  |           q4L · abL · kspL · anL · slL · fo2L · fa2L · h2oL |
-|  `fsp` |  fsp_H22 |  3  |                                               ab · an · san |
-|   `bi` |   bi_W14 |  7  |                  phl · annm · obi · east · tbi · fbi · mmbi |
-|    `g` |    g_W14 |  5  |                                  py · alm · spss · gr · kho |
-|   `ep` |   ep_H11 |  3  |                                               cz · ep · fep |
-|   `ma` |   ma_W14 |  6  |                         mut · celt · fcelt · pat · ma · fmu |
-|   `mu` |   mu_W14 |  6  |                           mut · cel · fcel · pat · ma · fmu |
-|  `opx` |  opx_W14 |  7  |                    en · fs · fm · mgts · fopx · mnopx · odi |
-|   `sa` |   sa_W14 |  5  |                            spr4 · spr5 · fspm · spro · ospr |
-|   `cd` |   cd_W14 |  4  |                                    crd · fcrd · hcrd · mncd |
-|   `st` |   st_W14 |  5  |                            mstm · fst · mnstm · msto · mstt |
-|  `chl` |  chl_W14 |  8  | clin · afchl · ames · daph · ochl1 · ochl4 · f3clin · mmchl |
-|  `ctd` |  ctd_W14 |  4  |                                   mctd · fctd · mnct · ctdo |
-|   `sp` |   sp_W02 |  4  |                                        herc · sp · mt · usp |
-|   `mt` |   mt_W00 |  3  |                                             imt · dmt · usp |
-|  `ilm` |  ilm_W00 |  3  |                                          oilm · dilm · dhem |
-| `ilmm` | ilmm_W14 |  5  |                             oilm · dilm · dhem · geik · pnt |
+|  Phase | Warr (2021) |    Model | em  |                                                 End-members |
+| ------:| -----------:| --------:|:---:| -----------------------------------------------------------:|
+|  `liq` |         liq |  liq_W14 |  8  |           q4L · abL · kspL · anL · slL · fo2L · fa2L · h2oL |
+|  `fsp` |         Fsp |  fsp_H22 |  3  |                                               ab · an · san |
+|   `bi` |          Bt |   bi_W14 |  7  |                  phl · annm · obi · east · tbi · fbi · mmbi |
+|    `g` |         Grt |    g_W14 |  5  |                                  py · alm · spss · gr · kho |
+|   `ep` |          Ep |   ep_H11 |  3  |                                               cz · ep · fep |
+|   `ma` |         Mrg |   ma_W14 |  6  |                         mut · celt · fcelt · pat · ma · fmu |
+|   `mu` |          Ms |   mu_W14 |  6  |                           mut · cel · fcel · pat · ma · fmu |
+|  `opx` |         Opx |  opx_W14 |  7  |                    en · fs · fm · mgts · fopx · mnopx · odi |
+|   `sa` |         Spr |   sa_W14 |  5  |                            spr4 · spr5 · fspm · spro · ospr |
+|   `cd` |         Crd |   cd_W14 |  4  |                                    crd · fcrd · hcrd · mncd |
+|   `st` |          St |   st_W14 |  5  |                            mstm · fst · mnstm · msto · mstt |
+|  `chl` |         Chl |  chl_W14 |  8  | clin · afchl · ames · daph · ochl1 · ochl4 · f3clin · mmchl |
+|  `ctd` |         Cld |  ctd_W14 |  4  |                                   mctd · fctd · mnct · ctdo |
+|   `sp` |         Spl |   sp_W02 |  4  |                                        herc · sp · mt · usp |
+|   `mt` |         Mag |   mt_W00 |  3  |                                             imt · dmt · usp |
+|  `ilm` |         Ilm |  ilm_W00 |  3  |                                          oilm · dilm · dhem |
+| `ilmm` |         Ilm | ilmm_W14 |  5  |                             oilm · dilm · dhem · geik · pnt |
 
 
 **Pure phases:** q · crst · trd · coe · stv · ky · sill · and · ru · sph · O2 · H2O · zo · cor
@@ -262,25 +270,25 @@ The **Buffers** row lists oxygen fugacity reference assemblages available as con
 
 == Metabasite (mb)
 
-|  Phase |    Model | em  |                                                    End-members |
-| ------:| --------:|:---:| --------------------------------------------------------------:|
-|   `sp` |   sp_W02 |  4  |                                           herc · sp · mt · usp |
-|  `spl` |  spl_W02 |  3  |                                                herc · sp · usp |
-|  `fsp` |  fsp_H22 |  3  |                                                  ab · an · san |
-|  `liq` |  liq_G16 |  9  |     q4L · abL · kspL · wo1L · sl1L · fa2L · fo2L · h2oL · anoL |
-|   `mu` |   mu_W14 |  6  |                               mu · cel · fcel · pa · mam · fmu |
-| `ilmm` | ilmm_W14 |  4  |                                      oilm · dilm · dhem · geik |
-|  `ilm` |  ilm_W00 |  3  |                                             oilm · dilm · dhem |
-|   `ol` |   ol_H11 |  2  |                                                        fo · fa |
-|  `amp` |  amp_G16 | 11  | tr · tsm · prgm · glm · cumm · grnm · a · b · mrb · kprg · tts |
-|   `ep` |   ep_H11 |  3  |                                                  cz · ep · fep |
-|    `g` |    g_W14 |  4  |                                            py · alm · gr · kho |
-|  `chl` |  chl_W14 |  7  |            clin · afchl · ames · daph · ochl1 · ochl4 · f3clin |
-|   `bi` |   bi_W14 |  6  |                            phl · annm · obi · east · tbi · fbi |
-|  `opx` |  opx_W14 |  6  |                               en · fs · fm · mgts · fopx · odi |
-|  `dio` |  dio_G16 |  7  |                          jd · di · hed · acmm · om · cfm · jac |
-|  `aug` |  aug_G16 |  8  |             di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
-|  `abc` |  abc_H11 |  2  |                                                      abm · anm |
+|  Phase | Warr (2021) |    Model | em  |                                                    End-members |
+| ------:| -----------:| --------:|:---:| --------------------------------------------------------------:|
+|   `sp` |         Spl |   sp_W02 |  4  |                                           herc · sp · mt · usp |
+|  `spl` |         Spl |  spl_W02 |  3  |                                                herc · sp · usp |
+|  `fsp` |         Fsp |  fsp_H22 |  3  |                                                  ab · an · san |
+|  `liq` |         liq |  liq_G16 |  9  |     q4L · abL · kspL · wo1L · sl1L · fa2L · fo2L · h2oL · anoL |
+|   `mu` |          Ms |   mu_W14 |  6  |                               mu · cel · fcel · pa · mam · fmu |
+| `ilmm` |         Ilm | ilmm_W14 |  4  |                                      oilm · dilm · dhem · geik |
+|  `ilm` |         Ilm |  ilm_W00 |  3  |                                             oilm · dilm · dhem |
+|   `ol` |          Ol |   ol_H11 |  2  |                                                        fo · fa |
+|  `amp` |         Amp |  amp_G16 | 11  | tr · tsm · prgm · glm · cumm · grnm · a · b · mrb · kprg · tts |
+|   `ep` |          Ep |   ep_H11 |  3  |                                                  cz · ep · fep |
+|    `g` |         Grt |    g_W14 |  4  |                                            py · alm · gr · kho |
+|  `chl` |         Chl |  chl_W14 |  7  |            clin · afchl · ames · daph · ochl1 · ochl4 · f3clin |
+|   `bi` |          Bt |   bi_W14 |  6  |                            phl · annm · obi · east · tbi · fbi |
+|  `opx` |         Opx |  opx_W14 |  6  |                               en · fs · fm · mgts · fopx · odi |
+|  `dio` |         Cpx |  dio_G16 |  7  |                          jd · di · hed · acmm · om · cfm · jac |
+|  `aug` |         Aug |  aug_G16 |  8  |             di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
+|  `abc` |          Ab |  abc_H11 |  2  |                                                      abm · anm |
 
 
 **Pure phases:** q · crst · trd · coe · law · ky · sill · and · ru · sph · O2 · ab · H2O · zo · cor
@@ -291,35 +299,35 @@ The **Buffers** row lists oxygen fugacity reference assemblages available as con
 
 Extends `mb` with two additional solution phases.
 
-|             Phase |           Model | em  |                                                 End-members |
-| -----------------:| ---------------:|:---:| -----------------------------------------------------------:|
-| _(all mb phases)_ |               — |  —  |                                      _(see Metabasite tab)_ |
-|              `ta` |  — (Rebay 2022) |  5  |                                 ta · fta · ota · tap · tats |
-|            `oamp` | — (Diener 2007) |  9  | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
+|             Phase | Warr (2021) |           Model | em  |                                                 End-members |
+| -----------------:| -----------:| ---------------:|:---:| -----------------------------------------------------------:|
+| _(all mb phases)_ |           — |               — |  —  |                                      _(see Metabasite tab)_ |
+|              `ta` |         Tlc |  — (Rebay 2022) |  5  |                                 ta · fta · ota · tap · tats |
+|            `oamp` |        oamp | — (Diener 2007) |  9  | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
 
 
 **Pure phases, Buffers, Activities:** identical to `mb`.
 
 == Igneous (ig)
 
-|  Phase |    Model | em  |                                                                End-members |
-| ------:| --------:|:---:| --------------------------------------------------------------------------:|
-|  `spl` |  spl_T21 |  8  |                             nsp · isp · nhc · ihc · nmt · imt · pcr · qndm |
-|   `bi` |   bi_G25 |  6  |                                         phl · annm · obi · eas · tbi · fbi |
-|   `cd` |   cd_G25 |  3  |                                                          crd · fcrd · hcrd |
-|  `cpx` |  cpx_W24 | 10  |                di · cfs · cats · crdi · cess · cbuf · jd · cen · cfm · kjd |
-|   `ep` |   ep_H11 |  3  |                                                              cz · ep · fep |
-|    `g` |    g_W24 |  6  |                                          py · alm · gr · andr · knom · tig |
-|  `amp` |  amp_G16 | 11  |             tr · tsm · prgm · glm · cumm · grnm · a · b · mrb · kprg · tts |
-|  `ilm` |  ilm_W24 |  5  |                                               oilm · dilm · hm · ogk · dgk |
-|  `liq` | liq_G25w | 12  | q4L · slL · wo1L · fo2L · fa2L · jdL · hmL · ekL · tiL · kjL · ctL · h2o1L |
-|   `ol` |   ol_H18 |  4  |                                                       mont · fa · fo · cfm |
-|  `opx` |  opx_W24 |  9  |                       en · fs · fm · odi · mgts · cren · obuf · mess · ojd |
-|  `fsp` |  fsp_H22 |  3  |                                                              ab · an · san |
-|   `fl` |   fl_G25 | 11  |   qfL · slfL · wofL · fofL · fafL · jdfL · hmfL · ekfL · tifL · kjfL · H2O |
-|   `mu` |   mu_W14 |  6  |                                           mu · cel · fcel · pa · mam · fmu |
-| `fper` |     fper |  2  |                                                                   per · wu |
-|  `chl` |  chl_W14 |  7  |                        clin · afchl · ames · daph · ochl1 · ochl4 · f3clin |
+|  Phase | Warr (2021) |    Model | em  |                                                                End-members |
+| ------:| -----------:| --------:|:---:| --------------------------------------------------------------------------:|
+|  `spl` |         Spl |  spl_T21 |  8  |                             nsp · isp · nhc · ihc · nmt · imt · pcr · qndm |
+|   `bi` |          Bt |   bi_G25 |  6  |                                         phl · annm · obi · eas · tbi · fbi |
+|   `cd` |         Crd |   cd_G25 |  3  |                                                          crd · fcrd · hcrd |
+|  `cpx` |         Cpx |  cpx_W24 | 10  |                di · cfs · cats · crdi · cess · cbuf · jd · cen · cfm · kjd |
+|   `ep` |          Ep |   ep_H11 |  3  |                                                              cz · ep · fep |
+|    `g` |         Grt |    g_W24 |  6  |                                          py · alm · gr · andr · knom · tig |
+|  `amp` |         Amp |  amp_G16 | 11  |             tr · tsm · prgm · glm · cumm · grnm · a · b · mrb · kprg · tts |
+|  `ilm` |         Ilm |  ilm_W24 |  5  |                                               oilm · dilm · hm · ogk · dgk |
+|  `liq` |         liq | liq_G25w | 12  | q4L · slL · wo1L · fo2L · fa2L · jdL · hmL · ekL · tiL · kjL · ctL · h2o1L |
+|   `ol` |          Ol |   ol_H18 |  4  |                                                       mont · fa · fo · cfm |
+|  `opx` |         Opx |  opx_W24 |  9  |                       en · fs · fm · odi · mgts · cren · obuf · mess · ojd |
+|  `fsp` |         Fsp |  fsp_H22 |  3  |                                                              ab · an · san |
+|   `fl` |          fl |   fl_G25 | 11  |   qfL · slfL · wofL · fofL · fafL · jdfL · hmfL · ekfL · tifL · kjfL · H2O |
+|   `mu` |          Ms |   mu_W14 |  6  |                                           mu · cel · fcel · pa · mam · fmu |
+| `fper` |        Fper |     fper |  2  |                                                                   per · wu |
+|  `chl` |         Chl |  chl_W14 |  7  |                        clin · afchl · ames · daph · ochl1 · ochl4 · f3clin |
 
 
 **Pure phases:** ne · q · crst · trd · coe · stv · ky · sill · and · ru · sph · O2 · H2O · cor
@@ -328,20 +336,20 @@ Extends `mb` with two additional solution phases.
 
 == Igneous Alkaline (igad)
 
-|  Phase |    Model | em  |                                                                            End-members |
-| ------:| --------:|:---:| --------------------------------------------------------------------------------------:|
-|  `spl` |  spl_T21 |  8  |                                          nsp · isp · nhc · ihc · nmt · imt · pcr · usp |
-|  `cpx` |  cpx_W24 | 10  |                            di · cfs · cats · crdi · cess · cbuf · jd · cen · cfm · kjd |
-|    `g` |    g_W24 |  6  |                                                       py · alm · gr · andr · knr · tig |
-|  `ilm` |  ilm_W24 |  5  |                                                           oilm · dilm · hm · ogk · dgk |
-|  `liq` | liq_W24d | 14  | q3L · sl1L · wo1L · fo2L · fa2L · nmL · hmL · ekL · tiL · kmL · anL · ab1L · enL · kfL |
-|   `ol` |   ol_H18 |  4  |                                                                    mnt · fa · fo · cfm |
-|  `opx` |  opx_W24 |  9  |                                   en · fs · fm · odi · mgts · cren · obuf · mess · ojd |
-|  `fsp` |  fsp_H22 |  3  |                                                                          ab · an · san |
-|  `lct` |  lct_W24 |  2  |                                                                              nlc · klc |
-|  `mel` |  mel_W24 |  5  |                                                             geh · ak · fak · nml · fge |
-|  `nph` |  nph_W24 |  6  |                                                      neN · neS · neK · neO · neC · neF |
-| `kals` | kals_W24 |  2  |                                                                              nks · kls |
+|  Phase | Warr (2021) |    Model | em  |                                                                            End-members |
+| ------:| -----------:| --------:|:---:| --------------------------------------------------------------------------------------:|
+|  `spl` |         Spl |  spl_T21 |  8  |                                          nsp · isp · nhc · ihc · nmt · imt · pcr · usp |
+|  `cpx` |         Cpx |  cpx_W24 | 10  |                            di · cfs · cats · crdi · cess · cbuf · jd · cen · cfm · kjd |
+|    `g` |         Grt |    g_W24 |  6  |                                                       py · alm · gr · andr · knr · tig |
+|  `ilm` |         Ilm |  ilm_W24 |  5  |                                                           oilm · dilm · hm · ogk · dgk |
+|  `liq` |         liq | liq_W24d | 14  | q3L · sl1L · wo1L · fo2L · fa2L · nmL · hmL · ekL · tiL · kmL · anL · ab1L · enL · kfL |
+|   `ol` |          Ol |   ol_H18 |  4  |                                                                    mnt · fa · fo · cfm |
+|  `opx` |         Opx |  opx_W24 |  9  |                                   en · fs · fm · odi · mgts · cren · obuf · mess · ojd |
+|  `fsp` |         Fsp |  fsp_H22 |  3  |                                                                          ab · an · san |
+|  `lct` |         Lct |  lct_W24 |  2  |                                                                              nlc · klc |
+|  `mel` |         Mel |  mel_W24 |  5  |                                                             geh · ak · fak · nml · fge |
+|  `nph` |         Nph |  nph_W24 |  6  |                                                      neN · neS · neK · neO · neC · neF |
+| `kals` |         Kls | kals_W24 |  2  |                                                                              nks · kls |
 
 
 **Pure phases:** q · crst · trd · coe · stv · ky · sill · and · ru · sph · O2 · cor
@@ -350,20 +358,20 @@ Extends `mb` with two additional solution phases.
 
 == Ultramafic (um)
 
-|  Phase |    Model | em  |                                         End-members |
-| ------:| --------:|:---:| ---------------------------------------------------:|
-|   `fl` |  fl_EF21 |  2  |                                            H2 · H2O |
-|   `ol` |   ol_H11 |  2  |                                             fo · fa |
-|   `br` |   br_E13 |  2  |                                            br · fbr |
-|   `ch` |  ch_EF21 |  2  |                                         chum · chuf |
-|  `atg` | atg_EF21 |  5  |                    atgf · fatg · atgo · aatg · oatg |
-|    `g` |    g_H18 |  2  |                                            py · alm |
-|   `ta` |  ta_EF21 |  6  |                   ta · fta · tao · tats · ota · tap |
-|  `chl` |  chl_W14 |  7  | clin · afchl · ames · daph · ochl1 · ochl4 · f3clin |
-|  `spi` |  spi_W02 |  3  |                                      herc · sp · mt |
-|  `opx` |  opx_W14 |  5  |                          en · fs · fm · mgts · fopx |
-|   `po` |   po_E10 |  2  |                                         trov · trot |
-| `anth` | anth_D07 |  5  |                          anth · gedf · fant · a · b |
+|  Phase | Warr (2021) |    Model | em  |                                         End-members |
+| ------:| -----------:| --------:|:---:| ---------------------------------------------------:|
+|   `fl` |          fl |  fl_EF21 |  2  |                                            H2 · H2O |
+|   `ol` |          Ol |   ol_H11 |  2  |                                             fo · fa |
+|   `br` |         Brc |   br_E13 |  2  |                                            br · fbr |
+|   `ch` |         Chu |  ch_EF21 |  2  |                                         chum · chuf |
+|  `atg` |         Atg | atg_EF21 |  5  |                    atgf · fatg · atgo · aatg · oatg |
+|    `g` |         Grt |    g_H18 |  2  |                                            py · alm |
+|   `ta` |         Tlc |  ta_EF21 |  6  |                   ta · fta · tao · tats · ota · tap |
+|  `chl` |         Chl |  chl_W14 |  7  | clin · afchl · ames · daph · ochl1 · ochl4 · f3clin |
+|  `spi` |         Spl |  spi_W02 |  3  |                                      herc · sp · mt |
+|  `opx` |         Opx |  opx_W14 |  5  |                          en · fs · fm · mgts · fopx |
+|   `po` |          Po |   po_E10 |  2  |                                         trov · trot |
+| `anth` |         Ath | anth_D07 |  5  |                          anth · gedf · fant · a · b |
 
 
 **Pure phases:** q · crst · trd · coe · stv · ky · sill · and · pyr · O2 · hem · cor
@@ -374,15 +382,15 @@ Extends `mb` with two additional solution phases.
 
 Extends `um` with plagioclase, amphibole, augite, spinel, carbonated fluid and carbonates.
 
-|             Phase |    Model | em  |                                        End-members |
-| -----------------:| --------:|:---:| --------------------------------------------------:|
-| _(all um phases)_ |        — |  —  |                             _(see Ultramafic tab)_ |
-|           `pl4tr` |  fsp_H22 |  2  |                                            ab · an |
-|             `amp` |  amp_G16 |  9  |  tr · tsm · prgm · glm · cumm · grnm · a · b · mrb |
-|             `aug` |  aug_G16 |  8  | di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
-|             `spl` |        — |  7  |            nsp · isp · nhc · ihc · nmt · imt · pcr |
-|             `flc` |   fl_H03 |  2  |                                          H2O · CO2 |
-|            `occm` | occm_F11 |  5  |                        cc · odo · mag · sid · oank |
+|             Phase | Warr (2021) |    Model | em  |                                        End-members |
+| -----------------:| -----------:| --------:|:---:| --------------------------------------------------:|
+| _(all um phases)_ |           — |        — |  —  |                             _(see Ultramafic tab)_ |
+|           `pl4tr` |          Pl |  fsp_H22 |  2  |                                            ab · an |
+|             `amp` |         Amp |  amp_G16 |  9  |  tr · tsm · prgm · glm · cumm · grnm · a · b · mrb |
+|             `aug` |         Aug |  aug_G16 |  8  | di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
+|             `spl` |         Spl |        — |  7  |            nsp · isp · nhc · ihc · nmt · imt · pcr |
+|             `flc` |         flc |   fl_H03 |  2  |                                          H2O · CO2 |
+|            `occm` |        occm | occm_F11 |  5  |                        cc · odo · mag · sid · oank |
 
 
 **Pure phases:** q · crst · trd · coe · stv · ky · sill · and · pyr · O2 · hem · H2O · cor · gph
@@ -391,22 +399,22 @@ Extends `um` with plagioclase, amphibole, augite, spinel, carbonated fluid and c
 
 == Mantle (mtl)
 
-|  Phase |    Model | em  |                                           End-members |
-| ------:| --------:|:---:| -----------------------------------------------------:|
-|    `g` |    g_H13 |  6  |                      py · alm · gr · maj · gfm · nagt |
-|   `fp` |   fp_H13 |  2  |                                            per · fper |
-|  `mpv` |  mpv_H13 |  5  |                        mpv · fpvm · cpvm · apv · npvm |
-|  `cpv` |  cpv_H13 |  5  |                        mpv · fpvm · cpvm · apv · npvm |
-|  `crn` |  crn_H13 |  3  |                                     cor · mcor · fcor |
-|   `cf` |   cf_H13 |  6  |              macf · cacf · mscf · fscf · oscf · nacfm |
-|  `nal` |  nal_H13 |  7  | nanal · canal · manal · msnal · fsnal · o1nal · o2nal |
-|  `aki` |  aki_H13 |  3  |                                       aak · mak · fak |
-|   `ol` |   ol_H13 |  2  |                                               fo · fa |
-|  `wad` |  wad_H13 |  2  |                                             mwd · fwd |
-| `ring` | ring_H13 |  2  |                                             mrw · frw |
-|  `cpx` |  cpx_H13 |  6  |                      di · cfs · cats · jd · cen · cfm |
-|  `opx` |  opx_H13 |  5  |                             en · fs · fm · odi · mgts |
-|  `hpx` |  hpx_H13 |  5  |                             en · fs · fm · odi · hmts |
+|  Phase | Warr (2021) |    Model | em  |                                           End-members |
+| ------:| -----------:| --------:|:---:| -----------------------------------------------------:|
+|    `g` |         Grt |    g_H13 |  6  |                      py · alm · gr · maj · gfm · nagt |
+|   `fp` |        Fper |   fp_H13 |  2  |                                            per · fper |
+|  `mpv` |         mpv |  mpv_H13 |  5  |                        mpv · fpvm · cpvm · apv · npvm |
+|  `cpv` |         cpv |  cpv_H13 |  5  |                        mpv · fpvm · cpvm · apv · npvm |
+|  `crn` |         crn |  crn_H13 |  3  |                                     cor · mcor · fcor |
+|   `cf` |          cf |   cf_H13 |  6  |              macf · cacf · mscf · fscf · oscf · nacfm |
+|  `nal` |         nal |  nal_H13 |  7  | nanal · canal · manal · msnal · fsnal · o1nal · o2nal |
+|  `aki` |         Aki |  aki_H13 |  3  |                                       aak · mak · fak |
+|   `ol` |          Ol |   ol_H13 |  2  |                                               fo · fa |
+|  `wad` |         Wds |  wad_H13 |  2  |                                             mwd · fwd |
+| `ring` |        ring | ring_H13 |  2  |                                             mrw · frw |
+|  `cpx` |         Cpx |  cpx_H13 |  6  |                      di · cfs · cats · jd · cen · cfm |
+|  `opx` |         Opx |  opx_H13 |  5  |                             en · fs · fm · odi · mgts |
+|  `hpx` |         hpx |  hpx_H13 |  5  |                             en · fs · fm · odi · hmts |
 
 
 **Pure phases:** q · crst · trd · coe · stv · ky · sill · and
@@ -415,17 +423,17 @@ Extends `um` with plagioclase, amphibole, augite, spinel, carbonated fluid and c
 
 Extends `mp` with phases from Green et al. (2016), Evans & Frost (2021), and Diener et al. (2007).
 
-|             Phase |           Model | em  |                                                    End-members |
-| -----------------:| ---------------:|:---:| --------------------------------------------------------------:|
-| _(all mp phases)_ |               — |  —  |                                         _(see Metapelite tab)_ |
-|            `occm` |        occm_F11 |  5  |                                    cc · odo · mag · sid · oank |
-|              `fl` |          fl_H03 |  2  |                                                      H2O · CO2 |
-|              `po` |          po_E10 |  2  |                                                    trov · trot |
-|             `dio` |         dio_G16 |  7  |                          jd · di · hed · acmm · om · cfm · jac |
-|             `aug` |         aug_G16 |  8  |             di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
-|             `amp` |         amp_G16 | 11  | tr · tsm · prgm · glm · cumm · grnm · a · b · mrb · kprg · tts |
-|            `oamp` | — (Diener 2007) |  9  |    anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
-|            `carp` |               — |  2  |                                                    mcar · fcar |
+|             Phase | Warr (2021) |           Model | em  |                                                    End-members |
+| -----------------:| -----------:| ---------------:|:---:| --------------------------------------------------------------:|
+| _(all mp phases)_ |           — |               — |  —  |                                         _(see Metapelite tab)_ |
+|            `occm` |        occm |        occm_F11 |  5  |                                    cc · odo · mag · sid · oank |
+|              `fl` |          fl |          fl_H03 |  2  |                                                      H2O · CO2 |
+|              `po` |          Po |          po_E10 |  2  |                                                    trov · trot |
+|             `dio` |         Cpx |         dio_G16 |  7  |                          jd · di · hed · acmm · om · cfm · jac |
+|             `aug` |         Aug |         aug_G16 |  8  |             di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
+|             `amp` |         Amp |         amp_G16 | 11  | tr · tsm · prgm · glm · cumm · grnm · a · b · mrb · kprg · tts |
+|            `oamp` |        oamp | — (Diener 2007) |  9  |    anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
+|            `carp` |         Cph |               — |  2  |                                                    mcar · fcar |
 
 
 **Pure phases:** q · crst · trd · coe · stv · ky · sill · and · ru · sph · O2 · pyr · gph · law · zo · prl · mpm · pre · cor
@@ -436,22 +444,22 @@ Extends `mp` with phases from Green et al. (2016), Evans & Frost (2021), and Die
 
 Stixrude & Lithgow-Bertelloni (2011). End-member names follow the SLB internal convention.
 
-|   Phase | em  |                 End-members |
-| -------:|:---:| ---------------------------:|
-|   `plg` |  2  |                     an · ab |
-|    `sp` |  2  |                     sp · hc |
-|    `ol` |  2  |                     fo · fa |
-|    `wa` |  2  |                 mgwa · fewa |
-|    `ri` |  2  |                 mgri · feri |
-|   `opx` |  4  |        en · fs · mgts · odi |
-|   `cpx` |  5  |   di · he · cen · cats · jd |
-| `hpcpx` |  2  |               hpcen · hpcfs |
-|    `ak` |  3  |            mgak · feak · co |
-|  `gtmj` |  5  | py · alm · gr · mgmj · jdmj |
-|    `pv` |  3  |          mgpv · fepv · alpv |
-|   `ppv` |  3  |          mppv · fppv · appv |
-|    `mw` |  2  |                     pe · wu |
-|    `cf` |  3  |          mgcf · fecf · nacf |
+|   Phase | Warr (2021) | em  |                 End-members |
+| -------:| -----------:|:---:| ---------------------------:|
+|   `plg` |          Pl |  2  |                     an · ab |
+|    `sp` |         Spl |  2  |                     sp · hc |
+|    `ol` |          Ol |  2  |                     fo · fa |
+|    `wa` |         Wds |  2  |                 mgwa · fewa |
+|    `ri` |        ring |  2  |                 mgri · feri |
+|   `opx` |         Opx |  4  |        en · fs · mgts · odi |
+|   `cpx` |         Cpx |  5  |   di · he · cen · cats · jd |
+| `hpcpx` |       hpcpx |  2  |               hpcen · hpcfs |
+|    `ak` |         Aki |  3  |            mgak · feak · co |
+|  `gtmj` |         Grt |  5  | py · alm · gr · mgmj · jdmj |
+|    `pv` |          pv |  3  |          mgpv · fepv · alpv |
+|   `ppv` |         ppv |  3  |          mppv · fppv · appv |
+|    `mw` |        Fper |  2  |                     pe · wu |
+|    `cf` |          cf |  3  |          mgcf · fecf · nacf |
 
 
 **Pure phases:** neph · ky · st · coe · qtz · capv · co &nbsp;&nbsp; **Activities:** aMgO · aFeO · aAl2O3
@@ -460,23 +468,23 @@ Stixrude & Lithgow-Bertelloni (2011). End-member names follow the SLB internal c
 
 Stixrude & Lithgow-Bertelloni (2021). Extends SB11 with new-aluminium-phase (`nal`) and an extra end-member in `mw`.
 
-|   Phase | em  |                 End-members |
-| -------:|:---:| ---------------------------:|
-|   `plg` |  2  |                     an · ab |
-|    `sp` |  2  |                     sp · hc |
-|    `ol` |  2  |                     fo · fa |
-|    `wa` |  2  |                 mgwa · fewa |
-|    `ri` |  2  |                 mgri · feri |
-|   `opx` |  4  |        en · fs · mgts · odi |
-|   `cpx` |  5  |   di · he · cen · cats · jd |
-| `hpcpx` |  2  |               hpcen · hpcfs |
-|    `ak` |  3  |            mgak · feak · co |
-|  `gtmj` |  5  | py · alm · gr · mgmj · jdmj |
-|    `pv` |  3  |          mgpv · fepv · alpv |
-|   `ppv` |  3  |          mppv · fppv · appv |
-|    `cf` |  3  |          mgcf · fecf · nacf |
-|    `mw` |  3  |              pe · wu · anao |
-|   `nal` |  3  |          mnal · fnal · nnal |
+|   Phase | Warr (2021) | em  |                 End-members |
+| -------:| -----------:|:---:| ---------------------------:|
+|   `plg` |          Pl |  2  |                     an · ab |
+|    `sp` |         Spl |  2  |                     sp · hc |
+|    `ol` |          Ol |  2  |                     fo · fa |
+|    `wa` |         Wds |  2  |                 mgwa · fewa |
+|    `ri` |        ring |  2  |                 mgri · feri |
+|   `opx` |         Opx |  4  |        en · fs · mgts · odi |
+|   `cpx` |         Cpx |  5  |   di · he · cen · cats · jd |
+| `hpcpx` |       hpcpx |  2  |               hpcen · hpcfs |
+|    `ak` |         Aki |  3  |            mgak · feak · co |
+|  `gtmj` |         Grt |  5  | py · alm · gr · mgmj · jdmj |
+|    `pv` |          pv |  3  |          mgpv · fepv · alpv |
+|   `ppv` |         ppv |  3  |          mppv · fppv · appv |
+|    `cf` |          cf |  3  |          mgcf · fecf · nacf |
+|    `mw` |        Fper |  3  |              pe · wu · anao |
+|   `nal` |         nal |  3  |          mnal · fnal · nnal |
 
 
 **Pure phases:** neph · ky · st · coe · qtz · capv · co &nbsp;&nbsp; **Activities:** aMgO · aFeO · aAl2O3
@@ -485,23 +493,23 @@ Stixrude & Lithgow-Bertelloni (2021). Extends SB11 with new-aluminium-phase (`na
 
 Stixrude & Lithgow-Bertelloni (2024). Expanded solid solutions throughout; new iron polymorphs and high-pressure phases as pure phases.
 
-|   Phase | em  |                                    End-members |
-| -------:|:---:| ----------------------------------------------:|
-|   `plg` |  2  |                                        an · ab |
-|    `sp` |  4  |                          sp · hc · smag · picr |
-|    `ol` |  2  |                                        fo · fa |
-|    `wa` |  2  |                                    mgwa · fewa |
-|    `ri` |  2  |                                    mgri · feri |
-|   `opx` |  4  |                           en · fs · mgts · odi |
-|   `cpx` |  6  |                di · he · cen · cats · jd · acm |
-| `hpcpx` |  2  |                                    mgc2 · fec2 |
-|    `ak` |  5  |                   mgak · feak · co · hem · esk |
-|  `gtmj` |  7  |      py · alm · gr · mgmj · jdmj · knor · andr |
-|    `pv` |  7  | mgpv · fepv · alpv · hepv · hlpv · fapv · crpv |
-|   `ppv` |  5  |               mppv · fppv · appv · hppv · cppv |
-|    `cf` |  5  |               mgcf · fecf · nacf · hmag · crcf |
-|    `mw` |  5  |                    pe · wu · wuls · mag · anao |
-|   `nal` |  3  |                             mnal · fnal · nnal |
+|   Phase | Warr (2021) | em  |                                    End-members |
+| -------:| -----------:|:---:| ----------------------------------------------:|
+|   `plg` |          Pl |  2  |                                        an · ab |
+|    `sp` |         Spl |  4  |                          sp · hc · smag · picr |
+|    `ol` |          Ol |  2  |                                        fo · fa |
+|    `wa` |         Wds |  2  |                                    mgwa · fewa |
+|    `ri` |        ring |  2  |                                    mgri · feri |
+|   `opx` |         Opx |  4  |                           en · fs · mgts · odi |
+|   `cpx` |         Cpx |  6  |                di · he · cen · cats · jd · acm |
+| `hpcpx` |       hpcpx |  2  |                                    mgc2 · fec2 |
+|    `ak` |         Aki |  5  |                   mgak · feak · co · hem · esk |
+|  `gtmj` |         Grt |  7  |      py · alm · gr · mgmj · jdmj · knor · andr |
+|    `pv` |          pv |  7  | mgpv · fepv · alpv · hepv · hlpv · fapv · crpv |
+|   `ppv` |         ppv |  5  |               mppv · fppv · appv · hppv · cppv |
+|    `cf` |          cf |  5  |               mgcf · fecf · nacf · hmag · crcf |
+|    `mw` |        Fper |  5  |                    pe · wu · wuls · mag · anao |
+|   `nal` |         nal |  3  |                             mnal · fnal · nnal |
 
 
 **Pure phases:** neph · ky · st · coe · qtz · capv · O2 · fea · fee · feg · apbo · wo · lppv · pwo &nbsp;&nbsp; **Activities:** aMgO · aFeO · aAl2O3
@@ -518,30 +526,30 @@ Stixrude & Lithgow-Bertelloni (2024). Expanded solid solutions throughout; new i
 
 The OL model uses a fixed set of empirical mineral/melt partition coefficients compiled by O. Laurent (2012). Kd values are tabulated as geometric-mean estimates subdivided into three melt SiO₂ ranges. Phase abbreviations used throughout:
 
-| Abbreviation |             Phase |
-| ------------:| -----------------:|
-|          cpx |     clinopyroxene |
-|           pl |       plagioclase |
-|            g |            garnet |
-|          opx |     orthopyroxene |
-|           ol |           olivine |
-|          amp |         amphibole |
-|           bi |           biotite |
-|          afs |   alkali feldspar |
-|           mu |         muscovite |
-|          ttn | titanite (sphene) |
-|           ap |           apatite |
-|          zrc |            zircon |
-|           ep |           epidote |
-|          all |          allanite |
-|          mgt |         magnetite |
-|           ru |            rutile |
-|       FeTiOx |       Fe-Ti oxide |
-|           sp |            spinel |
-|           cd |        cordierite |
-|            q |            quartz |
-|          and |        andalusite |
-|         sill |       sillimanite |
+| Abbreviation |             Phase | Warr (2021) |
+| ------------:| -----------------:| -----------:|
+|          cpx |     clinopyroxene |         Cpx |
+|           pl |       plagioclase |          Pl |
+|            g |            garnet |         Grt |
+|          opx |     orthopyroxene |         Opx |
+|           ol |           olivine |          Ol |
+|          amp |         amphibole |         Amp |
+|           bi |           biotite |          Bt |
+|          afs |   alkali feldspar |         Afs |
+|           mu |         muscovite |          Ms |
+|          ttn | titanite (sphene) |         Ttn |
+|           ap |           apatite |          Ap |
+|          zrc |            zircon |         Zrn |
+|           ep |           epidote |          Ep |
+|          all |          allanite |         Aln |
+|          mgt |         magnetite |         Mag |
+|           ru |            rutile |          Rt |
+|       FeTiOx |       Fe-Ti oxide |           — |
+|           sp |            spinel |         Spl |
+|           cd |        cordierite |         Crd |
+|            q |            quartz |          Qz |
+|          and |        andalusite |         And |
+|         sill |       sillimanite |         Sil |
 
 
 ::: tip Note
