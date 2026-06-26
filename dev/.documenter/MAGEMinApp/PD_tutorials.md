@@ -34,6 +34,8 @@ Here we provide a set of tutorials to generate various kind of phase diagrams, c
   
 - [14. Draw a P-T path on the diagram](/MAGEMinApp/PD_tutorials#14.-Draw-a-P-T-path-on-the-diagram)
   
+- [15. Quantitative isopleth thermobarometry with IntersecT](/MAGEMinApp/PD_tutorials#15.-Quantitative-isopleth-thermobarometry-with-IntersecT)
+  
 
 :::
 
@@ -619,7 +621,7 @@ This results in the following upper mantle density diagram that can be exported 
 
 The `Draw path` panel (available in the `Diagram` sub-tab, right sidebar) lets you manually trace a P-T path directly on the phase diagram by clicking on grid points, and then generates a stacked area chart of phase fractions along that path.
 
-#### Step 1 — Enable recording {#Step-1-—-Enable-recording}
+#### Step 1 - Enable recording {#Step-1-Enable-recording}
 
 Open the `Draw path` panel on the right sidebar. Toggle `Record` to **on**. The point counter resets to `0 point(s)`.
 
@@ -629,7 +631,7 @@ Recording is automatically disabled when you switch away from the `Draw path` pa
 
 :::
 
-#### Step 2 — Click points on the diagram {#Step-2-—-Click-points-on-the-diagram}
+#### Step 2 - Click points on the diagram {#Step-2-Click-points-on-the-diagram}
 
 With `Record` active, click on any location of the phase diagram. Each click appends a new row to the path table showing the coordinates of the selected point:
 
@@ -644,13 +646,17 @@ With `Record` active, click on any location of the phase diagram. Each click app
 - Use `Clear` to discard the entire path and start over.
   
 
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_path_setup.png?raw=true" alt="Path setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
+
+
+
 ::: tip Note
 
 For P-X and T-X diagram types the table columns adapt accordingly (`X; P [kbar]` or `X; T [°C]`).
 
 :::
 
-#### Step 3 — Choose the output unit and generate {#Step-3-—-Choose-the-output-unit-and-generate}
+#### Step 3 - Choose the output unit and generate {#Step-3-Choose-the-output-unit-and-generate}
 
 Select the system unit for the phase fractions plot:
 
@@ -663,4 +669,120 @@ Select the system unit for the phase fractions plot:
 
 Click `Generate`. MAGEMinApp computes the stable phase equilibrium at each recorded point and displays a stacked area chart titled **Phase fractions along path** in the expandable canvas below the controls.
 
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_path_ex.png?raw=true" alt="Path ex" style="max-width: 90%; height: auto; display: block; margin: 0 auto;">
+
+
+
 The x-axis reports the path coordinates (`T [°C]; P [kbar]` for a P-T diagram) and the y-axis shows the phase fraction in the selected unit. The chart can be exported as an `svg` file using the camera icon in the top-right corner of the plot.
+
+### 15. Quantitative isopleth thermobarometry with IntersecT {#15.-Quantitative-isopleth-thermobarometry-with-IntersecT}
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/Logo-IntersecT.png?raw=true" alt="Intersect" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
+
+
+
+The `IntersecT` tab implements quantitative isopleth thermobarometry (Nerone et al., 2025, doi:[10.1016/j.cageo.2025.105949](https://doi.org/10.1016/j.cageo.2025.105949)), following the compositional-quality-factor (Q$_{cmp}$) and reduced-$\chi^2$ approach of Duesterhoeft & Lanari (2020). For every grid point of a previously computed phase diagram, the modelled a.p.f.u. composition of one or several mineral phases is compared to a measured (e.g. EPMA) composition, returning a goodness-of-fit map that highlights the pressure-temperature region where the model best reproduces the natural sample.
+
+This tutorial reuses the two example files shipped in `examples/IntersecT/` of `MAGEMinApp`:
+- `Petroccia_et_al_2025_bulk_Magemin.csv` - a bulk-rock input file (same format as described in [Bulk-rock input file](/MAGEMinApp/bulk_rock#Bulk-rock-input-file)) containing one custom composition named `BAR38A`.
+  
+- `BAR38A_measurements_julia.csv` - a measured mineral-composition file for the same sample, with one row of observed a.p.f.u. values and one row of analytical uncertainties for garnet (`Grt`), chloritoid (`Cld`) and muscovite (`Ms`).
+  
+
+#### Step 1 - Load the bulk-rock composition and compute a phase diagram {#Step-1-Load-the-bulk-rock-composition-and-compute-a-phase-diagram}
+
+`BAR38A` is a peraluminous, water-bearing pelite intended for the `Metapelite extended` (White et al., 2014; Green et al., 2016; Evans & Frost, 2021) thermodynamic database, acronym `mpe`.
+
+::: warning Warning
+
+Before doing anything else, open the `Setup` tab, `General parameters` panel, and set `Mineral names = Warr (2021)`. `IntersecT` matches phases between the measurement file (column headers such as `Grt_Mg`) and the computed grid using the IMA-CNMNC symbols of Warr (2021). With the default `Legacy` naming (MAGEMin's internal codes, e.g. `g`, `ctd`, `mu`) no phase will be found in common and the `Stable phases` checklist will stay empty.
+
+:::
+
+In the `Phase diagram` tab, `Setup` sub-tab:
+1. In `Phase diagram parameters`, set `Database = Metapelite extended (White et al., 2014, Green et al., 2016, Evans & Frost., 2021)`.
+  
+2. In `Bulk-rock composition`, drag and drop `Petroccia_et_al_2025_bulk_Magemin.csv` onto the upload field. A `Bulk-rock(s) composition(s) successfully loaded` alert confirms the import.
+  
+3. Still in `Bulk-rock composition`, select `BAR38A` in the dropdown above the composition table (it is appended at the end of the list for the `mpe` database).
+  
+4. Since `BAR38A` is a peak-pressure, chloritoid-and-garnet-bearing pelite, lower the default temperature range to something like 400 – 700 °C (the default 800 – 1400 °C window is too hot for `Cld` to be stable). Change pressure range (15 - 35 kbar).
+  
+5. Set `Initial grid subdivision = 4` and `Refinement levels = 3`, then click `Compute phase diagram`.
+  
+
+::: tip Note
+
+If `Cld`, `Grt` and `Ms` do not all appear together anywhere on the resulting diagram, widen or shift the pressure-temperature window and recompute - `IntersecT` can only be run on phases that are present, in common with the measurement file, somewhere on the grid.
+
+:::
+
+#### Step 2 - Load the measurement file and select the stable phases {#Step-2-Load-the-measurement-file-and-select-the-stable-phases}
+
+Switch to the top-level `IntersecT` tab (`Setup` panel on the left, open by default).
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMin_Intersect_setup.png?raw=true" alt="MAGEMinApp Intersect setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
+
+
+1. Drag and drop `BAR38A_measurements_julia.csv` onto the `Measurement file` upload field.
+  
+2. The panel below the upload field reports the file name, the number of measured columns and the phases found in the header (`Grt`, `Cld`, `Ms`):
+  
+  |                                      Column |      Phase | Element (a.p.f.u.) |
+  | -------------------------------------------:| ----------:| ------------------:|
+  |      `Grt_Mg`, `Grt_Ca`, `Grt_Mn`, `Grt_Fe` |     Garnet |     Mg, Ca, Mn, Fe |
+  |                          `Cld_Mg`, `Cld_Fe` | Chloritoid |             Mg, Fe |
+  | `Ms_Mg`, `Ms_Fe`, `Ms_Si`, `Ms_Al`, `Ms_Na` |  Muscovite | Mg, Fe, Si, Al, Na |
+  
+  The first data row holds the observed a.p.f.u. values, the second row the corresponding analytical uncertainties.
+  
+3. The `Stable phases` checklist is automatically populated with the phases found both in the measurement file and on the computed grid, and all of them are pre-checked. Uncheck a phase here to exclude it from the calculation.
+  
+4. Leave `Analysis type = WDS spot` (or pick `WDS map`/`EDS`). This setting is only used to auto-estimate the analytical uncertainty when the measurement file does not already provide one - since `BAR38A_measurements_julia.csv` already has an explicit uncertainty row, it has no effect on this particular run, but the field must still hold a valid value.
+  
+
+#### Step 3 - Run IntersecT and compute the Q factor {#Step-3-Run-IntersecT-and-compute-the-Q-factor}
+
+Click `Run IntersecT`. For each selected phase, `IntersecT` compares the modelled a.p.f.u. composition at every grid point to the measured value (weighted by its uncertainty), giving a compositional quality factor Q$_{cmp}$ (1 = perfect match) and a reduced-$\chi^2$ statistic (≈1 = consistent with the analytical uncertainty) per phase and per element, plus weighted and unweighted combinations over all selected phases.
+
+The `Display` dropdown above the main diagram (`Diagrams` sub-tab) is populated with all available fields and defaults to `Qcmp weighted`:
+
+|                               Field |                                                                                                       Meaning |
+| -----------------------------------:| -------------------------------------------------------------------------------------------------------------:|
+| `Qcmp weighted` / `Qcmp unweighted` | Combined quality factor over all selected phases (weighted by each phase's best-fit reduced-$\chi^2$, or not) |
+|                     `redchi2 total` |                                                            Combined reduced-$\chi^2$ over all selected phases |
+|  `Qcmp <phase>` / `redchi2 <phase>` |                                         Quality factor / reduced-$\chi^2$ for one phase only, e.g. `Qcmp Grt` |
+|              `Qcmp <Phase_Element>` |                                      Quality factor for a single measured a.p.f.u. column, e.g. `Qcmp Grt_Mg` |
+
+
+The two smaller diagrams below let you compare two more fields side by side (e.g. `Qcmp Grt` against `Qcmp Cld`) to see whether all phases agree on the same pressure-temperature region.
+
+::: tip Note
+
+Switching the displayed field automatically rescales `Min`/`Max` in the `Color options` panel to that field's range, since `Qcmp` and `redchi²` fields have very different scales.
+
+:::
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_Intersect.png?raw=true" alt="Intersect results" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+
+
+
+#### Step 4 - Read the Log {#Step-4-Read-the-Log}
+
+Open the `Log` sub-tab to get the full text report: for each selected phase and for each measured element, the (P,T) location and value of the maximum Q$_{cmp}$ and the minimum reduced-$\chi^2$, together with the overall weighted and unweighted optimum and any warnings (for instance if a phase is not stable everywhere on the grid). This is the same information used to build the diagrams, in a form convenient to copy into a report or table.
+
+#### Step 5 - Overlay isocontours (optional) {#Step-5-Overlay-isocontours-optional}
+
+In the `Options` column, the `Isocontours` section works as in the `Phase diagram` tab (see [2. Reaction lines and isopleths](/MAGEMinApp/PD_tutorials#2.-Reaction-lines-and-isopleths)), with two contour sources:
+- `Type = Measurements`: contour a modelled a.p.f.u. field for a `Phase`/`Element` pair found in the measurement file, e.g. `Phase = Grt`, `Element = Mg`.
+  
+- `Type = Field`: contour one of the `IntersecT` result fields listed in the `Field` dropdown (only available after `Run IntersecT`), e.g. `Field = Qcmp weighted` with `Min = 0`, `Step = 0.1`, `Max = 1` to outline, for instance, the Q$_{cmp}$ ≥ 0.8 region.
+  
+
+Set `Range`, line style/width/size and color to your liking and click `Add`. Added isocontours can be shown, hidden or removed from the `Displayed`/`Hidden` lists at the bottom of the panel, exactly as for the regular phase-diagram isopleths.
+
+::: tip Tip
+
+Overlaying a `Measurements`-type isocontour for the same `Phase_Element` used in the fit (e.g. `Grt_Mg`) directly on top of the `Qcmp` field is a quick way to check, visually, which part of the high-Q region is actually controlled by that particular element.
+
+:::

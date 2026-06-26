@@ -215,6 +215,8 @@ The main structure stores the properties of the system.
 ├─ rho_F :: Float64             # [kg/m^3]  fluid/H2O density
 ├─ eta_M :: Float64             # [Pa.s]    viscosity of the melt (after Giordano et al., 2008)
 ├─ fO2 :: Float64               # [-]       oxygen fugacity
+├─ system_oxygen :: Float64     # [mol_i]]  mol fraction of oxygen bound in the solutions
+├─ Fe3_Fe2_ratio :: Float64     # [-]       Fe3 / (Fe3 + Fe2) mol ratio
 ├─ dQFM :: Float64              # [-]       oxygen fugacity offset from QFM buffer
 ├─ aH2O :: Float64              # [-]       system H2O activity
 ├─ aSiO2 :: Float64             # [-]       system SiO2 activity
@@ -245,12 +247,17 @@ The main structure stores the properties of the system.
 ├─ Vs :: Float64                # [km/s]    S-wave system velocity
 ├─ Vp_S :: Float64              # [km/s]    P-wave solid velocity
 ├─ Vs_S :: Float64              # [km/s]    S-wave solid velocity
+├─ Vp_cor :: Float64            # [km/s]    corrected P-wave solid velocity (shalow porosity, anelasticity and melt/fluid connectivity)
+├─ Vs_cor :: Float64            # [km/s]    corrected S-wave solid velocity (shalow porosity, anelasticity and melt/fluid connectivity)
 ├─ bulkMod :: Float64           # [GPa]     system bulk modulus
 ├─ shearMod :: Float64          # [GPa]     system shear modulus
 ├─ bulkModulus_M :: Float64     # [GPa]     melt bulk modulus
 ├─ bulkModulus_S :: Float64     # [GPa]     solid bulk modulus
 ├─ shearModulus_S :: Float64    # [GPa]     solid shear modulus
 ├─ entropy :: Float64           # [kJ/K]    system entropy
+├─ entropy_F :: Float64         # [kJ/K]    fluid entropy
+├─ entropy_M :: Float64         # [kJ/K]    melt entropy
+├─ entropy_S :: Float64         # [kJ/K]    solid entropy
 ├─ enthalpy :: Float64          # [kJ/mol]  system enthalpy
 ├─ iter :: Int64                # [-]       number of iterations to reach convergence
 ├─ bulk_res_norm :: Float64     # [-]       bulk rock composition residual
