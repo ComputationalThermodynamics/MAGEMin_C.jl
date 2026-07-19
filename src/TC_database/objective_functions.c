@@ -18255,8 +18255,19 @@ SS_ref PC_function(		global_variable 	 gv,
 	SS_ref_db.sf_ok = 1;
 	for (int i = 0; i < SS_ref_db.n_sf; i++){
 		if (SS_ref_db.sf[i] < gv.eps_sf_pc || isnan(SS_ref_db.sf[i]) == 1|| isinf(SS_ref_db.sf[i]) == 1){
-			SS_ref_db.sf_ok = 0;	
+			SS_ref_db.sf_ok = 0;
 			break;
+		}
+	}
+
+    /* Check if equality constraint on endmember fraction is respected for gh group */
+	if (SS_ref_db.sf_ok == 1 && strcmp(gv.research_group, "gh") == 0){
+		double sum_p = 0.0;
+		for (int i = 0; i < SS_ref_db.n_em; i++){
+			sum_p += SS_ref_db.p[i];
+		}
+		if (fabs(sum_p - 1.0) > 1.0e-6){
+			SS_ref_db.sf_ok = 0;
 		}
 	}
 

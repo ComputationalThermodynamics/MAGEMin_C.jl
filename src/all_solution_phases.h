@@ -17,4 +17,7 @@
     /* This include Stixrude & Lithgow-Bertelloni solution phase models */
     #include "./SB_database/SB_solution_phases.h"
 
+    /* This includes the Ghiorso/MELTS liquid model (research group "gh") */
+    #include "./GH_database/GH_solution_phases.h"
+
 #endif

@@ -29,6 +29,11 @@ global_variable global_variable_init( 	global_variable  	 gv,
 		gv 	=	global_variable_SB_init( 	gv,
 											z_b 	);
 	}
+	else if (strcmp(gv.research_group, "gh") 	== 0 ){
+	/* here we initialize MAGEMin using the Ghiorso/MELTS liquid model */
+		gv 	=	global_variable_GH_init( 	gv,
+											z_b 	);
+	}
 	else{
 		printf(" wrong group, fix group name\n");
 	}
@@ -65,8 +70,24 @@ char** get_EM_DB_names_sb(global_variable gv) {
     for ( i = 0; i < n_em_db; i++){
         names[i] = malloc(20 * sizeof(char));
     }
-    for ( i = 0; i < n_em_db; i++){	
+    for ( i = 0; i < n_em_db; i++){
         EM_return = Access_SB_EM_DB(i, gv.EM_dataset);
+        strcpy(names[i],EM_return.Name);
+    }
+    return names;
+}
+
+char** get_EM_DB_names_gh(global_variable gv) {
+
+    EM_db_gh EM_return;
+    int i, n_em_db;
+    n_em_db = gv.n_em_db;
+    char ** names = malloc((n_em_db+1) * sizeof(char*));
+    for ( i = 0; i < n_em_db; i++){
+        names[i] = malloc(20 * sizeof(char));
+    }
+    for ( i = 0; i < n_em_db; i++){
+        EM_return = Access_GH_EM_DB(gv.EM_database, i);
         strcpy(names[i],EM_return.Name);
     }
     return names;
@@ -122,7 +143,7 @@ global_variable global_variable_alloc( bulk_info  *z_b ){
 	}
 
 	strcpy(gv.outpath,"./output/");				/** define the outpath to save logs and final results file	 						*/
-	strcpy(gv.version,"1.9.9 26/06/2026]");		/** MAGEMin version 																*/
+	strcpy(gv.version,"1.9.10 [19/07/2026]");		/** MAGEMin version 																*/
 
 	/* generate parameters        		*/
 	strcpy(gv.buffer,"none");
@@ -141,6 +162,9 @@ global_variable global_variable_alloc( bulk_info  *z_b ){
 	gv.mpSp 			= 0;					/** 0: Sp LT, 1: Mt1													*/
 	gv.mpIlm 			= 0;					/** 0: Ilmm, 1: Ilm 																*/
 	gv.ig_ed 			= 0;					/** 0: flag to activate edited version of bi and amp for igneous database 			*/
+	gv.precond 			= 1;					/** 1: precondition (Ruiz-scale) the stoichiometric matrix before inverseMatrix's LU inversion, 0: preconditioning off 	*/
+	gv.BR_rel_norm 		= 1;					/** 1: PGE mass-residual convergence norm is per-oxide-relative (normalized by bulk abundance), 0: old absolute norm 	*/
+	gv.gh_multistart_order = 0;					/** 0 (default): single starting guess for gh's embedded order-parameter phases, matching real xMELTS' own order() exactly; 1: legacy multi-start (see MAGEMin.h) 	*/
 
 	// gv.calc_seismic_cor = 1;					/** compute seismic velocity corrections (melt and anelastic)						*/
 	// gv.melt_pressure 	= 0.0;				/** [kbar] pressure shift in case of modelling melt pressure 						*/
@@ -176,16 +200,24 @@ global_variable global_variable_alloc( bulk_info  *z_b ){
 	gv.launch_PGE 		= 0;
 	gv.n_pc 			= 8192;
 	gv.n_Ppc			= 8192;
-	gv.max_LP_ite 		= 256;
+	gv.max_LP_ite 		= 512;
 	gv.save_Ppc_val     = 0.0; 					/** During PGE iterations, if the driving force is < save_Ppc_val, then the 
 													pseudocompound is added to the Ppc list 										*/
 
 	/* local minimizer options 	*/
-	gv.bnd_val          = 1.0e-7;				/** boundary value for x-eos 										 				*/
+	gv.bnd_val          = 1.0e-6;				/** boundary value for x-eos 										 				*/
 	gv.box_size_mode_PGE= 0.25;					/** box edge size of the compositional variables used during PGE local minimization */
 	gv.maxeval   		= 1024;					/** max number of evaluation of the obj function for mode 1 (PGE)					*/
 	gv.maxgmTime        = 0.1; 					/** set a maximum minimization time for the local minimizer (sec)					*/
 	gv.box_size_mode_LP	= 1.0;					/** box edge size of the compositional variables used during PGE local minimization */
+
+	/* "liq" redundant-occurrence pseudocompound synthesis (gh and tc) */
+	gv.n_max_val 					= 3;	 		/** controls the max number of minimization per identical phases */
+	gv.act_rMELTS_liq_pc_synth      = 64;	     	/** number of global iterations steps before lienar discretization of the PC generation */
+	gv.liq_pc_synth_active			= 1;			/** 1: composite method active; 0: fully disabled, legacy per-occurrence NLopt path 	*/
+	gv.gh_liq_pc_synth_h			= 1e-2;			/** base xeos step size for the synthetic pseudocompound spread - actual step used
+													    is this * sqrt(gv.gamma_norm[.]), clamped to [1e-6, 1e-2] (see GH_liq_pc_synth_step) */
+	gv.gh_liq_pc_synth_threshold	= 2;			/** n_ss_ph[liq] above which the composite (1 real solve + synthesis) method fires 	*/
 
 	/* set of parameters to record the evolution of the norm of the mass constraint */
 	gv.it_1             = 128;                  /** first critical iteration                                                        */
@@ -197,8 +229,9 @@ global_variable global_variable_alloc( bulk_info  *z_b ){
 	gv.it_f             = 256;                  /** gives back failure when the number of iteration is bigger than it_f             */
 
 	/* phase update options 			*/
-	gv.min_df 			= -1e-6;					/** value under which a phase in hold is reintroduced */
+	gv.min_df 			= -1e-6;				/** value under which a phase in hold is reintroduced 								*/
 	gv.re_in_df 		= -1e-6;
+	
 	/* numerical derivatives P,T steps (same value as TC) */
 	gv.gb_P_eps			= 2e-3;					/** small value to calculate V using finite difference: V = dG/dP;					*/
 	gv.gb_T_eps			= 2e-3;					/** small value to calculate V using finite difference: V = dG/dP;					*/
@@ -274,6 +307,7 @@ csd_phase_set CP_INIT_function(csd_phase_set cp, global_variable gv){
 	cp.phase_density  		= 0.0;
 	cp.phase_cp				= 0.0;
 	cp.phase_expansivity	= 0.0;
+	cp.phase_compressibility= 0.0;
 	cp.phase_entropy		= 0.0;
 	cp.phase_enthalpy		= 0.0;
 		
@@ -413,7 +447,15 @@ SS_ref G_SS_init_EM_function(		SS_init_type		*SS_init,
 	
 	/* initialize fractions flags and cycle arrays with zeros */
 	SS_ref_db.ss_flags      = malloc (gv.n_flags  * sizeof(int));
-    SS_ref_db.solvus_id     = malloc ((gv.len_ss*4)   * sizeof (int)  	);
+    /* solvus_id is indexed by gv.n_solvi[ph_id], which counts how many
+       considered-phase instances (out of gv.len_cp) currently map to this
+       solution phase - in the worst case (a database with few distinct
+       solution phases, e.g. all considered phases being instances of the
+       same one) that can reach gv.len_cp, so size against gv.max_n_cp
+       (the hard upper bound on len_cp) rather than gv.len_ss*4, which
+       silently assumed every phase has several distinct solution phases
+       to spread solvus instances across. */
+    SS_ref_db.solvus_id     = malloc ((gv.max_n_cp)   * sizeof (int)  	);
 
 	/* dynamic memory allocation of data to send to NLopt */
 	SS_ref_db.bounds 	= malloc (n_xeos * sizeof (double*)  ); 
@@ -708,6 +750,7 @@ global_variable reset_gv(					global_variable 	 gv,
 	gv.system_volume_cm3mol = 0.;
 	gv.system_cp    	  = 0.;
 	gv.system_expansivity = 0.;
+	gv.system_compressibility = 0.;
 	gv.system_bulkModulus = 0.;
 	gv.system_shearModulus= 0.;
 	gv.system_Vp 		  = 0.;
@@ -786,6 +829,7 @@ void reset_sp(						global_variable 	 gv,
 	sp[0].aFeO  						= 0.0;
 
 	sp[0].alpha  						= 0.0;
+	sp[0].beta  						= 0.0;
 	sp[0].cp  							= 0.0;
 	sp[0].s_cp  						= 0.0;
 	sp[0].cp_wt  						= 0.0;

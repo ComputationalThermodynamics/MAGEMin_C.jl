@@ -215,8 +215,15 @@ global_variable PGE_residual_update(			bulk_info 				z_b,
 		}
 	}
 
-	gv.BR_norm    = norm_vector(	gv.mass_residual,
-									z_b.nzEl_val				);
+	if (gv.BR_rel_norm){
+		gv.BR_norm    = relative_norm_vector(	gv.mass_residual,
+												z_b.bulk_rock,
+												z_b.nzEl_val				);
+	}
+	else{
+		gv.BR_norm    = norm_vector(	gv.mass_residual,
+										z_b.nzEl_val				);
+	}
 
 	/* Calculate G-system */
 	gv.G_system = 0.0;

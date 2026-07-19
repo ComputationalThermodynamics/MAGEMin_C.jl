@@ -137,6 +137,7 @@ void reset_output_struct(		global_variable 	 gv,
 	sp[0].buffer_n				 = gv.buffer_n;
 
 	sp[0].alpha				 	 = gv.system_expansivity;
+	sp[0].beta				 	 = gv.system_compressibility;
 	sp[0].V				 	 	 = gv.system_volume_cm3mol;	
 	sp[0].V_cm3				 	 = gv.system_volume*1e6;	
 	sp[0].cp				 	 = gv.system_cp;	
@@ -240,6 +241,12 @@ void mSS_output_struct(			global_variable 	 gv,
 		SB_PC_init(	    		PC_read,
 								gv			);
 	}
+	else if (strcmp(gv.research_group, "gh") 	== 0 ){
+		GH_PC_init(	    		PC_read,
+								gv			);
+		GH_P2X_init(	    	P2X_read,
+								gv			);
+	}
 
 	int nox  = gv.len_ox;
 	int i, j, k, m, n, em_id, ph_id, pc_id;
@@ -310,17 +317,24 @@ void mSS_output_struct(			global_variable 	 gv,
 			SS_ref_db[ph_id] = non_rot_hyperplane(	gv, 
 													SS_ref_db[ph_id]			);
 
-			if (strcmp(gv.research_group, "tc") 	== 0 ){									
+			if (strcmp(gv.research_group, "tc") 	== 0 ){
 				SS_ref_db[ph_id] = PC_function(				gv,
 															PC_read,
-															SS_ref_db[ph_id], 
+															SS_ref_db[ph_id],
 															z_b,
 															ph_id 		);
 			}
 			else if (strcmp(gv.research_group, "sb") 	== 0 ){
 				SS_ref_db[ph_id] = SB_PC_function(			gv,
 															PC_read,
-															SS_ref_db[ph_id], 
+															SS_ref_db[ph_id],
+															z_b,
+															ph_id 		);
+			}
+			else if (strcmp(gv.research_group, "gh") 	== 0 ){
+				SS_ref_db[ph_id] = GH_PC_function(			gv,
+															PC_read,
+															SS_ref_db[ph_id],
 															z_b,
 															ph_id 		);
 			}
@@ -378,17 +392,24 @@ void mSS_output_struct(			global_variable 	 gv,
 			SS_ref_db[ph_id] = non_rot_hyperplane(	gv, 
 													SS_ref_db[ph_id]			);
 
-			if (strcmp(gv.research_group, "tc") 	== 0 ){									
+			if (strcmp(gv.research_group, "tc") 	== 0 ){
 				SS_ref_db[ph_id] = PC_function(				gv,
 															PC_read,
-															SS_ref_db[ph_id], 
+															SS_ref_db[ph_id],
 															z_b,
 															ph_id 		);
 			}
 			else if (strcmp(gv.research_group, "sb") 	== 0 ){
 				SS_ref_db[ph_id] = SB_PC_function(			gv,
 															PC_read,
-															SS_ref_db[ph_id], 
+															SS_ref_db[ph_id],
+															z_b,
+															ph_id 		);
+			}
+			else if (strcmp(gv.research_group, "gh") 	== 0 ){
+				SS_ref_db[ph_id] = GH_PC_function(			gv,
+															PC_read,
+															SS_ref_db[ph_id],
 															z_b,
 															ph_id 		);
 			}
@@ -563,6 +584,7 @@ void fill_output_struct(		global_variable 	 gv,
 			sp[0].cp_wt 		+= sp[0].SS[m].cp* cp[i].ss_n_wt;//cp[i].phase_cp * cp[i].ss_n_wt * cp[i].factor;
 			sp[0].SS[m].rho 	 = cp[i].phase_density;
 			sp[0].SS[m].alpha 	 = cp[i].phase_expansivity;
+			sp[0].SS[m].beta 	 = cp[i].phase_compressibility;
 			sp[0].SS[m].entropy  = cp[i].phase_entropy;
 			sp[0].SS[m].enthalpy = cp[i].phase_entropy*z_b.T + G;
 			sp[0].SS[m].bulkMod  = cp[i].phase_bulkModulus/10.;
