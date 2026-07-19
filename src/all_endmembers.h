@@ -19,4 +19,9 @@
     #include "./SB_database/SB_gem_function.h"
     //#include "STIX_solution_phases.h"
 
+    /* This includes the Ghiorso/MELTS liquid model (research group "gh") */
+    #include "./GH_database/GH_endmembers.h"
+    #include "./GH_database/GH_PP_endmembers.h"
+    #include "./GH_database/GH_gem_function.h"
+
 #endif

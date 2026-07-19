@@ -382,6 +382,18 @@ int runMAGEMin(			int    argc,
 								gv,
 								SS_ref_db						);
 	}
+	else if ( strcmp(gv.research_group, "gh") 	== 0 ){
+		gv = init_em_db_gh(		EM_database,
+								z_b,											/** bulk rock informations 			*/
+								gv,												/** global variables (e.g. Gamma) 	*/
+								PP_ref_db						);
+
+		/* Calculate solution phase data at given P-T conditions (G0 based on G0 of endmembers) */
+		gv = init_ss_db_gh(		EM_database,
+								z_b,
+								gv,
+								SS_ref_db						);
+	}
 
 
 
@@ -430,7 +442,22 @@ int runMAGEMin(			int    argc,
 
 		SB_PC_init(	                    		PC_read,
 												gv								);
-	}								
+	}
+	else if (strcmp(gv.research_group, "gh") 	== 0 ){
+		GH_SS_objective_init_function(			SS_objective,
+												gv								);
+
+		GH_NLopt_opt_init(	        			NLopt_opt,
+												gv								);
+
+		GH_PC_init(	                    		PC_read,
+												gv								);
+
+		GH_P2X_init(	                		P2X_read,
+												gv								);
+		/* "sb" still has no P2X_read map: every codepath that reads it is
+		   gated to exclude "sb" explicitly - see simplex_levelling.c */
+	}
 
 	/****************************************************************************************/
 	/**                                   LEVELLING                                        **/
@@ -808,30 +835,30 @@ global_variable ReadCommandLineOptions(	global_variable 	 gv,
 		else if (c == 310){
 			char *p = strtok(opt.arg,",");
 			size_t i = 0;
-			while(p && i<11) {
+			while(p && i<(size_t)gv.maxlen_ox) {
 					gv.arg_gamma[i++] = atof(p);
 					p = strtok(NULL, ",");
 			}
 			if (gv.verbose == 1){
 				printf("--Gam  	      : Gamma           = ");
-				for (int j = 0; j < 11; j++){
-					printf("%g ", gv.arg_gamma[j]);	
-				} 
+				for (int j = 0; j < gv.maxlen_ox; j++){
+					printf("%g ", gv.arg_gamma[j]);
+				}
 				printf(" dG \n");
 			}
 		 }
 		else if (c == 311){
 			char *p  = strtok(opt.arg,",");
 			size_t i = 0;
-			while(p && i<11) {
+			while(p && i<(size_t)gv.maxlen_ox) {
 					gv.arg_bulk[i++] = atof(p);
 					p = strtok(NULL, ",");
 			}
 			if (gv.verbose == 1){
 				printf("--Bulk  	 : Bulk         = ");
-				for (int j = 0; j < 11; j++){
-					printf("%g ", gv.arg_bulk[j]);	
-				} 
+				for (int j = 0; j < gv.maxlen_ox; j++){
+					printf("%g ", gv.arg_bulk[j]);
+				}
 				printf(" \n");
 			}
 		 }
@@ -848,7 +875,7 @@ global_variable SetupDatabase(			global_variable 	 gv,
 
 
 	// checks if research group is correct, otherwise sets to default
-	if 	( strcmp(gv.research_group, "tc") 	== 0 || strcmp(gv.research_group, "sb") == 0 ){
+	if 	( strcmp(gv.research_group, "tc") 	== 0 || strcmp(gv.research_group, "sb") == 0 /* || strcmp(gv.research_group, "gh") == 0 */){
 	}
 	else{
 		printf(" WARNING: Unknown research group '%s' has been provided, setting default one 'tc'\n",gv.research_group);
@@ -945,6 +972,34 @@ global_variable SetupDatabase(			global_variable 	 gv,
 		SB_set_eos_formulation(gv.SB_eos);
 		SB_set_eos_correction(gv.SB_eos_cor);
 	}
+	else if( strcmp(gv.research_group, "gh") == 0 ){
+		/* Beta testt: solved via the same LP-only path as "sb" */
+		if (gv.solver != 0){
+			gv.solver = 0;
+			if (gv.verbose == 1){
+				printf(" INFO: Solver option is not available for the 'gh' (Ghiorso/MELTS) database -> LP is used\n");
+			}
+		}
+
+		gv.EM_dataset = 1;
+
+		if 		(strcmp(gv.db, "xMELTS") 	== 0){
+			gv.EM_database = 0;
+		}
+		else if (strcmp(gv.db, "rMELTS") 	== 0){
+			gv.EM_database = 1;
+		}
+		else if (strcmp(gv.db, "pMELTS") 	== 0){
+			gv.EM_database = 2;
+		}
+		else {
+			if (gv.verbose == 1){
+				printf(" No or wrong database acronym has been provided, using default Ghiorso xMELTS([xMELTS])\n");
+			}
+			strcpy(gv.db, "xMELTS");
+			gv.EM_database = 0;
+		}
+	}
 
 	if (gv.verbose == 2){
 		printf("\n");	
@@ -1004,8 +1059,12 @@ Databases InitializeDatabases(	global_variable gv,
 		SB_SS_init(	        	    SS_init,
 									gv				);
 	}
+	else if (strcmp(gv.research_group, "gh") == 0 ){
+		GH_SS_init(	        	    SS_init,
+									gv				);
+	}
 
-	DB.SS_ref_db = malloc ((gv.len_ss) 		* sizeof(SS_ref)); 
+	DB.SS_ref_db = malloc ((gv.len_ss) 		* sizeof(SS_ref));
 	for (int iss = 0; iss < gv.len_ss; iss++){
 
 		DB.SS_ref_db[iss] = G_SS_init_EM_function(		SS_init,	
@@ -1032,6 +1091,9 @@ Databases InitializeDatabases(	global_variable gv,
 	}
 	else if (strcmp(gv.research_group, "sb") == 0){
 		DB.EM_names  =	get_EM_DB_names_sb(		gv									);
+	}
+	else if (strcmp(gv.research_group, "gh") == 0){
+		DB.EM_names  =	get_EM_DB_names_gh(		gv									);
 	}
 
 
@@ -1060,7 +1122,7 @@ Databases InitializeDatabases(	global_variable gv,
 	HASH_ITER(hh, PP, pp_s, tmp_pp) { HASH_DEL(PP, pp_s); free(pp_s); }
 	// Previous code (no clear — left as reference):
 	// PP2id *pp_s, *tmp_pp;
-    for (int i = 0; i < sizeof(gv.PP_list); ++i) {
+    for (int i = 0; i < gv.len_pp; ++i) {
         pp_s = (PP2id *)malloc(sizeof *pp_s);
         strcpy(pp_s->PP_tag, gv.PP_list[i]);
         pp_s->id = i;
@@ -1456,10 +1518,10 @@ void PrintOutput(	global_variable 	gv,
 		printf("\n");
 		printf(" SOL = [G: %.3f] (%i iterations, %.2f ms)\n",gv.G_system,gv.global_ite,time_taken*1000.0);
 		printf(" GAM = [");
-		for (i = 0; i < z_b.nzEl_val; i++){
+		for (i = 0; i < z_b.nzEl_val - 1; i++){
 			printf("%+8f,",gv.gam_tot[z_b.nzEl_array[i]]);
 		}
-		printf("%+8f",gv.gam_tot[z_b.nzEl_val-1]);
+		printf("%+8f",gv.gam_tot[z_b.nzEl_array[z_b.nzEl_val-1]]);
 		printf("]\n\n");
 
 		printf(" Phase : ");
@@ -1485,7 +1547,7 @@ void PrintOutput(	global_variable 	gv,
 				printf(" %.5f ", gv.pp_n[i]);
 			}
 		}
-		printf("\n");	
+		printf("\n");
 	}
 }
 

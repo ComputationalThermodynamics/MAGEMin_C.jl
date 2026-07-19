@@ -50,8 +50,8 @@ void print_help(	global_variable gv	){
 	printf("  --Verb=       [int]   : Verbose option, 0. inactive, 1. active\n");	
 	printf("  --File=       [str]   : File name containing multiple point calculation\n");
 	printf("  --n_points=   [int]   : Number of points when using 'File' argument\n");
-	printf("  --rg=         [str]   : ResearchGroup, can be 'tc' or 'sb (THERMOCALC, Stixrude-Lithgow-Bertelloni)\n");
-	printf("  --db=         [str]   : Database, can be 'mp', 'ig', 'igad', 'um'or 'ume'* for TC and 2011/2024 for SB\n");
+	printf("  --rg=         [str]   : ResearchGroup, can be 'tc', 'sb' or 'gh' (THERMOCALC, Stixrude-Lithgow-Bertelloni, Ghiorso/MELTS)\n");
+	printf("  --db=         [str]   : Database, can be 'mp', 'ig', 'igad', 'um'or 'ume'* for TC, 2011/2024 for SB, or 'xMELTS'/'rMELTS'/'pMELTS' for GH\n");
 	printf("  --ds=         [int]   : TC End-member dataset, 62, 633 or 634 (stands for ds6xx)\n");
 	printf("  --test=       [int]   : Number of points when using 'File' argument\n");
 	printf("  --Pres=       [float] : Pressure in kilobar\n");
@@ -282,7 +282,7 @@ bulk_info retrieve_bulk_PT(				global_variable      gv,
 				printf("  - Database                  : Metapelite extended (White et al., 2014; po from Evans & Frost, 2021;  amp, dio and aug from Green et al., 2016)\n"	);
 			}
 		}
-		else {
+		else if (strcmp(gv.research_group, "sb") == 0) {
 			if (gv.EM_database 		== 0){
 				printf("  - Database                  : Stixrude and Bertelloni-Lithgow (2011)\n"	);
 			}
@@ -292,6 +292,9 @@ bulk_info retrieve_bulk_PT(				global_variable      gv,
 			if (gv.EM_database 		== 2){
 				printf("  - Database                  : Stixrude and Bertelloni-Lithgow (2024)\n"	);
 			}
+		}
+		else if (strcmp(gv.research_group, "gh") == 0) {
+			printf("  - Database                  : Ghiorso/MELTS liquid, beta test\n"	);
 		}
 
 
@@ -315,16 +318,33 @@ bulk_info retrieve_bulk_PT(				global_variable      gv,
 	/** here we check if the normalized mol fraction is < 1e-4 for oxides != H2O */
 	/** if it is, then the fraction is set to 1e-4 -> this is a current limitation of system component reduction */
 	int renorm = 0;
-	for (int i = 0; i < gv.len_ox; i++){ 
+	for (int i = 0; i < gv.len_ox; i++){
 		if (gv.bulk_rock[i] < 1.0e-4){
 
-			if (gv.EM_database == 0){ 				// metapelite database
+			if (strcmp(gv.research_group, "gh") == 0){
+				/* Ghiorso/MELTS (xMELTS=0, rMELTS=1, pMELTS=2): the FeO=0
+				   solver failure this clip works around traces to the
+				   "1 FeO + 0.5 O per Fe3+" convention coupling the FeO/O
+				   oxide axes across many endmembers (see
+				   [[gh-reduced-system-support]]) - shared solid-phase
+				   data/formulas across all 3 calibration families
+				   (confirmed via Makefile.common), so this clip applies
+				   uniformly regardless of which one is active. */
+				if(strcmp( gv.ox[i], "FeO") == 0){
+					gv.bulk_rock[i] = 1.0e-4;
+					renorm = 1;
+					if (gv.verbose == 1){
+						printf("  - mol of %4s = %+.5f < 1e-4        : set back to 1e-4 to avoid minimization issues\n",gv.ox[i],gv.bulk_rock[i]);
+					}
+				}
+			}
+			else if (gv.EM_database == 0){ 				// metapelite database
 				if(strcmp( gv.ox[i], "H2O") != 0 && strcmp( gv.ox[i], "MnO") != 0  && strcmp( gv.ox[i], "O") != 0  && strcmp( gv.ox[i], "TiO2") != 0){
 					gv.bulk_rock[i] = 1.0e-4;
 					renorm = 1;
 					if (gv.verbose == 1){
 						printf("  - mol of %4s = %+.5f < 1e-4        : set back to 1e-4 to avoid minimization issues\n",gv.ox[i],gv.bulk_rock[i]);
-					}	
+					}
 				}
 			}
 			else if (gv.EM_database == 1){ 			// metabasite database
@@ -396,7 +416,7 @@ bulk_info retrieve_bulk_PT(				global_variable      gv,
 					renorm = 1;
 					if (gv.verbose == 1){
 						printf("  - mol of %4s = %+.5f < 1e-4        : set back to 1e-4 to avoid minimization issues\n",gv.ox[i],gv.bulk_rock[i]);
-					}	
+					}
 				}
 			}
 
@@ -620,6 +640,27 @@ double norm_vector(double *array ,int n){
 }
 
 /**
+  same as norm_vector, but each entry is normalized by the corresponding
+  bulk oxide abundance before being squared - so a trace oxide's
+  contribution reflects its own relative imbalance rather than being
+  measured on the same absolute scale as major oxides (see PGE_function.c's
+  BR_norm convergence check, gated by gv.BR_rel_norm). Oxides with a
+  near-zero bulk abundance (below 1e-8) fall back to the unnormalized
+  (absolute) residual, matching norm_vector's behavior for that entry -
+  those axes are excluded from n (z_b.nzEl_val) upstream anyway.
+*/
+double relative_norm_vector(double *array, double *bulk, int n){
+	double norm = 0.0;
+	for (int i = 0; i < n; i++){
+		double b = fabs(bulk[i]);
+		double r = (b > 1e-8) ? array[i]/b : array[i];
+		norm += r*r;
+	}
+	norm = pow(norm,0.5);
+	return norm;
+}
+
+/**
   function to calculate the Euclidean distance between two normalized vectors
   - used to decypher which phase to add during phase update
 */
@@ -644,19 +685,75 @@ double partial_euclidean_distance(double *array1 ,double *array2 ,int n){
 }
 /**
   inverse a matrix using LAPACKE dgetrf and dgetri
-*/	
-void inverseMatrix(int *ipiv, double *A1, int n, double *work, int lwork){	
+
+  When precond != 0, the matrix is equilibrated (Ruiz-style iterative
+  row/column scaling) before factorization and the true inverse is
+  recovered by unscaling afterward, to improve numerical conditioning
+  when entries span many orders of magnitude (e.g. a stoichiometric
+  matrix with a trace-oxide row/column next to major-oxide ones).
+
+  The scale/unscale round-trip below is written using a single flat-index
+  convention (idx = a + b*n) without assuming whether that corresponds to
+  row-major or column-major storage - deliberately so, since the two
+  branches below (__APPLE__ raw Fortran calls vs LAPACKE_ROW_MAJOR) do not
+  agree on that. Scaling entry idx=a+b*n by s1[a]*s2[b] before inversion
+  and unscaling the result by s2[a]*s1[b] (roles swapped) after inversion
+  recovers the exact true inverse regardless of which physical convention
+  LAPACK uses underneath - only self-consistency between the scale and
+  unscale steps matters, not which axis is "really" the row.
+
+  precond == 0 leaves this function's behavior completely unchanged
+  (the exact pre-existing code path, no scaling applied).
+*/
+void inverseMatrix(int *ipiv, double *A1, int n, double *work, int lwork, int precond){
 	int    info;
+	double s1[n], s2[n];
+
+	if (precond){
+		for (int i = 0; i < n; i++){ s1[i] = 1.0; s2[i] = 1.0; }
+
+		const int n_ruiz_iter = 2;
+		for (int iter = 0; iter < n_ruiz_iter; iter++){
+			for (int a = 0; a < n; a++){
+				double m = 0.0;
+				for (int b = 0; b < n; b++){
+					double v = fabs(A1[a + b*n]);
+					if (v > m){ m = v; }
+				}
+				double r = (m > 0.0) ? 1.0/m : 1.0;
+				for (int b = 0; b < n; b++){ A1[a + b*n] *= r; }
+				s1[a] *= r;
+			}
+			for (int b = 0; b < n; b++){
+				double m = 0.0;
+				for (int a = 0; a < n; a++){
+					double v = fabs(A1[a + b*n]);
+					if (v > m){ m = v; }
+				}
+				double c = (m > 0.0) ? 1.0/m : 1.0;
+				for (int a = 0; a < n; a++){ A1[a + b*n] *= c; }
+				s2[b] *= c;
+			}
+		}
+	}
 
 	/* call lapacke to inverse Matrix */
-	#if __APPLE__	
-			dgetrf(&n, &n, A1, &n, ipiv, &info); 
+	#if __APPLE__
+			dgetrf(&n, &n, A1, &n, ipiv, &info);
 			dgetri(&n, A1, &n, ipiv, work, &lwork, &info);
 
 	#else
-		info = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, n, n, A1, n, ipiv); 
+		info = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, n, n, A1, n, ipiv);
 		info = LAPACKE_dgetri_work(LAPACK_ROW_MAJOR, n, A1, n, ipiv, work, lwork);
-	#endif 
+	#endif
+
+	if (precond){
+		for (int a = 0; a < n; a++){
+			for (int b = 0; b < n; b++){
+				A1[a + b*n] *= s2[a] * s1[b];
+			}
+		}
+	}
 
 };
 
@@ -904,6 +1001,15 @@ global_variable get_tests_bulks(	global_variable  	 gv
 		}
 		else{
 			printf(" Wrong database...\n");
+		}
+	}
+	else if ( strcmp(gv.research_group, "gh") 	== 0 ){
+		if (gv.EM_database == 2){
+			/* pMELTS: 12-oxide bulk (CO2 dropped) - see gh_db_pmelts_dataset */
+			gv = get_bulk_pmelts_dataset( 	gv );
+		}
+		else{
+			gv = get_bulk_gh( 		gv );
 		}
 	}
 	else{
@@ -1561,6 +1667,7 @@ global_variable compute_density_volume_modulus(				int 				 EM_database,
 			cp[i].phase_cp 	 		 = 0.0;
 			cp[i].volume 	 		 = 0.0;
 			cp[i].phase_expansivity	 = 0.0;
+			cp[i].phase_compressibility = 0.0;
 			cp[i].phase_bulkModulus  = 0.0;
 			cp[i].phase_shearModulus = 0.0;
 			cp[i].phase_entropy  	 = 0.0;
@@ -1597,9 +1704,11 @@ global_variable compute_density_volume_modulus(				int 				 EM_database,
 						cp[i].phase_cp    		+= SS_ref_db[ss].ElCp[j]*cp[i].p_em[j];
 					}
 					else{
+						
 						cp[i].phase_expansivity += (1.0/(dGdP*10.0)*((dGdTPP-dGdTMP)/(gv.gb_P_eps)))*cp[i].p_em[j];
 						cp[i].phase_bulkModulus += -dGdP/( dG2dP2 + pow(((dGdTPP-dGdTMP)/(gv.gb_P_eps)),2.0)/dG2dT2 ) * cp[i].p_em[j];
 						cp[i].phase_cp    		+= -T*(dG2dT2)*cp[i].p_em[j];
+						cp[i].phase_compressibility += -(1.0/(dGdP*10.0)*(dG2dP2))*cp[i].p_em[j];
 					}
 					
 
@@ -1721,6 +1830,7 @@ global_variable compute_density_volume_modulus(				int 				 EM_database,
 				PP_ref_db[i].phase_bulkModulus	= -dGdP/( dG2dP2 + pow(((dGdTPP-dGdTMP)/(gv.gb_P_eps)),2.0)/dG2dT2 );
 				PP_ref_db[i].phase_cp 			= -T*(dG2dT2);
 				PP_ref_db[i].phase_expansivity 	= 1.0/(dGdP*10.0)*((dGdTPP-dGdTMP)/(gv.gb_P_eps));
+				PP_ref_db[i].phase_compressibility = -(1.0/(dGdP*10.0)*(dG2dP2));
 			}
 
 			/* shear modulus	*/
@@ -1910,6 +2020,7 @@ global_variable compute_density_volume_modulus(				int 				 EM_database,
 			gv.system_entropy += cp[i].phase_entropy*cp[i].ss_n_mol;//*cp[i].factor;
 			gv.system_cp 	  += cp[i].phase_cp*cp[i].ss_n_mol;
 			gv.system_expansivity 	  += cp[i].phase_expansivity*cp[i].ss_n_mol;
+			gv.system_compressibility += cp[i].phase_compressibility*cp[i].ss_n_mol;
 		}
 	}
 	for (int i = 0; i < gv.len_pp; i++){
@@ -1917,6 +2028,7 @@ global_variable compute_density_volume_modulus(				int 				 EM_database,
 			gv.system_entropy += PP_ref_db[i].phase_entropy*gv.pp_n_mol[i];//*PP_ref_db[i].factor;		
 			gv.system_cp 	  += PP_ref_db[i].phase_cp*gv.pp_n_mol[i];	
 			gv.system_expansivity 	  += PP_ref_db[i].phase_expansivity*gv.pp_n_mol[i];	
+			gv.system_compressibility += PP_ref_db[i].phase_compressibility*gv.pp_n_mol[i];
 		}
 	}
 	
@@ -1954,12 +2066,22 @@ global_variable compute_density_volume_modulus(				int 				 EM_database,
 }
 
 
-global_variable compute_activities(			int					 EM_database,	
+global_variable compute_activities(			int					 EM_database,
 											global_variable 	 gv,
 											PP_ref  			*PP_ref_db,
 											bulk_info 			 z_b			){
 
-	PP_ref PP_db;	
+	// if (strcmp(gv.research_group, "gh") == 0){
+	// 	/* This function probes pure mineral endmembers (q/coe/st, per, fper,
+	// 	   cor, ru, fa, mt...) that the Stage-A "gh" (Ghiorso/MELTS liquid-only)
+	// 	   database does not have - none of gh's activity outputs are
+	// 	   meaningful yet, and calling G_EM_function with those names would
+	// 	   fail (they're not in gh's endmember hashtable). Skip until a
+	// 	   broader gh database exists. */
+	// 	return gv;
+	// }
+
+	PP_ref PP_db;
 
 	/** calculate oxygen fugacity: mu_O2 = G0_O2 + RTlog(fO2) */
 	/* get O2 Gibbs energy of reference */

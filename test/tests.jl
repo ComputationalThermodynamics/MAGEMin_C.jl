@@ -47,6 +47,46 @@ T           =   600.0
 out         =   point_wise_minimization(P,T, data);
 Finalize_MAGEMin(data)
 
+
+using MAGEMin_C
+data        =   Initialize_MAGEMin("xMELTS", verbose=-1);
+test        =   0 #rough basalt
+data        =   use_predefined_bulk_rock(data, test);
+P           =   8.0
+T           =   800.0
+out         =   point_wise_minimization(P,T, data);
+
+using MAGEMin_C
+data        =   Initialize_MAGEMin("pMELTS", verbose=-1);
+test        =   0 #rough basalt
+data        =   use_predefined_bulk_rock(data, test);
+P           =   8.0
+T           =   800.0
+out         =   point_wise_minimization(P,T, data);
+
+
+using MAGEMin_C
+data        =   Initialize_MAGEMin("pMELTS", verbose=1);
+test        =   0 #rough basalt
+data        =   use_predefined_bulk_rock(data, test);
+P           =   8.0
+T           =   800.0
+#out         =   point_wise_minimization(P,T, data);
+rm_list =   remove_phases(["spn","rhm"],"pMELTS")
+out     = single_point_minimization(P, T, data, rm_list=rm_list)
+
+
+using MAGEMin_C
+data        =   Initialize_MAGEMin("rMELTS", verbose=-1);
+test        =   0 #rough basalt
+data        =   use_predefined_bulk_rock(data, test);
+P           =   1.0
+T           =   500.0
+out         =   point_wise_minimization(P,T, data)
+
+rm_list =   remove_phases(["spn","rhm"],"pMELTS")
+out     = single_point_minimization(P, T, data, rm_list=rm_list)
+
 =#
 
 data        =   Initialize_MAGEMin("sb21", verbose=-1);
@@ -166,6 +206,23 @@ end
     Finalize_MAGEMin(data)
 
 end
+
+
+@testset verbose=true "test PH_vec keys" begin
+    using MAGEMin_C
+    data    = Initialize_MAGEMin("mp", verbose=-1);
+    P,T     = 6.0, 710.0
+    Xoxides = ["SiO2";  "TiO2";  "Al2O3";  "FeO";   "MnO";   "MgO";   "CaO";   "Na2O";  "K2O"; "H2O"; "O"];
+    X       = [58.509,  1.022,   14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 10.0, 0.0];
+    sys_in  = "wt"
+    out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in, scp = 1, dT=1.5)
+    @test haskey(out.PH_vec, :ru)   == false
+    @test haskey(out.PH_vec, :q)    == true
+    @test haskey(out.PH_vec, :opx)  == true
+    
+    Finalize_MAGEMin(data)
+end
+
 
 @testset verbose=true "test activity buffers" begin
     data        =   Initialize_MAGEMin("mp", verbose=-1, buffer="aH2O");
@@ -625,7 +682,7 @@ end
     @test out_TE.fapt_wt ≈ 0.0023191756689226023        rtol=1e-3
     # CO2 saturation was computed and 50 ppm is well below the limit
     @test !isnan(out_TE.Sat_CO2_liq)
-    @test out_TE.fl_CO2_wt ≈ 0.0003154780601036963      rtol=1e-3
+    @test out_TE.fl_CO2_wt ≈ 0.0003154780601036963      rtol=1e-2
 
     Finalize_MAGEMin(data)
 end

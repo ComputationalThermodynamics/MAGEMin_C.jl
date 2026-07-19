@@ -58,6 +58,16 @@ PP_ref G_EM_function(	    char        *research_group,
                                         name,
                                         state);
     }
+    if 	(strcmp(research_group, "gh") 	== 0){
+        PP_ref_db = GH_G_EM_function(	EM_dataset,
+                                        len_ox,
+                                        id,
+                                        bulk_rock,
+                                        apo,
+                                        P, T,
+                                        name,
+                                        state);
+    }
 
 
     return PP_ref_db;

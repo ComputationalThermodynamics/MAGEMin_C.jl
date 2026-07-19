@@ -8,16 +8,14 @@
  **   Contact      : nriel[at]uni-mainz.de, kaus[at]uni-mainz.de
  **
  ** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ @*/
-#ifndef __TC_all_init_db_H_
-#define __TC_all_init_db_H_
+#ifndef __PC_XEOS_GH_H_
+#define __PC_XEOS_GH_H_
 
-    /* This includes the initializing routine for THERMOCALC database */
-    #include "./TC_database/TC_init_database.h"
+#include "../MAGEMin.h"
 
-    /* This includes the initializing routine for Stixrude & Lithgow-Bertelloni database */
-    #include "./SB_database/SB_init_database.h"
-
-    /* This includes the initializing routine for the Ghiorso/MELTS database */
-    #include "./GH_database/GH_init_database.h"
-
+void GH_pc_init_function(  PC_ref  *SS_pc_xeos,
+                            int      iss,
+                            char    *name,
+                            double  *z_em,
+                            int      EM_database    );
 #endif

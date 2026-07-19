@@ -226,7 +226,8 @@ void initialize_initial_guess(		bulk_info 	 		 z_b,
 					d->A1,
 					d->n_Ox,
 					gv.work,
-					gv.lwork		);
+					gv.lwork,
+					gv.precond		);
 
 	/** update phase fractions */
 	MatVecMul(		d->A1,
@@ -290,7 +291,8 @@ void swap_pure_phases(				bulk_info 	 		 z_b,
 								d->A1,
 								d->n_Ox,
 								gv.work,
-								gv.lwork		);
+								gv.lwork,
+								gv.precond		);
 
 				/** update phase fractions */
 				MatVecMul(		d->A1,
@@ -321,61 +323,68 @@ void swap_pure_endmembers(				bulk_info 	 		 z_b,
 
 	for (int i = 0; i < gv.len_ss; i++){												/**loop to pass informations from active endmembers */
 		// if (SS_ref_db[i].ss_flags[0] == 1 && strcmp( gv.SS_list[i], "aq17") != 0 && strcmp( gv.SS_list[i], "chl") != 0 && strcmp( gv.SS_list[i], "g") != 0 && strcmp( gv.SS_list[i], "ep") != 0 && strcmp( gv.SS_list[i], "fsp") != 0 && strcmp( gv.SS_list[i], "mu") != 0){												/** if SS is not filtered out then continue */
-		if ( strcmp( gv.SS_list[i], "ta") == 1 && strcmp( gv.SS_list[i], "oamp") == 1){												/** if SS is not filtered out then continue */
-		if (SS_ref_db[i].ss_flags[0] == 1){												/** if SS is not filtered out then continue */
+		/* the "!= 0" form here is the evidently-intended fix for a pre-existing
+		   "== 1" typo (strcmp only returns exactly 1 by chance, so the old form
+		   made this filter dead code for every research group) - but making it
+		   live changes tc/um/mantle's existing LP-swap behavior (regression
+		   confirmed on tc "um" db, 20kbar/600C: Status 0 -> -1), so it's scoped
+		   to "gh" only here; tc/um/mantle keep the old (inert) behavior */
+		if ( strcmp(gv.research_group, "gh") == 0 || (strcmp( gv.SS_list[i], "ta") == 1 && strcmp( gv.SS_list[i], "oamp") == 1) ){												/** if SS is not filtered out then continue */
+			if (SS_ref_db[i].ss_flags[0] == 1){												/** if SS is not filtered out then continue */
 
-			for (int l = 0; l < SS_ref_db[i].n_em; l++){	
-				/** if bulk-rock satisfy the compositions of endmembers, retrieve their informations */
-				if (SS_ref_db[i].z_em[l] == 1.0){ 
-					
-					/* update normalizing factor for solution models than need it */
-					factor 	= z_b.fbc/SS_ref_db[i].ape[l];	
-
-					d->g0_B		  = SS_ref_db[i].gbase[l]*factor;
-					d->ph_id_B[0] = 2;														/** added phase is a pure species */
-					d->ph_id_B[1] = i;														/** save pure species index */
-					d->ph_id_B[2] = 0;														/** save used initial guess */	
-					
-					/** retrieve the composition in the right (reduced) chemical space */
-					for (int j = 0; j < z_b.nzEl_val; j++){
-						d->B[j] 	 = SS_ref_db[i].Comp[l][z_b.nzEl_array[j]]*factor; 
-					}
-
-					/** update deltaG with respect to G hyperplane */
-					update_dG(splx_data);
-									
-					/** swap phase */
-					if (d->ph2swp != -1){													/** if the phase can be added */
-						d->swp 						   = 1;
-						d->n_swp 					  += 1;
-						d->ph_id_A[d->ph2swp][0] = d->ph_id_B[0];
-						d->ph_id_A[d->ph2swp][1] = d->ph_id_B[1];
-						d->ph_id_A[d->ph2swp][2] = d->ph_id_B[2];
-						d->ph_id_A[d->ph2swp][3] = l;	
-						d->g0_A[d->ph2swp] 	   	 = d->g0_B;
+				for (int l = 0; l < SS_ref_db[i].n_em; l++){	
+					/** if bulk-rock satisfy the compositions of endmembers, retrieve their informations */
+					if (SS_ref_db[i].z_em[l] == 1.0){ 
 						
-						for (int j = 0; j < d->n_Ox; j++){				
-							int k = d->ph2swp + j*d->n_Ox;
-							d->A[k] = d->B[j];
+						/* update normalizing factor for solution models than need it */
+						factor 	= z_b.fbc/SS_ref_db[i].ape[l];	
+
+						d->g0_B		  = SS_ref_db[i].gbase[l]*factor;
+						d->ph_id_B[0] = 2;														/** added phase is a pure species */
+						d->ph_id_B[1] = i;														/** save pure species index */
+						d->ph_id_B[2] = 0;														/** save used initial guess */	
+						
+						/** retrieve the composition in the right (reduced) chemical space */
+						for (int j = 0; j < z_b.nzEl_val; j++){
+							d->B[j] 	 = SS_ref_db[i].Comp[l][z_b.nzEl_array[j]]*factor; 
 						}
-						for (int k = 0; k < d->n_Ox*d->n_Ox; k++){ d->A1[k] = d->A[k];}
 
-						/** inverse guessed assemblage stoechiometry matrix */
-						inverseMatrix(	gv.ipiv,
-										d->A1,
-										d->n_Ox,
-										gv.work,
-										gv.lwork	);
+						/** update deltaG with respect to G hyperplane */
+						update_dG(splx_data);
+										
+						/** swap phase */
+						if (d->ph2swp != -1){													/** if the phase can be added */
+							d->swp 						   = 1;
+							d->n_swp 					  += 1;
+							d->ph_id_A[d->ph2swp][0] = d->ph_id_B[0];
+							d->ph_id_A[d->ph2swp][1] = d->ph_id_B[1];
+							d->ph_id_A[d->ph2swp][2] = d->ph_id_B[2];
+							d->ph_id_A[d->ph2swp][3] = l;
+							d->g0_A[d->ph2swp] 	   	 = d->g0_B;
+							
+							for (int j = 0; j < d->n_Ox; j++){				
+								int k = d->ph2swp + j*d->n_Ox;
+								d->A[k] = d->B[j];
+							}
+							for (int k = 0; k < d->n_Ox*d->n_Ox; k++){ d->A1[k] = d->A[k];}
 
-						/** update phase fractions */
-						MatVecMul(		d->A1,
-										z_b.bulk_rock_cat,
-										d->n_vec,
-										d->n_Ox		);	
+							/** inverse guessed assemblage stoechiometry matrix */
+							inverseMatrix(	gv.ipiv,
+											d->A1,
+											d->n_Ox,
+											gv.work,
+											gv.lwork,
+											gv.precond	);
+
+							/** update phase fractions */
+							MatVecMul(		d->A1,
+											z_b.bulk_rock_cat,
+											d->n_vec,
+											d->n_Ox		);	
+						}
 					}
 				}
-			}
-		}}
+			}}
 	}
 	
 }
@@ -439,7 +448,8 @@ void swap_pseudocompounds(				bulk_info 	 		 z_b,
 									d->A1,
 									d->n_Ox,
 									gv.work,
-									gv.lwork	);
+									gv.lwork,
+									gv.precond	);
 
 					/** update phase fractions */
 					MatVecMul(		d->A1,
@@ -512,7 +522,8 @@ void swap_PGE_pseudocompounds(			bulk_info 	 		 z_b,
 									d->A1,
 									d->n_Ox,
 									gv.work,
-									gv.lwork	);
+									gv.lwork,
+									gv.precond	);
 
 					/** update phase fractions */
 					MatVecMul(		d->A1,
@@ -666,6 +677,20 @@ void generate_pseudocompounds(	int 		 		 ss,
 				SS_ref_db[ss].sf_ok = 0;
 				SS_ref_db[ss].sf_id = i;
 				break;
+			}
+		}
+
+		/* gh phases only: Sigma(p)=1 sanity check - see the matching check
+		   in PC_function (TC_database/objective_functions.c) for the full
+		   explanation; not needed for tc/sb, whose last endmember is
+		   always the implicit dependent 1-sum(others) variable. */
+		if (SS_ref_db[ss].sf_ok == 1 && strcmp(gv.research_group, "gh") == 0){
+			double sum_p = 0.0;
+			for (int i = 0; i < SS_ref_db[ss].n_em; i++){
+				sum_p += SS_ref_db[ss].p[i];
+			}
+			if (fabs(sum_p - 1.0) > 1.0e-4){
+				SS_ref_db[ss].sf_ok = 0;
 			}
 		}
 
@@ -1100,7 +1125,7 @@ void run_simplex_pseudocompounds(		bulk_info 	 		z_b,
 		k 		   += 1;
 		d->swp      = 0;
 		t 			= clock();
-		if (gv.EM_database != 6 && strcmp(gv.research_group, "sb") 	!= 0){ //TMP fix, at the moment I don't have the return mapping function from p to x for Mantle database
+		if (gv.EM_database != 6 && strcmp(gv.research_group, "sb") 	!= 0){ //TMP fix, at the moment I don't have the return mapping function from p to x for Mantle database (nor for "sb" yet); "gh" has its own p2x_gh_generic (GH_P2X_init), see gh_objective_functions.c
 			swap_pure_endmembers(				z_b,
 												splx_data,
 												gv,
@@ -1152,7 +1177,7 @@ void run_simplex_pseudocompounds_IG(	bulk_info 	 		z_b,
 		k 		   += 1;
 		d->swp      = 0;
 		t 			= clock();
-		if (gv.EM_database != 6 && strcmp(gv.research_group, "sb") 	!= 0){ //TMP fix, at the moment I don't have the return mapping function from p to x for Mantle database
+		if (gv.EM_database != 6 && strcmp(gv.research_group, "sb") 	!= 0){ //TMP fix, at the moment I don't have the return mapping function from p to x for Mantle database (nor for "sb" yet); "gh" has its own p2x_gh_generic (GH_P2X_init), see gh_objective_functions.c
 			swap_pure_endmembers(				z_b,
 												splx_data,
 												gv,
@@ -1306,7 +1331,7 @@ void run_simplex_levelling(				bulk_info 	 		 z_b,
 										PP_ref_db,
 										SS_ref_db				);	
 
-	if (gv.EM_database != 6 && strcmp(gv.research_group, "sb") 	!= 0){ //TMP fix, at the moment I don't have the return mapping function from p to x for Mantle database
+	if (gv.EM_database != 6 && strcmp(gv.research_group, "sb") 	!= 0){ //TMP fix, at the moment I don't have the return mapping function from p to x for Mantle database (nor for "sb" yet); "gh" has its own p2x_gh_generic (GH_P2X_init), see gh_objective_functions.c
 		swap_pure_endmembers(				z_b,
 											splx_data,
 											gv,
@@ -1426,11 +1451,20 @@ void run_simplex_levelling(				bulk_info 	 		 z_b,
 		}
 		else if (gv.EM_database == 2){
 			for (iss = 0; iss < gv.len_ss; iss++){
-				SB_sb24_pc_init_function(			SS_pc_xeos, 
+				SB_sb24_pc_init_function(			SS_pc_xeos,
 													iss,
 													gv.SS_list[iss]				);
 			}
-			
+
+		}
+	}
+	else if (strcmp(gv.research_group, "gh") 	== 0 ){
+		for (iss = 0; iss < gv.len_ss; iss++){
+			GH_pc_init_function(				SS_pc_xeos,
+												iss,
+												gv.SS_list[iss],
+												SS_ref_db[iss].z_em,
+												gv.EM_database				);
 		}
 	}
 

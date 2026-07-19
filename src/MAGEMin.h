@@ -86,6 +86,9 @@ typedef struct global_variables {
 	int      mpSp;
 	int      mpIlm;
 	int      ig_ed;			/** igneous endmember database? */
+	int      precond;		/** 1: equilibrate (Ruiz-scale) the stoichiometric matrix before inverseMatrix's LU inversion, 0: off (unmodified legacy behavior) */
+	int      BR_rel_norm;	/** 1: PGE mass-residual convergence norm (BR_norm) is computed per-oxide-relative (normalized by each oxide's own bulk abundance), 0: off (unmodified legacy absolute norm) */
+	int      gh_multistart_order;	/** gh phases with an embedded order-parameter solve (e.g. spinel): 0 (default) = single physically-motivated starting guess, exactly matching real xMELTS' own order() function; 1 (legacy/opt-in) = multi-start over several starting points, keeping the lowest-G result - finds a lower true minimum at extreme near-single-endmember compositions but can disagree with what real MELTS itself would compute there */
 	int      fixed_bulk;
 	int      SB_eos;		/** 0: legacy (Perple_X-style) SLB EOS solver, 1: burnman-style (Brent volume solve + 3rd order shear), 2: same as 1 but with HeFESTo's analytic vibrational/spinodal volume bounds */
 	int      SB_eos_cor;	/** 0: compute_G0() legacy Newton solver behaves exactly as before (default), 1: destabilize (NAN) on non-convergence instead of silently using the unconverged volume, and tighten its v/v0 sanity bound to match Perple_X/HeFESTo */
@@ -112,6 +115,7 @@ typedef struct global_variables {
 
 	/* GENERAL PARAMETERS */
 	int		*n_min;
+	int      n_max_val;
 	int 	 LP;				/** linear programming stage flag	*/
 	int 	 PGE;				/** PGE stage flag				 	*/
 	double   mean_sum_xi;
@@ -212,6 +216,15 @@ typedef struct global_variables {
 	double   bnd_val;			/** boundary value for x-eos when the fraction of an endmember = 0. */
 	double   obj_refine_fac;    /** how much the residual of the objective function is refined during iterations */
 
+	/* "liq" redundant-occurrence pseudocompound synthesis (ss_min_LP, gh and tc) */
+	int 	 act_rMELTS_liq_pc_synth;	/** number of redundant per-occurrence liq NLopt solves to perform before switching to the analytic hyperplane synthesis */
+	int 	 liq_pc_synth_active;		/** 1 (default): replace redundant per-occurrence liq NLopt solves with the
+											    analytic hyperplane synthesis; 0: fully disabled, legacy per-occurrence path */
+	double   gh_liq_pc_synth_h;			/** base xeos step size for the synthetic pseudocompound spread - scaled by
+											    sqrt(gv.gamma_norm[.]) and clamped to [1e-6,1e-2], see GH_liq_pc_synth_step 	*/
+	int 	 gh_liq_pc_synth_threshold;	/** n_ss_ph[liq] above which real per-occurrence NLopt solves are replaced
+											    by one real solve + synthetic pseudocompounds on the refined Gamma hyperplane */
+
 	/* PARTITIONING GIBBS ENERGY */ 
 	double 	*A_PGE;				/** LHS  */
 	double 	*A0_PGE;			/** First stage of extend Newton method LHS*/
@@ -286,6 +299,7 @@ typedef struct global_variables {
 	double   system_enthalpy;
 	double   system_cp;
 	double   system_expansivity;
+	double   system_compressibility;
 	double   system_bulkModulus;
 	double   system_shearModulus;
 	double   system_Vp;
@@ -624,6 +638,7 @@ typedef struct csd_phase_sets {
 	double  phase_density;
 	double  phase_cp;
 	double  phase_expansivity;
+	double  phase_compressibility;
 	double  phase_bulkModulus;
 	double  phase_isoTbulkModulus;
 	// double  volume_P0;
@@ -643,6 +658,7 @@ typedef struct stb_SS_phases {
 	double   deltaG;
 	double   V;
 	double   alpha;
+	double   beta;
 	double   cp;
 	double   entropy;
 	double   enthalpy;	
@@ -710,6 +726,7 @@ typedef struct stb_PP_phases {
 	double   deltaG;
 	double   V;
 	double   alpha;
+	double   beta;
 	double   cp;
 	double   entropy;
 	double   enthalpy;	
@@ -763,6 +780,7 @@ typedef struct stb_systems {
 	double  aFeO;
 
 	double  alpha;
+	double  beta;
 	double  cp;
 	double  s_cp;
 	double  cp_wt;

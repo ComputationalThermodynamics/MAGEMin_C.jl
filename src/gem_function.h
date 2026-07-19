@@ -26,6 +26,7 @@ typedef struct PP_refs {
     double  phase_bulkModulus;
     double  phase_cp;			    /** molar cp of the phase                   */
 	double  phase_expansivity;
+    double  phase_compressibility;
 	double  phase_isoTbulkModulus;
 	// double  volume_P0;
 	double  thetaExp;
