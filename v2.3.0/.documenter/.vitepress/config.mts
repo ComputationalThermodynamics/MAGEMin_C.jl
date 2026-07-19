@@ -1,0 +1,217 @@
+import { defineConfig } from 'vitepress'
+import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
+import { mathjaxPlugin } from './mathjax-plugin'
+import { juliaReplTransformer } from './julia-repl-transformer'
+import footnote from "markdown-it-footnote";
+import path from 'path'
+
+const mathjax = mathjaxPlugin()
+
+function getBaseRepository(base: string): string {
+  if (!base || base === '/') return '/';
+  const parts = base.split('/').filter(Boolean);
+  return parts.length > 0 ? `/${parts[0]}/` : '/';
+}
+
+const baseTemp = {
+  base: '/MAGEMin_C.jl/v2/',// TODO: replace this in makedocs!
+}
+
+const navTemp = {
+  nav: [{ text: 'Home', link: '/index' },
+{ text: 'Methods', link: '/problem' },
+{ text: 'Databases', link: '/database' },
+{ text: 'MAGEMinApp.jl',  items: [
+{text: 'Introduction', link: '/MAGEMinApp/MAGEMinApp'},
+{text: 'Installation & update', link: '/MAGEMinApp/installation'},
+{text: 'Interface', link: '/MAGEMinApp/interface'},
+{text: 'Tutorials - Bulk input file', link: '/MAGEMinApp/bulk_rock'},
+{text: 'Tutorials - Partition coeficient file', link: '/MAGEMinApp/partition_coef'},
+{text: 'Tutorials - Phase diagrams', link: '/MAGEMinApp/PD_tutorials'},
+{text: 'Tutorials - P-T-X paths', link: '/MAGEMinApp/PTX_tutorials'},
+{text: 'Tutorials - Citations', link: '/MAGEMinApp/citation'}
+] },
+{ text: 'MAGEMin_C.jl',  items: [
+{text: 'Introduction', link: '/MAGEMin_C/MAGEMin_C'},
+{text: 'Installation & update', link: '/MAGEMin_C/installation'},
+{text: 'Important options', link: '/MAGEMin_C/options'},
+{text: 'Tutorials - Quickstart', link: '/MAGEMin_C/quickstart'},
+{text: 'Tutorials - Output structure', link: '/MAGEMin_C/output_structure'},
+{text: 'Tutorials - Trace-elements', link: '/MAGEMin_C/trace_elements'},
+{text: 'Tutorials - Saturation models', link: '/MAGEMin_C/saturation_models'},
+{text: 'Tutorials - Fractional crystallization', link: '/MAGEMin_C/fractional_crystallization'},
+{text: 'Tutorials - Threaded fractional cryst.', link: '/MAGEMin_C/threaded_fractional_crystallization'},
+{text: 'Tutorials - Isentropic path', link: '/MAGEMin_C/isentropic_path'},
+{text: 'Tutorials - Initial guess', link: '/MAGEMin_C/initial_guess'},
+{text: 'Tutorials - Other examples', link: '/MAGEMin_C/examples'},
+{text: 'API', link: '/api'}
+] },
+{ text: 'MAGEMin',  items: [
+{text: 'Introduction', link: '/MAGEMin/MAGEMin'},
+{text: 'Compilation', link: '/MAGEMin/installation'},
+{text: 'Tutorials', link: '/MAGEMin/tutorials'}
+] },
+{ text: 'Workshops',  items: [
+{text: 'Trace-element partitioning',  items: [
+{text: 'Overview', link: '/WS_Bejing_2026/overview'},
+{text: '1 — Introduction', link: '/WS_Bejing_2026/MAGEMin_C_intro'},
+{text: '2 — Iterative calculations', link: '/WS_Bejing_2026/MAGEMin_C_iterative_calculations'},
+{text: '3 — Fractional melting', link: '/WS_Bejing_2026/MAGEMin_C_fractional_melting'},
+{text: '4 — Li partitioning', link: '/WS_Bejing_2026/MAGEMin_C_Li_partitioning'},
+{text: '5 — Li partitioning (frac. melt.)', link: '/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting'}
+]}
+] },
+{ text: 'Applications',  items: [
+{text: 'Li enrichment — Riel et al. 2026',  items: [
+{text: 'Overview', link: '/Riel_2026_gcubed/overview'},
+{text: '1 — P–H₂O systematics', link: '/Riel_2026_gcubed/TUTORIAL_compute_PH2O_systematics'},
+{text: '2 — P–T extraction curves', link: '/Riel_2026_gcubed/TUTORIAL_compute_PT_curves'},
+{text: '3 — Stepwise batch melting', link: '/Riel_2026_gcubed/TUTORIAL_compute_plot_stepwise_batch_melting'},
+{text: '4 — Biotite Li profiles', link: '/Riel_2026_gcubed/TUTORIAL_compute_bi_Li_profiles'},
+{text: '5 — Phase stability', link: '/Riel_2026_gcubed/TUTORIAL_compute_plot_phase_stability'},
+{text: '6 — Solidus across pelites', link: '/Riel_2026_gcubed/TUTORIAL_compute_solidus_FS'},
+{text: '7 — Li systematics across pelites', link: '/Riel_2026_gcubed/TUTORIAL_compute_systematics_FS'}
+]}
+] }]
+,
+}
+
+const nav = [
+  ...navTemp.nav,
+  {
+    component: 'VersionPicker'
+  }
+]
+
+// https://vitepress.dev/reference/site-config
+export default defineConfig({
+  base: '/MAGEMin_C.jl/v2/',// TODO: replace this in makedocs!
+  title: 'MAGEMin',
+  description: 'Documentation for MAGEMin_C.jl',
+  lastUpdated: true,
+  cleanUrls: true,
+  outDir: '../2', // This is required for MarkdownVitepress to work correctly...
+  head: [
+    
+    ['script', {src: `${getBaseRepository(baseTemp.base)}versions.js`}],
+    // ['script', {src: '/versions.js'], for custom domains, I guess if deploy_url is available.
+    ['script', {src: `${baseTemp.base}siteinfo.js`}],
+    ['meta', { name: 'robots', content: 'noindex, nofollow' }],
+  ],
+  
+  markdown: {
+    codeTransformers: [juliaReplTransformer()],
+    config(md) {
+      md.use(tabsMarkdownPlugin);
+      md.use(footnote);
+      mathjax.markdownConfig(md);
+    },
+    theme: {
+      light: "github-light",
+      dark: "github-dark"
+    },
+  },
+  vite: {
+    plugins: [
+      mathjax.vitePlugin,
+    ],
+    define: {
+      __DEPLOY_ABSPATH__: JSON.stringify('/MAGEMin_C.jl'),
+    },
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, '../components')
+      }
+    },
+    optimizeDeps: {
+      exclude: [ 
+        '@nolebase/vitepress-plugin-enhanced-readabilities/client',
+        'vitepress',
+        '@nolebase/ui',
+      ], 
+    }, 
+    ssr: { 
+      noExternal: [ 
+        // If there are other packages that need to be processed by Vite, you can add them here.
+        '@nolebase/vitepress-plugin-enhanced-readabilities',
+        '@nolebase/ui',
+      ], 
+    },
+  },
+  themeConfig: {
+    outline: 'deep',
+    logo: { src: '/logo.png', width: 24, height: 24},
+    search: {
+      provider: 'local',
+      options: {
+        detailedView: true
+      }
+    },
+    nav,
+    sidebar: [{ text: 'Home', link: '/index' },
+{ text: 'Methods', link: '/problem' },
+{ text: 'Databases', link: '/database' },
+{ text: 'MAGEMinApp.jl', collapsed: false, items: [
+{text: 'Introduction', link: '/MAGEMinApp/MAGEMinApp'},
+{text: 'Installation & update', link: '/MAGEMinApp/installation'},
+{text: 'Interface', link: '/MAGEMinApp/interface'},
+{text: 'Tutorials - Bulk input file', link: '/MAGEMinApp/bulk_rock'},
+{text: 'Tutorials - Partition coeficient file', link: '/MAGEMinApp/partition_coef'},
+{text: 'Tutorials - Phase diagrams', link: '/MAGEMinApp/PD_tutorials'},
+{text: 'Tutorials - P-T-X paths', link: '/MAGEMinApp/PTX_tutorials'},
+{text: 'Tutorials - Citations', link: '/MAGEMinApp/citation'}
+] },
+{ text: 'MAGEMin_C.jl', collapsed: false, items: [
+{text: 'Introduction', link: '/MAGEMin_C/MAGEMin_C'},
+{text: 'Installation & update', link: '/MAGEMin_C/installation'},
+{text: 'Important options', link: '/MAGEMin_C/options'},
+{text: 'Tutorials - Quickstart', link: '/MAGEMin_C/quickstart'},
+{text: 'Tutorials - Output structure', link: '/MAGEMin_C/output_structure'},
+{text: 'Tutorials - Trace-elements', link: '/MAGEMin_C/trace_elements'},
+{text: 'Tutorials - Saturation models', link: '/MAGEMin_C/saturation_models'},
+{text: 'Tutorials - Fractional crystallization', link: '/MAGEMin_C/fractional_crystallization'},
+{text: 'Tutorials - Threaded fractional cryst.', link: '/MAGEMin_C/threaded_fractional_crystallization'},
+{text: 'Tutorials - Isentropic path', link: '/MAGEMin_C/isentropic_path'},
+{text: 'Tutorials - Initial guess', link: '/MAGEMin_C/initial_guess'},
+{text: 'Tutorials - Other examples', link: '/MAGEMin_C/examples'},
+{text: 'API', link: '/api'}
+] },
+{ text: 'MAGEMin', collapsed: false, items: [
+{text: 'Introduction', link: '/MAGEMin/MAGEMin'},
+{text: 'Compilation', link: '/MAGEMin/installation'},
+{text: 'Tutorials', link: '/MAGEMin/tutorials'}
+] },
+{ text: 'Workshops', collapsed: false, items: [
+{text: 'Trace-element partitioning', collapsed: false, items: [
+{text: 'Overview', link: '/WS_Bejing_2026/overview'},
+{text: '1 — Introduction', link: '/WS_Bejing_2026/MAGEMin_C_intro'},
+{text: '2 — Iterative calculations', link: '/WS_Bejing_2026/MAGEMin_C_iterative_calculations'},
+{text: '3 — Fractional melting', link: '/WS_Bejing_2026/MAGEMin_C_fractional_melting'},
+{text: '4 — Li partitioning', link: '/WS_Bejing_2026/MAGEMin_C_Li_partitioning'},
+{text: '5 — Li partitioning (frac. melt.)', link: '/WS_Bejing_2026/MAGEMin_C_Li_partitioning_fractional_melting'}
+]}
+] },
+{ text: 'Applications', collapsed: false, items: [
+{text: 'Li enrichment — Riel et al. 2026', collapsed: false, items: [
+{text: 'Overview', link: '/Riel_2026_gcubed/overview'},
+{text: '1 — P–H₂O systematics', link: '/Riel_2026_gcubed/TUTORIAL_compute_PH2O_systematics'},
+{text: '2 — P–T extraction curves', link: '/Riel_2026_gcubed/TUTORIAL_compute_PT_curves'},
+{text: '3 — Stepwise batch melting', link: '/Riel_2026_gcubed/TUTORIAL_compute_plot_stepwise_batch_melting'},
+{text: '4 — Biotite Li profiles', link: '/Riel_2026_gcubed/TUTORIAL_compute_bi_Li_profiles'},
+{text: '5 — Phase stability', link: '/Riel_2026_gcubed/TUTORIAL_compute_plot_phase_stability'},
+{text: '6 — Solidus across pelites', link: '/Riel_2026_gcubed/TUTORIAL_compute_solidus_FS'},
+{text: '7 — Li systematics across pelites', link: '/Riel_2026_gcubed/TUTORIAL_compute_systematics_FS'}
+]}
+] }]
+,
+    sidebarDrawer: false,
+    editLink: { pattern: "https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/edit/main/docs/src/:path" },
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/ComputationalThermodynamics/MAGEMin_C.jl' }
+    ],
+    footer: {
+      message: 'Made with <a href="https://luxdl.github.io/DocumenterVitepress.jl/dev/" target="_blank"><strong>DocumenterVitepress.jl</strong></a><br>',
+      copyright: `© Copyright ${new Date().getUTCFullYear()}.`
+    }
+  }
+})
