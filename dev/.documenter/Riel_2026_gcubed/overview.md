@@ -1,3 +1,5 @@
+---
+---
 
 # Thermodynamic modelling of Li enrichment during partial melting: the importance of partition coefficients {#Thermodynamic-modelling-of-Li-enrichment-during-partial-melting:-the-importance-of-partition-coefficients}
 <img src="../assets/Figure_MM-71-PH_T.png" alt="Density evolution" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">

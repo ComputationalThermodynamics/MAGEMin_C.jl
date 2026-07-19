@@ -1,3 +1,5 @@
+---
+---
 <img src="./assets/Minimization.png" alt="MAGEMin framework" style="width: 60%; height: auto; display: block; margin: 0 auto;">
 
 

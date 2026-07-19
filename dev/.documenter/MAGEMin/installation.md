@@ -1,3 +1,5 @@
+---
+---
 
 # MAGEMin installation (C-library) {#MAGEMin-installation-C-library}
 

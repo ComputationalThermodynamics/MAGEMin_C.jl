@@ -1,3 +1,5 @@
+---
+---
 
 # MAGEMin_C.jl: installation guide {#MAGEMin_C.jl:-installation-guide}
 

@@ -37,7 +37,6 @@ features:
     link: /MAGEMin/MAGEMin
 ---
 
-
 ## What is MAGEMin? {#What-is-MAGEMin?}
 
 `MAGEMin` is a Gibbs energy minimization solver, which computes the thermodynamically most stable assemblage for a given thermodynamic database and a set of bulk-rock composition, pressure and temperature conditions. It returns the fraction of the stable minerals, their compositions and all thermodynamically-derived parameters such as density, thermal expansivity, heat capacity etc. 

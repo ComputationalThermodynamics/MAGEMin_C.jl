@@ -1,3 +1,5 @@
+---
+---
 
 # MAGEMin_C.jl: Output structures: {#MAGEMin_C.jl:-Output-structures:}
 

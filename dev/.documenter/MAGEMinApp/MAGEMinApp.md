@@ -1,3 +1,5 @@
+---
+---
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_overview.png?raw=true" alt="MAGEMinApp banner" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
 
 

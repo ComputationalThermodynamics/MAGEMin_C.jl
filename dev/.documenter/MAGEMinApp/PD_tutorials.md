@@ -1,3 +1,5 @@
+---
+---
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_tabs_PD.png?raw=true" alt="MAGEMinApp tabs" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
 
 
@@ -336,9 +338,9 @@ Heat capacity is computed as a second order derivative of the Gibbs energy with 
 $C_p = -T \frac{\partial ^2G}{\partial T^2}$
 
 **There is however two ways to retrieve the second order derivative:**
-1. Default option `Specific Cp = G0` - no latent heat of reaction: Fixing the phase assemblage (phase proportions and compositions) and computing the Gibbs energy of the assemblage at T, T+eps and T-eps.
+2. Default option `Specific Cp = G0` - no latent heat of reaction: Fixing the phase assemblage (phase proportions and compositions) and computing the Gibbs energy of the assemblage at T, T+eps and T-eps.
   
-2. Full differentiation option `Specific Cp = G_system` - latent heat of reaction: Computing three stable phase equilibrium at T, T+eps and T-eps.
+3. Full differentiation option `Specific Cp = G_system` - latent heat of reaction: Computing three stable phase equilibrium at T, T+eps and T-eps.
   
 
 ::: tip Note
@@ -700,15 +702,15 @@ Before doing anything else, open the `Setup` tab, `General parameters` panel, an
 :::
 
 In the `Phase diagram` tab, `Setup` sub-tab:
-1. In `Phase diagram parameters`, set `Database = Metapelite extended (White et al., 2014, Green et al., 2016, Evans & Frost., 2021)`.
+2. In `Phase diagram parameters`, set `Database = Metapelite extended (White et al., 2014, Green et al., 2016, Evans & Frost., 2021)`.
   
-2. In `Bulk-rock composition`, drag and drop `Petroccia_et_al_2025_bulk_Magemin.csv` onto the upload field. A `Bulk-rock(s) composition(s) successfully loaded` alert confirms the import.
+3. In `Bulk-rock composition`, drag and drop `Petroccia_et_al_2025_bulk_Magemin.csv` onto the upload field. A `Bulk-rock(s) composition(s) successfully loaded` alert confirms the import.
   
-3. Still in `Bulk-rock composition`, select `BAR38A` in the dropdown above the composition table (it is appended at the end of the list for the `mpe` database).
+4. Still in `Bulk-rock composition`, select `BAR38A` in the dropdown above the composition table (it is appended at the end of the list for the `mpe` database).
   
-4. Since `BAR38A` is a peak-pressure, chloritoid-and-garnet-bearing pelite, lower the default temperature range to something like 400 – 700 °C (the default 800 – 1400 °C window is too hot for `Cld` to be stable). Change pressure range (15 - 35 kbar).
+5. Since `BAR38A` is a peak-pressure, chloritoid-and-garnet-bearing pelite, lower the default temperature range to something like 400 – 700 °C (the default 800 – 1400 °C window is too hot for `Cld` to be stable). Change pressure range (15 - 35 kbar).
   
-5. Set `Initial grid subdivision = 4` and `Refinement levels = 3`, then click `Compute phase diagram`.
+6. Set `Initial grid subdivision = 4` and `Refinement levels = 3`, then click `Compute phase diagram`.
   
 
 ::: tip Note
@@ -724,9 +726,9 @@ Switch to the top-level `IntersecT` tab (`Setup` panel on the left, open by defa
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMin_Intersect_setup.png?raw=true" alt="MAGEMinApp Intersect setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
 
 
-1. Drag and drop `BAR38A_measurements_julia.csv` onto the `Measurement file` upload field.
+2. Drag and drop `BAR38A_measurements_julia.csv` onto the `Measurement file` upload field.
   
-2. The panel below the upload field reports the file name, the number of measured columns and the phases found in the header (`Grt`, `Cld`, `Ms`):
+3. The panel below the upload field reports the file name, the number of measured columns and the phases found in the header (`Grt`, `Cld`, `Ms`):
   
   |                                      Column |      Phase | Element (a.p.f.u.) |
   | -------------------------------------------:| ----------:| ------------------:|
@@ -736,9 +738,9 @@ Switch to the top-level `IntersecT` tab (`Setup` panel on the left, open by defa
   
   The first data row holds the observed a.p.f.u. values, the second row the corresponding analytical uncertainties.
   
-3. The `Stable phases` checklist is automatically populated with the phases found both in the measurement file and on the computed grid, and all of them are pre-checked. Uncheck a phase here to exclude it from the calculation.
+4. The `Stable phases` checklist is automatically populated with the phases found both in the measurement file and on the computed grid, and all of them are pre-checked. Uncheck a phase here to exclude it from the calculation.
   
-4. Leave `Analysis type = WDS spot` (or pick `WDS map`/`EDS`). This setting is only used to auto-estimate the analytical uncertainty when the measurement file does not already provide one - since `BAR38A_measurements_julia.csv` already has an explicit uncertainty row, it has no effect on this particular run, but the field must still hold a valid value.
+5. Leave `Analysis type = WDS spot` (or pick `WDS map`/`EDS`). This setting is only used to auto-estimate the analytical uncertainty when the measurement file does not already provide one - since `BAR38A_measurements_julia.csv` already has an explicit uncertainty row, it has no effect on this particular run, but the field must still hold a valid value.
   
 
 #### Step 3 - Run IntersecT and compute the Q factor {#Step-3-Run-IntersecT-and-compute-the-Q-factor}

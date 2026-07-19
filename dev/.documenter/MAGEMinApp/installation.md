@@ -1,3 +1,5 @@
+---
+---
 
 ## How to install MAGEMinApp.jl {#How-to-install-MAGEMinApp.jl}
 

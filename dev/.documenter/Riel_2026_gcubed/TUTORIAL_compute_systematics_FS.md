@@ -1,3 +1,5 @@
+---
+---
 
 # Tutorial: `compute_systematics_FS.jl` {#Tutorial:-compute_systematics_FS.jl}
 
@@ -189,11 +191,11 @@ end
 
 
 Each sample is:
-1. **Converted from wt% to mol fractions** using atomic weights (`wt2mol()`)
+2. **Converted from wt% to mol fractions** using atomic weights (`wt2mol()`)
   
-2. **Normalized to sum to 1** (`norm2one()`)
+3. **Normalized to sum to 1** (`norm2one()`)
   
-3. **H₂O set to 0** initially — it is computed per-sample later
+4. **H₂O set to 0** initially — it is computed per-sample later
   
 
 The oxide order is fixed: `[SiO₂, Al₂O₃, CaO, MgO, FeO, K₂O, Na₂O, TiO₂, O, MnO, H₂O]`.
@@ -266,9 +268,9 @@ In the P–H₂O script, pressure is an axis of the grid, so the saturation curv
 **File:** `TE_functions_FS.jl`, lines 6–115
 
 This is the per-thread, per-sample version of the saturation computation. The logic mirrors `get_wat_sat_function()` from `TE_functions.jl`, with two key differences:
-1. **It receives `data_thread`** (already-initialized MAGEMin state) instead of creating a new one
+2. **It receives `data_thread`** (already-initialized MAGEMin state) instead of creating a new one
   
-2. **Tolerance is relaxed** to 0.01 °C (vs. 1e-4 in the global version) for speed
+3. **Tolerance is relaxed** to 0.01 °C (vs. 1e-4 in the global version) for speed
   
 
 ### Algorithm {#Algorithm}
@@ -299,13 +301,13 @@ The `Ex_H2O_sat = 0.03` parameter adds a small deliberate excess above the satur
 **File:** `plot_figures_FS.jl`, lines 1415–1568
 
 The post-processing loop is 1D (`for i = 1:np`) rather than 2D. For each sample `i`:
-1. **Find the extraction event with peak Li** — same logic as the P–H₂O script
+2. **Find the extraction event with peak Li** — same logic as the P–H₂O script
   
-2. **Require `Cliq > 100 ppm`** — a minimum enrichment threshold filters samples that barely melted
+3. **Require `Cliq > 100 ppm`** — a minimum enrichment threshold filters samples that barely melted
   
-3. **Extract mineral changes**: Δbi, Δcd, Δmu (same as P–H₂O script)
+4. **Extract mineral changes**: Δbi, Δcd, Δmu (same as P–H₂O script)
   
-4. **Additional fields** not present in the P–H₂O script:
+5. **Additional fields** not present in the P–H₂O script:
   - `afs[i]` — alkali feldspar volume fraction at peak extraction
     
   - `pl[i]` — plagioclase volume fraction at peak extraction
@@ -320,7 +322,7 @@ The post-processing loop is 1D (`for i = 1:np`) rather than 2D. For each sample 
     This gives the actual KD value that biotite had for each rock sample, which varies because the MM model's biotite KD depends on composition and temperature.
     
   
-5. **Saves everything to a JLD2 file**: `out_struct.jld2` — including the full MAGEMin outputs for later analysis.
+6. **Saves everything to a JLD2 file**: `out_struct.jld2` — including the full MAGEMin outputs for later analysis.
   
 
 

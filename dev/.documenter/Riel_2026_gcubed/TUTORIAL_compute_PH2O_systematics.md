@@ -1,3 +1,5 @@
+---
+---
 
 # Tutorial: `compute_P-H2O_systematics.jl` {#Tutorial:-compute_P-H2O_systematics.jl}
 
@@ -210,11 +212,11 @@ The water content at which a rock is exactly saturated in H₂O changes with pre
 ### How It Works (Bisection on the Solidus) {#How-It-Works-Bisection-on-the-Solidus}
 
 For each pressure point:
-1. **Find the solidus temperature** — using a bisection algorithm that brackets the temperature at which "liq" first appears in the stable phase assemblage. The loop halves the temperature interval `[a, b]` until convergence within `tolerance = 1e-4 °C`.
+2. **Find the solidus temperature** — using a bisection algorithm that brackets the temperature at which "liq" first appears in the stable phase assemblage. The loop halves the temperature interval `[a, b]` until convergence within `tolerance = 1e-4 °C`.
   
-2. **Remove excess free water** — at the solidus, compute the equilibrium assemblage. If a free water phase (`H2O` or `fl`) is stable, subtract its contribution from the bulk.
+3. **Remove excess free water** — at the solidus, compute the equilibrium assemblage. If a free water phase (`H2O` or `fl`) is stable, subtract its contribution from the bulk.
   
-3. **Record the saturation H₂O value** — the water content remaining in the anhydrous-normalized bulk is the saturation value at that pressure.
+4. **Record the saturation H₂O value** — the water content remaining in the anhydrous-normalized bulk is the saturation value at that pressure.
   
 
 ```
@@ -492,7 +494,7 @@ return Li_infos(ext_out, ext_out_te)
 After the threaded loop finishes, this function extracts scalar summary fields from the full `Out_all[np, np]` array.
 
 For each grid cell `[i, j]`:
-1. **Find the maximum Li concentration** — loop over all even-indexed steps (extraction events), find the one with the highest `Cliq`:
+2. **Find the maximum Li concentration** — loop over all even-indexed steps (extraction events), find the one with the highest `Cliq`:
   
   ```julia
   Cliq = [Out_all[i,j].ext_out_te[k].Cliq[1] for k = 2:2:nval_points]
@@ -500,11 +502,11 @@ For each grid cell `[i, j]`:
   ```
   
   
-2. **Record the extraction event index** — which episode produced the peak Li enrichment.
+3. **Record the extraction event index** — which episode produced the peak Li enrichment.
   
-3. **Record the temperature** at peak enrichment.
+4. **Record the temperature** at peak enrichment.
   
-4. **Compute mineral vol% changes** — for biotite, cordierite, muscovite, and staurolite, the change in volume fraction between the pre-extraction and post-extraction states:
+5. **Compute mineral vol% changes** — for biotite, cordierite, muscovite, and staurolite, the change in volume fraction between the pre-extraction and post-extraction states:
   
   ```julia
   Δbi[i,j] = bi_end - bi_start
@@ -512,7 +514,7 @@ For each grid cell `[i, j]`:
   
   This tells whether a mineral grew or was consumed during the melt extraction step.
   
-5. **Handle missing data** — cells that were skipped (outside the saturation window) are set to `NaN`.
+6. **Handle missing data** — cells that were skipped (outside the saturation window) are set to `NaN`.
   
 
 Output matrices `Cliq_max`, `Extract_epi`, `Extract_T`, `Δbi`, `Δcd`, `Δmu`, `Δst`, `eta_M` are all `np × np` and ready for plotting.

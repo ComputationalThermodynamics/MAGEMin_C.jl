@@ -1,3 +1,5 @@
+---
+---
 
 # Introduction to MAGEMin_C {#Introduction-to-MAGEMin_C}
 

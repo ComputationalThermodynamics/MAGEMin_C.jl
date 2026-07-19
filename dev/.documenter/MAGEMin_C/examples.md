@@ -1,3 +1,5 @@
+---
+---
 
 # MAGEMin_C.jl: Examples {#MAGEMin_C.jl:-Examples}
 

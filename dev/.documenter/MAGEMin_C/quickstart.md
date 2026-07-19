@@ -1,3 +1,5 @@
+---
+---
 
 # MAGEMin_C.jl: Quickstart {#MAGEMin_C.jl:-Quickstart}
 

@@ -1,3 +1,5 @@
+---
+---
 
 # MAGEMin_C.jl: Fractional crystallization {#MAGEMin_C.jl:-Fractional-crystallization}
 

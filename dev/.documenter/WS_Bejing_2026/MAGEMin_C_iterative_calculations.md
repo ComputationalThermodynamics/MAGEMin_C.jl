@@ -1,3 +1,5 @@
+---
+---
 
 # MAGEMin_C iterative phase equilibrium calculations {#MAGEMin_C-iterative-phase-equilibrium-calculations}
 
@@ -221,9 +223,9 @@ which gives:
 - In the previous exercise, we have seen that the specific heat capacity did not account for latent heat of reaction. Heat capacity is computed as a second-order derivative of the Gibbs energy with respect to temperature using numerical differentiation:
   $C_p = -T \frac{\partial^2 G}{\partial T^2}$
   **There are, however, two ways to retrieve the second-order derivative:**
-  1. Default option `scp = 0` — no latent heat of reaction: fixing the phase assemblage (phase proportions and compositions) and computing the Gibbs energy of the assemblage at T, T+eps and T-eps.
+  2. Default option `scp = 0` — no latent heat of reaction: fixing the phase assemblage (phase proportions and compositions) and computing the Gibbs energy of the assemblage at T, T+eps and T-eps.
     
-  2. Full differentiation option `scp = 1` — latent heat of reaction: computing three stable phase equilibria at T, T+eps and T-eps.
+  3. Full differentiation option `scp = 1` — latent heat of reaction: computing three stable phase equilibria at T, T+eps and T-eps.
     
   
 

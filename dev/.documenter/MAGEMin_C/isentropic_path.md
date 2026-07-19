@@ -1,3 +1,5 @@
+---
+---
 
 # MAGEMin_C.jl: Isentropic path calculation {#MAGEMin_C.jl:-Isentropic-path-calculation}
 

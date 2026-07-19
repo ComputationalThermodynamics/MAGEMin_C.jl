@@ -1,3 +1,5 @@
+---
+---
 
 # MAGEMin_C fractional melting {#MAGEMin_C-fractional-melting}
 

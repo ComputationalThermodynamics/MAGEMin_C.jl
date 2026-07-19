@@ -1,3 +1,5 @@
+---
+---
 
 # MAGEMin - C-library {#MAGEMin-C-library}
 

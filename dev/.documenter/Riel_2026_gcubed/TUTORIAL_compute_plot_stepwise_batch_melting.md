@@ -1,3 +1,5 @@
+---
+---
 
 # Tutorial: `compute_plot_stepwise_batch_melting.jl` {#Tutorial:-compute_plot_stepwise_batch_melting.jl}
 
@@ -8,11 +10,11 @@
 
 
 This is the **single-path diagnostic** of the project. All other scripts sweep across many conditions (pressure, H₂O, bulk compositions). This script fixes everything — one pressure, one water content, one bulk rock — and watches the system evolve continuously from the solidus to 1000 °C through 1024 temperature steps. It produces a three-panel figure showing:
-1. **Li concentration vs T** — in the melt and in every mineral simultaneously
+2. **Li concentration vs T** — in the melt and in every mineral simultaneously
   
-2. **Phase volumes vs T** — how each mineral grows and shrinks during heating
+3. **Phase volumes vs T** — how each mineral grows and shrinks during heating
   
-3. **Bulk partition coefficient D_Li vs T** — the system-wide effective KD in log scale
+4. **Bulk partition coefficient D_Li vs T** — the system-wide effective KD in log scale
   
 
 This is the script you run to understand and debug a specific P–T path before or after running the large grid calculations.

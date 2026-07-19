@@ -1,3 +1,5 @@
+---
+---
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_bulk.png?raw=true" alt="MAGEMinApp bulk" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 
 
