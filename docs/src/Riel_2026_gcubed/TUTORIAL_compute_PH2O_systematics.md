@@ -1,6 +1,6 @@
 # Tutorial: `compute_P-H2O_systematics.jl`
 
-## What This Script Does — The Big Picture
+## What This Script Does - The Big Picture
 
 This script answers the question:
 
@@ -9,9 +9,9 @@ This script answers the question:
 It sweeps a 2D grid of **pressure (P)** × **H₂O content** conditions, runs thermodynamic equilibrium calculations at each point, simulates repeated episodes of melt extraction (fractional melting), tracks Li through each episode using mineral–melt partition coefficients (KDs), and finally maps the results as heatmaps.
 
 The script combines:
-- **MAGEMin_C** — a Gibbs free energy minimizer that gives mineral assemblages and melt fractions
-- **Li trace-element partitioning** — how Li distributes between minerals and melt
-- **Julia multithreading** — parallel computation over the P–H₂O grid
+- **MAGEMin_C** - a Gibbs free energy minimizer that gives mineral assemblages and melt fractions
+- **Li trace-element partitioning** - how Li distributes between minerals and melt
+- **Julia multithreading** - parallel computation over the P–H₂O grid
 
 ---
 
@@ -32,8 +32,8 @@ plot_figures.jl                ← heatmap plotting helpers
 
 The computation sweeps a 2D grid of `np × np` = 150 × 150 = **22,500 independent thermodynamic calculations**. The two axes are:
 
-- **Rows (i)** — pressure `P[i]`, ranging from 2 to 16 kbar (crustal depth)
-- **Columns (j)** — H₂O content `H[j]`, ranging from ~1 to 12 mol%
+- **Rows (i)** - pressure `P[i]`, ranging from 2 to 16 kbar (crustal depth)
+- **Columns (j)** - H₂O content `H[j]`, ranging from ~1 to 12 mol%
 
 Each cell `[i, j]` is one complete fractional melting simulation at a fixed (P, H₂O) condition.
 
@@ -54,7 +54,7 @@ Each cell `[i, j]` is one complete fractional melting simulation at a fixed (P, 
  2 kbar ──┼─────┼─────┼─────┼─────┼─────┼──
 ```
 
-**Crucially, most cells are never computed.** Only a narrow strip of cells lying within ±0.03 mol% of the **water saturation curve** (the curve that separates water-undersaturated from water-saturated conditions) is active. This reduces the effective computation to a thin diagonal band across the grid — which is also exactly where the geologically interesting melting behavior occurs.
+**Crucially, most cells are never computed.** Only a narrow strip of cells lying within ±0.03 mol% of the **water saturation curve** (the curve that separates water-undersaturated from water-saturated conditions) is active. This reduces the effective computation to a thin diagonal band across the grid - which is also exactly where the geologically interesting melting behavior occurs.
 
 ```
           H₂O content (mol%)
@@ -80,7 +80,7 @@ A partition coefficient KD = C_mineral / C_melt. A KD > 1 means the mineral conc
 
 ---
 
-## Step 1 — Entry Point and Parameter Setup
+## Step 1 - Entry Point and Parameter Setup
 
 **File:** `compute_P-H2O_systematics.jl`, lines 155–190
 
@@ -98,7 +98,7 @@ Key parameters explained:
 
 | Parameter | Meaning |
 |-----------|---------|
-| `np` | Grid resolution — `np×np` total calculations |
+| `np` | Grid resolution - `np×np` total calculations |
 | `Pin` | Pressure range in kbar (e.g., 2–16 kbar) |
 | `Li_content` | Starting Li concentration in the bulk rock (ppm) |
 | `e1_liq` | Volume % of melt at which extraction is triggered |
@@ -110,7 +110,7 @@ The outer loop iterates over model variants and calls `main()` for each.
 
 ---
 
-## Step 2 — `main()` Function
+## Step 2 - `main()` Function
 
 **File:** `compute_P-H2O_systematics.jl`, lines 24–153
 
@@ -125,7 +125,7 @@ bulk = norm2one([0.67153, 0.12111, 0.00729, ...])
 `norm2one()` normalizes the oxide vector to sum to 1.0. The oxides are:
 `[SiO₂, Al₂O₃, CaO, MgO, FeO, K₂O, Na₂O, TiO₂, O, MnO, H₂O]`
 
-H₂O is initially set to 0 — it will be varied across the H axis of the grid.
+H₂O is initially set to 0 - it will be varied across the H axis of the grid.
 
 ### Stage B: Water Saturation Curve
 
@@ -135,7 +135,7 @@ pChip_wat = water_saturation_curve(P, bulk, Xoxides, dtb, 0.0)
 
 This computes, for each pressure on the P-axis, the exact H₂O mol fraction at which the rock becomes water-saturated just below the solidus. The result is stored as a **PCHIP interpolant** (a smooth spline). This curve is the most expensive part to compute and is cached to a `.jld2` file so it is only computed once.
 
-The curve is used to filter the grid: only cells near the saturation curve (within ±0.03 mol fraction) are computed — the rest are set to `nothing`.
+The curve is used to filter the grid: only cells near the saturation curve (within ±0.03 mol fraction) are computed - the rest are set to `nothing`.
 
 ### Stage C: KD Database
 
@@ -172,7 +172,7 @@ Extracts scalar fields from the results (maximum Li concentration, extraction ev
 
 ---
 
-## Step 3 — The Water Saturation Curve
+## Step 3 - The Water Saturation Curve
 
 **File:** `TE_functions.jl`, `water_saturation_curve()` and `get_wat_sat_function()`, lines 193–317
 
@@ -184,11 +184,11 @@ The water content at which a rock is exactly saturated in H₂O changes with pre
 
 For each pressure point:
 
-1. **Find the solidus temperature** — using a bisection algorithm that brackets the temperature at which "liq" first appears in the stable phase assemblage. The loop halves the temperature interval `[a, b]` until convergence within `tolerance = 1e-4 °C`.
+1. **Find the solidus temperature** - using a bisection algorithm that brackets the temperature at which "liq" first appears in the stable phase assemblage. The loop halves the temperature interval `[a, b]` until convergence within `tolerance = 1e-4 °C`.
 
-2. **Remove excess free water** — at the solidus, compute the equilibrium assemblage. If a free water phase (`H2O` or `fl`) is stable, subtract its contribution from the bulk.
+2. **Remove excess free water** - at the solidus, compute the equilibrium assemblage. If a free water phase (`H2O` or `fl`) is stable, subtract its contribution from the bulk.
 
-3. **Record the saturation H₂O value** — the water content remaining in the anhydrous-normalized bulk is the saturation value at that pressure.
+3. **Record the saturation H₂O value** - the water content remaining in the anhydrous-normalized bulk is the saturation value at that pressure.
 
 ```
 For each pressure P_i:
@@ -204,7 +204,7 @@ The interpolant `pChip_wat` can then be called as a function: `pChip_wat(8.5)` r
 
 ---
 
-## Step 4 — Partition Coefficient Models
+## Step 4 - Partition Coefficient Models
 
 **File:** `TE_functions.jl`, `get_Kds()` and `get_Kds_data()`, lines 74–187
 
@@ -216,7 +216,7 @@ Several published KD datasets are implemented as named models:
 | `"KM"` | Koopmans et al. (2022) | Fixed KDs, includes garnet near zero |
 | `"BA"` | Ballouard et al. (2023) | Different mineral set |
 | `"HO"` | Horányi et al. (2025) | Includes staurolite |
-| `"MM_F"` | Morris & Beard (fake bi) | Biotite KD = 32.8 — extreme sensitivity test |
+| `"MM_F"` | Morris & Beard (fake bi) | Biotite KD = 32.8 - extreme sensitivity test |
 
 The **biotite KD in model "MM"** is notably encoded as an **expression string**:
 
@@ -234,7 +234,7 @@ The function `get_Kds()` creates the KD database in MAGEMin's internal format; `
 
 ---
 
-## Step 5 — Threading Architecture
+## Step 5 - Threading Architecture
 
 **File:** `TE_functions.jl`, `perform_threaded_calc()`, lines 366–422
 
@@ -242,7 +242,7 @@ This is the heart of the parallel computation. Understanding it requires underst
 
 ### The Problem: 22,500 Independent Calculations
 
-The P × H grid has `np × np` cells. Each cell is completely independent of the others — there is no data dependency between them. This is a perfect candidate for parallelism.
+The P × H grid has `np × np` cells. Each cell is completely independent of the others - there is no data dependency between them. This is a perfect candidate for parallelism.
 
 ### The Solution: Static Thread Scheduling
 
@@ -310,7 +310,7 @@ else
 end
 ```
 
-This ±0.03 mol fraction window around the saturation curve is where the interesting melting behavior occurs (near-solidus, water-saturated conditions). Cells far from this strip are skipped — this dramatically reduces the total computation time.
+This ±0.03 mol fraction window around the saturation curve is where the interesting melting behavior occurs (near-solidus, water-saturated conditions). Cells far from this strip are skipped - this dramatically reduces the total computation time.
 
 ### Thread Safety of Writes
 
@@ -331,7 +331,7 @@ No locking needed
 
 ---
 
-## Step 6 — The Fractional Melting Engine
+## Step 6 - The Fractional Melting Engine
 
 **File:** `TE_fractional.jl`, `threaded_frac_melting()`, lines 1–150
 
@@ -346,7 +346,7 @@ Output: Li_infos struct containing MAGEMin outputs at each extraction step
 
 ### Step-by-Step
 
-#### 6.1 — Set Bulk Composition
+#### 6.1 - Set Bulk Composition
 
 ```julia
 bulk[id_h] = H          # set H₂O to this cell's water content
@@ -355,7 +355,7 @@ gv = define_bulk_rock(gv, bulk, Xoxides, sys_in, dtb)
 
 The H₂O slot in the bulk vector is overwritten with the current grid value `H`, then the bulk is registered with MAGEMin.
 
-#### 6.2 — Set Initial Trace Element
+#### 6.2 - Set Initial Trace Element
 
 ```julia
 C0 = adjust_chemical_system(KDs_database, bulk_TE, elem_TE)
@@ -363,7 +363,7 @@ C0 = adjust_chemical_system(KDs_database, bulk_TE, elem_TE)
 
 `C0` is initialized to `Li_content` (e.g., 100 ppm). This value will be updated after each extraction event to track the evolving residual concentration.
 
-#### 6.3 — Find the Solidus
+#### 6.3 - Find the Solidus
 
 ```julia
 Tsol = retrieve_solidus(P, gv, z_b, DB, splx_data)
@@ -371,13 +371,13 @@ Tsol = retrieve_solidus(P, gv, z_b, DB, splx_data)
 
 A bisection method (the same algorithm as in the water saturation curve) finds the temperature at which melt first appears. This is the starting temperature for the extraction loop.
 
-#### 6.4 — Extraction Event Loop
+#### 6.4 - Extraction Event Loop
 
 The loop runs up to `n_ee` times (default 10). Each iteration is one extraction episode.
 
 **Inside each extraction event:**
 
-**a) Find the extraction temperature** — bisect temperature until the melt volume fraction equals `e1_liq / 100`:
+**a) Find the extraction temperature** - bisect temperature until the melt volume fraction equals `e1_liq / 100`:
 
 ```julia
 result = out.frac_M_vol - e1_liq/100.0
@@ -385,7 +385,7 @@ result = out.frac_M_vol - e1_liq/100.0
 
 The bisection narrows `[a, b]` until the melt volume matches the target (e.g., 14%). Several relaxed tolerances are tried before giving up.
 
-**b) Compute trace element concentrations** — once the extraction temperature is found:
+**b) Compute trace element concentrations** - once the extraction temperature is found:
 
 ```julia
 out_TE = TE_prediction(out, C0, KDs_database, dtb; ZrSat_model="CB", norm_TE=norm_TE)
@@ -393,7 +393,7 @@ out_TE = TE_prediction(out, C0, KDs_database, dtb; ZrSat_model="CB", norm_TE=nor
 
 This computes `Cliq` (Li concentration in the melt) using the partition coefficients and the current mineral assemblage from MAGEMin.
 
-**c) Extract the melt** — remove the melt from the system, keeping only `e1_remain` vol% behind:
+**c) Extract the melt** - remove the melt from the system, keeping only `e1_remain` vol% behind:
 
 ```julia
 ratio  = (out.frac_M_vol - e1_remain/100.0) / out.frac_M_vol
@@ -403,7 +403,7 @@ C0     = C0 .- out_TE.Cliq[1] .* (out_TE.liq_wt_norm * ratio)
 
 The bulk composition is updated by subtracting the extracted melt composition. The trace element budget `C0` is similarly reduced. The next event starts from this residual.
 
-**d) Save results** — both the pre-extraction and post-extraction states are stored:
+**d) Save results** - both the pre-extraction and post-extraction states are stored:
 
 ```julia
 ext_out[ee*2]    = out      # at extraction temperature
@@ -412,24 +412,24 @@ ext_out[ee*2+1]  = out      # after melt removal (start of next step)
 
 This odd/even indexing stores the full path through P–T space for each extraction episode.
 
-#### 6.5 — Early Exit Conditions
+#### 6.5 - Early Exit Conditions
 
 The loop breaks if:
 - Convergence fails (system cannot reach the target melt fraction)
-- The melt has zero H₂O (anhydrous melt — Li systematics change fundamentally)
+- The melt has zero H₂O (anhydrous melt - Li systematics change fundamentally)
 - The bisection hits iteration limit and residual is too large
 
-#### 6.6 — Return
+#### 6.6 - Return
 
 ```julia
 return Li_infos(ext_out, ext_out_te)
 ```
 
-`Li_infos` is a simple struct holding two vectors — the MAGEMin outputs and the trace element outputs — one entry per sub-step of the extraction history.
+`Li_infos` is a simple struct holding two vectors - the MAGEMin outputs and the trace element outputs - one entry per sub-step of the extraction history.
 
 ---
 
-## Step 7 — Post-Processing: `retrieve_outputs()`
+## Step 7 - Post-Processing: `retrieve_outputs()`
 
 **File:** `plot_figures.jl`, lines 555–673
 
@@ -437,29 +437,29 @@ After the threaded loop finishes, this function extracts scalar summary fields f
 
 For each grid cell `[i, j]`:
 
-1. **Find the maximum Li concentration** — loop over all even-indexed steps (extraction events), find the one with the highest `Cliq`:
+1. **Find the maximum Li concentration** - loop over all even-indexed steps (extraction events), find the one with the highest `Cliq`:
    ```julia
    Cliq = [Out_all[i,j].ext_out_te[k].Cliq[1] for k = 2:2:nval_points]
    max_Cliq, index_Cliq = findmax(Cliq)
    ```
 
-2. **Record the extraction event index** — which episode produced the peak Li enrichment.
+2. **Record the extraction event index** - which episode produced the peak Li enrichment.
 
 3. **Record the temperature** at peak enrichment.
 
-4. **Compute mineral vol% changes** — for biotite, cordierite, muscovite, and staurolite, the change in volume fraction between the pre-extraction and post-extraction states:
+4. **Compute mineral vol% changes** - for biotite, cordierite, muscovite, and staurolite, the change in volume fraction between the pre-extraction and post-extraction states:
    ```julia
    Δbi[i,j] = bi_end - bi_start
    ```
    This tells whether a mineral grew or was consumed during the melt extraction step.
 
-5. **Handle missing data** — cells that were skipped (outside the saturation window) are set to `NaN`.
+5. **Handle missing data** - cells that were skipped (outside the saturation window) are set to `NaN`.
 
 Output matrices `Cliq_max`, `Extract_epi`, `Extract_T`, `Δbi`, `Δcd`, `Δmu`, `Δst`, `eta_M` are all `np × np` and ready for plotting.
 
 ---
 
-## Step 8 — Plotting: `plot_output()`
+## Step 8 - Plotting: `plot_output()`
 
 **File:** `plot_figures.jl`, `plot_output()`, lines 763–916
 
@@ -481,7 +481,7 @@ The `Li` field is normalized to the initial content (`mat ./= Li_content`), so v
 
 ---
 
-## Step 9 — Custom Biotite Margules Parameters
+## Step 9 - Custom Biotite Margules Parameters
 
 **File:** `TE_functions.jl`, `custom_bi_Ws()`, lines 13–43
 

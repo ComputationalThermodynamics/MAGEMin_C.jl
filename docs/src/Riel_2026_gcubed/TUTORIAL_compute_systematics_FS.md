@@ -1,10 +1,10 @@
 # Tutorial: `compute_systematics_FS.jl`
 
-## What This Script Does — The Big Picture
+## What This Script Does - The Big Picture
 
 > *Given the full geochemical diversity of natural pelite rocks, which bulk compositions produce the strongest Li enrichment in the melt, and why?*
 
-While `compute_P-H2O_systematics.jl` sweeps a synthetic 2D grid of (pressure, H₂O) conditions for a **single average pelite**, this script takes the opposite approach: it fixes pressure and uses **hundreds of real pelite bulk compositions** from the Forshaw & Pattison (2023) natural database. Each rock sample is an independent fractional melting simulation. The result is a cloud of data points in geochemical composition space, colored by Li enrichment — showing which rock chemistries are most prone to producing Li-rich granites.
+While `compute_P-H2O_systematics.jl` sweeps a synthetic 2D grid of (pressure, H₂O) conditions for a **single average pelite**, this script takes the opposite approach: it fixes pressure and uses **hundreds of real pelite bulk compositions** from the Forshaw & Pattison (2023) natural database. Each rock sample is an independent fractional melting simulation. The result is a cloud of data points in geochemical composition space, colored by Li enrichment - showing which rock chemistries are most prone to producing Li-rich granites.
 
 The script is the computational backbone of:
 > Riel et al., 2026, *Thermodynamic modelling of lithium enrichment during partial melting*, G³
@@ -52,13 +52,13 @@ Unlike the P–H₂O script where a single interpolant `pChip_wat(P)` serves the
 
 ---
 
-## Step 1 — Entry Point and Parameters
+## Step 1 - Entry Point and Parameters
 
 **File:** `compute_systematics_FS.jl`, lines 140–172
 
 ```julia
 model       = "MM"
-P           = [4.0, 8.0]      # kbar — run at each pressure
+P           = [4.0, 8.0]      # kbar - run at each pressure
 Ex_H2O_sat  = 0.03            # excess H₂O above saturation (mol fraction)
 Li_content  = 100.0           # ppm
 e1_liq      = 7.0             # vol% melt triggering extraction
@@ -85,7 +85,7 @@ Key differences from the P–H₂O script:
 
 ---
 
-## Step 2 — `main()` Function
+## Step 2 - `main()` Function
 
 **File:** `compute_systematics_FS.jl`, lines 38–137
 
@@ -111,7 +111,7 @@ np       = size(FS_bulks, 1)
 
 `load_Forshaw_mp()` reads the Excel file into a DataFrame. `get_mol_bulks()` converts wt% oxides to mol fractions and normalizes each row to sum to 1. The result is an `np × 11` matrix where row `i` is one pelite sample and columns are oxide mol fractions.
 
-If `test = true`, only every 50th sample is used (`FS_bulks[1:50:end,:]`) — useful for quick validation runs.
+If `test = true`, only every 50th sample is used (`FS_bulks[1:50:end,:]`) - useful for quick validation runs.
 
 ### Stage C: Threading Setup
 
@@ -129,7 +129,7 @@ Out_all, Out_all_FC, FS_bulks = perform_threaded_calc_FS(
     Out_all, Out_all_FC, data, dtb, P, T, np, ...)
 ```
 
-The H₂O column of `FS_bulks` is written back after each calculation — this records the actual saturation water content used for each sample.
+The H₂O column of `FS_bulks` is written back after each calculation - this records the actual saturation water content used for each sample.
 
 ### Stage E: Post-processing and Plotting
 
@@ -141,11 +141,11 @@ plot_all_oxides(FS_bulks, Li_content, Xoxides, ...)
 plot_custom_oxides(FS_bulks, Li_content, Xoxides, ...)
 ```
 
-Two families of plots are generated — see Step 6.
+Two families of plots are generated - see Step 6.
 
 ---
 
-## Step 3 — Loading and Converting the Database
+## Step 3 - Loading and Converting the Database
 
 **File:** `TE_functions_FS.jl`, `get_mol_bulks()`, lines 187–210
 
@@ -162,13 +162,13 @@ end
 Each sample is:
 1. **Converted from wt% to mol fractions** using atomic weights (`wt2mol()`)
 2. **Normalized to sum to 1** (`norm2one()`)
-3. **H₂O set to 0** initially — it is computed per-sample later
+3. **H₂O set to 0** initially - it is computed per-sample later
 
 The oxide order is fixed: `[SiO₂, Al₂O₃, CaO, MgO, FeO, K₂O, Na₂O, TiO₂, O, MnO, H₂O]`.
 
 ---
 
-## Step 4 — Threading Architecture
+## Step 4 - Threading Architecture
 
 **File:** `TE_functions_FS.jl`, `perform_threaded_calc_FS()`, lines 118–184
 
@@ -193,7 +193,7 @@ Thread 3: i=2*np/8+1, ...        →  sample ~400, 401, ...
 
 Each thread reads a unique row of `FS_bulks` and writes to a unique index of `Out_all`. No locking needed.
 
-### Per-Sample Water Saturation — Computed Inside the Thread
+### Per-Sample Water Saturation - Computed Inside the Thread
 
 This is the key architectural difference. Rather than calling a precomputed interpolant, each thread runs a full bisection to find the solidus temperature of its sample's bulk composition, then extracts the saturation H₂O:
 
@@ -217,11 +217,11 @@ This saves the computed water content back into the bulk matrix so it can be use
 
 ### Why Per-Thread and Not Pre-Computed?
 
-In the P–H₂O script, pressure is an axis of the grid, so the saturation curve can be computed once over the pressure range and interpolated. Here, **every sample has a different bulk composition**, so the saturation curve is unique to each sample — it must be computed fresh each time, within the thread that holds the right MAGEMin state.
+In the P–H₂O script, pressure is an axis of the grid, so the saturation curve can be computed once over the pressure range and interpolated. Here, **every sample has a different bulk composition**, so the saturation curve is unique to each sample - it must be computed fresh each time, within the thread that holds the right MAGEMin state.
 
 ---
 
-## Step 5 — Per-Sample Water Saturation: `water_saturation_curve_FS()`
+## Step 5 - Per-Sample Water Saturation: `water_saturation_curve_FS()`
 
 **File:** `TE_functions_FS.jl`, lines 6–115
 
@@ -246,34 +246,34 @@ Input: thread's MAGEMin state, P, bulk composition, excess H₂O
 8. Return the H₂O mol fraction
 ```
 
-The `Ex_H2O_sat = 0.03` parameter adds a small deliberate excess above the saturation threshold — this ensures the rock is slightly over-saturated, which is the geologically relevant condition for partial melting near the wet solidus.
+The `Ex_H2O_sat = 0.03` parameter adds a small deliberate excess above the saturation threshold - this ensures the rock is slightly over-saturated, which is the geologically relevant condition for partial melting near the wet solidus.
 
 ---
 
-## Step 6 — Post-Processing: `retrieve_outputs_FS()`
+## Step 6 - Post-Processing: `retrieve_outputs_FS()`
 
 **File:** `plot_figures_FS.jl`, lines 1415–1568
 
 The post-processing loop is 1D (`for i = 1:np`) rather than 2D. For each sample `i`:
 
-1. **Find the extraction event with peak Li** — same logic as the P–H₂O script
-2. **Require `Cliq > 100 ppm`** — a minimum enrichment threshold filters samples that barely melted
+1. **Find the extraction event with peak Li** - same logic as the P–H₂O script
+2. **Require `Cliq > 100 ppm`** - a minimum enrichment threshold filters samples that barely melted
 3. **Extract mineral changes**: Δbi, Δcd, Δmu (same as P–H₂O script)
 4. **Additional fields** not present in the P–H₂O script:
-   - `afs[i]` — alkali feldspar volume fraction at peak extraction
-   - `pl[i]` — plagioclase volume fraction at peak extraction
-   - `Dbi[i]` — the **effective biotite KD at the extraction point**, evaluated by calling the expression from the KD database:
+   - `afs[i]` - alkali feldspar volume fraction at peak extraction
+   - `pl[i]` - plagioclase volume fraction at peak extraction
+   - `Dbi[i]` - the **effective biotite KD at the extraction point**, evaluated by calling the expression from the KD database:
      ```julia
      expr  = KDs_database.KDs_expr[2]           # biotite expression
      Dbi[i] = Base.invokelatest(expr, out)       # evaluate at this P-T-X
      ```
      This gives the actual KD value that biotite had for each rock sample, which varies because the MM model's biotite KD depends on composition and temperature.
 
-5. **Saves everything to a JLD2 file**: `out_struct.jld2` — including the full MAGEMin outputs for later analysis.
+5. **Saves everything to a JLD2 file**: `out_struct.jld2` - including the full MAGEMin outputs for later analysis.
 
 ---
 
-## Step 7 — Statistical Analysis (inside `plot_custom_oxides()`)
+## Step 7 - Statistical Analysis (inside `plot_custom_oxides()`)
 
 **File:** `plot_figures_FS.jl`, lines 1144–1201
 
@@ -321,17 +321,17 @@ This tells you: "what does a typical high-Li pelite look like chemically, compar
 
 ---
 
-## Step 8 — Plotting
+## Step 8 - Plotting
 
 **Files:** `plot_figures_FS.jl`, `plot_figures.jl`
 
 Two plotting functions are called:
 
-### `plot_all_oxides()` — Full Oxide Matrix
+### `plot_all_oxides()` - Full Oxide Matrix
 
 Creates an `n × n` scatter matrix where every oxide is plotted against every other oxide, colored by Li enrichment. With 10 oxides this gives a 10×10 panel figure (100 subplots), saved as `Oxides_vs_oxides.png`. This is a comprehensive view of which oxide ratios correlate with high Li enrichment.
 
-### `plot_custom_oxides()` — Targeted Diagnostic Plots
+### `plot_custom_oxides()` - Targeted Diagnostic Plots
 
 Generates a curated set of figures:
 
@@ -352,9 +352,9 @@ Generates a curated set of figures:
 | `Herron_classification.png` | PlotlyJS Herron diagram with full sample cloud |
 
 The **ASM ternary plots** (SiO₂–Al₂O₃–MgO) are produced with PlotlyJS, using `scatterternary()` with color-coded markers. The ternary corner labels are:
-- **S** = SiO₂ — maturity / silica content
-- **A** = Al₂O₃ — aluminosity (controls muscovite/biotite stability)
-- **M** = MgO — maficity (controls biotite vs. cordierite)
+- **S** = SiO₂ - maturity / silica content
+- **A** = Al₂O₃ - aluminosity (controls muscovite/biotite stability)
+- **M** = MgO - maficity (controls biotite vs. cordierite)
 
 ### The Herron Diagram
 
@@ -432,8 +432,8 @@ Post-processing: 2D matrices           Post-processing: 1D vectors
 julia --threads 8 compute_systematics_FS.jl
 ```
 
-No cached `.jld2` files are needed upfront — the water saturation is computed fresh per sample inside the threads. The Excel database file must be present at `./Forshaw_bulk_db/G50542_SuppData.xlsx` (default path in `load_Forshaw_mp()`).
+No cached `.jld2` files are needed upfront - the water saturation is computed fresh per sample inside the threads. The Excel database file must be present at `./Forshaw_bulk_db/G50542_SuppData.xlsx` (default path in `load_Forshaw_mp()`).
 
 Outputs are saved under `./output_Li_v0.1/<model>/FS_dtb_<model>_P<P>kbar_H<Ex_H2O_sat>_e<e1_liq>_r<e1_remain>/`.
 
-To test on a small subset before a full run, set `test = true` at the bottom of the script — this downsamples to every 50th rock sample.
+To test on a small subset before a full run, set `test = true` at the bottom of the script - this downsamples to every 50th rock sample.

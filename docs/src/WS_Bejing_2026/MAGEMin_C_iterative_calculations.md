@@ -194,8 +194,8 @@ which gives:
     $C_p = -T \frac{\partial^2 G}{\partial T^2}$
 
     **There are, however, two ways to retrieve the second-order derivative:**
-    1. Default option `scp = 0` — no latent heat of reaction: fixing the phase assemblage (phase proportions and compositions) and computing the Gibbs energy of the assemblage at T, T+eps and T-eps.
-    2. Full differentiation option `scp = 1` — latent heat of reaction: computing three stable phase equilibria at T, T+eps and T-eps.
+    1. Default option `scp = 0` - no latent heat of reaction: fixing the phase assemblage (phase proportions and compositions) and computing the Gibbs energy of the assemblage at T, T+eps and T-eps.
+    2. Full differentiation option `scp = 1` - latent heat of reaction: computing three stable phase equilibria at T, T+eps and T-eps.
 
 
     In order to account for latent heat of reaction, you simply need to rerun the calculation while modifying the `single_point_minimization()` call to:

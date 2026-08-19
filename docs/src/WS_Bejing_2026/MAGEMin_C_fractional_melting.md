@@ -78,7 +78,7 @@ else
     residual_comp_wt    = Out_XY[i].rho_M * Out_XY[i].frac_M_vol  .* Out_XY[i].bulk_M_wt .+ Out_XY[i].rho_S * Out_XY[i].frac_S_vol .* Out_XY[i].bulk_S_wt
 end
 ```
-The "if, else" statement allows updating the residual bulk-rock composition when the MCT is reached. Note that we don't renormalize here — this is done internally within `MAGEMin`.
+The "if, else" statement allows updating the residual bulk-rock composition when the MCT is reached. Note that we don't renormalize here - this is done internally within `MAGEMin`.
 
 ### 4. Display melt volume fraction evolution
 

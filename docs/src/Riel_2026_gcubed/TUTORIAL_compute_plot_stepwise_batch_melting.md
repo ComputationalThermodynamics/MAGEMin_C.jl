@@ -1,14 +1,14 @@
 # Tutorial: `compute_plot_stepwise_batch_melting.jl`
 
-## What This Script Does — The Big Picture
+## What This Script Does - The Big Picture
 
 > *As temperature rises at a single fixed P–H₂O condition, how do Li concentrations in the melt and in each mineral evolve, how do mineral volumes change, and how does the bulk partition coefficient shift?*
 
-This is the **single-path diagnostic** of the project. All other scripts sweep across many conditions (pressure, H₂O, bulk compositions). This script fixes everything — one pressure, one water content, one bulk rock — and watches the system evolve continuously from the solidus to 1000 °C through 1024 temperature steps. It produces a three-panel figure showing:
+This is the **single-path diagnostic** of the project. All other scripts sweep across many conditions (pressure, H₂O, bulk compositions). This script fixes everything - one pressure, one water content, one bulk rock - and watches the system evolve continuously from the solidus to 1000 °C through 1024 temperature steps. It produces a three-panel figure showing:
 
-1. **Li concentration vs T** — in the melt and in every mineral simultaneously
-2. **Phase volumes vs T** — how each mineral grows and shrinks during heating
-3. **Bulk partition coefficient D_Li vs T** — the system-wide effective KD in log scale
+1. **Li concentration vs T** - in the melt and in every mineral simultaneously
+2. **Phase volumes vs T** - how each mineral grows and shrinks during heating
+3. **Bulk partition coefficient D_Li vs T** - the system-wide effective KD in log scale
 
 This is the script you run to understand and debug a specific P–T path before or after running the large grid calculations.
 
@@ -29,21 +29,21 @@ plot_figures.jl                          ← shared helpers
 
 | | Other scripts | This script |
 |---|---|---|
-| **Axis** | Pressure, H₂O, or bulk composition | Fixed — one (P, H₂O) point |
+| **Axis** | Pressure, H₂O, or bulk composition | Fixed - one (P, H₂O) point |
 | **Temperature** | Found by bisection | Swept as a dense 1024-step array |
 | **Extraction** | Tracked per event | Triggered inline when melt vol ≥ 7% |
 | **Output** | Scalar summary per grid cell | Full time-series of every variable |
-| **Threading** | `@threads` over the sweep axis | None — single thread |
+| **Threading** | `@threads` over the sweep axis | None - single thread |
 | **Trace elements** | `Cliq` only | **`Cliq` + `Cmin` for every mineral** |
 
 `Cmin` (Li in each solid phase) is the key quantity this script adds. The other scripts only record the melt concentration; this one shows the full mineral-by-mineral Li budget at every temperature step.
 
 ---
 
-## Step 1 — Setup
+## Step 1 - Setup
 
 ```julia
-P       = 4.0       # kbar — single fixed pressure
+P       = 4.0       # kbar - single fixed pressure
 H_ex    = 0.0       # no excess water beyond saturation
 n_ee    = 15        # max extraction events (used as context, not in loop)
 e1_liq  = 7.0       # vol% melt threshold for extraction
@@ -60,13 +60,13 @@ H = pChip_wat(P)
 bulk[id_h] = H      # set water to exact saturation value at P = 4 kbar
 ```
 
-Unlike `compute_plot_phase_stability.jl` which adds `H_ex = 0.03`, here `H_ex = 0.0` — exact saturation, no excess. The solidus temperature also comes from the interpolant directly:
+Unlike `compute_plot_phase_stability.jl` which adds `H_ex = 0.03`, here `H_ex = 0.0` - exact saturation, no excess. The solidus temperature also comes from the interpolant directly:
 
 ```julia
 Tsol = pChip_T(P) + 1   # +1°C to sit just above the solidus
 ```
 
-This is a shortcut — instead of running the bisection (`retrieve_solidus()`), the cached `pChip_T` interpolant gives the solidus temperature instantly.
+This is a shortcut - instead of running the bisection (`retrieve_solidus()`), the cached `pChip_T` interpolant gives the solidus temperature instantly.
 
 ### Temperature Axis
 
@@ -76,7 +76,7 @@ Tall = collect(range(Tsol, max_T, length=n_max))   # 1024 steps, Tsol → 1000°
 
 ---
 
-## Step 2 — The Forward Sweep with Inline Extraction
+## Step 2 - The Forward Sweep with Inline Extraction
 
 ```julia
 @showprogress for i = 1:n_max
@@ -97,13 +97,13 @@ Tall = collect(range(Tsol, max_T, length=n_max))   # 1024 steps, Tsol → 1000°
 end
 ```
 
-This is structurally identical to `compute_plot_phase_stability.jl` — a forward temperature sweep that triggers extraction when the 7% threshold is crossed and immediately updates the bulk composition. The difference is that here the loop runs at a **single fixed pressure**, so every detail of the evolution is captured.
+This is structurally identical to `compute_plot_phase_stability.jl` - a forward temperature sweep that triggers extraction when the 7% threshold is crossed and immediately updates the bulk composition. The difference is that here the loop runs at a **single fixed pressure**, so every detail of the evolution is captured.
 
 The key visual consequence: when an extraction event fires, the next temperature step will show a **discontinuity** in `Li`, `liq_vol`, and mineral volumes because the bulk composition has changed. These jumps are the signature of fractional melting and are visible in the output plots.
 
 ---
 
-## Step 3 — Extracting Phase Volumes
+## Step 3 - Extracting Phase Volumes
 
 Phase volumes are read from `ext_out2` using the same `SS_syms`/`PP_syms` pattern as in `compute_plot_phase_stability.jl`:
 
@@ -119,13 +119,13 @@ q_vol  = [haskey(ext_out2[i].PP_syms, :q) ?
           for i = 1:n_max]
 ```
 
-The capped melt volume line in `compute_plot_phase_stability.jl` (`liq_vol[liq_vol .> 0.07] .= 0.07`) is commented out here — the uncapped melt fraction is plotted directly so that the extraction jumps remain visible.
+The capped melt volume line in `compute_plot_phase_stability.jl` (`liq_vol[liq_vol .> 0.07] .= 0.07`) is commented out here - the uncapped melt fraction is plotted directly so that the extraction jumps remain visible.
 
 ---
 
-## Step 4 — Extracting Li in Each Mineral (`Cmin`)
+## Step 4 - Extracting Li in Each Mineral (`Cmin`)
 
-This is the **unique feature** of this script. `TE_prediction()` computes not only `Cliq` (Li in the melt) but also `Cmin` — the Li concentration in each solid phase. This is read from `ext_out_te2[i]`:
+This is the **unique feature** of this script. `TE_prediction()` computes not only `Cliq` (Li in the melt) but also `Cmin` - the Li concentration in each solid phase. This is read from `ext_out_te2[i]`:
 
 ```julia
 bi_Li = []
@@ -151,7 +151,7 @@ This is important for readability: when biotite breaks down at high temperature,
 
 ---
 
-## Step 5 — Evaluating Individual Mineral KDs
+## Step 5 - Evaluating Individual Mineral KDs
 
 Beyond plotting `Cliq` and `Cmin`, the script also evaluates the actual KD expressions from the database for biotite, muscovite, and cordierite at each temperature step:
 
@@ -167,16 +167,16 @@ for k = 1:n_max
 end
 ```
 
-`KDs_database.KDs_expr` holds the compiled Julia functions for each phase's KD expression — the same expressions encoded as strings in `get_Kds()`. `Base.invokelatest()` calls them safely after runtime compilation. The index mapping is:
+`KDs_database.KDs_expr` holds the compiled Julia functions for each phase's KD expression - the same expressions encoded as strings in `get_Kds()`. `Base.invokelatest()` calls them safely after runtime compilation. The index mapping is:
 - `KDs_expr[1]` → muscovite (Dms)
 - `KDs_expr[2]` → biotite (Dbi)
 - `KDs_expr[3]` → cordierite (Dcd)
 
-These arrays are computed but not plotted in the current version — they are available for further analysis or can be added to the figure.
+These arrays are computed but not plotted in the current version - they are available for further analysis or can be added to the figure.
 
 ---
 
-## Step 6 — Three-Panel Figure
+## Step 6 - Three-Panel Figure
 
 ```julia
 plots = []
@@ -224,7 +224,7 @@ The three panels are stacked vertically (`grid(3,1)`) into a tall 600×1350 figu
            650°C           1000°C
 ```
 
-`bulk_D` is the bulk partition coefficient — a single number that tells you how strongly the whole mineral assemblage buffers Li relative to the melt. Values > 1 mean the solid holds more Li than the melt; values < 1 mean the melt is enriched. Its log-scale plot reveals the order-of-magnitude changes that occur when biotite breaks down.
+`bulk_D` is the bulk partition coefficient - a single number that tells you how strongly the whole mineral assemblage buffers Li relative to the melt. Values > 1 mean the solid holds more Li than the melt; values < 1 mean the melt is enriched. Its log-scale plot reveals the order-of-magnitude changes that occur when biotite breaks down.
 
 ---
 
@@ -285,4 +285,4 @@ julia compute_plot_stepwise_batch_melting.jl
 
 **Prerequisites:** `pChip_wat.jld2` must exist (produced by `compute_P-H2O_systematics.jl`).
 
-To explore a different pressure, change `P = 4.0` at line 37. The output filename `P4kbar_MM_71.svg` is hardcoded — rename it manually when changing conditions. To switch KD models, change `model = "MM"` at line 24.
+To explore a different pressure, change `P = 4.0` at line 37. The output filename `P4kbar_MM_71.svg` is hardcoded - rename it manually when changing conditions. To switch KD models, change `model = "MM"` at line 24.

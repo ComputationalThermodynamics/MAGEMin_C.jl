@@ -8,6 +8,7 @@ A comprehensive overview of all thermodynamic databases available in MAGEMin, in
     - [Important Notes](#Important-Notes)
     - [Reference Citations](#Reference-Citations)
     - [Phase and End-member Listing](#Phase-and-End-member-Listing)
+    - [Deep Earth Water (DEW) aqueous fluid model](#Deep-Earth-Water-DEW-aqueous-fluid-model)
     - [Trace-element partitioning models](#Trace-element-partitioning-models)
         - [OL fixed Kd database](#OL-fixed-Kd-database)
         - [CO lattice strain model](#CO-lattice-strain-model)
@@ -29,9 +30,10 @@ A comprehensive overview of all thermodynamic databases available in MAGEMin, in
 | **sb11**  | Mantle (Stixrude & Lithgow-Bertelloni) | v1.7.7 | Stixrude & Lithgow-Bertelloni, 2011 |
 | **sb21** | Mantle (Stixrude & Lithgow-Bertelloni) | v1.7.7 | Stixrude & Lithgow-Bertelloni, 2021 |
 | **sb24**  | Mantle (Stixrude & Lithgow-Bertelloni) | v1.8.0 | Stixrude & Lithgow-Bertelloni, 2024 |
-| **ume** | Ultramafic extended | — | Evans & Frost, 2021 + Green et al., 2016 |
-| **mpe** | Extended metapelite | — | White et al., 2014 + Green et al., 2016 + Franzolin et al., 2011 + Diener et al., 2007 |
-| **mbe** | Extended metabasite | — | Green et al., 2016 + Diener et al., 2007 + Rebay et al., 2022 |
+| **ume** | Ultramafic extended | - | Evans & Frost, 2021 + Green et al., 2016 |
+| **mpe** | Extended metapelite | - | White et al., 2014 + Green et al., 2016 + Franzolin et al., 2011 + Diener et al., 2007 |
+| **mbe** | Extended metabasite | - | Green et al., 2016 + Diener et al., 2007 + Rebay et al., 2022 |
+| **all** | Global (union of mp/mb/mbe/ig/igd/igad/um/ume/mpe) | Added August 2026 | see individual databases above, plus DEW aqueous fluid model |
 
 ---
 
@@ -159,6 +161,20 @@ The metapelitic model (extended with MnO, White et al., 2014) allows to compute 
 </ul>
 ```
 
+== Global (all)
+
+```@raw html
+<ul>
+    <li>Added August 2026</li>
+    <li>Union of every unique solution-phase model across the mp, mb, mbe, ig, igd, igad, um, ume, and mpe databases, plus the DEW aqueous fluid model (see the dedicated section below) - one database exposing every citation-tagged phase variant instead of switching between <code>--db=</code> values.</li>
+    <li>SiO2-Al2O3-CaO-MgO-FeO-K2O-Na2O-TiO2-O-MnO-Cr2O3-H2O-CO2-S chemical system (14 oxides, the union of every source database's own system)</li>
+    <li>56 solution phases, 36 pure phases - see the <a href="#Phase-and-End-member-Listing">Phase and End-member Listing</a> section below for the full table</li>
+    <li>Default dataset is <code>ds636</code> (the newest Holland-Green table). Phases sourced from mp/mb/mbe (calibrated against ds62) and um/ume (calibrated against ds633) therefore run "off-label" against ds636 endmember values in <code>all</code> - a known scientific caveat, not a bug, and the reason the single-system databases above remain the recommended starting point for focused work.</li>
+    <li>Where two source databases defined genuinely different mixing models under the same short phase name (e.g. <code>liq</code>, <code>g</code>, <code>opx</code>), both are kept as separate, citation-tagged entries (<code>liq_W14</code> vs <code>liq_G16</code> vs …) rather than one being silently dropped - see the Phase and End-member Listing table for the full disambiguation.</li>
+    <li>Database-specific mutual-exclusion toggles that exist on the single-system databases (<code>mbCpx</code>, <code>mbIlm</code>, <code>mpSp</code>, <code>mpIlm</code> - see MAGEMin_C.jl: options) do not apply here: both phase variants each toggle would otherwise switch between (e.g. <code>dio</code>/<code>aug</code>, <code>ilm</code>/<code>ilmm</code>) are simply present as independent, separately selectable phases. Use <code>select_phases</code>/<code>pp_list=</code>/<code>ss_list=</code> or <code>remove_phases</code>/<code>rm_list=</code> instead.</li>
+</ul>
+```
+
 :::
 
 ---
@@ -172,7 +188,7 @@ The metapelitic model (extended with MnO, White et al., 2014) allows to compute 
     Developing new, more widely applicable, thermodynamic datasets is a huge research topic, which will require funding to develop the models themselves, as well as to perform targeted experiments to calibrate those models.
 
 !!! warning
-    For most users, we recommend starting with the relevant single-system database (mp, um, mb, ig, igad, or mtl) before exploring extended/composite databases. When using extended database, mind that all phases are active by default and that the user needs to selected the adequate subset.
+    For most users, we recommend starting with the relevant single-system database (mp, um, mb, ig, igad, or mtl) before exploring extended/composite databases, including `all`. When using an extended or composite database, mind that all phases are active by default and that the user needs to select the adequate subset (see `select_phases`/`remove_phases` in [MAGEMin_C.jl: options](MAGEMin_C/options.md)).
 
 ---
 
@@ -282,9 +298,9 @@ Extends `mb` with two additional solution phases.
 
 | Phase | Warr (2021) | Model | em | End-members |
 |---|---|---|:---:|---|
-| *(all mb phases)* | — | — | — | *(see Metabasite tab)* |
-| `ta` | Tlc | — (Rebay 2022) | 5 | ta · fta · ota · tap · tats |
-| `oamp` | oamp | — (Diener 2007) | 9 | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
+| *(all mb phases)* | - | - | - | *(see Metabasite tab)* |
+| `ta` | Tlc | - (Rebay 2022) | 5 | ta · fta · ota · tap · tats |
+| `oamp` | oamp | - (Diener 2007) | 9 | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
 
 **Pure phases, Buffers, Activities:** identical to `mb`.
 
@@ -361,11 +377,11 @@ Extends `um` with plagioclase, amphibole, augite, spinel, carbonated fluid and c
 
 | Phase | Warr (2021) | Model | em | End-members |
 |---|---|---|:---:|---|
-| *(all um phases)* | — | — | — | *(see Ultramafic tab)* |
+| *(all um phases)* | - | - | - | *(see Ultramafic tab)* |
 | `pl4tr` | Pl | fsp_H22 | 2 | ab · an |
 | `amp` | Amp | amp_G16 | 9 | tr · tsm · prgm · glm · cumm · grnm · a · b · mrb |
 | `aug` | Aug | aug_G16 | 8 | di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
-| `spl` | Spl | — | 7 | nsp · isp · nhc · ihc · nmt · imt · pcr |
+| `spl` | Spl | - | 7 | nsp · isp · nhc · ihc · nmt · imt · pcr |
 | `flc` | flc | fl_H03 | 2 | H2O · CO2 |
 | `occm` | occm | occm_F11 | 5 | cc · odo · mag · sid · oank |
 
@@ -400,15 +416,15 @@ Extends `mp` with phases from Green et al. (2016), Evans & Frost (2021), and Die
 
 | Phase | Warr (2021) | Model | em | End-members |
 |---|---|---|:---:|---|
-| *(all mp phases)* | — | — | — | *(see Metapelite tab)* |
+| *(all mp phases)* | - | - | - | *(see Metapelite tab)* |
 | `occm` | occm | occm_F11 | 5 | cc · odo · mag · sid · oank |
 | `fl` | fl | fl_H03 | 2 | H2O · CO2 |
 | `po` | Po | po_E10 | 2 | trov · trot |
 | `dio` | Cpx | dio_G16 | 7 | jd · di · hed · acmm · om · cfm · jac |
 | `aug` | Aug | aug_G16 | 8 | di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
 | `amp` | Amp | amp_G16 | 11 | tr · tsm · prgm · glm · cumm · grnm · a · b · mrb · kprg · tts |
-| `oamp` | oamp | — (Diener 2007) | 9 | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
-| `carp` | Cph | — | 2 | mcar · fcar |
+| `oamp` | oamp | - (Diener 2007) | 9 | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
+| `carp` | Cph | - | 2 | mcar · fcar |
 
 **Pure phases:** q · crst · trd · coe · stv · ky · sill · and · ru · sph · O2 · pyr · gph · law · zo · prl · mpm · pre · cor
 
@@ -485,7 +501,136 @@ Stixrude & Lithgow-Bertelloni (2024). Expanded solid solutions throughout; new i
 
 **Pure phases:** neph · ky · st · coe · qtz · capv · O2 · fea · fee · feg · apbo · wo · lppv · pwo &nbsp;&nbsp; **Activities:** aMgO · aFeO · aAl2O3
 
+== Global (all)
+
+56 solution phases, generated live from the database itself (`print_phase_info("all"; level=1)`)
+rather than hand-transcribed, to avoid drift from this table.
+
+| Phase | Warr (2021) | Model | em | End-members |
+|---|---|---|:---:|---|
+| `liq` | liq | liq_W24d | 14 | q3L · sl1L · wo1L · fo2L · fa2L · neL · hmL · ekL · tiL · kjL · anL · ab1L · enL · kfL |
+| `liq` | liq | liq_G16 | 9 | q4L · abL · kspL · wo1L · sl1L · fa2L · fo2L · h2oL · anoL |
+| `liq` | liq | liq_W14 | 8 | q4L · abL · kspL · anL · slL · fo2L · fa2L · h2oL |
+| `liq` | liq | liq_G25w | 12 | q4L · slL · wo1L · fo2L · fa2L · jdL · hmL · ekL · tiL · kjL · ctL · h2o1L |
+| `fsp` | Fsp | fsp_H22 | 3 | ab · an · san |
+| `fsp` | Fsp | fsp_H22 * | 4 | ab · an · san · op |
+| `g` | Grt | g_W24 | 6 | py · alm · gr · andr · knom · tig |
+| `g` | Grt | g_W14 | 5 | py · alm · spss · gr · kho |
+| `g` | Grt | g_H18 | 2 | py · alm |
+| `opx` | Opx | opx_W24 | 9 | en · fs · fm · odi · mgts · cren · obuf · mess · ojd |
+| `opx` | Opx | opx_W14 | 7 | en · fs · fm · mgts · fopx · mnopx · odi |
+| `ol` | Ol | ol_H18 | 4 | mnt · fa · fo · cfm |
+| `ol` | Ol | ol_H11 | 2 | fo · fa |
+| `ilm` | Ilm | ilm_W24 | 5 | oilm · dilm · hm · ogk · dgk |
+| `ilm` | Ilm | ilm_W00 | 3 | oilm · dilm · dhem |
+| `spl` | Spl | spl_T21 | 7 | nsp · isp · nhc · ihc · nmt · imt · pcr |
+| `spl` | Spl | spl_W02 | 3 | herc · sp · usp |
+| `bi` | Bt | bi_G25 | 6 | phl · annm · obi · eas · tbi · fbi |
+| `bi` | Bt | bi_W14 | 7 | phl · annm · obi · east · tbi · fbi · mmbi |
+| `cd` | Crd | cd_G25 | 3 | crd · fcrd · hcrd |
+| `cd` | Crd | cd_W14 | 4 | crd · fcrd · hcrd · mncd |
+| `fl` | fl | fl_G25 | 11 | qfL · slfL · wofL · fofL · fafL · jdfL · hmfL · ekfL · tifL · kjfL · H2O |
+| `fl` | fl | fl_EF21 | 2 | H2 · H2O |
+| `fl` | fl | fl_H03 | 2 | H2O · CO2 |
+| `ep` | Ep | ep_H11 | 3 | cz · ep · fep |
+| `ma` | Mrg | ma_W14 | 6 | mut · celt · fcelt · pat · ma · fmu |
+| `mu` | Ms | mu_W14 | 6 | mut · cel · fcel · pat · ma · fmu |
+| `sa` | Spr | sa_W14 | 5 | spr4 · spr5 · fspm · spro · ospr |
+| `st` | St | st_W14 | 5 | mstm · fst · mnstm · msto · mstt |
+| `chl` | Chl | chl_W14 | 8 | clin · afchl · ames · daph · ochl1 · ochl4 · f3clin · mmchl |
+| `ctd` | Cld | ctd_W14 | 4 | mctd · fctd · mnct · ctdo |
+| `sp` | Spl | sp_W02 | 4 | herc · sp · mt · usp |
+| `mt` | Mag | mt_W00 | 3 | imt · dmt · usp |
+| `ilmm` | Ilm | ilmm_W14 | 4 | oilm · dilm · dhem · geik |
+| `amp` | Amp | amp_G16 | 11 | tr · tsm · prgm · glm · cumm · grnm · a · b · mrb · kprg · tts |
+| `dio` | Cpx | dio_G16 | 7 | jd · di · hed · acmm · om · cfm · jac |
+| `aug` | Aug | aug_G16 | 8 | di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
+| `abc` | Ab | abc_H11 | 2 | abm · anm |
+| `ta` | Tlc | ta_EF21 | 6 | ta · fta · tao · tats · ota · tap |
+| `oamp` | oamp | oamp_D07 | 9 | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
+| `DEW` | - | DEW_S14 | 107 | see the [DEW aqueous fluid model](#Deep-Earth-Water-DEW-aqueous-fluid-model) section below |
+| `cpx` | Cpx | cpx_W24 | 10 | di · cfs · cats · crdi · cess · cbuf · jd · cen · cfm · kjd |
+| `fper` | Fper | fper | 2 | per · wu |
+| `lct` | Lct | lct_W24 | 2 | nlc · klc |
+| `mel` | Mel | mel_W24 | 5 | geh · ak · fak · nml · fge |
+| `nph` | Nph | nph_W24 | 6 | neN · neS · neK · neO · neC · neF |
+| `kals` | Kls | kals_W24 | 2 | nks · kls |
+| `br` | Brc | br_E13 | 2 | br · fbr |
+| `ch` | Chu | ch_EF21 | 2 | chum · chuf |
+| `atg` | Atg | atg_EF21 | 5 | atgf · fatg · atgo · aatg · oatg |
+| `spi` | Spl | spi_W02 | 3 | herc · sp · mt |
+| `po` | Po | po_E10 | 2 | trov · trot |
+| `anth` | Ath | anth_D07 | 5 | anth · gedf · fant · a · b |
+| `occm` | occm | occm_F11 | 5 | cc · odo · mag · sid · oank |
+| `carp` | Cph | carp_W14 | 2 | mcar · fcar |
+| `plc` | - | plc_B05 | 3 | ab · an · san |
+
+\* The two `fsp_H22` rows share the same internal citation tag despite differing endmember
+counts (a known, pre-existing data labelling quirk carried over from the source databases, not
+introduced by `all`) - distinguish them by endmember count/list in practice.
+
+**Pure phases:** q · crst · trd · coe · stv · law · ky · sill · and · ru · sph · O2 · H2O · ab · zo · cor · pyr · hem · gph · ne · prl · mpm · pre
+
+**Buffers:** qfm · mw · qif · nno · hm · iw · cco &nbsp;&nbsp; **Activities:** aH2O · aO2 · aMgO · aFeO · aAl2O3 · aTiO2
+
 :::
+
+---
+
+## Deep Earth Water (DEW) aqueous fluid model
+
+Unlike every other phase in MAGEMin, `DEW_S14` is not a solid solution - it is a 107-species
+ionic aqueous-fluid speciation model (charged and neutral species such as `Na+`, `Cl-`, `H+`,
+`OH-`, `CO2`, `CH4`, and larger organic/complex species), solved self-consistently for molality
+and activity coefficients at the system's pressure, temperature and oxide chemical potentials,
+following the Deep Earth Water (DEW) model. It is available today in the `all` master database
+and, as `fl_DEW`, in the `mb`, `mbe`, `ig`, `um`, `ume`, and `mpe` databases.
+
+There is **no separate activation flag** - `DEW_S14`/`fl_DEW` is a normal solution phase that
+participates in the Gibbs energy minimization whenever it is present in the chosen database's
+phase list, exactly like any other phase, and can be excluded the same way (`remove_phases`/
+`rm_list=`, or `select_phases`/`pp_list=`/`ss_list=` - see
+[MAGEMin_C.jl: options](MAGEMin_C/options.md)).
+
+### References
+
+- Sverjensky, D. A., Harrison, B., & Azzolini, D. (2014). Water in the deep Earth: The dielectric
+  constant and the solubilities of quartz and corundum to 60 kb and 1200 °C. *Geochimica et
+  Cosmochimica Acta*, 129, 125–145. [doi: 10.1016/j.gca.2013.12.019](https://doi.org/10.1016/j.gca.2013.12.019) -
+  the dielectric-constant / activity-coefficient methodology (the "S14" in the `DEW_S14` model
+  tag).
+- Huang, F., & Sverjensky, D. A. (2019). Extended Deep Earth Water Model for predicting major
+  element mantle metasomatism. *Geochimica et Cosmochimica Acta*, 254, 192–230.
+  [doi: 10.1016/j.gca.2019.03.036](https://doi.org/10.1016/j.gca.2019.03.036) - the "DEW2019"
+  species-parameter update this 107-species subset is drawn from.
+- [dewcommunity.org](http://www.dewcommunity.org) - the DEW community's reference site
+  (spreadsheet releases, documentation).
+
+### Species list
+
+107 species (of the 229 in the full DEW2019 release - MAGEMin currently includes those whose
+formula is expressible in its tracked oxide set):
+
+::: details Show all 107 DEW_S14 species
+
+Al(OH)3 · Al(OH)4- · Al(OH)Si(OH)- · Al+3 · C2H5COOH · CH3CH2COO- · CH3COO- · CH3COOH · CO2 ·
+CO3-2 · Ca(H3SiO4)+ · Ca(HCO3)+ · Ca(HCOO)+ · Ca(OH)+ · Ca+2 · CaCO3 · CaO · CaSO4 · Co · Cr+2 ·
+Cr+3 · Cr2O7-2 · CrO4-2 · Fe(CH3COO)+ · Fe(H3SiO4)+ · Fe(HCOO)+ · Fe(OH)+ · Fe(OH)2 · Fe(OH)3- ·
+Fe+2 · Fe+3 · FeC4H6O4 · H+ · H2 · H2CO3 · H2S · H3SiO4- · H4SiO4 · H6Si2O7 · H8Si3O10 · HCO3- ·
+HCOO- · HCOOH · HCrO4- · HS- · HSO3- · HSO4- · HSO5- · H_SUCCINa · K+ · KOH · KSO4- ·
+Mg(H3SiO4)+ · Mg(HCO3)+ · Mg(OH)+ · Mg(OH)2 · Mg+2 · MgCO3 · MgSO4 · MgSiC+ · Mn+2 · MnO4- ·
+MnO4-2 · MnSO4 · Na(AC) · Na(AC)2- · Na+ · NaCO3- · NaHCO3 · NaHSiO3 · NaOH · O2 · OH- · S2-2 ·
+S2O3-2 · S2O4-2 · S2O5-2 · S2O6-2 · S2O8-2 · S3- · S3-2 · S3O6-2 · S4-2 · S4O6-2 · S5-2 ·
+S506-2 · SO2 · SO3-2 · SO4-2 · benzene · ethane · ethanol · ethylene · glutarate- · glutaric ·
+glycolate- · glycolic · hexane · isobutane · lactate- · lactic · methane · methanol · propane ·
+propanol · toluene · H2O
+
+:::
+
+### Known limitations
+
+- Only species active for the current bulk-rock oxide set participate - most compositions only
+  see a handful of the 107 species actually enter the stable assemblage.
 
 ---
 
@@ -513,7 +658,7 @@ The OL model uses a fixed set of empirical mineral/melt partition coefficients c
 | all | allanite | Aln |
 | mgt | magnetite | Mag |
 | ru | rutile | Rt |
-| FeTiOx | Fe-Ti oxide | — |
+| FeTiOx | Fe-Ti oxide | - |
 | sp | spinel | Spl |
 | cd | cordierite | Crd |
 | q | quartz | Qz |
@@ -521,7 +666,7 @@ The OL model uses a fixed set of empirical mineral/melt partition coefficients c
 | sill | sillimanite | Sil |
 
 !!! note
-    Phases marked `—` are not present in that compositional range. Values of `1e-5` indicate nominally incompatible or effectively zero partitioning.
+    Phases marked `-` are not present in that compositional range. Values of `1e-5` indicate nominally incompatible or effectively zero partitioning.
 
 #### Mafic compositions
 
@@ -649,13 +794,13 @@ The partition coefficient of an element *i* entering a crystallographic site of 
 $$D_i = D_0 \exp\!\left[\frac{-4\pi N_A E}{RT}\left(\frac{r_0}{2}(r_0^2 - r_i^2) - \frac{r_0^3 - r_i^3}{3}\right)\right]$$
 
 where:
-- $D_0$ — peak partition coefficient at the optimal ionic radius $r_0$
-- $E$ — Young's modulus of the crystallographic site [GPa]
-- $r_i$ — ionic radius of element *i* in the relevant coordination (Shannon, 1976)
-- $r_0$ — optimal-fit radius of the site
-- $T$ — temperature [K]
-- $R$ — gas constant (8.3145 J mol⁻¹ K⁻¹)
-- $N_A$ — Avogadro's number
+- $D_0$ - peak partition coefficient at the optimal ionic radius $r_0$
+- $E$ - Young's modulus of the crystallographic site [GPa]
+- $r_i$ - ionic radius of element *i* in the relevant coordination (Shannon, 1976)
+- $r_0$ - optimal-fit radius of the site
+- $T$ - temperature [K]
+- $R$ - gas constant (8.3145 J mol⁻¹ K⁻¹)
+- $N_A$ - Avogadro's number
 
 A second variant ("mixed Brice") separates the elastic radius $r_e$ from the fixed reference cation radius $r_\text{ref}$ when the peak is anchored to a cation with a known $D_0$:
 
@@ -684,7 +829,7 @@ Mineral site fractions are derived from the oxide wt% composition following Ther
 | LILE 2+ (M2, mixed Brice) | Blundy & Wood (1994) | $r_0 = r_{0,\text{REE}}+0.06$, $E_2 = 2E_3/3$, ref = $D_\text{Ca}$ |
 | Ti (M1 site) | Hill et al. (2011) | $X_\text{Al4}$, $X_\text{Na}$, $X_\text{K}$, $X_\text{Si}$, $P$ |
 | HFSE 4+ (M1, mixed Brice) | Corgne et al. (2005) | $r_0$, $E_4$ from $X_\text{Al6}$, $X_\text{Al4}$, $P$; ref = $D_\text{Ti}$ |
-| HFSE 5+ | — | Fixed regressions: $D_\text{Ta} = f(X_\text{Al4})$; $D_\text{Nb} = f(D_\text{Ta})$ |
+| HFSE 5+ | - | Fixed regressions: $D_\text{Ta} = f(X_\text{Al4})$; $D_\text{Nb} = f(D_\text{Ta})$ |
 | Actinides U, Th (M2) | Blundy & Wood (2003) | $D_\text{Th}$ from Mg-site exchange; $D_\text{U}$ from Brice relative to Th |
 
 **Garnet (g)**
@@ -693,10 +838,10 @@ Mineral site fractions are derived from the oxide wt% composition following Ther
 |---|---|---|
 | REE 3+ (X site, 8-fold) | van Westrenen & Draper (2007), Sun & Liang (2013) | $r_0$, $E_3$ from $X_\text{Ca,X}$; $D_0$ from $X_\text{Ca}$, $T$, $P$ |
 | Sc | Adam & Green (2006) | Fixed: $D_\text{Sc} = 5.79$ |
-| LILE 1+ | — | $D_\text{Cs}=0.001$ (fixed); $D_\text{Rb}$, $D_\text{K}$ from $X_\text{Mg}$, $X_\text{Ca}$, $P$ |
-| LILE 2+ (X site, mixed Brice) | — | $E_2 = 2E_3/3$, ref = $D_\text{Mg}$ |
-| Ti | — | Empirical regression to melt polymerisation index |
-| HFSE 4+ (X or Y site) | — | Dual-site model when $0.19 < X_\text{Ca} < 0.40$; mixed Brice with $D_\text{Th}$ or $D_\text{Ti}$ as $D_0$ |
+| LILE 1+ | - | $D_\text{Cs}=0.001$ (fixed); $D_\text{Rb}$, $D_\text{K}$ from $X_\text{Mg}$, $X_\text{Ca}$, $P$ |
+| LILE 2+ (X site, mixed Brice) | - | $E_2 = 2E_3/3$, ref = $D_\text{Mg}$ |
+| Ti | - | Empirical regression to melt polymerisation index |
+| HFSE 4+ (X or Y site) | - | Dual-site model when $0.19 < X_\text{Ca} < 0.40$; mixed Brice with $D_\text{Th}$ or $D_\text{Ti}$ as $D_0$ |
 | HFSE 5+ | Adam & Green (2006) | Fixed: $D_\text{Ta}=0.0146$, $D_\text{Nb}=0.0290$ |
 | Actinides | Salters & Longhi (1999) | $D_\text{Th}$ from melt Fe+Mg+Si; $D_\text{U} = 3.6 D_\text{Th} + 0.003$ |
 

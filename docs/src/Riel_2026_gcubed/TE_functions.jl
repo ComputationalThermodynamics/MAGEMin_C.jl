@@ -122,14 +122,14 @@ end
 
 Return raw Li partition coefficient data (element names, phase abbreviations, and KD expression
 strings) for the specified partitioning model. Unlike `get_Kds`, no database object is
-created — useful when KD values must be modified before database construction (e.g., sensitivity analysis).
+created - useful when KD values must be modified before database construction (e.g., sensitivity analysis).
 
 Available models:
-- `"KM"`: Koopmans et al. (2024) — constant KDs, no quartz or garnet
-- `"BA"`: Ballouard et al. (2023) — constant KDs
-- `"MM"`: Morris et al. (2026) — T-dependent cordierite KD and composition-dependent biotite KD
+- `"KM"`: Koopmans et al. (2024) - constant KDs, no quartz or garnet
+- `"BA"`: Ballouard et al. (2023) - constant KDs
+- `"MM"`: Morris et al. (2026) - T-dependent cordierite KD and composition-dependent biotite KD
 - `"MM_F"`: Morris et al. (2026) with high fixed biotite KD (F-rich biotite analog)
-- `"HO"`: Horányi et al. (2025) — constant KDs including staurolite
+- `"HO"`: Horányi et al. (2025) - constant KDs including staurolite
 """
 function get_Kds_data(; model::String = "MM")
     if model == "KM"
@@ -392,7 +392,7 @@ Returns 0.0 where data is absent (no melt, uninitialized point).
 - `out_TE_XY`: Vector of MAGEMin trace-element output structs (may be `Nothing`)
 
 # Keyword Arguments
-- `arg`: Field selector — `"Cliq"` (melt Li [µg/g]), `"Csol"` (solid Li), `"liq_wt"` (melt
+- `arg`: Field selector - `"Cliq"` (melt Li [µg/g]), `"Csol"` (solid Li), `"liq_wt"` (melt
   weight fraction), `"liq_wt_norm"` (normalized melt weight fraction), `"C0"` (initial bulk Li)
 """
 function retrieve_concentration(np          :: Int64,
