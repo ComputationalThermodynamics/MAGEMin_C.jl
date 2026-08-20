@@ -8,3 +8,6 @@ Manifest.toml
 /docs/package-lock.json
 /docs/Manifest.toml
 **/.DS_Store
+**/*.o
+**/*.o.tmp
+**/*.md

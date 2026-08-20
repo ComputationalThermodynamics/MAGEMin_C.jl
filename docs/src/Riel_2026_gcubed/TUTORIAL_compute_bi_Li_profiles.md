@@ -1,10 +1,10 @@
 # Tutorial: `compute_bi_Li_profiles.jl`
 
-## What This Script Does — The Big Picture
+## What This Script Does - The Big Picture
 
 > *How does the biotite–melt partition coefficient for Li vary with temperature and pressure along a realistic P–T path in a pelite?*
 
-This is a focused diagnostic script. It does not run the full fractional melting pipeline. Instead, it sweeps a grid of **pressure × temperature** conditions, runs a single equilibrium calculation at each point, and directly evaluates the **Morris & Beard (2024) expression** for the biotite–melt Li partition coefficient (D_bi). The output is a set of curves showing how D_bi evolves with temperature at several crustal pressures — a key input to understanding the sensitivity of Li enrichment predictions to the KD model.
+This is a focused diagnostic script. It does not run the full fractional melting pipeline. Instead, it sweeps a grid of **pressure × temperature** conditions, runs a single equilibrium calculation at each point, and directly evaluates the **Morris & Beard (2024) expression** for the biotite–melt Li partition coefficient (D_bi). The output is a set of curves showing how D_bi evolves with temperature at several crustal pressures - a key input to understanding the sensitivity of Li enrichment predictions to the KD model.
 
 ---
 
@@ -20,7 +20,7 @@ Unlike the other scripts in this project, this one has **no includes** and does 
 
 ## Key Concept: The Biotite KD Expression
 
-In the `"MM"` model used by the main scripts, biotite's Li partition coefficient is not a fixed number — it is a **thermodynamic expression** that depends on three quantities evaluated at each P–T point:
+In the `"MM"` model used by the main scripts, biotite's Li partition coefficient is not a fixed number - it is a **thermodynamic expression** that depends on three quantities evaluated at each P–T point:
 
 | Variable | Meaning | Source |
 |----------|---------|--------|
@@ -38,9 +38,9 @@ with fitted constants:
 
 ```
 c9  = -7.01   (intercept)
-c10 = -4.29   (Fe³⁺ site effect — higher Fe³⁺ → lower D_bi)
-c11 =  4.18   (melt peralkalinity effect — more Na+K/Al → higher D_bi)
-c12 =  0.407  (temperature effect — higher T → lower D_bi)
+c10 = -4.29   (Fe³⁺ site effect - higher Fe³⁺ → lower D_bi)
+c11 =  4.18   (melt peralkalinity effect - more Na+K/Al → higher D_bi)
+c12 =  0.407  (temperature effect - higher T → lower D_bi)
 ```
 
 `D_bi = exp(ln_D_Li)` gives the final partition coefficient.
@@ -49,7 +49,7 @@ The key insight this script reveals is that **D_bi is not a constant**. It chang
 
 ---
 
-## Step 1 — Setup
+## Step 1 - Setup
 
 ```julia
 Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "MnO"; "H2O"]
@@ -71,7 +71,7 @@ Three pressures are tested (shallow, mid-crust, deep crust), spanning a temperat
 data = Initialize_MAGEMin("mp", verbose=-1, solver=0)
 ```
 
-A single MAGEMin instance is initialized (no threading needed here — the calculation is small).
+A single MAGEMin instance is initialized (no threading needed here - the calculation is small).
 
 ```julia
 D_bi = fill(NaN, length(P), length(T))
@@ -81,7 +81,7 @@ The output array is pre-filled with `NaN` so that cells where biotite and melt d
 
 ---
 
-## Step 2 — The P–T Loop
+## Step 2 - The P–T Loop
 
 ```julia
 for i = 1:length(P)
@@ -100,7 +100,7 @@ if :bi in keys(out.SS_syms) && :liq in keys(out.SS_syms)
 
 The KD expression only makes physical sense when **both biotite and melt are present simultaneously**. If either is absent (e.g., below the solidus where there is no melt, or at very high temperatures where biotite has broken down), the cell stays `NaN` and is skipped.
 
-The `out.SS_syms` dictionary maps phase abbreviations to their index in the solution-phase vector — checking `keys()` is a clean way to test phase presence.
+The `out.SS_syms` dictionary maps phase abbreviations to their index in the solution-phase vector - checking `keys()` is a clean way to test phase presence.
 
 ### Evaluating the KD Expression
 
@@ -117,13 +117,13 @@ D_bi[i,j] = exp(ln_D_Li)
 ```
 
 `bi` and `liq` are integer indices into `out.SS_vec`. The relevant quantities are extracted directly from MAGEMin's output structs:
-- `siteFractions[4]` — the 4th site in the biotite model corresponds to the Fe³⁺ M-site fraction
-- `Comp_apfu[6]` and `[7]` — Na and K in atoms per formula unit in the melt
-- `Comp_apfu[2]` — Al in atoms per formula unit in the melt
+- `siteFractions[4]` - the 4th site in the biotite model corresponds to the Fe³⁺ M-site fraction
+- `Comp_apfu[6]` and `[7]` - Na and K in atoms per formula unit in the melt
+- `Comp_apfu[2]` - Al in atoms per formula unit in the melt
 
 ---
 
-## Step 3 — What the Grid Looks Like
+## Step 3 - What the Grid Looks Like
 
 ```
   Temperature →  650°C   700°C   750°C   800°C   850°C
@@ -137,7 +137,7 @@ Each non-NaN cell holds `exp(ln_D_Li)` computed from MAGEMin's equilibrium assem
 
 ---
 
-## Step 4 — Plotting
+## Step 4 - Plotting
 
 ```julia
 plt = plot(xlabel="Temperature [°C]",
@@ -199,7 +199,7 @@ expr   = KDs_database.KDs_expr[2]
 Dbi[i] = Base.invokelatest(expr, out)
 ```
 
-This is computing the exact same formula — but `compute_bi_Li_profiles.jl` does it by hand, making the individual terms (`XMFe3p`, `NaK_Almelt`, `T_C`) directly visible and interpretable.
+This is computing the exact same formula - but `compute_bi_Li_profiles.jl` does it by hand, making the individual terms (`XMFe3p`, `NaK_Almelt`, `T_C`) directly visible and interpretable.
 
 ---
 

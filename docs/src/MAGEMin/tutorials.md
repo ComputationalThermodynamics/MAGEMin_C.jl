@@ -1,4 +1,4 @@
-# List of arguments
+# MAGEMin command-line reference
 
 MAGEMin is run using command line arguments when executing the binary file.
 
@@ -17,7 +17,8 @@ MAGEMin is run using command line arguments when executing the binary file.
 | `--Bulk=[y]`   | Bulk rock composition in molar amount          |
 | `--Gam=[y]`    | Gamma, when a guess of gamma is known          |
 | `--solver=x`   | Legacy, 0; PGE, 1; 2 Hybrid (default)          |
-| `--db=""`      | Database, "ig" or "mp", default is "ig"        |
+| `--rg=""`      | Research group / thermodynamic framework: "tc" (default, ThermoCalc-family), "sb" (Stixrude & Lithgow-Bertelloni), or "gh" (xMELTS/pMELTS/rMELTS) |
+| `--db=""`      | Database, e.g. "ig", "mp", or "all" (union of mp/mb/mbe/ig/igd/igad/um/ume/mpe), default is "ig" - see [Databases information](../database.md) for the full list |
 | `--ds=x`       | Dataset selection: 62, 633, 634, 635 or 636    |
 | `--sys_in=""`  | System composition: "mol" or "wt", default is "mol" |
 | `--out_matlab=x` | Matlab output, 0: inactive, 1: active        |
@@ -27,8 +28,14 @@ MAGEMin is run using command line arguments when executing the binary file.
 | `--mpIlm=x`    |  Metapelite database Ilm, 0; Ilmm, 1           |
 | `--buffer=""`  |  Oxygen buffer, "qfm", "mw", "qif", "nno", "hm", "iw", "cco", "aH2O", "aO2", "aMgO", "aFeO", "aAl2O3", "aTiO2          |
 | `--buffer_n=x` |  Buffer offset in the RTlog scale             |
+| `--DEW_solve_algorithm=x` | Inner solver for the DEW aqueous fluid model's charge-balance root-find: 0 = plain Picard + bisection (default), 1 = damped/mixed Picard + bisection, 2 = plain Picard + Newton safeguarded by bisection. C-CLI only - not yet exposed through `Initialize_MAGEMin` in `MAGEMin_C.jl`. See the [DEW aqueous fluid model](../database.md#Deep-Earth-Water-DEW-aqueous-fluid-model) section. |
 
 where *x* is an `integer`, *y* a `float`/`double`, *""* is a `string` and *[]* a comma-separated list of size *number of oxides*.
+
+!!! note
+    `mbCpx`/`mbIlm`/`mpSp`/`mpIlm` only apply to their native single-system database (`mb`/`mp`
+    respectively) - the `all` database keeps both phase variants each toggle switches between
+    as independent, separately selectable phases instead.
 
 ## Order of Oxides
 

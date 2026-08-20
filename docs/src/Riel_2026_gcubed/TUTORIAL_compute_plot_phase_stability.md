@@ -1,10 +1,10 @@
 # Tutorial: `compute_plot_phase_stability.jl`
 
-## What This Script Does — The Big Picture
+## What This Script Does - The Big Picture
 
 > *Over what temperature range is each mineral stable, and how does that stability window shift with pressure along the water-saturated pelite solidus?*
 
-This script computes **mineral stability fields in P–T space** for the average Forshaw & Pattison pelite. For each pressure step along the wet solidus (2 to 16 kbar), it runs a dense temperature sweep from the solidus up to 1000 °C, records at which temperatures each mineral (muscovite, biotite, cordierite, quartz, plagioclase, alkali feldspar, paragonite) is stable, and reduces that to a `[T_min, T_max]` stability window. The result is a P–T diagram where each mineral appears as a **filled stability polygon** — the geologist's equivalent of a pseudosection slice.
+This script computes **mineral stability fields in P–T space** for the average Forshaw & Pattison pelite. For each pressure step along the wet solidus (2 to 16 kbar), it runs a dense temperature sweep from the solidus up to 1000 °C, records at which temperatures each mineral (muscovite, biotite, cordierite, quartz, plagioclase, alkali feldspar, paragonite) is stable, and reduces that to a `[T_min, T_max]` stability window. The result is a P–T diagram where each mineral appears as a **filled stability polygon** - the geologist's equivalent of a pseudosection slice.
 
 A secondary output is a 2D matrix `Z[pressure, temperature]` counting how many melt extraction events have occurred at each (P, T) point, showing where in P–T space cumulative melt extraction progresses.
 
@@ -19,14 +19,14 @@ TE_fractional.jl                      ← TE_prediction (used in the T-sweep loo
 plot_figures.jl                       ← shared helpers
 plot_phase_stability_functions.jl     ← get_mu_poly, get_bi_poly, get_cd_poly, get_pat_poly
                                          (note: this file is included at line 297 but does
-                                          not yet exist — it must be created separately)
+                                          not yet exist - it must be created separately)
 ```
 
 ---
 
 ## Key Difference from All Other Scripts
 
-Every other script in this project uses **bisection** to find specific temperatures (solidus, extraction threshold). This script instead runs a **dense forward temperature sweep**: it steps through `n_max = 2048` equally spaced temperatures from solidus to 1000 °C and evaluates the full equilibrium assemblage at each step. This is the **batch melting** equivalent — the rock stays closed while temperature rises, melt is extracted when it hits the 7% threshold, and the sweep continues on the residual bulk.
+Every other script in this project uses **bisection** to find specific temperatures (solidus, extraction threshold). This script instead runs a **dense forward temperature sweep**: it steps through `n_max = 2048` equally spaced temperatures from solidus to 1000 °C and evaluates the full equilibrium assemblage at each step. This is the **batch melting** equivalent - the rock stays closed while temperature rises, melt is extracted when it hits the 7% threshold, and the sweep continues on the residual bulk.
 
 ```
 Other scripts:           This script:
@@ -37,7 +37,7 @@ fast, targeted           exhaustive, reveals full mineral evolution
 
 ---
 
-## Step 1 — Parameters
+## Step 1 - Parameters
 
 ```julia
 main_fct(; model = "MM", Prange = [2.0, 16.0], Pstep = 0.2)
@@ -51,11 +51,11 @@ main_fct(; model = "MM", Prange = [2.0, 16.0], Pstep = 0.2)
 | `e1_liq` | `7.0` vol% | Melt fraction threshold for extraction |
 | `H_ex` | `0.03` mol fraction | Excess H₂O above saturation |
 
-Total equilibrium calculations: 71 pressures × 2048 temperatures = **~145,000 MAGEMin calls**. This runs on a single thread (no `@threads`) — it is the most compute-intensive script in the project, but outputs the richest picture of mineral stability.
+Total equilibrium calculations: 71 pressures × 2048 temperatures = **~145,000 MAGEMin calls**. This runs on a single thread (no `@threads`) - it is the most compute-intensive script in the project, but outputs the richest picture of mineral stability.
 
 ---
 
-## Step 2 — Water Saturation from Cache
+## Step 2 - Water Saturation from Cache
 
 ```julia
 pChip_wat, pChip_T = load("pChip_wat.jld2", "pChip_wat", "pChip_T")
@@ -70,13 +70,13 @@ bulk[id_h] = H + H_ex     # saturation water + 0.03 excess
 
 ---
 
-## Step 3 — The Temperature Sweep Loop
+## Step 3 - The Temperature Sweep Loop
 
 **File:** `compute_plot_phase_stability.jl`, lines 94–269
 
 For each pressure `P` from 2 to 16 kbar in steps of 0.2:
 
-### Step 3a — Find Solidus and Build Temperature Axis
+### Step 3a - Find Solidus and Build Temperature Axis
 
 ```julia
 Tsol = retrieve_solidus(P, gv, z_b, DB, splx_data)
@@ -85,7 +85,7 @@ Tall = collect(range(Tsol, 1000.0, length=n_max))   # 2048 equally spaced T step
 
 The solidus is found by bisection (same function used in all other scripts). The 2048 temperature points are then spaced uniformly between the solidus and 1000 °C.
 
-### Step 3b — Forward Temperature Sweep with Inline Extraction
+### Step 3b - Forward Temperature Sweep with Inline Extraction
 
 ```julia
 ee = 0    # extraction event counter
@@ -115,7 +115,7 @@ end
 
 This is fundamentally different from `threaded_frac_melting()`: rather than bisecting for the exact extraction temperature, the sweep simply detects when melt volume **crosses** the threshold during the continuous temperature scan and extracts immediately. The extraction counter `ee` increments each time 7% melt is reached, giving a running tally at every temperature step.
 
-### Step 3c — Extract Phase Volumes Along the Sweep
+### Step 3c - Extract Phase Volumes Along the Sweep
 
 For each mineral, the volume fraction is read from every temperature step using the `SS_syms` and `PP_syms` dictionaries:
 
@@ -131,14 +131,14 @@ end
 ```
 
 Note the distinction:
-- **Solution phases** (bi, mu, cd, pl, afs, pat) — accessed via `SS_syms` (solid solution index)
-- **Pure phases** (q = quartz) — accessed via `PP_syms` and offset by `n_SS`:
+- **Solution phases** (bi, mu, cd, pl, afs, pat) - accessed via `SS_syms` (solid solution index)
+- **Pure phases** (q = quartz) - accessed via `PP_syms` and offset by `n_SS`:
   ```julia
   push!(q_vol, ext_out2[i].ph_frac_vol[ext_out2[i].PP_syms[:q] + ext_out2[i].n_SS])
   ```
   The `+ n_SS` offset is needed because MAGEMin stores pure phases after all solution phases in the `ph_frac_vol` array.
 
-### Step 3d — Find Stability Windows
+### Step 3d - Find Stability Windows
 
 For each mineral, the temperature range where it is present (vol > 0) is reduced to `[T_min, T_max]`:
 
@@ -147,9 +147,9 @@ mu_T_range = Tall[mu_vol .> 0.0]        # Boolean mask → temperatures where mu
 mu_T       = [minimum(mu_T_range), maximum(mu_T_range)]   # stability window
 ```
 
-If a mineral is absent at all temperatures, `[NaN, NaN]` is stored — this propagates cleanly as a gap in the P–T plot.
+If a mineral is absent at all temperatures, `[NaN, NaN]` is stored - this propagates cleanly as a gap in the P–T plot.
 
-### Step 3e — Accumulate Across Pressures
+### Step 3e - Accumulate Across Pressures
 
 All stability windows and temperature vectors are appended to growing lists:
 
@@ -166,7 +166,7 @@ After the pressure loop, `mu_T_all[k]` holds the muscovite stability window at `
 
 ---
 
-## Step 4 — The Extraction Event Matrix
+## Step 4 - The Extraction Event Matrix
 
 After `main_fct()` returns, the extraction event counter arrays are packed into a 2D matrix:
 
@@ -180,7 +180,7 @@ for i = 1:nP
 end
 ```
 
-`Z[i, j]` = how many melt extraction events have occurred by temperature step `j` at pressure `i`. This matrix can be visualized as a heatmap showing how many cumulative extraction pulses have happened across P–T space — a 2D picture of the fractional melting history.
+`Z[i, j]` = how many melt extraction events have occurred by temperature step `j` at pressure `i`. This matrix can be visualized as a heatmap showing how many cumulative extraction pulses have happened across P–T space - a 2D picture of the fractional melting history.
 
 ```
 P (kbar)
@@ -198,7 +198,7 @@ P (kbar)
 
 ---
 
-## Step 5 — Stability Polygon Plotting
+## Step 5 - Stability Polygon Plotting
 
 **File:** `plot_phase_stability_functions.jl` *(to be created)*
 
@@ -290,7 +290,7 @@ Post-processing
 | **`compute_plot_phase_stability.jl`** | **Dense T sweep** | **Mineral stability fields in P–T space** |
 | `compute_bi_Li_profiles.jl` | Dense T sweep (no extraction) | Biotite KD variation with T and P |
 
-This is the only script that uses a **dense forward sweep** rather than targeted bisection. The trade-off is 145,000 MAGEMin calls vs. ~100 for `compute_PT_curves.jl`, but it reveals the full evolution of every mineral across the melting interval — information that bisection-based scripts never compute.
+This is the only script that uses a **dense forward sweep** rather than targeted bisection. The trade-off is 145,000 MAGEMin calls vs. ~100 for `compute_PT_curves.jl`, but it reveals the full evolution of every mineral across the melting interval - information that bisection-based scripts never compute.
 
 ---
 

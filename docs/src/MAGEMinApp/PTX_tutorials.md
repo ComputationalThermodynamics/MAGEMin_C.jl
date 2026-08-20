@@ -310,27 +310,27 @@ Trace-element (TE) partitioning can be computed simultaneously with any P-T-X pa
 
 ### E.9. Trace-element partitioning setup
 
-#### Step 1 — Activate the TE predictive model
+#### Step 1 - Activate the TE predictive model
 
 In the `Path options` panel, set `TE predictive model = true`. This reveals the `Trace Elements` panel in the left sidebar.
 
-#### Step 2 — Configure KD model and saturation options
+#### Step 2 - Configure KD model and saturation options
 
 In the `Trace Elements` panel, the following options are available:
 
 | Option | Description | Available values |
 |---|---|---|
-| **KD model** | Lattice-strain Kd database | `OL` — O. Laurent (2012) ; `CO` — J. Cornet (2019) |
+| **KD model** | Lattice-strain Kd database | `OL` - O. Laurent (2012) ; `CO` - J. Cornet (2019) |
 | **Zr saturation** | Zircon saturation model | `none` ; `Watson 1979` (WH) ; `Blundy 2022` (CB) |
 | **S saturation** | Sulfide saturation model | `none` ; `Liu 2021` (Liu07) |
 | **P₂O₅ saturation** | Fluorapatite saturation model | `none` ; `Tollari 2006` |
-| **CO₂ saturation** | CO₂ fluid saturation model | `none` ; `SY26` — Sun & Yao (2026) |
+| **CO₂ saturation** | CO₂ fluid saturation model | `none` ; `SY26` - Sun & Yao (2026) |
 
 !!! note
     - Saturation models only activate when the corresponding element is present in the TE bulk composition.
     - The CO₂ saturation model (SY26) requires dissolved H₂O in the melt: it inverts the H₂O solubility equation to derive P_H₂O, then evaluates CO₂ solubility at P_CO₂ = P − P_H₂O.
 
-#### Step 3 — Load the trace-element bulk composition
+#### Step 3 - Load the trace-element bulk composition
 
 Two options are available:
 - **Built-in database**: use the dropdown below the saturation options to select a predefined TE composition; the `Initial TE bulk composition [μg/g]` table updates automatically.
@@ -340,7 +340,7 @@ Values in the table are editable directly in the interface.
 
 When `Assimilation = true`, a second table (`Assimilant TE bulk composition [μg/g]`) is also displayed and follows the same loading logic.
 
-#### Step 4 — Compute the path
+#### Step 4 - Compute the path
 
 Click `Compute path`. Thermodynamic minimization and TE partitioning are performed simultaneously at each step along the path.
 
@@ -355,16 +355,16 @@ In the `Display options` panel (right side) use the `Field type` dropdown to cho
 
 | Field type | Available fields |
 |---|---|
-| Zircon | `Sat_Zr_liq` [ug/g] — Zr saturation in melt ; `zrc_wt` — zircon weight fraction |
-| Sulfide | `Sat_S_liq` [ug/g] — S saturation in melt ; `sulf_wt` — sulfide weight fraction |
-| Fluorapatite | `Sat_P2O5_liq` [ug/g] — P₂O₅ saturation in melt ; `fapt_wt` — apatite weight fraction |
-| CO2 saturation | `Sat_CO2_liq` [ug/g] — CO₂ saturation in melt ; `fl_CO2_wt` — CO₂ fluid weight fraction |
+| Zircon | `Sat_Zr_liq` [ug/g] - Zr saturation in melt ; `zrc_wt` - zircon weight fraction |
+| Sulfide | `Sat_S_liq` [ug/g] - S saturation in melt ; `sulf_wt` - sulfide weight fraction |
+| Fluorapatite | `Sat_P2O5_liq` [ug/g] - P₂O₅ saturation in melt ; `fapt_wt` - apatite weight fraction |
+| CO2 saturation | `Sat_CO2_liq` [ug/g] - CO₂ saturation in melt ; `fl_CO2_wt` - CO₂ fluid weight fraction |
 | Trace element | Any TE concentration or user-defined expression (see below) |
 
 For the **Trace element** field type, the **Field builder** allows you to enter arbitrary expressions, for example:
 
-- `[M_Dy] / [M_Yb]` — Dy/Yb ratio in the melt
-- `[M_La] / [M_Sm]` — La/Sm ratio
+- `[M_Dy] / [M_Yb]` - Dy/Yb ratio in the melt
+- `[M_La] / [M_Sm]` - La/Sm ratio
 
 where `[M_X]` refers to element X in the melt. Set a normalization (`none`, `bulk`, `chondrite`) and click `Compute and display`.
 

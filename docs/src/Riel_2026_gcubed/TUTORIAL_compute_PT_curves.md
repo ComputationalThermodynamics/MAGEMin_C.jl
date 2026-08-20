@@ -1,10 +1,10 @@
 # Tutorial: `compute_PT_curves.jl`
 
-## What This Script Does — The Big Picture
+## What This Script Does - The Big Picture
 
 > *At what temperatures do successive melt extraction events occur, and how does that change with pressure along a water-saturated pelite solidus?*
 
-This script computes **P–T curves of melt extraction events** — the temperatures at which each successive pulse of melt is extracted from the rock, traced from 2 to 16 kbar along the wet solidus. Rather than mapping a 2D grid or sweeping bulk compositions, it runs **one fractional melting path per pressure point** along the water-saturation curve, then collects the extraction temperatures to reconstruct the P–T trajectory of each melting episode.
+This script computes **P–T curves of melt extraction events** - the temperatures at which each successive pulse of melt is extracted from the rock, traced from 2 to 16 kbar along the wet solidus. Rather than mapping a 2D grid or sweeping bulk compositions, it runs **one fractional melting path per pressure point** along the water-saturation curve, then collects the extraction temperatures to reconstruct the P–T trajectory of each melting episode.
 
 The output is a P–T diagram with up to 15 curves, each one tracing the temperature of the 1st, 2nd, ... 15th melt extraction event as a function of pressure.
 
@@ -30,7 +30,7 @@ Unlike the P–H₂O script (2D grid) and the FS script (bulk composition sweep)
 
 ### What Is an "Extraction Curve"?
 
-Each fractional melting simulation produces up to `n_ee = 15` extraction events. Each event has a temperature — the temperature at which the melt volume fraction first reaches `e1_liq = 7%`. After collecting all 100 pressure points, we have:
+Each fractional melting simulation produces up to `n_ee = 15` extraction events. Each event has a temperature - the temperature at which the melt volume fraction first reaches `e1_liq = 7%`. After collecting all 100 pressure points, we have:
 
 ```
               Extraction event #
@@ -45,7 +45,7 @@ Plotting column 1 vs. pressure gives the P–T curve of "when does the first mel
 
 ---
 
-## Step 1 — Setup and Parameters
+## Step 1 - Setup and Parameters
 
 ```julia
 model       = "MM"
@@ -65,11 +65,11 @@ P = collect(range(2.0, 16.0, 100))   # 100 equally spaced pressures
 T = [600.0, 1000.0]                  # temperature bounds for bisection
 ```
 
-`T` here is just a bracket for the internal bisection — not a grid axis.
+`T` here is just a bracket for the internal bisection - not a grid axis.
 
 ---
 
-## Step 2 — Threaded Calculation via `perform_threaded_calc_EE()`
+## Step 2 - Threaded Calculation via `perform_threaded_calc_EE()`
 
 **File:** `TE_functions.jl`, lines 426–485
 
@@ -109,11 +109,11 @@ For each pressure, `water_saturation_curve_FS()` computes the H₂O content at w
 | Loop axis | 1D over flattened P×H grid | 1D over P |
 | Water content | Passed from precomputed PCHIP interpolant | Computed from scratch per thread |
 | KD database | Passed in | Created inside the loop from `model` string |
-| Filter | Skip cells far from saturation | No filter — all points are on the saturation curve |
+| Filter | Skip cells far from saturation | No filter - all points are on the saturation curve |
 
 ---
 
-## Step 3 — Extracting Extraction Temperatures
+## Step 3 - Extracting Extraction Temperatures
 
 After the threaded calculation, the `Out_all[np]` array holds one `Li_infos` struct per pressure point. Each struct contains up to 15 pairs of MAGEMin outputs (pre- and post-extraction). The post-processing loop reads out the temperature of each extraction event:
 
@@ -138,9 +138,9 @@ for i = 1:np
 end
 ```
 
-The even-indexed steps (`k = 2, 4, 6, ...`) are the extraction snapshots (odd indices are the post-extraction residual states — see the fractional melting engine tutorial). `T_C` is the temperature in °C at the moment of extraction.
+The even-indexed steps (`k = 2, 4, 6, ...`) are the extraction snapshots (odd indices are the post-extraction residual states - see the fractional melting engine tutorial). `T_C` is the temperature in °C at the moment of extraction.
 
-`Extract_events` ends up as a vector of vectors — one inner vector per pressure, each holding up to 15 temperatures:
+`Extract_events` ends up as a vector of vectors - one inner vector per pressure, each holding up to 15 temperatures:
 
 ```
 Extract_events[1]  = [T₁, T₂, T₃, ..., T₁₅]   ← P = 2.0 kbar
@@ -151,7 +151,7 @@ Extract_events[50] = [T₁, T₂, T₃, ..., T₁₀]   ← P = 9.0 kbar (fewer 
 
 ---
 
-## Step 4 — Assembling the `T_curves` Matrix
+## Step 4 - Assembling the `T_curves` Matrix
 
 The jagged vector of vectors is packed into a rectangular matrix for easy plotting:
 
@@ -184,7 +184,7 @@ NaN entries at higher event numbers reflect pressure points where the melting se
 
 ---
 
-## Step 5 — Plotting
+## Step 5 - Plotting
 
 ```julia
 plot(T_curves[:,1],  P)
@@ -268,7 +268,7 @@ Plotting
 | `compute_PT_curves.jl` | Yes | Pressure along saturation curve | Map P–T positions of extraction events |
 | `compute_bi_Li_profiles.jl` | No | P × T grid | Visualize biotite KD variation |
 
-This script shares the same fractional melting engine as the two main scripts, but uses `perform_threaded_calc_EE()` — the variant that recomputes water saturation per thread rather than reading from a precomputed interpolant.
+This script shares the same fractional melting engine as the two main scripts, but uses `perform_threaded_calc_EE()` - the variant that recomputes water saturation per thread rather than reading from a precomputed interpolant.
 
 ---
 
@@ -278,4 +278,4 @@ This script shares the same fractional melting engine as the two main scripts, b
 julia --threads 8 compute_PT_curves.jl
 ```
 
-Output is saved as `wat_phase_stability_EE-T_+0.03.svg` in the working directory. The `+0.03` in the filename reflects the `Ex_H2O_sat = 0.03` excess water parameter — rerunning with different values produces comparable files without overwriting.
+Output is saved as `wat_phase_stability_EE-T_+0.03.svg` in the working directory. The `+0.03` in the filename reflects the `Ex_H2O_sat = 0.03` excess water parameter - rerunning with different values produces comparable files without overwriting.

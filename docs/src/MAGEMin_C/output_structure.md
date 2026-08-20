@@ -337,9 +337,10 @@ This structure stores the properties of the trace elements and accessory mineral
 ├─ Csol :: Union{Nothing, Vector{Float64}}          # [ug/g]    trace-elements concentration in the solid
 ├─ Cliq :: Union{Nothing, Vector{Float64}}          # [ug/g]    trace-elements concentration in the melt
 ├─ Cmin :: Union{Nothing, Matrix{Float64}}          # [ug/g]    trace-elements concentration in the stable phases
-├─ Sat_P2O5_liq :: Union{Nothing, Float64}          # [ug/g]    zirconium saturation of the melt (computed using several saturation models)
-├─ Sat_S_liq :: Union{Nothing, Float64}             # [ug/g]    zirconium saturation of the melt (computed using several saturation models)
+├─ Sat_P2O5_liq :: Union{Nothing, Float64}          # [ug/g]    P2O5 (fluorapatite) saturation of the melt (computed using several saturation models)
+├─ Sat_S_liq :: Union{Nothing, Float64}             # [ug/g]    sulfur (sulfide) saturation of the melt (computed using several saturation models)
 ├─ Sat_Zr_liq :: Union{Nothing, Float64}            # [ug/g]    zirconium saturation of the melt (computed using several saturation models)
+├─ Sat_CO2_liq :: Union{Nothing, Float64}           # [ug/g]    CO2 (fluid) saturation of the melt (computed using several saturation models)
 ├─ bulk_D :: Union{Nothing, Float64}                # [-]       bulk partition coefficient
 ├─ bulk_cor_wt :: Union{Nothing, Vector{Float64}}   # [wt_i]    wt fraction corrected bulk rock composition after phase crystallization from saturation models
 ├─ bulk_cor_mol :: Union{Nothing, Vector{Float64}}  # [mol_i]   mol fraction corrected bulk rock composition after phase crystallization from saturation models
@@ -350,4 +351,9 @@ This structure stores the properties of the trace elements and accessory mineral
 ├─ fapt_wt :: Union{Nothing, Float64}               # [wt]     calculated fluorapatite weight fraction
 ├─ sulf_wt :: Union{Nothing, Float64}               # [wt]     calculated sulfide weight fraction
 ├─ zrc_wt :: Union{Nothing, Float64}                # [wt]     calculated zircon weight fraction
+├─ fl_CO2_wt :: Union{Nothing, Float64}             # [wt]     calculated CO2 fluid weight fraction
 ```
+
+!!! note
+    `Sat_CO2_liq`/`fl_CO2_wt` are only populated when `CO2Sat_model=` is passed to
+    `TE_prediction` - see [Saturation models: E.5 CO2 saturation model example](saturation_models.md#E.5-CO2-saturation-model-example).

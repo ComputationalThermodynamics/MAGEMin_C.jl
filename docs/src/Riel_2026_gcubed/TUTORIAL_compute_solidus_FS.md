@@ -1,12 +1,12 @@
 # Tutorial: `compute_solidus_FS.jl`
 
-## What This Script Does — The Big Picture
+## What This Script Does - The Big Picture
 
 > *At the exact moment the first melt forms, what is the mineral assemblage across all natural pelite compositions, and how does it vary with bulk chemistry?*
 
-This script is a **solidus-snapshot diagnostic**. Rather than tracking Li enrichment through multiple extraction events, it runs `n_ee = 1` extraction event per sample — just enough to capture the equilibrium state at the first melt threshold — and then plots the resulting mineral volume fractions (quartz, plagioclase, alkali feldspar, biotite, muscovite, cordierite, garnet, ilmenite, sillimanite) against bulk composition in Herron chemical space.
+This script is a **solidus-snapshot diagnostic**. Rather than tracking Li enrichment through multiple extraction events, it runs `n_ee = 1` extraction event per sample - just enough to capture the equilibrium state at the first melt threshold - and then plots the resulting mineral volume fractions (quartz, plagioclase, alkali feldspar, biotite, muscovite, cordierite, garnet, ilmenite, sillimanite) against bulk composition in Herron chemical space.
 
-The key output is a Herron diagram colored by the combined Q+A+P (quartz + alkali feldspar + plagioclase) volume fraction at the solidus — showing which pelite compositions are most felsic at the onset of melting.
+The key output is a Herron diagram colored by the combined Q+A+P (quartz + alkali feldspar + plagioclase) volume fraction at the solidus - showing which pelite compositions are most felsic at the onset of melting.
 
 ---
 
@@ -30,8 +30,8 @@ The only new file relative to `compute_systematics_FS.jl` is `plot_bulk_FS.jl`, 
 
 | | `compute_systematics_FS.jl` | `compute_solidus_FS.jl` |
 |---|---|---|
-| `n_ee` | 10 — full melting history | **1** — solidus snapshot only |
-| `Ex_H2O_sat` | 0.03 — slight over-saturation | **0.0** — exact saturation |
+| `n_ee` | 10 - full melting history | **1** - solidus snapshot only |
+| `Ex_H2O_sat` | 0.03 - slight over-saturation | **0.0** - exact saturation |
 | Melting stored in | `Li_infos` struct via `threaded_frac_melting` | `ext_out[i]` directly, inline |
 | Post-processing | `retrieve_outputs_FS()` | Custom inline loop, then `plot_bulk_FS()` |
 | Output | Li enrichment vs. composition | Mineral assemblage at solidus vs. composition |
@@ -40,12 +40,12 @@ Setting `n_ee = 1` and `Ex_H2O_sat = 0.0` means: *find the exact water-saturated
 
 ---
 
-## Step 1 — Parameters
+## Step 1 - Parameters
 
 ```julia
 model       = "MM"
-P           = 8.0       # kbar — single fixed pressure
-Ex_H2O_sat  = 0.0       # no excess water — exact saturation
+P           = 8.0       # kbar - single fixed pressure
+Ex_H2O_sat  = 0.0       # no excess water - exact saturation
 n_ee        = 1         # one event only → solidus snapshot
 e1_liq      = 7.0       # vol% melt threshold (used in bisection)
 e1_remain   = 1.0       # retained melt (irrelevant for n_ee=1)
@@ -55,11 +55,11 @@ e1_remain   = 1.0       # retained melt (irrelevant for n_ee=1)
 
 ---
 
-## Step 2 — `main()` Function
+## Step 2 - `main()` Function
 
 **File:** `compute_solidus_FS.jl`, lines 39–265
 
-### Stage A — Load Database
+### Stage A - Load Database
 
 ```julia
 bulk_db  = load_Forshaw_mp()
@@ -69,7 +69,7 @@ np       = size(FS_bulks, 1)
 
 Identical to the FS script: Excel → DataFrame → wt% → mol fractions → normalized.
 
-### Stage B — Pre-allocate Output Flat Vectors
+### Stage B - Pre-allocate Output Flat Vectors
 
 Unlike `compute_systematics_FS.jl` which packs everything into `Li_infos` structs, here the MAGEMin outputs are stored directly in flat vectors:
 
@@ -78,9 +78,9 @@ ext_out    = Vector{MAGEMin_C.gmin_struct{Float64, Int64}}(undef, np)
 ext_out_te = Vector{MAGEMin_C.out_tepm}(undef, np)
 ```
 
-One MAGEMin output struct per sample — no wrapping in `Li_infos`. This is intentional: since only one extraction event is needed, the extra nesting of `Li_infos` is unnecessary overhead.
+One MAGEMin output struct per sample - no wrapping in `Li_infos`. This is intentional: since only one extraction event is needed, the extra nesting of `Li_infos` is unnecessary overhead.
 
-### Stage C — Threaded Loop (Inline Melting Engine)
+### Stage C - Threaded Loop (Inline Melting Engine)
 
 The melting logic that is normally delegated to `threaded_frac_melting()` is **written inline** inside the `@threads` loop here. This gives the developer direct access to intermediate variables without unpacking the `Li_infos` struct:
 
@@ -113,7 +113,7 @@ The melting logic that is normally delegated to `threaded_frac_melting()` is **w
 end
 ```
 
-The bisection inside the loop (steps 5–6) is the same algorithm as in `threaded_frac_melting()` — it narrows the temperature bracket until `out.frac_M_vol ≈ e1_liq/100`. Since `n_ee = 1`, the outer `for ee = 1:n_ee` loop executes exactly once and then exits.
+The bisection inside the loop (steps 5–6) is the same algorithm as in `threaded_frac_melting()` - it narrows the temperature bracket until `out.frac_M_vol ≈ e1_liq/100`. Since `n_ee = 1`, the outer `for ee = 1:n_ee` loop executes exactly once and then exits.
 
 ### Threading Structure
 
@@ -127,7 +127,7 @@ The bisection inside the loop (steps 5–6) is the same algorithm as in `threade
   └── Thread k writes ext_out[i], ext_out_te[i] → unique indices
 ```
 
-No shared mutable state — each thread operates on its own MAGEMin instance and writes to distinct array positions.
+No shared mutable state - each thread operates on its own MAGEMin instance and writes to distinct array positions.
 
 ### Return Values
 
@@ -135,11 +135,11 @@ No shared mutable state — each thread operates on its own MAGEMin instance and
 return ext_out, ext_out_te, np, KDs_database, FS_bulks
 ```
 
-The flat `ext_out[np]` array is returned directly to the caller (no `Li_infos` wrapping). `FS_bulks` is also returned — its H₂O column has been updated with the per-sample saturation values during the loop.
+The flat `ext_out[np]` array is returned directly to the caller (no `Li_infos` wrapping). `FS_bulks` is also returned - its H₂O column has been updated with the per-sample saturation values during the loop.
 
 ---
 
-## Step 3 — Plotting: `plot_bulk_FS()`
+## Step 3 - Plotting: `plot_bulk_FS()`
 
 **File:** `plot_bulk_FS.jl`, lines 36–337
 
@@ -151,7 +151,7 @@ plot_bulk_FS(ext_out, P, np, FS_bulks, n_ee)
 
 This function does two things: extracts mineral volumes from `ext_out`, then plots them on Herron diagrams.
 
-### Stage A — Extract Mineral Volumes
+### Stage A - Extract Mineral Volumes
 
 For each of 8 phases (q, pl, afs, sill, g, bi, mu, cd, ilm), the function loops over all samples and reads the volume fraction from `ext_out[i].ph_frac_vol`:
 
@@ -167,7 +167,7 @@ for i = 1:np
 end
 ```
 
-The `isassigned()` check is essential — samples that failed to converge leave `ext_out[i]` uninitialized, and accessing them would crash. The same pattern is repeated for all 8 minerals.
+The `isassigned()` check is essential - samples that failed to converge leave `ext_out[i]` uninitialized, and accessing them would crash. The same pattern is repeated for all 8 minerals.
 
 Then the three felsic phases are combined:
 
@@ -175,7 +175,7 @@ Then the three felsic phases are combined:
 pl_vol = afs_vol .+ pl_vol .+ q_vol    # Q + A + P total felsic fraction
 ```
 
-### Stage B — Compute Herron Coordinates
+### Stage B - Compute Herron Coordinates
 
 The Herron classification uses log-ratio chemistry:
 
@@ -205,7 +205,7 @@ log10(FeO/K2O)
               0.55     0.71      1.04
 ```
 
-### Stage C — Scatter Plot (Q+A+P colored)
+### Stage C - Scatter Plot (Q+A+P colored)
 
 ```julia
 scatter_plot = PlotlyJS.scatter(
@@ -223,7 +223,7 @@ The color scale is centered on the mean Q+A+P fraction and spans ±1 standard de
 
 Output: `1e_8.0_kbar_pl.png` (filename encodes `n_ee` and `P`).
 
-### Stage D — IDW Interpolated Heatmap
+### Stage D - IDW Interpolated Heatmap
 
 Because the ~600 samples are **scattered irregularly** in Herron space (not on a regular grid), a simple heatmap cannot be made directly. Instead, `create_heatmap_data_scattered()` interpolates the scattered points onto a regular 64×64 grid using **Inverse Distance Weighting (IDW)**:
 
@@ -312,7 +312,7 @@ julia --threads 8 compute_solidus_FS.jl
 ```
 
 Outputs are saved in the working directory:
-- `1e_8.0_kbar_pl.png` — Herron scatter, colored by Q+A+P vol%
-- `1e_8.0_kbar_pl_heatmap.png` — IDW-smoothed version of the same field
+- `1e_8.0_kbar_pl.png` - Herron scatter, colored by Q+A+P vol%
+- `1e_8.0_kbar_pl_heatmap.png` - IDW-smoothed version of the same field
 
 To run at a different pressure, change `P = 8.0` at line 275. The filename automatically encodes the pressure and `n_ee`, so multiple runs do not overwrite each other.

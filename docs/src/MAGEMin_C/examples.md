@@ -13,6 +13,9 @@ This page provides a set of quick examples showing how to use MAGEMin_C.jl to pe
     - [E.6 Oxygen buffer](#E.6-Oxygen-buffer)
     - [E.7 Activity buffer](#E.7-Activity-buffer)
     - [E.8 Many points](#E.8-Many-points)
+    - [E.9 Discovering phase names](#E.9-Discovering-phase-names)
+    - [E.10 Keeping only a list of phases](#E.10-Keeping-only-a-list-of-phases)
+    - [E.11 The "all" master database and the DEW aqueous fluid](#E.11-The-all-master-database-and-the-DEW-aqueous-fluid)
 
 !!! note
     - The examples are not optimized for performances, but are provided in hope they can be useful to present `MAGEMin_C` functionality.
@@ -440,6 +443,136 @@ Finalize_MAGEMin(data)
 By default, this will show a progressbar (which you can deactivate with the `progressbar=false` option).
 
 You can also specify a custom bulk rock for all points (see above), or a custom bulk rock for every point.
+
+### E.9 Discovering phase names
+
+`remove_phases`/`select_phases` need exact phase names, which can be hard to guess for an
+unfamiliar database. `print_phase_info(dtb; level=0|1)` prints them directly:
+
+```julia
+using MAGEMin_C
+print_phase_info("mp")
+```
+which gives:
+```julia
+================================================================================
+ Database : mp  -  Metapelite (White et al., 2014)
+ Dataset  : 62  (available: (62, 633, 634, 635, 636))
+================================================================================
+ Solution phases (17):
+    liq_W14   fsp_H22   bi_W14    g_W14     ep_H11    ma_W14    mu_W14    opx_W14   sa_W14
+    cd_W14    st_W14    chl_W14   ctd_W14   sp_W02    mt_W00    ilm_W00   ilmm_W14
+
+ Pure phases (27):
+    q       crst    trd     coe     stv     ky      sill    and     ru      sph     O2      H2O
+    zo      cor     qfm     mw      qif     nno     hm      iw      cco     aH2O    aO2     aMgO
+    aFeO    aAl2O3  aTiO2
+
+================================================================================
+```
+
+Passing `level=1` additionally lists every solution phase's endmembers (`print_phase_info("mp"; level=1)`).
+
+### E.10 Keeping only a list of phases
+
+`select_phases` is the inverse of `remove_phases` (E.5): instead of listing the phase(s) to
+*remove*, list the phase(s) you want to *keep active* via `pp_list=`/`ss_list=`, and every
+other phase in that category is deactivated automatically. This is the exact inverse of E.5's
+first example - keeping the same 15 solution phases E.5's `rm_list = remove_phases(["liq","sp"],"mp")`
+left available:
+
+```julia
+using MAGEMin_C
+data    = Initialize_MAGEMin("mp", verbose=-1, solver=0);
+P,T     = 10.713125, 1177.34375;
+Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","K2O","Na2O","TiO2","O","MnO","H2O"];
+X       = [70.999,12.805,0.771,3.978,6.342,2.7895,1.481,0.758,0.72933,0.075,30.0];
+sys_in  = "mol";
+ss_list = ["fsp_H22","bi_W14","g_W14","ep_H11","ma_W14","mu_W14","opx_W14","sa_W14",
+           "cd_W14","st_W14","chl_W14","ctd_W14","mt_W00","ilm_W00","ilmm_W14"]
+out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in, ss_list=ss_list)
+```
+which gives the same result as E.5's `rm_list` version:
+```julia
+Pressure          : 10.713125      [kbar]
+Temperature       : 1177.3438    [Celsius]
+     Stable phase | Fraction (mol fraction)
+              fsp   0.27881
+             ilmm   0.02258
+                g   0.15338
+                q   0.2328
+             sill   0.08294
+              H2O   0.22948
+     Stable phase | Fraction (wt fraction)
+              fsp   0.34545
+             ilmm   0.0261
+                g   0.17761
+                q   0.25385
+             sill   0.12196
+              H2O   0.07503
+     Stable phase | Fraction (vol fraction)
+              fsp   0.31976
+             ilmm   0.01307
+                g   0.10873
+                q   0.23367
+             sill   0.08991
+              H2O   0.23487
+Gibbs free energy : -920.021202  (30 iterations; 13.81 ms)
+Oxygen fugacity          : -5.422564143468571
+Delta QFM                : 2.5063072509086273
+```
+
+`pp_list=` works the same way for pure phases, and `pp_list`/`ss_list` are independent -
+passing only one leaves the other phase category untouched. Combining `rm_list=` with
+`pp_list=`/`ss_list=` on the same call raises an error rather than silently guessing intent.
+
+### E.11 The "all" master database and the DEW aqueous fluid
+
+The `all` database unifies every unique solution-phase model across the mp/mb/mbe/ig/igd/igad/
+um/ume/mpe databases into one, plus the DEW aqueous fluid model (`DEW_S14`, 107 ionic aqueous
+species - see [Databases information](../database.md#Deep-Earth-Water-DEW-aqueous-fluid-model)).
+There is no separate flag to turn DEW on - like any other phase, it simply enters the stable
+assemblage whenever it lowers the system's Gibbs energy:
+
+```julia
+using MAGEMin_C
+data    = Initialize_MAGEMin("all", verbose=false, solver=0);
+P, T    = 10.0, 400.0;
+Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "MnO"; "Cr2O3"; "H2O"; "CO2"; "S"];
+X       = [0.62212, 0.1122, 0.0, 0.03486, 0.05557, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.17525, 0.0, 0.0];
+sys_in  = "mol";
+out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
+```
+which gives:
+```julia
+Pressure          : 10.0      [kbar]
+Temperature       : 400.0    [Celsius]
+     Stable phase | Fraction (mol fraction)
+          chl_W14   0.04649
+          ctd_W14   0.29635
+          DEW_S14   0.05689
+                q   0.41324
+              prl   0.18704
+     Stable phase | Fraction (wt fraction)
+          chl_W14   0.03831
+          ctd_W14   0.31417
+          DEW_S14   0.01796
+                q   0.43347
+              prl   0.19609
+     Stable phase | Fraction (vol fraction)
+          chl_W14   0.03916
+          ctd_W14   0.25637
+          DEW_S14   0.04829
+                q   0.45984
+              prl   0.19633
+Gibbs free energy : -865.766899  (5 iterations; 63.23 ms)
+Oxygen fugacity          : 11.124522284678017
+Delta QFM                : 38.537682224019605
+```
+
+To restrict `all` to a specific sub-database's own phases (e.g. to reproduce a single-system
+calculation inside the unified database), use `pp_list=`/`ss_list=` with the citation-tagged
+names from `print_phase_info("all")` (E.9), or `remove_phases`/`rm_list=` (E.5/E.10).
 
 
 
