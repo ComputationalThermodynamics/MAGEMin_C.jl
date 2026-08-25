@@ -18,7 +18,35 @@ For the first P-T-X path, simply launch `MAGEMinApp` and navigate to the `PTX pa
 !!! note
     - New points for the P-T-X path can be added by clicking on `Add new point`.
     - To delete a point simply click on the cross icon on the left of point.
-    
+
+#### Load a P-T-X path from file (MAGEMinApp v1.6.3)
+
+As an alternative to adding points one by one, drag and drop a CSV file onto the `Drag and drop path` box below the path table to define (and replace) the whole path at once. The file needs a header line `P;T` (or `P,T`; pressure always in kbar regardless of the app's current pressure-unit setting), and comment lines start with `#`:
+
+```
+P;T
+10.0;1200
+7.0;1000
+4.0;800
+2.0;600
+```
+
+Two optional columns, `Assim` and `Buffer`, can be added for use with the `Assimilation` and `Variable buffer` modes described in [E.4. Assimilation](#E.4.-Assimilation) and [E.5. Variable buffer](#E.5.-Variable-buffer) below - if omitted, both default to 0.0:
+
+```
+P;T;Assim;Buffer
+10.0;1200;0.0;0.0
+7.0;1000;5.0;-1.0
+4.0;800;10.0;-2.0
+2.0;600;15.0;-3.0
+```
+
+Ready-to-use examples are shipped in `MAGEMinApp` as `examples/ptx-path.csv` (P,T only) and `examples/ptx-path_assim-buffer.csv` (with Assim/Buffer).
+
+!!! note
+    - Loading a file **replaces** all rows currently in the path table.
+    - `Assim`/`Buffer` values are kept in the table even if the corresponding mode is off; they are simply ignored until `Assimilation`/`Variable buffer` is switched on.
+
 In the `Path options` panel, change the resolution to 32. This option defines the number of point-wise calculation between two defined points. Hit `Compute path` and after a few seconds you should get the following result:
 
 #### Stable phase fraction

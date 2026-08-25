@@ -569,6 +569,22 @@ Then in the `Bulk-rock composition` middle panel, select the pre-defined bulk `F
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_PTX_diagram.png?raw=true" alt="MAGEMinAppPTX diagram" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 ``` 
 
+#### Load a P-T path from file (MAGEMinApp v1.6.3)
+
+Instead of entering pressure-temperature points one by one with `Add new point`, you can drag and drop a CSV file directly onto the `Drag and drop path` box below the path table to define (and replace) the whole path in one go. The file needs a header line `P;T` (or `P,T`), with pressure always given in kbar regardless of the app's current pressure-unit setting (kbar/GPa) - it is converted for display automatically. Lines starting with `#` are treated as comments. For example:
+
+```
+P;T
+0.1;300
+10.0;400
+20.0;550
+```
+
+A ready-to-use example reproducing the subduction path above is shipped as `examples/pt-path.csv` in `MAGEMinApp`.
+
+!!! note
+    - Loading a file **replaces** all rows currently in the P-T path table.
+
 ### 12. TT polymetamorphic diagram
 
 The goal of a T-T poly-metamorphic diagram is to predict the evolution of the stable phase assemblage for a rock undergoing two successive metamorphic events. 
