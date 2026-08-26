@@ -11,13 +11,15 @@ The list of all available thermodynamic datasets is presented below.
 
 ## Available thermodynamic databases
 
-`MAGEMin` ships 13 thermodynamic databases - `mp`, `um`, `mb`, `mtl`, `ig`, `igad`, `sb11`, `sb21`, `sb24`, `ume`, `mpe`, `mbe`, and `all` (a master database unifying every unique solution-phase model across mp/mb/mbe/ig/igd/igad/um/ume/mpe) - plus the DEW aqueous fluid model, available in `all` and several of the single-system databases.
+`MAGEMin` ships 14 thermodynamic databases - `mp`, `um`, `mb`, `mtl`, `ig`, `igd`, `igad`, `sb11`, `sb21`, `sb24`, `ume`, `mpe`, `mbe`, and `all` (a master database unifying every unique solution-phase model across mp/mb/mbe/ig/igd/igad/um/ume/mpe) - plus the DEW aqueous fluid model, available in `all` and several of the single-system databases.
 
 **→ See the full [Databases information](../database.md) page** for the acronym reference table, per-database chemical systems, phase/end-member listings, and the DEW aqueous fluid model section - kept in one place rather than duplicated here to avoid the two copies drifting apart.
 
 For the command-line arguments used to select a database and configure a run (`--db=`, `--rg=`, `--buffer=`, `--DEW_solve_algorithm=`, etc.), see [MAGEMin command-line reference](tutorials.md).
 
 ## References
+
+- Su et al. (2026). Igneous thermodynamic model (`igd` database), corrected from Tomlinson & Holland (2021).
 
 - Green, ECR, Holland, TJB, Powell, R, Weller, OM, & Riel, N (2025). Journal of Petrology, 66, doi: 10.1093/petrology/egae079
 

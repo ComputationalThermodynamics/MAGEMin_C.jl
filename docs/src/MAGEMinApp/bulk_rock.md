@@ -43,6 +43,7 @@ MAGEMinApp  bulk-rock input in CSV format. The CSV file should have columns for 
     - `mp` -> metapelite (White et al., 2014)
     - `mb` -> metabasite (Green et al., 2016)
     - `ig` -> igneous (Green et al., 2025 updated from and replacing Holland et al., 2018)
+    - `igd` -> igneous (Su et al., 2026, corrected from Tomlinson & Holland, 2021)
     - `igad` -> igneous alkaline dry (Weller et al., 2024)
     - `um` -> ultramafic (Evans & Frost, 2021)
     - `sb11` -> Stixrude & Lithgow-Bertelloni (2011)
