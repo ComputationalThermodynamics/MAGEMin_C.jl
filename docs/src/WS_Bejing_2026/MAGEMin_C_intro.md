@@ -104,6 +104,7 @@ Available thermodynamic a-x sets:
 | `mp` | Metapelite | White et al., 2014 |
 | `mb` | Metabasite | Green et al., 2016 |
 | `ig` | Igneous | Green et al., 2025 (updated from Holland et al., 2018) |
+| `igd` | Igneous | Su et al., 2026 (corrected from Tomlinson & Holland, 2021) |
 | `igad` | Igneous alkaline dry | Weller et al., 2024 |
 | `um` | Ultramafic | Evans & Frost, 2021 |
 | `sb11` | Stixrude & Lithgow-Bertelloni | 2011 |

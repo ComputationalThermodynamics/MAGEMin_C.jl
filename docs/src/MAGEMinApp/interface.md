@@ -140,7 +140,7 @@ Links for documentation, reporting issues on GitHub, the GitHub repository, and 
       <td>
         <ul>
             <li><b>Thermodynamic database</b> - select among available thermodynamic databases, grouped as:<br>
-                <i>Published:</i> mp (Metapelite, White et al., 2014), mb (Metabasite, Green et al., 2016), ig (Igneous, Green et al., 2025, after Holland et al., 2018), igad (Igneous alkaline dry, Weller et al., 2024), um (Ultramafic, Evans &amp; Frost, 2021)<br>
+                <i>Published:</i> mp (Metapelite, White et al., 2014), mb (Metabasite, Green et al., 2016), ig (Igneous, Green et al., 2025, after Holland et al., 2018), igd (Igneous, Su et al., 2026, after Tomlinson &amp; Holland, 2021), igad (Igneous alkaline dry, Weller et al., 2024), um (Ultramafic, Evans &amp; Frost, 2021)<br>
                 <i>Mantle:</i> mtl (Mantle, Holland et al., 2013), sb11/sb21/sb24 (Stixrude &amp; Lithgow-Bertelloni, 2011/2021/2024)<br>
                 <i>Custom:</i> ume (Ultramafic extended), mpe (Metapelite extended), mbe (Metabasite extended), all (Global TC dataset - combines every database's oxide set; use <b>Preset</b> below to quickly restrict phases to one database's default set)</li>
             <li><b>Dataset</b> - select among available thermodynamic datasets for the chosen database</li>
@@ -838,7 +838,7 @@ Provides static reference data across three sections:
 
 - **Solution phases table** - name, abbreviation, and solvus flag for all solution phases in the selected database (filterable, 16 rows per page)
 - **End-members table** - end-member name, abbreviation, and stoichiometric formula (filterable, 16 rows per page)
-- **CSV bulk-rock format** - example table showing the required column structure for bulk-rock input files (title, comments, db, sysUnit, oxide columns, optional _frac2 variants), followed by the full field documentation including the thermodynamic dataset acronym table (mtl, mp, mb, ig, igad, um, sb11, sb21, sb24, ume, mpe, mbe, all)
+- **CSV bulk-rock format** - example table showing the required column structure for bulk-rock input files (title, comments, db, sysUnit, oxide columns, optional _frac2 variants), followed by the full field documentation including the thermodynamic dataset acronym table (mtl, mp, mb, ig, igd, igad, um, sb11, sb21, sb24, ume, mpe, mbe, all)
 - **Trace-element Kd tables** - three tabs subdivided by SiO₂ content of the melt (`SiO2 < 52 wt%`, `52 wt% <= SiO2 < 63 wt%`, `63 wt% <= SiO2`); each shows the element × mineral Kd matrix (filterable, 32 rows per page)
 - **Calculation details** - static reference cards describing phase deactivation logic, oxide activity formulation, water saturation methodology, specific heat capacity calculation, the site fraction calculator, and seismic velocity corrections (melt/anelastic/shallow, cross-referencing the PTX path [Configuration panel](#6.1.-Configuration-panel) controls)
 

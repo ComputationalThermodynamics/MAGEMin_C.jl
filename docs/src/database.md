@@ -26,6 +26,7 @@ A comprehensive overview of all thermodynamic databases available in MAGEMin, in
 | **mb** | Metabasite | v1.3.5 | Green et al., 2016 |
 | **mtl** | Mantle | v1.5.5 | Holland et al., 2013 |
 | **ig**  | Igneous | v1.6.2 | Green et al., 2025 (updated from Holland et al., 2018) |
+| **igd**  | Igneous | v1.9.9 | Su et al., 2026 (corrected from Tomlinson & Holland, 2021) |
 | **igad**  | Igneous alkaline | v1.6.2 | Weller et al., 2024 |
 | **sb11**  | Mantle (Stixrude & Lithgow-Bertelloni) | v1.7.7 | Stixrude & Lithgow-Bertelloni, 2011 |
 | **sb21** | Mantle (Stixrude & Lithgow-Bertelloni) | v1.7.7 | Stixrude & Lithgow-Bertelloni, 2021 |
@@ -88,6 +89,18 @@ The metapelitic model (extended with MnO, White et al., 2014) allows to compute 
     <li>K2O-Na2O-CaO-FeO-MgO-Al2O3-SiO2-H2O-TiO2-O-Cr2O3 chemical system</li>
     <li>Pure stoichiometric phases quartz (q), cristobalite (crst), tridymite (trd), coesite (coe), stishovite (stv), kyanite (ky), sillimanite (sill), andalusite (and), rutile (ru), corundum (cor) and sphene (sph).</li>
     <li>Solution phases spinel (spl), biotite (bi), cordierite (cd), clinopyroxene (cpx), orthopyroxene (opx), epidote (ep), garnet (g), clino-amphibole (amp), ilmenite (ilm), silicate melt (liq), muscovite (mu), olivine (ol), ternary feldspar (pl4T), and aqueous fluid (fl).</li>
+</ul>
+```
+
+== Igneous (igd)
+
+```@raw html
+<ul>
+    <li>Added June 2026, `MAGEMin v1.9.9`</li>
+    <li>Su et al., 2026, corrected from Tomlinson & Holland, 2021 (see doi:10.1093/petrology/egab012)</li>
+    <li>K2O-Na2O-CaO-FeO-MgO-Al2O3-SiO2-TiO2-O-Cr2O3 chemical system</li>
+    <li>Pure stoichiometric phases quartz (q), cristobalite (crst), tridymite (trd), coesite (coe), stishovite (stv), kyanite (ky), sillimanite (sill), andalusite (and), rutile (ru), corundum (cor) and sphene (sph).</li>
+    <li>Solution phases spinel (spl), clinopyroxene (cpx), garnet (g), ilmenite (ilm), silicate melt (liq), olivine (ol), orthopyroxene (opx) and ternary feldspar (fsp).</li>
 </ul>
 ```
 
@@ -188,11 +201,13 @@ The metapelitic model (extended with MnO, White et al., 2014) allows to compute 
     Developing new, more widely applicable, thermodynamic datasets is a huge research topic, which will require funding to develop the models themselves, as well as to perform targeted experiments to calibrate those models.
 
 !!! warning
-    For most users, we recommend starting with the relevant single-system database (mp, um, mb, ig, igad, or mtl) before exploring extended/composite databases, including `all`. When using an extended or composite database, mind that all phases are active by default and that the user needs to select the adequate subset (see `select_phases`/`remove_phases` in [MAGEMin_C.jl: options](MAGEMin_C/options.md)).
+    For most users, we recommend starting with the relevant single-system database (mp, um, mb, ig, igd, igad, or mtl) before exploring extended/composite databases, including `all`. When using an extended or composite database, mind that all phases are active by default and that the user needs to select the adequate subset (see `select_phases`/`remove_phases` in [MAGEMin_C.jl: options](MAGEMin_C/options.md)).
 
 ---
 
 ## Reference Citations
+
+- Su et al. (2026). Igneous thermodynamic model (`igd` database), corrected from Tomlinson & Holland (2021).
 
 - Green, E.C.R., Holland, T.J.B., Powell, R., Weller, O.M., & Riel, N. (2025). Journal of Petrology, 66. [doi: 10.1093/petrology/egae079](https://doi.org/10.1093/petrology/egae079)
 
@@ -326,6 +341,23 @@ Extends `mb` with two additional solution phases.
 | `chl` | Chl | chl_W14 | 7 | clin · afchl · ames · daph · ochl1 · ochl4 · f3clin |
 
 **Pure phases:** ne · q · crst · trd · coe · stv · ky · sill · and · ru · sph · O2 · H2O · cor
+
+**Buffers:** qfm · mw · qif · nno · hm · iw · cco &nbsp;&nbsp; **Activities:** aH2O · aO2 · aMgO · aFeO · aAl2O3 · aTiO2
+
+== Igneous (igd)
+
+| Phase | Warr (2021) | Model | em | End-members |
+|---|---|---|:---:|---|
+| `spl` | Spl | spl_T21 | 8 | nsp · isp · nhc · ihc · nmt · imt · pcr · usp |
+| `cpx` | Cpx | cpx_T21 | 10 | di · cfs · cats · crdi · cess · cbuf · jd · cen · cfm · kjd |
+| `g` | Grt | g_T21 | 6 | py · alm · gr · andr · knr · tig |
+| `ilm` | Ilm | ilm_T21 | 5 | oilm · dilm · hm · ogk · dgk |
+| `liq` | liq | liq_S26 | 14 | q3L · sl1L · wo1L · fo2L · fa2L · neL · hmL · ekL · tiL · kjL · anL · ab1L · enL · kfL |
+| `ol` | Ol | ol_H18 | 4 | mnt · fa · fo · cfm |
+| `opx` | Opx | opx_T21 | 9 | en · fs · fm · odi · mgts · cren · obuf · mess · ojd |
+| `fsp` | Fsp | fsp_H22 | 4 | ab · an · san · op |
+
+**Pure phases:** q · crst · trd · coe · stv · ky · sill · and · ru · sph · O2 · cor
 
 **Buffers:** qfm · mw · qif · nno · hm · iw · cco &nbsp;&nbsp; **Activities:** aH2O · aO2 · aMgO · aFeO · aAl2O3 · aTiO2
 
