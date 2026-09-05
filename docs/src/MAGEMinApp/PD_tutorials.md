@@ -23,6 +23,7 @@ Here we provide a set of tutorials to generate various kind of phase diagrams, c
     - [13. LaMEM density diagram](#13.-LaMEM-density-diagram)
     - [14. Draw a P-T path on the diagram](#14.-Draw-a-P-T-path-on-the-diagram)
     - [15. Quantitative isopleth thermobarometry with IntersecT](#15.-Quantitative-isopleth-thermobarometry-with-IntersecT)
+    - [16. μ-μ (chemical potential) diagram](#16.-μ-μ-chemical-potential-diagram)
 
 ### 1. First phase diagram 
 
@@ -813,3 +814,34 @@ Set `Range`, line style/width/size and color to your liking and click `Add`. Add
 
 !!! tip
     Overlaying a `Measurements`-type isocontour for the same `Phase_Element` used in the fit (e.g. `Grt_Mg`) directly on top of the `Qcmp` field is a quick way to check, visually, which part of the high-Q region is actually controlled by that particular element.
+
+### 16. μ-μ (chemical potential) diagram
+
+A μ-μ diagram fixes both pressure and temperature at a single point and instead varies the chemical potential (μ, in J/mol) of two oxide components directly, via `MAGEMin`'s native chemical-potential-fixing mechanism (the same `mu_fix_idx`/`mu_fix_val` mechanism used directly from `MAGEMin_C.jl`, see "Example 9 - fixing chemical potential directly" in its README). This is the classic open-system (Schreinemakers/Korzhinskii-style) projection, useful when the abundance of one or two components in the natural system is unknown, externally buffered, or mobile - e.g. K2O, Na2O, H2O or CO2.
+
+In the `Setup` sub-tab, select `Diagram type = μ-μ diagram (chemical potential)`. This changes the `Phase diagram parameters` panel as follows:
+
+#### Step 1 - Fix pressure and temperature
+
+Unlike every other diagram type, the whole μ-μ diagram is computed at a single point. Set `Fixed pressure [kbar]` and `Fixed temperature` to the P-T conditions you want to project from.
+
+#### Step 2 - Pick the two free oxides
+
+In the `μ oxide 1` and `μ oxide 2` dropdowns, choose the two oxide components that will become the diagram's X and Y axes (an oxide already picked in one dropdown is removed from the other, so the same oxide cannot be selected twice).
+
+!!! warning
+    As soon as `μ-μ diagram` is selected, the corresponding rows of the `Bulk-rock composition` table are greyed out and locked. At compute time `MAGEMinApp` automatically oversaturates both free oxides in the bulk (100 mol% each) so that their chemical potential can be fixed independently - their entries in the bulk-rock table therefore no longer have any effect on the calculation. Only the other, non-free oxides of the bulk composition matter.
+
+#### Step 3 - Compute the μ bounds
+
+For each free oxide, enter a `min [mol%]` / `max [mol%]` range. This is only a trial content window used to derive sensible μ-axis bounds - it is **not** the diagram's actual axis unit. Click `Compute μ bounds`: `MAGEMinApp` runs a few ordinary minimizations at the fixed P-T across that content range and converts the resulting oxide content into a chemical potential, filling in `min [μ1, J/mol]` / `max [μ1, J/mol]` and `min [μ2, J/mol]` / `max [μ2, J/mol]` automatically.
+
+!!! note
+    If a warning *"One or more pre-pass minimizations did not converge - bounds shown may be unreliable"* appears, narrow the `mol%` range and click `Compute μ bounds` again. The resulting μ bounds (in J/mol) can also be edited by hand afterwards if you want a specific window instead.
+
+#### Step 4 - Compute the diagram
+
+Click `Compute phase diagram` as usual. The resulting diagram (`Diagram` sub-tab) has μ(oxide 1) [J/mol] on the X-axis and μ(oxide 2) [J/mol] on the Y-axis instead of pressure, temperature or composition.
+
+!!! note
+    Every other option demonstrated in the previous sections - displayed field and colormaps ([3. Displayed field and colormap options](#3.-Displayed-field-and-colormap-options)), reaction lines and isopleths ([2. Reaction lines and isopleths](#2.-Reaction-lines-and-isopleths)), refinement, grid-point information, and exporting `svg` layers ([4. Export figures](#4.-Export-figures)) - works exactly the same way on a μ-μ diagram, simply with μ(oxide 1)/μ(oxide 2) taking the place of the usual P-T or P-X/T-X axes.

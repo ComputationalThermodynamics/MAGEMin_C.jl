@@ -2,7 +2,7 @@
 
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://computationalthermodynamics.github.io/MAGEMin_C.jl/dev/)
 [![Build Status](https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/workflows/CI/badge.svg)](https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/actions)
-[![DOI](https://zenodo.org/badge/489304972.svg)](https://zenodo.org/doi/10.5281/zenodo.10212322)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22115296.svg)](https://doi.org/10.5281/zenodo.22115296)
 
 Julia interface to the MAGEMin C package, which performs thermodynamic equilibrium calculations.
 
@@ -38,6 +38,8 @@ Thermodynamic dataset acronym are the following:
 - `ume` -> ultramafic extended (Green et al., 2016 + Evans & Frost, 2021)
 - `mpe` -> extended metapelite (White et al., 2014 + Green et al., 2016 + Franzolin et al., 2011 + Diener et al., 2007)
 - `mbe` -> extended metabasite (Green et al., 2016 + Diener et al., 2007 + Rebay et al., 2022)
+- `po` -> HP/LT (Pourteau et al., 2014)
+- `all` -> combined dataset, all available published components/phases in a single chemical system (advanced/exploratory use)
 
 ### Oxygen buffers and activity
 Several buffers can be used to fix the oxygen fugacity
@@ -56,6 +58,11 @@ Similarly activity can be fixed for the following oxides
 - `aAl2O3` -> using corundum as reference phase
 - `aTiO2` -> using rutile as reference phase
 - `aSiO2` -> using quartz/coesite as reference phase
+
+### Chemical potential fixing
+In addition to the single-component `buffer`/oxide-activity options above, `MAGEMin` can fix the chemical potential of one or more oxide components directly, via `mu_fix_idx` (oxide names, passed to `Initialize_MAGEMin`) and `mu_fix_val` (target chemical potentials in J/mol, passed to `single_point_minimization`/`multi_point_minimization`). This is a distinct, more general mechanism than `buffer`/`buffer_n` — it is not restricted to a fixed whitelist of oxides and can fix several oxides at once — see Example 9.
+
+*As with the oxygen/activity buffers above, the fixed oxide's bulk content needs to be set generously in excess of what the target chemical potential implies (e.g. several times its "natural" amount), or the underlying mechanism may not reliably activate. There is no automatic check for this — verify `out.Gamma` against your intended target when in doubt.*
 
 ### Example 1 - predefined compositions
 This is an example of how to use it for a predefined bulk rock composition:
@@ -440,6 +447,36 @@ plot([trace1,trace2,trace3], layout)
 
 
 <img src="https://github.com/ComputationalThermodynamics/repositories_pictures/blob/main/MAGEMin_C/Density_evolution.png?raw=true" alt="drawing" width="640" alt="centered image"/>
+
+
+### Example 9 - fixing chemical potential directly
+
+Instead of fixing an oxide's bulk content, its chemical potential can be fixed directly, via `mu_fix_idx`/`mu_fix_val` (see "Chemical potential fixing" above). This is the mechanism behind `MAGEMinApp`'s μ-μ (chemical potential) diagrams.
+
+```julia
+using MAGEMin_C
+db      = "ig"
+Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "Cr2O3"; "H2O"];
+X       = [38.494; 1.977; 2.907; 50.264; 5.435; 0.017; 0.204; 0.077; 0.086; 0.469; 0.077];
+P, T    = 10.0, 1100.0
+
+# first, get a target chemical potential for MgO from an ordinary minimization
+data_base = Initialize_MAGEMin(db, verbose=false);
+out_base  = single_point_minimization(P, T, data_base; X=X, Xoxides=Xoxides, sys_in="mol");
+Gamma_MgO = out_base.Gamma[4]    # 1-based; MgO is Xoxides[4]
+Finalize_MAGEMin(data_base)
+
+# now fix MgO's chemical potential to that same value; MgO is deliberately
+# oversaturated in the bulk (mu_fix requires this, same as the buffers above)
+data      = Initialize_MAGEMin(db, verbose=false, mu_fix_idx=["MgO"]);
+X_oversat = copy(X); X_oversat[4] = 150.0
+out       = single_point_minimization(P, T, data; X=X_oversat, Xoxides=Xoxides, sys_in="mol", mu_fix_val=[Gamma_MgO]);
+Finalize_MAGEMin(data)
+
+out.Gamma[4]      # ≈ Gamma_MgO, within tolerance
+```
+
+More than one oxide can be fixed at once (`mu_fix_idx=["MgO","K2O"]`, `mu_fix_val=[Gamma_MgO, Gamma_K2O]`), and grid calculations accept one target vector per point (`multi_point_minimization(..., mu_fix_val=[[Gamma_MgO, Gamma_K2O] for _ in eachindex(P)])`).
 
 
 ### Access complete information about the minimization

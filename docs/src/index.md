@@ -55,7 +55,7 @@ While `MAGEMin` is the engine for the prediction of the stable phases, it is bes
 
 ## Available thermodynamic databases
 
-`MAGEMin` ships 14 thermodynamic databases - `mp`, `um`, `mb`, `mtl`, `ig`, `igd`, `igad`, `sb11`, `sb21`, `sb24`, `ume`, `mpe`, `mbe`, and `all` (a master database unifying every unique solution-phase model across mp/mb/mbe/ig/igd/igad/um/ume/mpe) - plus the DEW aqueous fluid model, available in `all` and several of the single-system databases.
+`MAGEMin` ships 15 thermodynamic databases - `mp`, `um`, `mb`, `mtl`, `ig`, `igd`, `igad`, `sb11`, `sb21`, `sb24`, `po`, `ume`, `mpe`, `mbe`, and `all` (a master database unifying every unique solution-phase model across mp/mb/mbe/ig/igd/igad/um/ume/mpe) - plus the DEW aqueous fluid model, available in `all` and several of the single-system databases.
 
 **→ See the full [Databases information](database.md) page** for the acronym reference table, per-database chemical systems, phase/end-member listings, and the DEW aqueous fluid model section.
 

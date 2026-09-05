@@ -17,7 +17,7 @@ MAGEMin is run using command line arguments when executing the binary file.
 | `--Bulk=[y]`   | Bulk rock composition in molar amount          |
 | `--Gam=[y]`    | Gamma, when a guess of gamma is known          |
 | `--solver=x`   | Legacy, 0; PGE, 1; 2 Hybrid (default)          |
-| `--rg=""`      | Research group / thermodynamic framework: "tc" (default, ThermoCalc-family), "sb" (Stixrude & Lithgow-Bertelloni), or "gh" (xMELTS/pMELTS/rMELTS) |
+| `--rg=""`      | Research group / thermodynamic framework: "tc" (default, ThermoCalc-family), "sb" (Stixrude & Lithgow-Bertelloni), "gh" (xMELTS/pMELTS/rMELTS), or "br" (Berman/Pourteau, `po`) |
 | `--db=""`      | Database, e.g. "ig", "mp", or "all" (union of mp/mb/mbe/ig/igd/igad/um/ume/mpe), default is "ig" - see [Databases information](../database.md) for the full list |
 | `--ds=x`       | Dataset selection: 62, 633, 634, 635 or 636    |
 | `--sys_in=""`  | System composition: "mol" or "wt", default is "mol" |
