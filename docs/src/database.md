@@ -34,6 +34,7 @@ A comprehensive overview of all thermodynamic databases available in MAGEMin, in
 | **ume** | Ultramafic extended | - | Evans & Frost, 2021 + Green et al., 2016 |
 | **mpe** | Extended metapelite | - | White et al., 2014 + Green et al., 2016 + Franzolin et al., 2011 + Diener et al., 2007 |
 | **mbe** | Extended metabasite | - | Green et al., 2016 + Diener et al., 2007 + Rebay et al., 2022 |
+| **po** | HP/LT Metapelite (Berman) | Added September 2026 | Pourteau et al., 2014 (Berman, 1988 formalism) |
 | **all** | Global (union of mp/mb/mbe/ig/igd/igad/um/ume/mpe) | Added August 2026 | see individual databases above, plus DEW aqueous fluid model |
 
 ---
@@ -164,6 +165,19 @@ The metapelitic model (extended with MnO, White et al., 2014) allows to compute 
 </ul>
 ```
 
+== HP/LT Metapelite (po)
+
+```@raw html
+<ul>
+    <li>Added September 2026</li>
+    <li>Pourteau et al., 2014 (see doi:10.1007/s00410-014-1090-7), built on the Berman (1988) internally-consistent dataset rather than the Holland-Powell-family datasets used by every other database above</li>
+    <li>Na2O-K2O-CaO-FeO-MgO-Al2O3-SiO2-TiO2-H2O-O chemical system</li>
+    <li>Pure stoichiometric phases corundum (cor), coesite (coe), quartz (q), kyanite (ky), andalusite (and), sillimanite (sill), Mg-talc (mtlc), Fe-talc (ftlc), lawsonite (law), glaucophane (glc), diaspore (dsp), water (h2o), magnetite (mt) and hematite (hem).</li>
+    <li>Solution phases chloritoid (ctd), carpholite (car), chlorite (chl), white mica (mica), talc (talc), ilmenite (ilm), biotite (bt), olivine (ol), epidote (ep), orthopyroxene (opx), spinel (spl), staurolite (stau), cordierite (crd), garnet (grt), omphacite (omph), Na-Ca amphibole (amphx) and ternary feldspar (fsp) - the HP/LT (blueschist-eclogite facies) metapelite assemblage this model targets.</li>
+    <li>Selected via `db="po"`, which also selects the `br` (Berman) research group automatically - unlike the datasets above, `po` is not selectable via `--ds=`, and only the LP solver is available for it (the PGE/Hybrid `solver` option has no effect).</li>
+</ul>
+```
+
 == Extended Databases (ume, mpe, mbe)
 
 ```@raw html
@@ -238,6 +252,10 @@ The metapelitic model (extended with MnO, White et al., 2014) allows to compute 
 - Rebay, G., Powell, R., & Diener, J.F.A. (2022). New activities for the system FeO-MgO-Al₂O₃-SiO₂ with applications to metamorphic rocks. Journal of Metamorphic Geology.
 
 - Franzolin, E., Schmidt, M.W., & Poli, S. (2011). Ternary Ca–Fe–Mg carbonates: subsolidus phase relations at 3.5 GPa and a thermodynamic solid solution model including order/disorder. Contributions to Mineralogy and Petrology, 161(2), 213-227.
+
+- Pourteau, A., Bousquet, R., Vidal, O., Plunder, A., Duesterhoeft, E., Candan, O., & Oberhänsli, R. (2014). Multistage growth of Fe–Mg–carpholite and Fe–Mg–chloritoid, from field evidence to thermodynamic modelling. Contributions to Mineralogy and Petrology, 168, 1090. [doi: 10.1007/s00410-014-1090-7](https://doi.org/10.1007/s00410-014-1090-7)
+
+- Berman, R.G. (1988). Internally-consistent thermodynamic data for minerals in the system Na2O-K2O-CaO-MgO-FeO-Fe2O3-Al2O3-SiO2-TiO2-H2O-CO2. Journal of Petrology, 29(2), 445-522. [doi: 10.1093/petrology/29.2.445](https://doi.org/10.1093/petrology/29.2.445)
 
 - Warr, L.N. (2021). IMA-CNMNC approved mineral symbols. Mineralogical Magazine, 85, 291-320. [doi: 10.1180/mgm.2021.43](https://doi.org/10.1180/mgm.2021.43)
 
@@ -461,6 +479,32 @@ Extends `mp` with phases from Green et al. (2016), Evans & Frost (2021), and Die
 **Pure phases:** q · crst · trd · coe · stv · ky · sill · and · ru · sph · O2 · pyr · gph · law · zo · prl · mpm · pre · cor
 
 **Buffers:** qfm · mw · qif · nno · hm · iw · cco &nbsp;&nbsp; **Activities:** aH2O · aO2 · aMgO · aFeO · aAl2O3 · aTiO2
+
+== HP/LT Metapelite (po)
+
+Berman (1988) formalism (`br` research group), not the Holland-Powell-family datasets used elsewhere in this table.
+
+| Phase | Warr (2021) | Model | em | End-members |
+|---|---|---|:---:|---|
+| `ctd` | Cld | ctd_BR | 2 | fctd · mctd |
+| `car` | Cph | car_BR | 2 | fcar · mcar |
+| `chl` | Chl | chl_BR | 5 | dph · clin · feam · sud · ames |
+| `mica` | Ms | mica_BR | 5 | mu · pa · cel · fcel · prlph |
+| `talc` | Tlc | talc_BR | 2 | ftlc · mtlc |
+| `ilm` | Ilm | ilm_BR | 2 | ilm · gk |
+| `bt` | Bt | bt_BR | 2 | phl · ann |
+| `ol` | Ol | ol_BR | 2 | fa · fo |
+| `ep` | Ep | ep_BR | 2 | czo · ep |
+| `opx` | Opx | opx_BR | 2 | en · fs |
+| `spl` | Spl | spl_BR | 2 | spin · herc |
+| `stau` | St | stau_BR | 2 | fst · mst |
+| `crd` | Crd | crd_BR | 2 | crd · fcrd |
+| `grt` | Grt | grt_BR | 2 | py · alm |
+| `omph` | Omp | omph_BR | 3 | di · jd · hed |
+| `amphx` | Amp | amphx_BR | 3 | tr · tsch · parg |
+| `fsp` | Fsp | fsp_BR | 3 | ab · kfs · an |
+
+**Pure phases:** cor · coe · q · ky · and · sill · mtlc · ftlc · law · glc · dsp · h2o · mt · hem
 
 == Mantle SB11
 
