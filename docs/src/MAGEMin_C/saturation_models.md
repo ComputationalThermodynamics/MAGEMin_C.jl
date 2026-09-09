@@ -8,6 +8,7 @@
     - [E.3 P2O5 saturation model example](#E.3-P2O5-saturation model-example)
     - [E.4 Saturation models and bulk correction](#E.4-Saturation-models-and-bulk-correction)
     - [E.5 CO2 saturation model example](#E.5-CO2-saturation-model-example)
+    - [E.6 Monazite saturation model example](#E.6-Monazite-saturation-model-example)
 
 ## Introduction
 
@@ -73,6 +74,24 @@ P_H₂O is obtained by numerically inverting Eq. 7 from the dissolved H₂O in t
 Unlike mineral saturation phases, excess CO₂ degasses into a CO₂-bearing fluid (phase acronym: flC) rather than crystallizing a solid.
 
 ```
+
+== Monazite (LREE)
+
+```@raw html
+<ul>
+    <li>Stepanov et al., 2012 - MnzSat_model = "Stepanov12"</li>
+    <li>Montel, 1993 - MnzSat_model = "Montel93"</li>
+    <li>Maimaiti et al., 2019 - MnzSat_model = "Maimaiti19"</li>
+</ul>
+
+All three models predict the saturation of ΣLREE (La+Ce+Pr+Nd+Sm, ppm) in the melt as a function of
+temperature, pressure (Stepanov12 and Maimaiti19 only), melt H₂O content, a melt compositional
+parameter, and X_mnz_LREE — the molar ratio of LREE to all cations (LREE, Y, Th, U) in monazite
+itself. Because monazite competes with zircon and apatite for Y/Th/U and with apatite for P₂O₅,
+X_mnz_LREE is not known in advance; it is updated self-consistently across iterations of
+solve_with_saturation (see E.6 below).
+
+```
 :::
 
 
@@ -82,6 +101,7 @@ Unlike mineral saturation phases, excess CO₂ degasses into a CO₂-bearing flu
 | S    | sulfide | sulf  | FeS | FeO and O | SSat_model = "Oneill21", "Liu07" |
 | P2O5   | fluorapatite |fapt  | Ca5(PO4)3F | CaO (F is omitted) | P2O5Sat_model = "Klein26"|
 | CO2  | CO2 fluid | flC | CO2 | CO2 (re-enters CO2 budget) | CO2Sat_model = "SY26" |
+| LREE (La-Sm) | monazite | mnz | REEPO4 | P2O5 (competes with fluorapatite) | MnzSat_model = "Stepanov12", "Montel93", "Maimaiti19" |
 
 ## E.1 Zirconium saturation
 
@@ -304,6 +324,48 @@ Finalize_MAGEMin(data)
 !!! important
     The SY26 model is calibrated over 1 bar – 6 GPa, 660 – 1924 °C, and covers compositions ranging from carbonatite to rhyolite. The model assumes a binary H₂O–CO₂ fluid; mixed fluids with other species (e.g., H₂S, SO₂) are not accounted for.
 
+## E.6 Monazite saturation model example
+
+Monazite differs from the other four accessory phases in one respect: its own composition
+(`X_mnz_LREE`, the molar LREE/(LREE+Y+Th+U) ratio) feeds back into the next evaluation of the
+saturation threshold, and monazite also competes with zircon and apatite for Y, Th and U. This
+means monazite needs *real* (non-zero) partition coefficients for itself in the KDs database,
+unlike zircon/sulfide/apatite/CO₂-fluid where a dummy `KD = 0.0` is enough. The `SaturationConfig` /
+`solve_with_saturation` pair (the built-in equivalent of the manual iteration loop in E.4) handles
+this automatically: it appends monazite to the KDs database with literature Kd values
+(Yakymchuk et al., 2025, Table S1) and threads `X_mnz_LREE` between iterations.
+
+This example reproduces the monazite (Stepanov12) vs. fluorapatite competition for P₂O₅:
+
+```julia
+using MAGEMin_C
+dtb     = "mp"
+data    = Initialize_MAGEMin(dtb, verbose=-1, solver=0);
+P,T     = 6.0, 730.0
+Xoxides = ["SiO2";  "TiO2";  "Al2O3";  "FeO";   "MnO";   "MgO";   "CaO";   "Na2O";  "K2O"; "H2O"; "O"];
+X       = [58.509,  1.022,   14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 3.0, 0.2];
+X_mol, Xoxides  = convertBulk4MAGEMin(X, Xoxides, "wt", dtb); sys_in = "mol"
+X_mol ./= sum(X_mol)                                          # normalize to 1.0
+
+el      = ["La","Ce","Pr","Nd","Sm","Eu","Gd","Y","Th","U","P2O5"]
+C0      = [400.0, 800.0, 90.0, 350.0, 70.0, 16.0, 40.0, 200.0, 85.0, 20.0, 1200.0]   # ppm
+KDs_dtb = create_custom_KDs_database(el)                      # dummy 0.0 KDs for real phases;
+                                                                # mnz gets real KDs from SaturationConfig
+
+sat = SaturationConfig(P2O5 = "HWBea92", Mnz = "Stepanov12")
+
+out, out_TE, converged, n_iter = solve_with_saturation(P, T, data, X_mol, Xoxides, C0, KDs_dtb, dtb;
+                                                        sat = sat, sys_in = sys_in)
+
+Finalize_MAGEMin(data)
+```
+
+!!! note
+    - `out_TE.Sat_LREE_liq` gives the ΣLREE (La+Ce+Pr+Nd+Sm) saturation concentration in the melt [ppm]; at convergence `sum(out_TE.Cliq[1:5]) ≈ out_TE.Sat_LREE_liq`.
+    - `out_TE.mnz_wt` gives the weight fraction of monazite precipitated.
+    - `out_TE.X_mnz_LREE` gives the converged molar LREE/(LREE+Y+Th+U) ratio in monazite (`< 1.0` since Y, Th and U also enter the monazite structure).
+    - Both monazite and fluorapatite draw on the same P₂O₅ budget: as in the `!!! important` note above, if there is not enough P₂O₅ to satisfy both, the saturation level of the limiting phase is increased so that mass conservation holds.
+
 ## References
 
 - Watson, E. B., & Harrison, T. M. (1983). Zircon saturation revisited: temperature and composition effects in a variety of crustal magma types. earth and planetary science letters, 64(2), 295-304.
@@ -327,3 +389,11 @@ Finalize_MAGEMin(data)
 - Klein, B. Z., Müntener, O., Gillespie, J., & Marxer, F. (2026). Apatite saturation revisited: new model formulations and applications to igneous rocks. Contributions to Mineralogy and Petrology, 181(3), 18.
 
 - Sun, C., & Yao, L. (2026). A unified H₂O–CO₂ solubility–speciation model for magmatic liquids: Constraints on magma storage architecture in continental rifts. Earth and Planetary Science Letters, 689, 120115.
+
+- Montel, J. M. (1993). A model for monazite/melt equilibrium and application to the generation of granitic magmas. Chemical Geology, 110(1-3), 127-146. https://doi.org/10.1016/0009-2541(93)90250-M
+
+- Stepanov, A. S., Hermann, J., Rubatto, D., & Rapp, R. P. (2012). Experimental study of monazite/melt partitioning with implications for the REE, Th and U geochemistry of crustal rocks. Chemical Geology, 300, 200-220.
+
+- Maimaiti, M., Fabbrizio, A., Carroll, M. R., Ertel-Ingrisch, W., Abudureheman, A., Paris, E., & Dingwell, D. B. (2019). Experimental study of monazite solubility in haplogranitic melts: a new model for peraluminous and peralkaline melts. European Journal of Mineralogy, 31(1), 49-59. https://doi.org/10.1127/ejm/2019/0031-2801
+
+- Yakymchuk, C., Gareau, J., & Williams, M. (2025). Location, location, location: monazite behaviour during UHT metamorphism and melt crystallization. Journal of Metamorphic Geology, 44(2), 158-175. https://doi.org/10.1111/jmg.70030

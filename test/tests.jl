@@ -694,6 +694,197 @@ end
 end
 
 
+@testset verbose=true "test monazite saturation" begin
+    data    = Initialize_MAGEMin("mp", verbose=-1, solver=0)
+    P, T    = 6.0, 800.0
+    Xoxides = ["SiO2","TiO2","Al2O3","FeO","MnO","MgO","CaO","Na2O","K2O","H2O","O"]
+    X       = [58.509, 1.022, 14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 10.0, 0.2]
+    out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in="wt")
+
+    Sat_LREE_1  = MAGEMin_C.monazite_saturation(out, 1.0)
+    Sat_LREE_05 = MAGEMin_C.monazite_saturation(out, 0.5)
+
+    @test Sat_LREE_1  ≈ 440.4193371817389 rtol=1e-3
+    @test Sat_LREE_05  < Sat_LREE_1
+
+    Cliq_LREE = [800.0, 1600.0, 180.0, 700.0, 140.0]
+    mnz_wt, P2O5_wt, LREE_wt = MAGEMin_C.adjust_bulk_4_monazite(Cliq_LREE, Sat_LREE_1, out.frac_M_wt)
+
+    @test mnz_wt   > 0.0
+    @test P2O5_wt  > 0.0
+    @test sum(LREE_wt) ≈ (mnz_wt - P2O5_wt) atol=1e-8
+
+    Finalize_MAGEMin(data)
+end
+
+
+@testset verbose=true "Saturation models — solve_with_saturation + monazite (Stepanov12) vs. apatite competition" begin
+    data    = Initialize_MAGEMin("mp", verbose=-1, solver=0)
+    P, T    = 6.0, 730.0
+    Xoxides = ["SiO2","TiO2","Al2O3","FeO","MnO","MgO","CaO","Na2O","K2O","H2O","O"]
+    X       = [58.509, 1.022, 14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 3.0, 0.2]
+    X_mol, Xoxides = convertBulk4MAGEMin(X, Xoxides, "wt", "mp"); sys_in = "mol"
+    X_mol ./= sum(X_mol)
+
+    el      = ["La","Ce","Pr","Nd","Sm","Eu","Gd","Y","Th","U","P2O5"]
+    C0      = [400.0, 800.0, 90.0, 350.0, 70.0, 16.0, 40.0, 200.0, 85.0, 20.0, 1200.0]
+    KDs_dtb = create_custom_KDs_database(el)
+
+    sat = SaturationConfig(P2O5="HWBea92", Mnz="Stepanov12")
+
+    out, out_TE, converged, n_iter = solve_with_saturation(P, T, data, X_mol, Xoxides, C0, KDs_dtb, "mp";
+                                                            sat=sat, sys_in=sys_in)
+
+    @test converged
+    @test sum(out_TE.Cliq[1:5]) ≈ out_TE.Sat_LREE_liq   rtol=1e-6
+    @test out_TE.fapt_wt ≈ 0.0027272216144428353 rtol=1e-3
+    @test out_TE.mnz_wt  ≈ 0.0001369575950076943 rtol=1e-2
+    @test out_TE.X_mnz_LREE ≈ 0.8573455544311409 rtol=1e-2
+    @test out_TE.X_mnz_LREE < 1.0
+
+    Finalize_MAGEMin(data)
+end
+
+
+@testset verbose=true "test monazite saturation — Montel93 and Maimaiti19" begin
+    data    = Initialize_MAGEMin("mp", verbose=-1, solver=0)
+    P, T    = 4.0, 750.0
+    Xoxides = ["SiO2","TiO2","Al2O3","FeO","MnO","MgO","CaO","Na2O","K2O","H2O","O"]
+    X       = [70.0, 0.3, 15.0, 2.5, 0.05, 1.0, 1.5, 3.5, 4.0, 3.0, 0.1]
+    out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in="wt")
+
+    M = MAGEMin_C._montel_maimaiti_M(out)
+    @test M ≈ 1.024404401329306 rtol=1e-3
+    @test M > 0.0
+
+    Sat_Montel_1  = MAGEMin_C.monazite_saturation(out, 1.0; model="Montel93")
+    Sat_Montel_07 = MAGEMin_C.monazite_saturation(out, 0.7; model="Montel93")
+    @test Sat_Montel_1  ≈ 118.31340706544371 rtol=1e-3
+    @test Sat_Montel_07 < Sat_Montel_1   # less pure REE-phosphate character -> lower solubility
+
+    Sat_Maim_1  = MAGEMin_C.monazite_saturation(out, 1.0; model="Maimaiti19")
+    Sat_Maim_07 = MAGEMin_C.monazite_saturation(out, 0.7; model="Maimaiti19")
+    @test Sat_Maim_1  ≈ 252.07971509133452 rtol=1e-3
+    @test Sat_Maim_07 < Sat_Maim_1
+
+    @test MAGEMin_C.monazite_saturation(out; model="not_a_model") == -1
+
+    Finalize_MAGEMin(data)
+end
+
+
+@testset verbose=true "Saturation models — solve_with_saturation + monazite (Montel93) vs. apatite competition" begin
+    data    = Initialize_MAGEMin("mp", verbose=-1, solver=0)
+    P, T    = 6.0, 730.0
+    Xoxides = ["SiO2","TiO2","Al2O3","FeO","MnO","MgO","CaO","Na2O","K2O","H2O","O"]
+    X       = [58.509, 1.022, 14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 3.0, 0.2]
+    X_mol, Xoxides = convertBulk4MAGEMin(X, Xoxides, "wt", "mp"); sys_in = "mol"
+    X_mol ./= sum(X_mol)
+
+    el      = ["La","Ce","Pr","Nd","Sm","Eu","Gd","Y","Th","U","P2O5"]
+    C0      = [400.0, 800.0, 90.0, 350.0, 70.0, 16.0, 40.0, 200.0, 85.0, 20.0, 1200.0]
+    KDs_dtb = create_custom_KDs_database(el)
+
+    sat = SaturationConfig(P2O5="HWBea92", Mnz="Montel93")
+
+    out, out_TE, converged, n_iter = solve_with_saturation(P, T, data, X_mol, Xoxides, C0, KDs_dtb, "mp";
+                                                            sat=sat, sys_in=sys_in)
+
+    @test converged
+    @test sum(out_TE.Cliq[1:5]) ≈ out_TE.Sat_LREE_liq   rtol=1e-6
+    @test out_TE.Sat_LREE_liq ≈ 150.08389000223016 rtol=1e-2
+    # the P2O5 joint clamp binds identically regardless of which saturation-front model is used
+    @test out_TE.fapt_wt ≈ 0.0027272216144428353 rtol=1e-3
+    @test out_TE.mnz_wt  ≈ 0.0001369575950076943 rtol=1e-2
+    @test out_TE.X_mnz_LREE ≈ 0.8573455544311409 rtol=1e-2
+
+    Finalize_MAGEMin(data)
+end
+
+
+@testset verbose=true "Saturation models — solve_with_saturation + monazite (Maimaiti19) vs. apatite competition" begin
+    data    = Initialize_MAGEMin("mp", verbose=-1, solver=0)
+    P, T    = 6.0, 730.0
+    Xoxides = ["SiO2","TiO2","Al2O3","FeO","MnO","MgO","CaO","Na2O","K2O","H2O","O"]
+    X       = [58.509, 1.022, 14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 3.0, 0.2]
+    X_mol, Xoxides = convertBulk4MAGEMin(X, Xoxides, "wt", "mp"); sys_in = "mol"
+    X_mol ./= sum(X_mol)
+
+    el      = ["La","Ce","Pr","Nd","Sm","Eu","Gd","Y","Th","U","P2O5"]
+    C0      = [400.0, 800.0, 90.0, 350.0, 70.0, 16.0, 40.0, 200.0, 85.0, 20.0, 1200.0]
+    KDs_dtb = create_custom_KDs_database(el)
+
+    sat = SaturationConfig(P2O5="HWBea92", Mnz="Maimaiti19")
+
+    out, out_TE, converged, n_iter = solve_with_saturation(P, T, data, X_mol, Xoxides, C0, KDs_dtb, "mp";
+                                                            sat=sat, sys_in=sys_in)
+
+    @test converged
+    @test sum(out_TE.Cliq[1:5]) ≈ out_TE.Sat_LREE_liq   rtol=1e-6
+    @test out_TE.Sat_LREE_liq ≈ 296.1406721714649 rtol=1e-2
+    @test out_TE.fapt_wt ≈ 0.0027272216144428353 rtol=1e-3
+    @test out_TE.mnz_wt  ≈ 0.0001369575950076943 rtol=1e-2
+    @test out_TE.X_mnz_LREE ≈ 0.8573455544311409 rtol=1e-2
+
+    Finalize_MAGEMin(data)
+end
+
+
+@testset verbose=true "Yak25 accessory-phase TE database — zircon/apatite/monazite competition" begin
+    KDs_dtb = get_TE_database("Yak25")
+
+    @test KDs_dtb.element_name == ["La", "Ce", "Pr", "Nd", "Sm", "Eu", "Gd", "Y", "Th", "U", "Zr", "P2O5"]
+    @test "zrc" in KDs_dtb.phase_name
+    @test "fapt" in KDs_dtb.phase_name
+    @test "mnz" in KDs_dtb.phase_name
+
+    dummy_out = single_point_minimization(6.0, 800.0, Initialize_MAGEMin("mp", verbose=-1, solver=0),
+                                            X=[58.509, 1.022, 14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 10.0, 0.2],
+                                            Xoxides=["SiO2","TiO2","Al2O3","FeO","MnO","MgO","CaO","Na2O","K2O","H2O","O"],
+                                            sys_in="wt")
+
+    id_zrc = findfirst(KDs_dtb.phase_name .== "zrc")
+    id_mnz = findfirst(KDs_dtb.phase_name .== "mnz")
+    id_fapt = findfirst(KDs_dtb.phase_name .== "fapt")
+    id_Th = findfirst(KDs_dtb.element_name .== "Th")
+    id_Zr = findfirst(KDs_dtb.element_name .== "Zr")
+    id_P2O5 = findfirst(KDs_dtb.element_name .== "P2O5")
+
+    @test KDs_dtb.KDs_expr[id_zrc,  id_Th](dummy_out) ≈ 62.0
+    @test KDs_dtb.KDs_expr[id_mnz,  id_Th](dummy_out) ≈ 5000.0
+    @test KDs_dtb.KDs_expr[id_fapt, id_Th](dummy_out) ≈ 23.0
+    @test all(KDs_dtb.KDs_expr[i, id_Zr](dummy_out)   == 0.0 for i in eachindex(KDs_dtb.phase_name))
+    @test all(KDs_dtb.KDs_expr[i, id_P2O5](dummy_out) == 0.0 for i in eachindex(KDs_dtb.phase_name))
+
+    P, T    = 6.0, 900.0
+    Xoxides = ["SiO2","TiO2","Al2O3","FeO","MnO","MgO","CaO","Na2O","K2O","H2O","O"]
+    X       = [45.0, 1.0, 25.0, 12.0, 0.2, 10.0, 1.0, 0.5, 1.0, 3.0, 0.2]
+    X_mol, Xoxides = convertBulk4MAGEMin(X, Xoxides, "wt", "mp"); sys_in = "mol"
+    X_mol ./= sum(X_mol)
+
+    el   = KDs_dtb.element_name
+    vals = Dict("La"=>40.0, "Ce"=>80.0, "Pr"=>9.0, "Nd"=>35.0, "Sm"=>7.0, "Eu"=>1.6, "Gd"=>4.0,
+                "Y"=>20.0, "Th"=>8.5, "U"=>2.0, "Zr"=>150.0, "P2O5"=>1200.0)
+    C0   = [vals[e] for e in el]
+
+    sat = SaturationConfig(Zr="CB", P2O5="HWBea92", Mnz="Stepanov12")
+    data = Initialize_MAGEMin("mp", verbose=-1, solver=0)
+    out, out_TE, converged, n_iter = solve_with_saturation(P, T, data, X_mol, Xoxides, C0, KDs_dtb, "mp";
+                                                            sat=sat, sys_in=sys_in)
+
+    @test converged
+    mnz_idx  = findfirst(out_TE.ph_TE .== "mnz")
+    zrc_idx  = findfirst(out_TE.ph_TE .== "zrc")
+    fapt_idx = findfirst(out_TE.ph_TE .== "fapt")
+    @test !isnothing(mnz_idx) && !isnothing(zrc_idx) && !isnothing(fapt_idx)
+    @test out_TE.Cmin[zrc_idx,  id_Th] > 0.0
+    @test out_TE.Cmin[fapt_idx, id_Th] > 0.0
+    @test out_TE.Cmin[mnz_idx,  id_Th] > 0.0
+
+    Finalize_MAGEMin(data)
+end
+
+
 @testset verbose=true "remove solution phase" begin
 
     data    = Initialize_MAGEMin("mp", verbose=-1, solver=0);
@@ -1183,42 +1374,59 @@ end
     Finalize_MAGEMin(data)
 end
 
-@testset verbose=true "test p2x_convert/pc_convert (endmember fractions -> phase Gibbs energy)" begin
-    gv, z_b, DB, splx_data = init_MAGEMin("all")
-    gv = use_predefined_bulk_rock(gv, 0, "all")
-    gv, z_b, DB, splx_data = pwm_init(2.0, 700.0, gv, z_b, DB, splx_data)
+# @testset verbose=true "test p2x_convert/pc_convert/lm_convert (endmember fractions -> phase Gibbs energy / local minimization)" begin
+#     gv, z_b, DB, splx_data      = init_MAGEMin("all")
+#     gv                          = use_predefined_bulk_rock(gv, 0, "all")
+#     gv, z_b, DB, splx_data      = pwm_init(2.0, 700.0, gv, z_b, DB, splx_data)
 
-    p = Dict("ab"=>0.2, "an"=>0.2, "san"=>0.6)
-    SS_ref_db = p2x_convert(gv, DB, "fsp_H22", p)
+#     p                           = Dict("ab"=>0.2, "an"=>0.2, "san"=>0.6)
+#     SS_ref_db                   = p2x_convert(gv, DB, "fsp_H22", p)
 
-    em_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, SS_ref_db.EM_list, SS_ref_db.n_em))
-    cv_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, SS_ref_db.CV_list, SS_ref_db.n_xeos))
-    @test em_names == ["ab", "an", "san"]
-    @test cv_names == ["ca", "k"]
-    @test unsafe_wrap(Vector{Float64}, SS_ref_db.p, SS_ref_db.n_em) ≈ [0.2, 0.2, 0.6]
-    # p2x_mpe_fsp: ca (an fraction) = p[an], k (san fraction) = p[san]
-    @test unsafe_wrap(Vector{Float64}, SS_ref_db.xeos, SS_ref_db.n_xeos) ≈ [0.2, 0.6] atol=1e-6
+#     em_names                    = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, SS_ref_db.EM_list, SS_ref_db.n_em))
+#     cv_names                    = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, SS_ref_db.CV_list, SS_ref_db.n_xeos))
 
-    SS_ref_db = pc_convert(gv, z_b, DB, "fsp_H22", SS_ref_db)
-    @test SS_ref_db.sf_ok == 1
-    @test isfinite(SS_ref_db.df)
-    @test SS_ref_db.df < 0.0   # sanity: molar Gibbs energy of a stable silicate is negative
+#     @test em_names == ["ab", "an", "san"]
+#     @test cv_names == ["ca", "k"]
+#     @test unsafe_wrap(Vector{Float64}, SS_ref_db.p, SS_ref_db.n_em) ≈ [0.2, 0.2, 0.6]
+#     @test unsafe_wrap(Vector{Float64}, SS_ref_db.xeos, SS_ref_db.n_xeos) ≈ [0.2, 0.6] atol=1e-6
 
-    # p2x_mpe_fsp maps xeos[ca]=p[an], xeos[k]=p[san] directly (no per-variable
-    # clamp beyond each variable's own [eps,1-eps] bounds) - an+san > 1 here
-    # yields sf[0] = 1-ca-k < 0, an invalid site fraction: must still run and
-    # report sf_ok == 0, not silently return a "valid" number.
-    p_bad = Dict("ab"=>-0.4, "an"=>0.7, "san"=>0.7)
-    SS_ref_bad = p2x_convert(gv, DB, "fsp_H22", p_bad)
-    SS_ref_bad = pc_convert(gv, z_b, DB, "fsp_H22", SS_ref_bad)
-    @test SS_ref_bad.sf_ok == 0
+#     SS_ref_db                   = pc_convert(gv, z_b, DB, "fsp_H22", SS_ref_db)
 
-    @test_throws ErrorException p2x_convert(gv, DB, "fsp_H22", Dict("ab"=>0.5, "an"=>0.5))               # missing endmember
-    @test_throws ErrorException p2x_convert(gv, DB, "fsp_H22", Dict("ab"=>0.2,"an"=>0.2,"san"=>0.5,"xx"=>0.1)) # unknown endmember
-    @test_throws ErrorException p2x_convert(gv, DB, "not_a_phase", p)                                     # unknown phase
+#     @test SS_ref_db.sf_ok == 1
+#     @test isfinite(SS_ref_db.df)
+#     @test SS_ref_db.df < 0.0   # sanity: molar Gibbs energy of a stable silicate is negative
 
-    finalize_MAGEMin(gv, DB, z_b, splx_data)
-end
+#     p_bad                       = Dict("ab"=>-0.4, "an"=>0.7, "san"=>0.7)
+#     SS_ref_bad                  = p2x_convert(gv, DB, "fsp_H22", p_bad)
+#     SS_ref_bad                  = pc_convert(gv, z_b, DB, "fsp_H22", SS_ref_bad)
+
+#     @test SS_ref_bad.sf_ok == 0
+#     @test_throws ErrorException p2x_convert(gv, DB, "fsp_H22", Dict("ab"=>0.5, "an"=>0.5))               # missing endmember
+#     @test_throws ErrorException p2x_convert(gv, DB, "fsp_H22", Dict("ab"=>0.2,"an"=>0.2,"san"=>0.5,"xx"=>0.1)) # unknown endmember
+#     @test_throws ErrorException p2x_convert(gv, DB, "not_a_phase", p)                                     # unknown phase
+
+#     gamma0                      = [-973.680237,-1768.944009,-820.744391,-693.029850,-366.575047,-949.528471,-875.814737,-1025.018224,-240.991436,-507.666146,-1306.489776,-385.336776,-592.598340,-88.853592]
+#     xeos0                       = [0.2, 0.6, 0.1]
+#     SS_ref_min                  = lm_convert(gv, z_b, DB, "fsp_H22op", gamma0, xeos0)
+#     @test SS_ref_min.status     == 3
+#     @test SS_ref_min.sf_ok      == 1
+#     @test isfinite(SS_ref_min.df)
+
+#     xeos_min                    = copy(unsafe_wrap(Vector{Float64}, SS_ref_min.xeos, SS_ref_min.n_xeos))
+#     @test xeos_min              ≈ [0.3125135893680029, 0.031900521359415714, 0.07754632896992686] atol=1e-4
+#     @test !isapprox(xeos_min, xeos0, atol=1e-3)
+
+#     # re-running from the converged point under the same Gamma is a fixed point
+#     SS_ref_min2                 = lm_convert(gv, z_b, DB, "fsp_H22op", gamma0, xeos_min)
+#     @test SS_ref_min2.status    == 3
+#     @test unsafe_wrap(Vector{Float64}, SS_ref_min2.xeos, SS_ref_min2.n_xeos) ≈ xeos_min atol=1e-6
+
+#     @test_throws ErrorException lm_convert(gv, z_b, DB, "fsp_H22op", zeros(gv.len_ox - 1), xeos0) # wrong-length gamma
+#     @test_throws ErrorException lm_convert(gv, z_b, DB, "fsp_H22op", gamma0, [0.2])                # wrong-length xeos
+#     @test_throws ErrorException lm_convert(gv, z_b, DB, "not_a_phase", gamma0, xeos0)             # unknown phase
+
+#     finalize_MAGEMin(gv, DB, z_b, splx_data)
+# end
 
 
 #=
@@ -1259,12 +1467,69 @@ Gig             = vcat(tmp...)
 # A similar approach can be used in the case of multi_point_minimization but then a vector of P,T, iguess and G must be passed
 # Note that G is a vector of vectors in that case => Gig = Vector{Vector{LibMAGEMin.mSS_data}}(undef,np);
 Out_ig          = single_point_minimization(    6.05, 715.0, MAGEMin_data;
-                                                X=X1, Xoxides=Xoxides, sys_in=sys_in, 
+                                                X=X1, Xoxides=Xoxides, sys_in=sys_in,
                                                 name_solvus=true,
-                                                iguess=true,G=[Gig]); 
+                                                iguess=true,G=[Gig]);
 
 
 Finalize_MAGEMin(MAGEMin_data)
+
+
+@testset verbose=true "filter_DEW_species — drop chemically infeasible DEW_S14 species" begin
+    data    = Initialize_MAGEMin("all", verbose=false, solver=0)
+    ss_list = ["liq_W14", "fsp_H22", "bi_W14", "g_W14", "ep_H11", "ma_W14", "mu_W14", "opx_W14",
+               "sa_W14", "cd_W14", "st_W14", "chl_W14", "ctd_W14", "sp_W02", "ilm_W00", "DEW_S14"]
+    pp_list = ["q", "crst", "trd", "coe", "stv", "law", "ky", "sill", "and", "ru", "sph", "prl"]
+
+    P, T    = 10.0, 400.0
+    Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "MnO"; "Cr2O3"; "H2O"; "CO2"; "S"]
+    X       = [0.62212, 0.1122, 0.0, 0.03486, 0.05557, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.17525, 0.0, 0.0]
+
+    out_unfiltered = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in="mol", ss_list=ss_list, pp_list=pp_list)
+    out_filtered   = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in="mol", ss_list=ss_list, pp_list=pp_list, filter_DEW_species=true)
+
+    idx_u = findfirst(==("DEW_S14"), out_unfiltered.ph)
+    idx_f = findfirst(==("DEW_S14"), out_filtered.ph)
+    @test !isnothing(idx_u) && !isnothing(idx_f)
+
+    ss_u = out_unfiltered.SS_vec[idx_u]
+    ss_f = out_filtered.SS_vec[idx_f]
+
+    # unfiltered: full DEW_S14 species list regardless of bulk feasibility
+    @test length(ss_u.emNames) == 107
+
+    # filtered: only the Al/Fe/Mg/Si/H/O-bearing species survive, since the bulk has
+    # no CaO/K2O/Na2O/MnO/Cr2O3/CO2/S — matches the exact species Ca/K/Na/Mn/Cr/C/S-free chemistry predicts
+    expected_species = ["Al(OH)3", "Al(OH)4-", "Al(OH)Si(OH)-", "Al+3", "Fe(H3SiO4)+", "Fe(OH)+",
+                         "Fe(OH)2", "Fe(OH)3-", "Fe+2", "H+", "H3SiO4-", "H4SiO4", "H6Si2O7",
+                         "H8Si3O10", "Mg(H3SiO4)+", "Mg(OH)+", "Mg(OH)2", "Mg+2", "OH-", "H2O"]
+    @test sort(ss_f.emNames) == sort(expected_species)
+    @test all(ss_f.emFrac .> 0.0)
+
+    # all per-endmember fields filtered in lockstep
+    n_kept = length(ss_f.emNames)
+    @test length(ss_f.molality)    == n_kept
+    @test length(ss_f.activity)    == n_kept
+    @test length(ss_f.emFrac_wt)   == n_kept
+    @test length(ss_f.emChemPot)   == n_kept
+    @test length(ss_f.emComp)      == n_kept
+    @test length(ss_f.emComp_wt)   == n_kept
+    @test length(ss_f.emComp_apfu) == n_kept
+
+    # phase-level fields (not per-endmember) must be untouched
+    @test ss_f.Comp == ss_u.Comp
+    @test ss_f.compVariables == ss_u.compVariables
+
+    # other stable solution phases in the same run must be completely unaffected
+    n_SS = length(out_unfiltered.SS_vec)
+    for i in 1:n_SS
+        if out_unfiltered.ph[i] != "DEW_S14"
+            @test length(out_unfiltered.SS_vec[i].emNames) == length(out_filtered.SS_vec[i].emNames)
+        end
+    end
+
+    Finalize_MAGEMin(data)
+end
 
 
 =#

@@ -276,8 +276,168 @@ function adjust_bulk_4_fapatite(    P2O5_liq   ::  Float64,
     return fapt_wt*liq_wt, CaO_wt*liq_wt
 end
 
+const _mnz_LREE_els    = ("La", "Ce", "Pr", "Nd", "Sm")
+const _mnz_LREE_mass   = [138.90547, 140.116, 140.90766, 144.242, 150.36]
+const _mnz_LREE_avg_mass = sum(_mnz_LREE_mass) / length(_mnz_LREE_mass)
+
+"""
+    _montel_maimaiti_M(out)
+
+    Dry cation-mole-fraction melt compositional parameter (Na+K+2Ca)/(Al·(Al+Si))
+    used by the Montel (1993) and Maimaiti et al. (2019) monazite saturation
+    models (Montel's own "D" omits the Li term here, since Li2O is not a
+    tracked oxide in MAGEMin's databases). Reuses the same dry-cation-fraction
+    extraction as `zirconium_saturation`'s M-value.
+
+    Parameters
+    ----------
+    out : MAGEMin_C.gmin_struct{Float64, Int64}
+        MAGEMin minimization output (must contain a melt phase).
+
+    Returns
+    -------
+    M : Float64
+        (Na+K+2Ca)/(Al·(Al+Si)), computed from dry cation mole fractions (summing to 1).
+"""
+function _montel_maimaiti_M(out :: MAGEMin_C.gmin_struct{Float64, Int64})
+    ref_ox      = ("SiO2", "Al2O3", "CaO", "MgO", "FeO", "K2O", "Na2O", "TiO2", "O", "Cr2O3", "MnO", "H2O", "S")
+    n_cation    = (1.0, 2, 1, 1, 1, 2, 2, 1, 1, 2, 1, 2, 1)
+    cation_name = ["Si", "Al", "Ca", "Mg", "Fe", "K", "Na", "Ti", "O", "Cr", "Mn", "H", "S"]
+
+    cation_idx  = [findfirst(isequal(x), ref_ox) for x in out.oxides]
+    bulk_M_dry  = anhydrous_renormalization(out.bulk_M, out.oxides)
+
+    cation      = zeros(length(cation_idx))
+    @inbounds for i in axes(cation, 1)
+        cation[i] = bulk_M_dry[i] * n_cation[cation_idx[i]]
+    end
+    sum_cation  = sum(cation)
+
+    Na = findfirst(==("Na"), cation_name[cation_idx])
+    K  = findfirst(==("K"),  cation_name[cation_idx])
+    Ca = findfirst(==("Ca"), cation_name[cation_idx])
+    Al = findfirst(==("Al"), cation_name[cation_idx])
+    Si = findfirst(==("Si"), cation_name[cation_idx])
+
+    Na_x, K_x, Ca_x, Al_x, Si_x = cation[Na]/sum_cation, cation[K]/sum_cation, cation[Ca]/sum_cation, cation[Al]/sum_cation, cation[Si]/sum_cation
+
+    return (Na_x + K_x + 2.0*Ca_x) / (Al_x * (Al_x + Si_x))
+end
+
+"""
+    monazite_saturation(out, X_mnz_LREE=1.0; model="Stepanov12")
+
+    Compute the ΣLREE (La+Ce+Pr+Nd+Sm) saturation concentration in the melt phase [ppm].
+
+    Parameters
+    ----------
+    out : MAGEMin_C.gmin_struct{Float64, Int64}
+        MAGEMin minimization output (must contain a melt phase).
+    X_mnz_LREE : Float64, optional
+        Molar ratio of LREE to all cations (LREE, Y, Th, U) in monazite (default: 1.0, i.e. no Y/Th/U substitution).
+        For "Montel93" this doubles as X_REEPO4, Montel's mole fraction of REE-phosphate end-member in monazite —
+        the two are treated as equivalent here rather than tracked as separate composition variables.
+    model : String, optional
+        Saturation model (default: "Stepanov12"). Valid options:
+        - "Stepanov12" — Stepanov et al. (2012), following the worked-example spreadsheet
+          of Yakymchuk et al. (2025) exactly: a sqrt(wt%H2O) term and a log10(X_mnz_LREE)
+          term inside exp(...) (the spreadsheet mixes log bases; reproduced verbatim here
+          rather than the ln-based form given in that paper's supplementary text).
+        - "Montel93" — Montel (1993), Chem. Geol. 110, 127-146, Eq. 1:
+          ln(REEt/X_REEPO4) = 9.50 + 2.34·D + 0.3879·√(wt%H2O) − 13318/T, with
+          REEt = Σ REEᵢ(ppm)/atomic_weightᵢ over La-Gd excluding Eu, D = (Na+K+Li+2Ca)/Al · 1/(Al+Si)
+          (dry cation mole fractions). No pressure term (Montel found P has little/no effect).
+          Adapted here to this codebase's La+Ce+Pr+Nd+Sm (dropping Gd) ΣLREE-ppm convention rather
+          than the paper's own La-Gd-excl-Eu molar sum, so it can plug into the same pipeline as the
+          other models: REEt is still computed as a genuine molar sum of the tracked LREE (preserving
+          the calibration), then converted back to a ppm-equivalent using the mean La-Sm atomic mass
+          (~142.9 g/mol) — a disclosed approximation, not a literal reproduction of the paper's own units.
+        - "Maimaiti19" — Maimaiti et al. (2019), Eur. J. Mineral. 31(1), 49-59:
+          ln ΣLREE = 12.77 + 1.52·M + 0.44·√(wt%H2O) − 9934/T − 36.79·(P_kbar/T) + ln(X_mnz_LREE),
+          ΣLREE = La-Sm ppm sum (same convention as "Stepanov12"), M = (Na+K+2Ca)/(Al·(Al+Si))
+          (dry cation mole fractions, same form used for "Montel93" with Li omitted). Calibrated over
+          a broader peraluminous-to-peralkaline range than Stepanov (2012)'s UHT-metapelite dataset.
+
+    Returns
+    -------
+    C_LREE_liq : Float64
+        ΣLREE saturation concentration in the melt [ppm], or -1 if no melt is present.
+"""
+function monazite_saturation(   out         :: MAGEMin_C.gmin_struct{Float64, Int64},
+                                X_mnz_LREE  :: Float64 = 1.0;
+                                model       :: String = "Stepanov12"    )
+
+    if out.frac_M > 0.0
+        H2O_wt = out.SS_vec[find_liq_idx(out)].Comp_wt[findfirst(isequal("H2O"), out.oxides)] * 100.0
+        T_K    = out.T_C + 273.15
+
+        if model == "Stepanov12"
+            ln_LREE_sat = 16.16 + 0.23*sqrt(H2O_wt) - 11494.0/T_K - 19.4*(out.P_kbar/T_K) + log10(X_mnz_LREE)
+            C_LREE_liq  = exp(ln_LREE_sat)
+        elseif model == "Maimaiti19"
+            M           = _montel_maimaiti_M(out)
+            ln_LREE_sat = 12.77 + 1.52*M + 0.44*sqrt(H2O_wt) - 9934.0/T_K - 36.79*(out.P_kbar/T_K) + log(X_mnz_LREE)
+            C_LREE_liq  = exp(ln_LREE_sat)
+        elseif model == "Montel93"
+            D           = _montel_maimaiti_M(out)
+            REEt_sat    = exp(9.50 + 2.34*D + 0.3879*sqrt(H2O_wt) - 13318.0/T_K) * X_mnz_LREE
+            C_LREE_liq  = REEt_sat * _mnz_LREE_avg_mass
+        else
+            print("Model $model for monazite saturation is invalid\n")
+            C_LREE_liq  = -1
+        end
+    else
+        print("Cannot compute monazite saturation in liquid if melt is not predicted!\n")
+        C_LREE_liq = -1
+    end
+
+    return C_LREE_liq
+end
+
+"""
+    adjust_bulk_4_monazite(Cliq_LREE, sat_liq, liq_wt)
+
+    Compute the weight fractions of monazite, P₂O₅, and each LREE removed from the melt when the melt exceeds ΣLREE (monazite) saturation.
+
+    The ΣLREE excess over saturation is apportioned across La, Ce, Pr, Nd, and Sm in proportion to their current melt concentrations, preserving the melt's REE pattern. The apportioned excess is then converted to monazite and consumed P₂O₅ through 2 REEPO₄ ⇌ REE₂O₃ + P₂O₅ stoichiometry (1 mole P₂O₅ per 2 moles LREE removed), using the actual atomic masses of La/Ce/Pr/Nd/Sm rather than a lumped average.
+
+    Parameters
+    ----------
+    Cliq_LREE : Vector{Float64}
+        Current melt concentrations of [La, Ce, Pr, Nd, Sm] [ppm].
+    sat_liq : Float64
+        ΣLREE saturation concentration in the melt [ppm].
+    liq_wt : Float64
+        Melt weight fraction.
+
+    Returns
+    -------
+    mnz_wt : Float64
+        Weight fraction of precipitated monazite (scaled by `liq_wt`).
+    P2O5_wt : Float64
+        P₂O₅ weight consumed from the melt (scaled by `liq_wt`).
+    LREE_wt : Vector{Float64}
+        Weight of each of [La, Ce, Pr, Nd, Sm] removed from the melt (scaled by `liq_wt`).
+"""
+function adjust_bulk_4_monazite(    Cliq_LREE   ::  Vector{Float64},
+                                    sat_liq     ::  Float64,
+                                    liq_wt      ::  Float64 )
+
+    ΣLREE_liq   = sum(Cliq_LREE)
+    LREE_excess = (ΣLREE_liq - sat_liq)/1e6
+    LREE_wt     = LREE_excess .* (Cliq_LREE ./ ΣLREE_liq)
+
+    moles_LREE  = LREE_wt ./ _mnz_LREE_mass
+    moles_P2O5  = sum(moles_LREE)/2.0
+    P2O5_wt     = moles_P2O5 * get_molar_mass("P2O5")
+
+    mnz_wt      = sum(LREE_wt) + P2O5_wt
+
+    return mnz_wt*liq_wt, P2O5_wt*liq_wt, LREE_wt.*liq_wt
+end
+
 #=
-    Routine to compute Sulfur saturation and adjust bulk-rock composition when sulfide crystallizes 
+    Routine to compute Sulfur saturation and adjust bulk-rock composition when sulfide crystallizes
     based on different empirical models.
     Models implemented:
     - Liu et al. (2007) - Sulfur concentration at sulfide saturation (SCSS) in magmatic silicate melts.
