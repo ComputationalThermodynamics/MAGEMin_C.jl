@@ -22,7 +22,7 @@ const available_TC_ds   = [62,633,634,635,636]
 export  anhydrous_renormalization, retrieve_solution_phase_information, print_phase_info, remove_phases, select_phases, get_ss_from_mineral, mineral_classification,
         init_MAGEMin, allocate_output,finalize_MAGEMin, point_wise_minimization, 
         get_all_stable_phases, convertBulk4MAGEMin, use_predefined_bulk_rock, define_bulk_rock, create_output,
-        print_info, create_gmin_struct, pwm_init, pwm_run, p2x_convert, pc_convert,
+        print_info, create_gmin_struct, pwm_init, pwm_run, p2x_convert, pc_convert, lm_convert,
         point_wise_metastability,
         single_point_minimization, multi_point_minimization, AMR_minimization, MAGEMin_Data,
         MAGEMin_data2dataframe, MAGEMin_dataTE2dataframe, MAGEMin_data2dataframe_inlined,
@@ -32,9 +32,9 @@ export  anhydrous_renormalization, retrieve_solution_phase_information, print_ph
 export wt2mol, mol2wt, get_molar_mass, vec_norm, FeO2Fe_O
 export compute_melt_viscosity_G08
 
-export TE_prediction, adjust_bulk_4_zircon, create_custom_KDs_database, get_TE_database, get_CO_KDs_database, adjust_chemical_system
+export TE_prediction, adjust_bulk_4_zircon, create_custom_KDs_database, get_TE_database, get_CO_KDs_database, get_Yak25_KDs_database, adjust_chemical_system
 export custom_KDs_database, TE_names
-export zirconium_saturation, sulfur_saturation, phosphate_saturation, co2_saturation, volatile_saturation_SY26, CO2_from_dissolved_H2O
+export zirconium_saturation, sulfur_saturation, phosphate_saturation, co2_saturation, monazite_saturation, volatile_saturation_SY26, CO2_from_dissolved_H2O
 export SaturationConfig, solve_with_saturation
 
 
@@ -1450,6 +1450,12 @@ end
     seismic_water : Int, optional
         Water content mode passed to [`anelastic_correction`](@ref) when `seismic_cor=true`:
         `0` = dry mantle, `1` = damp mantle, `2` = wet mantle (default: 0).
+    filter_DEW_species : Bool, optional
+        If true, drop chemically infeasible species (`emFrac <= 1e-40`) from the `DEW_S14`
+        aqueous speciation phase's per-endmember output, instead of returning the full
+        ~100+ possible species regardless of whether the bulk can actually form them.
+        Only affects a phase named "DEW_S14"; all other phases are unaffected
+        (default: false). See [`create_gmin_struct`](@ref).
 
     Returns
     -------
@@ -1494,7 +1500,8 @@ function single_point_minimization(     P           ::  T1,
                                         seismic_water::  Int64      = 0,
                                         shallow_correction::  Bool  = false,
                                         fluid_as_melt ::  Bool      = false,
-                                        anelastic_cor::  Bool       = false
+                                        anelastic_cor::  Bool       = false,
+                                        filter_DEW_species:: Bool   = false
                                         ) where {T1 <: Float64}
 
     P   = [P];
@@ -1535,7 +1542,8 @@ function single_point_minimization(     P           ::  T1,
                                                 seismic_water = seismic_water,
                                                 shallow_correction = shallow_correction,
                                                 fluid_as_melt = fluid_as_melt,
-                                                anelastic_cor = anelastic_cor);
+                                                anelastic_cor = anelastic_cor,
+                                                filter_DEW_species = filter_DEW_species);
     return Out_PT[1]
 
 end
@@ -1603,7 +1611,8 @@ function multi_point_minimization(P           ::  AbstractMatrix{Float64},
                                   seismic_water::  Int64                         = 0,
                                   shallow_correction::  Bool                     = false,
                                   fluid_as_melt::  Bool                          = false,
-                                  anelastic_cor::  Bool                          = false)
+                                  anelastic_cor::  Bool                          = false,
+                                  filter_DEW_species::  Bool                     = false)
 
     @assert size(P) == size(T) "P and T matrices must have the same size"
     grid_size = size(P)
@@ -1628,7 +1637,7 @@ function multi_point_minimization(P           ::  AbstractMatrix{Float64},
                                        callback_int=callback_int, seismic_cor=seismic_cor,
                                        aspect_ratio=aspect_ratio, seismic_water=seismic_water,
                                        shallow_correction=shallow_correction, fluid_as_melt=fluid_as_melt,
-                                       anelastic_cor=anelastic_cor)
+                                       anelastic_cor=anelastic_cor, filter_DEW_species=filter_DEW_species)
 
     return reshape(out_vec, grid_size)
 end
@@ -1750,7 +1759,8 @@ function multi_point_minimization(P           ::  T2,
                                   seismic_water::  Int64                         = 0,
                                   shallow_correction::  Bool                     = false,
                                   fluid_as_melt ::  Bool                          = false,
-                                  anelastic_cor::  Bool                          = false
+                                  anelastic_cor::  Bool                          = false,
+                                  filter_DEW_species::  Bool                     = false
                                   ) where {T1 <: Float64, T2 <: AbstractVector{Float64}}
 
     if ~isnothing(pp_list) || ~isnothing(ss_list)
@@ -1822,7 +1832,7 @@ function multi_point_minimization(P           ::  T2,
         buffer      = isnothing(B) ? 0.0 :      B[i]
         mu_val_i    = isnothing(mu_fix_val) ? Float64[] : mu_fix_val[i]
         out         = point_wise_minimization(  P[i], T[i], gv, z_b, DB, splx_data;
-                                                light=light, light_ig=light_ig, buffer_n=buffer, mu_fix_val=mu_val_i, name_solvus=name_solvus, fixed_bulk=fixed_bulk, Gi=Gi, W=W, scp=scp, dT=dT, iguess=ig, rm_list=rm_list, seismic_cor=seismic_cor, aspect_ratio=aspect_ratio, seismic_water=seismic_water, shallow_correction=shallow_correction, fluid_as_melt=fluid_as_melt, anelastic_cor=anelastic_cor)
+                                                light=light, light_ig=light_ig, buffer_n=buffer, mu_fix_val=mu_val_i, name_solvus=name_solvus, fixed_bulk=fixed_bulk, Gi=Gi, W=W, scp=scp, dT=dT, iguess=ig, rm_list=rm_list, seismic_cor=seismic_cor, aspect_ratio=aspect_ratio, seismic_water=seismic_water, shallow_correction=shallow_correction, fluid_as_melt=fluid_as_melt, anelastic_cor=anelastic_cor, filter_DEW_species=filter_DEW_species)
 
         Out_PT[i]   = deepcopy(out)
 
@@ -2634,7 +2644,8 @@ function point_wise_minimization(   P       ::Float64,
                                     seismic_water = 0,
                                     shallow_correction = false,
                                     fluid_as_melt = false,
-                                    anelastic_cor = false)
+                                    anelastic_cor = false,
+                                    filter_DEW_species = false)
 
     gv.buffer_n     =   buffer_n;
     if gv.n_mu_fix > 0
@@ -2931,7 +2942,7 @@ function point_wise_minimization(   P       ::Float64,
     elseif light && !light_ig
          out = deepcopy(create_light_gmin_struct(DB,gv));
     else  
-        out = deepcopy(create_gmin_struct(DB, gv, time; name_solvus = name_solvus, seismic_cor = seismic_cor, aspect_ratio = aspect_ratio, seismic_water = seismic_water, shallow_correction = shallow_correction, fluid_as_melt = fluid_as_melt, anelastic_cor = anelastic_cor));
+        out = deepcopy(create_gmin_struct(DB, gv, time; name_solvus = name_solvus, seismic_cor = seismic_cor, aspect_ratio = aspect_ratio, seismic_water = seismic_water, shallow_correction = shallow_correction, fluid_as_melt = fluid_as_melt, anelastic_cor = anelastic_cor, filter_DEW_species = filter_DEW_species));
     end
     # here we compute specific heat capacity using reactions
     if (scp == 1)
@@ -3004,8 +3015,9 @@ point_wise_minimization(P       ::  Number,
                         seismic_water::Int      = 0,
                         shallow_correction::Bool = false,
                         fluid_as_melt::Bool      = false,
-                        anelastic_cor::Bool     = false) =
-                        point_wise_minimization(Float64(P),Float64(T), gv, z_b, DB, splx_data; buffer_n, mu_fix_val, Gi, scp, dT, iguess, rm_list, name_solvus, fixed_bulk, W, seismic_cor, aspect_ratio, seismic_water, shallow_correction, fluid_as_melt, anelastic_cor)
+                        anelastic_cor::Bool     = false,
+                        filter_DEW_species::Bool = false) =
+                        point_wise_minimization(Float64(P),Float64(T), gv, z_b, DB, splx_data; buffer_n, mu_fix_val, Gi, scp, dT, iguess, rm_list, name_solvus, fixed_bulk, W, seismic_cor, aspect_ratio, seismic_water, shallow_correction, fluid_as_melt, anelastic_cor, filter_DEW_species)
 
 point_wise_minimization(P       ::  Number,
                         T       ::  Number,
@@ -3029,8 +3041,9 @@ point_wise_minimization(P       ::  Number,
                         seismic_water::Int      = 0,
                         shallow_correction::Bool = false,
                         fluid_as_melt::Bool      = false,
-                        anelastic_cor::Bool     = false) =
-                        point_wise_minimization(Float64(P),Float64(T), gv, z_b, DB, splx_data; buffer_n, mu_fix_val, Gi, scp, dT, iguess, rm_list, name_solvus, fixed_bulk, W, seismic_cor, aspect_ratio, seismic_water, shallow_correction, fluid_as_melt, anelastic_cor)
+                        anelastic_cor::Bool     = false,
+                        filter_DEW_species::Bool = false) =
+                        point_wise_minimization(Float64(P),Float64(T), gv, z_b, DB, splx_data; buffer_n, mu_fix_val, Gi, scp, dT, iguess, rm_list, name_solvus, fixed_bulk, W, seismic_cor, aspect_ratio, seismic_water, shallow_correction, fluid_as_melt, anelastic_cor, filter_DEW_species)
 
 point_wise_minimization(P       ::  Number,
                         T       ::  Number,
@@ -3050,8 +3063,9 @@ point_wise_minimization(P       ::  Number,
                         seismic_water::Int      = 0,
                         shallow_correction::Bool = false,
                         fluid_as_melt::Bool      = false,
-                        anelastic_cor::Bool     = false) =
-                        point_wise_minimization(Float64(P),Float64(T), data.gv[1], data.z_b[1], data.DB[1], data.splx_data[1]; buffer_n, mu_fix_val, Gi, scp, dT, iguess, rm_list, name_solvus, fixed_bulk, W, seismic_cor, aspect_ratio, seismic_water, shallow_correction, fluid_as_melt, anelastic_cor)
+                        anelastic_cor::Bool     = false,
+                        filter_DEW_species::Bool = false) =
+                        point_wise_minimization(Float64(P),Float64(T), data.gv[1], data.z_b[1], data.DB[1], data.splx_data[1]; buffer_n, mu_fix_val, Gi, scp, dT, iguess, rm_list, name_solvus, fixed_bulk, W, seismic_cor, aspect_ratio, seismic_water, shallow_correction, fluid_as_melt, anelastic_cor, filter_DEW_species)
 
 
 """
@@ -3176,7 +3190,7 @@ pwm_init(P::Number,T::Number, gv, z_b, DB, splx_data) = pwm_init(Float64(P),Floa
     out     = pwm_run(gv, z_b, DB, splx_data);
     ```
 """
-function pwm_run(gv, z_b, DB, splx_data; name_solvus = false, seismic_cor = false, aspect_ratio = 0.3, seismic_water = 0, shallow_correction = false, fluid_as_melt = false, anelastic_cor = false)
+function pwm_run(gv, z_b, DB, splx_data; name_solvus = false, seismic_cor = false, aspect_ratio = 0.3, seismic_water = 0, shallow_correction = false, fluid_as_melt = false, anelastic_cor = false, filter_DEW_species = false)
     input_data      =   LibMAGEMin.io_data();                           # zero (not used actually)
 
     time = @elapsed  gv      = LibMAGEMin.ComputeEquilibrium_Point(gv.EM_database, input_data, z_b, gv, pointer_from_objref(splx_data),	DB.PP_ref_db,DB.SS_ref_db,DB.cp);
@@ -3191,7 +3205,7 @@ function pwm_run(gv, z_b, DB, splx_data; name_solvus = false, seismic_cor = fals
     LibMAGEMin.PrintOutput(gv, 0, 1, DB, time, z_b);
 
     # Transform results to a more convenient julia struct
-    out = create_gmin_struct(DB, gv, time; name_solvus = name_solvus, seismic_cor = seismic_cor, aspect_ratio = aspect_ratio, seismic_water = seismic_water, shallow_correction = shallow_correction, fluid_as_melt = fluid_as_melt, anelastic_cor = anelastic_cor);
+    out = create_gmin_struct(DB, gv, time; name_solvus = name_solvus, seismic_cor = seismic_cor, aspect_ratio = aspect_ratio, seismic_water = seismic_water, shallow_correction = shallow_correction, fluid_as_melt = fluid_as_melt, anelastic_cor = anelastic_cor, filter_DEW_species = filter_DEW_species);
 
     # LibMAGEMin.FreeDatabases(gv, DB, z_b);
 
@@ -3353,6 +3367,135 @@ end
 
 
 """
+    lm_convert(gv, z_b, DB, ph_name, gamma, xeos)
+
+    Run MAGEMin's own per-model local minimization (NLopt) for one solution
+    phase, starting from a given compositional-variable guess (`xeos`) and
+    with that phase's endmembers' reference energies rotated against a
+    caller-supplied Gamma (`gamma`) - the C-side `LM_convert_function`, the
+    same `rotate_hyperplane` + `NLopt_opt` + `PC_function` +
+    `SS_UPDATE_function` pipeline `ss_min_PGE`/`ss_min_LP` run internally
+    during a full equilibrium solve, but for a single phase driven by an
+    externally-supplied Gamma instead of the solver's own, and without
+    restricting the search hypervolume (uses the phase's full bounds).
+    Intended for thermodynamic database inversion/calibration workflows:
+    given a candidate Gamma (e.g. from a previous equilibrium solve, or a
+    trial value under test), find each solution model's own locally stable
+    composition/energy against that Gamma directly, without running a full
+    multi-phase equilibrium solve.
+
+    Currently only supported for the "tc" (THERMOCALC) research group, i.e.
+    any of MAGEMin's THERMOCALC-derived databases ("ig", "igd", "igad",
+    "mp", "mb", "um", ... or the combined "all" database).
+
+    Parameters
+    ----------
+    gv : LibMAGEMin.global_variables
+        Global variables structure (from `Initialize_MAGEMin`/`init_MAGEMin`).
+    z_b : LibMAGEMin.bulk_infos
+        `z_b.P`/`z_b.T` must already match the P-T at which `DB.SS_ref_db`'s
+        endmember reference energies were computed (via `pwm_init`/
+        `LibMAGEMin.ComputeG0_point`, not by this function).
+    DB : LibMAGEMin.Database
+        Database structure (from `Initialize_MAGEMin`/`init_MAGEMin`).
+    ph_name : String
+        Solution phase name as it appears in `gv.SS_list` (e.g. `"fsp_H22"`).
+    gamma : Vector{Float64}
+        Chemical potential of each component, length `gv.len_ox`, in the
+        same order as `gv.ox` (same convention as `gv.gam_tot`).
+    xeos : Vector{Float64}
+        Starting guess for the phase's compositional variables, length
+        matching the phase's `n_xeos` (see `.CV_list`/`.n_xeos` on the
+        returned struct, or on the phase's entry in `DB.SS_ref_db`).
+
+    Returns
+    -------
+    SS_ref_db : LibMAGEMin.SS_ref
+        The phase's reference struct after local minimization:
+        - `.xeos`/`.p` - the minimized compositional variables/endmember
+          fractions.
+        - `.df` - the phase's Gibbs energy [kJ/mol] at that composition,
+          relative to the supplied `gamma` hyperplane.
+        - `.status` - the NLopt return status (`3` = converged; anything
+          else means the local minimization did not converge cleanly).
+        - `.sf_ok`/`.sum_xi`/`.xi_em`/`.ss_comp` - as in `pc_convert`.
+
+    Examples
+    --------
+    ```julia
+    gv, z_b, DB, splx_data = init_MAGEMin("all");
+    gv = use_predefined_bulk_rock(gv, 0, "all")   # see p2x_convert's notes
+    gv, z_b, DB, splx_data = pwm_init(2.0, 700.0, gv, z_b, DB, splx_data);
+    gamma = zeros(gv.len_ox)          # e.g. from a previous equilibrium solve
+    xeos  = [0.3, 0.3, 0.4]           # starting guess, length n_xeos for "fsp_H22"
+    SS_ref_db = lm_convert(gv, z_b, DB, "fsp_H22", gamma, xeos)
+    println(SS_ref_db.xeos, SS_ref_db.df)
+    ```
+"""
+function lm_convert(gv, z_b, DB, ph_name::String, gamma::Vector{Float64}, xeos::Vector{Float64})
+    ss_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, gv.SS_list, gv.len_ss))
+    ph_id0   = findfirst(==(ph_name), ss_names)
+    isnothing(ph_id0) && error("lm_convert: solution phase \"$ph_name\" not found in gv.SS_list ($ss_names)")
+    ph_id    = ph_id0 - 1   # C is 0-indexed
+
+    length(gamma) == gv.len_ox || error("lm_convert: gamma must have length gv.len_ox=$(gv.len_ox), got $(length(gamma))")
+
+    SS_ref_vec = unsafe_wrap(Vector{LibMAGEMin.SS_ref}, DB.SS_ref_db, gv.len_ss)
+    SS_ref_db  = SS_ref_vec[ph_id0]
+
+    length(xeos) == SS_ref_db.n_xeos || error("lm_convert: xeos must have length SS_ref_db.n_xeos=$(SS_ref_db.n_xeos) for phase \"$ph_name\", got $(length(xeos))")
+
+    SS_ref_db = LibMAGEMin.LM_convert_function(gv, SS_ref_db, z_b, ph_id, pointer(gamma), length(gamma), pointer(xeos), length(xeos))
+    return SS_ref_db
+end
+
+
+"""
+    _filter_DEW_species(ss, eps=1e-40)
+
+    Drop chemically infeasible species (endmembers with `emFrac <= eps`) from a `DEW_S14`
+    aqueous speciation phase's per-endmember fields, shrinking `emNames`, `molality`,
+    `activity`, `emFrac`, `emFrac_wt`, `emChemPot`, `emComp`, `emComp_wt`, and
+    `emComp_apfu` together (same kept-index set for all of them). The phase-level fields
+    (`Comp`, `compVariables`, `siteFractions`, etc.) are untouched, since those describe
+    the phase as a whole rather than individual species.
+
+    Parameters
+    ----------
+    ss : LibMAGEMin.SS_data
+        Solution-phase data for a `DEW_S14` entry.
+    eps : Float64, optional
+        Species with `emFrac <= eps` are dropped (default: 1e-40, i.e. essentially exact
+        zero rather than "small but present").
+
+    Returns
+    -------
+    ss_filtered : LibMAGEMin.SS_data
+        Copy of `ss` with infeasible species removed from its per-endmember fields.
+"""
+function _filter_DEW_species(ss :: LibMAGEMin.SS_data, eps :: Float64 = 1e-40)
+    keep = findall(x -> x > eps, ss.emFrac)
+
+    return LibMAGEMin.SS_data(
+        ss.f, ss.G, ss.deltaG, ss.V, ss.alpha, ss.beta, ss.entropy, ss.enthalpy, ss.cp, ss.rho,
+        ss.bulkMod, ss.shearMod, ss.Vp, ss.Vs, ss.pH, ss.chargeResidual, ss.sumMolality, ss.G_water,
+        ss.Comp, ss.Comp_wt, ss.Comp_apfu,
+        ss.compVariables, ss.compVariablesNames,
+        ss.siteFractions, ss.siteFractionsNames,
+        ss.emNames[keep],
+        ss.molality[keep],
+        ss.activity[keep],
+        ss.emFrac[keep],
+        ss.emFrac_wt[keep],
+        ss.emChemPot[keep],
+        ss.emComp[keep],
+        ss.emComp_wt[keep],
+        ss.emComp_apfu[keep],
+    )
+end
+
+
+"""
     create_gmin_struct(DB, gv, time; name_solvus=false, seismic_cor=false, aspect_ratio=0.3)
 
     Extract the output of a pointwise MAGEMin optimization into a Julia structure.
@@ -3377,13 +3520,21 @@ end
     seismic_water : Int, optional
         Water content mode passed to [`anelastic_correction`](@ref) when `seismic_cor=true`:
         `0` = dry mantle, `1` = damp mantle, `2` = wet mantle (default: 0).
+    filter_DEW_species : Bool, optional
+        If true, drop chemically infeasible species (those with `emFrac <= 1e-40`,
+        i.e. essentially exact zero) from the `DEW_S14` aqueous speciation phase's
+        per-endmember arrays (`emNames`, `molality`, `activity`, `emFrac`, `emFrac_wt`,
+        `emChemPot`, `emComp`, `emComp_wt`, `emComp_apfu`), rather than returning the
+        full ~100+ possible species regardless of whether the bulk composition can
+        actually form them. Only applies to the phase named "DEW_S14"; all other
+        solution phases are left untouched. Default: false (unchanged behavior).
 
     Returns
     -------
     out : gmin_struct{Float64, Int64}
         Structure containing the full minimization results.
 """
-function create_gmin_struct(DB, gv, time; name_solvus = false, seismic_cor = false, aspect_ratio = 0.3, seismic_water = 0, shallow_correction = false, fluid_as_melt = false, anelastic_cor = false)
+function create_gmin_struct(DB, gv, time; name_solvus = false, seismic_cor = false, aspect_ratio = 0.3, seismic_water = 0, shallow_correction = false, fluid_as_melt = false, anelastic_cor = false, filter_DEW_species = false)
 
     stb      = unsafe_load(DB.sp)
 
@@ -3479,6 +3630,14 @@ function create_gmin_struct(DB, gv, time; name_solvus = false, seismic_cor = fal
 
     # extract info about compositional variables of the solution models:
     SS_vec  = convert.(LibMAGEMin.SS_data, unsafe_wrap(Vector{LibMAGEMin.stb_SS_phase},stb.SS,n_SS))
+
+    if filter_DEW_species
+        for i = 1:n_SS
+            if ph[i] == "DEW_S14"
+                SS_vec[i] = _filter_DEW_species(SS_vec[i])
+            end
+        end
+    end
 
     if name_solvus == true
         for i=1:n_SS

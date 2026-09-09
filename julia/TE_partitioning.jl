@@ -21,7 +21,9 @@
     Parameters
     ----------
     tedb : String, optional
-        Database identifier (default: "OL12"). Currently only "OL12" is supported (Laurent, 2012).
+        Database identifier (default: "OL12"). Valid options: "OL12" (Laurent, 2012),
+        "CO" (Cornet, lattice strain — see `get_CO_KDs_database`), "Yak25" (Yakymchuk,
+        Gareau & Williams 2025 Table S1 — see `get_Yak25_KDs_database`).
 
     Returns
     -------
@@ -38,6 +40,8 @@ function get_TE_database(tedb :: String = "OL12")
         return (infos,el,ph,KDs)
     elseif tedb == "CO"
         return get_CO_KDs_database()
+    elseif tedb == "Yak25"
+        return get_Yak25_KDs_database()
     end
 end
 
@@ -215,12 +219,14 @@ end
     S    : String — sulfur saturation model. Options: "none", "Liu07", "Oneill21", "<N>ppm".
     P2O5 : String — phosphate saturation model. Options: "none", "Klein26", "HWBea92", "Tollari06".
     CO2  : String — CO₂ saturation model. Options: "none", "SY26".
+    Mnz  : String — monazite (ΣLREE) saturation model. Options: "none", "Stepanov12", "Montel93", "Maimaiti19".
 """
 Base.@kwdef struct SaturationConfig
     Zr   :: String = "none"
     S    :: String = "none"
     P2O5 :: String = "none"
     CO2  :: String = "none"
+    Mnz  :: String = "none"
     # Optional per-element phase overrides.  Keys are element names (e.g. "Zr");
     # values are (phase, adjust) NamedTuples where:
     #   phase  :: String   — phase label used in the KDs database
@@ -277,6 +283,12 @@ end
         CO₂ saturation concentration in the melt [ppm] (NaN if not computed).
     fl_CO2_wt : Float64
         Weight fraction of CO₂ fluid formed (NaN if not computed).
+    Sat_LREE_liq : Float64
+        ΣLREE (monazite) saturation concentration in the melt [ppm] (NaN if not computed).
+    mnz_wt : Float64
+        Weight fraction of monazite precipitated (NaN if not computed).
+    X_mnz_LREE : Float64
+        Molar ratio of LREE to all cations (LREE, Y, Th, U) in monazite, updated from `Cmin` (NaN if not computed).
 """
 struct out_tepm
     elements        :: Union{Float64, Vector{String}}
@@ -303,6 +315,10 @@ struct out_tepm
 
     Sat_CO2_liq     :: Union{Float64, Float64}
     fl_CO2_wt       :: Union{Float64, Float64}
+
+    Sat_LREE_liq    :: Union{Float64, Float64}
+    mnz_wt          :: Union{Float64, Float64}
+    X_mnz_LREE      :: Union{Float64, Float64}
 end
 
 
@@ -710,7 +726,12 @@ end
 
 
 # Default element → saturation phase mapping
-const _SAT_PHASE = Dict("Zr" => "zrc", "S" => "sulf", "P2O5" => "fapt", "CO2" => "flC")
+const _SAT_PHASE = Dict("Zr" => "zrc", "S" => "sulf", "P2O5" => "fapt", "CO2" => "flC", "Mnz" => "mnz")
+
+const _MNZ_KD = Dict(
+    "La" => 517.0, "Ce" => 505.0, "Pr" => 530.0, "Nd" => 538.0, "Sm" => 493.0,
+    "Eu" => 414.0, "Gd" => 419.0, "Y" => 130.0, "Th" => 5000.0, "U" => 22.0,
+)
 
 # Return the saturation phase for `el`: override → _SAT_PHASE default → nothing
 _sat_phase(sat::SaturationConfig, el::String) =
@@ -719,15 +740,19 @@ _sat_phase(sat::SaturationConfig, el::String) =
 """
     _augment_KDs_for_saturation(KDs_database, sat)
 
-Internal helper. When `sat` is a `SaturationConfig`, append a column of zero-KD
+Internal helper. When `sat` is a `SaturationConfig`, append a column of KD
 functions for each active saturation phase that is not already present in
-`KDs_database.phase_name`.  Returns the (possibly augmented) database; the
-original is never mutated.
+`KDs_database.phase_name`. Every saturation phase gets zero-KD functions
+(its budget is handled entirely through the saturation front, not Nernst
+partitioning), except monazite ("mnz"), which gets the literature Kd row
+`_MNZ_KD` so that it competes for Y/Th/U (and La–Gd) against every other
+modal phase through the ordinary partitioning machinery. Returns the
+(possibly augmented) database; the original is never mutated.
 """
 function _augment_KDs_for_saturation(KDs_database :: custom_KDs_database,
                                      sat          :: SaturationConfig)
     extra = String[]
-    for field in ("Zr", "S", "P2O5", "CO2")
+    for field in ("Zr", "S", "P2O5", "CO2", "Mnz")
         model = getfield(sat, Symbol(field))
         phase = _sat_phase(sat, field)
         if model != "none" && !isnothing(phase) && phase ∉ KDs_database.phase_name
@@ -738,14 +763,17 @@ function _augment_KDs_for_saturation(KDs_database :: custom_KDs_database,
     isempty(extra) && return KDs_database
 
     n_elem   = length(KDs_database.element_name)
-    zero_fn  = (_) -> 0.0
-    new_KDs  = vcat(KDs_database.KDs_expr, fill(zero_fn, length(extra), n_elem))
+    new_rows = Matrix{Function}(undef, length(extra), n_elem)
+    for i in eachindex(extra), j in 1:n_elem
+        val            = extra[i] == "mnz" ? get(_MNZ_KD, KDs_database.element_name[j], 0.0) : 0.0
+        new_rows[i,j]  = (_) -> val
+    end
 
     return custom_KDs_database(
         KDs_database.infos,
         KDs_database.element_name,
         vcat(KDs_database.phase_name, extra),
-        new_KDs,
+        vcat(KDs_database.KDs_expr, new_rows),
     )
 end
 
@@ -962,6 +990,86 @@ end
 
 
 """
+    compute_Mnz_sat_n_part(out, KDs_database, Cliq, C0, liq_wt, Sat_P2O5_liq; MnzSat_model="Stepanov12", X_mnz_LREE=1.0)
+
+    Check monazite (ΣLREE) saturation and compute the precipitated monazite weight fraction.
+
+    If ΣLa+Ce+Pr+Nd+Sm in the melt exceeds the ΣLREE saturation concentration, the excess is converted to
+    monazite. Monazite draws on the same melt P₂O₅ budget as apatite: the P₂O₅ available to monazite is
+    capped at whatever remains once apatite saturation (`Sat_P2O5_liq`) is satisfied, and if that is not
+    enough to precipitate the full LREE excess, `Sat_LREE_liq` is raised so the P₂O₅ actually consumed
+    matches what is available. Unlike zircon/apatite/sulfide, monazite does not return any oxide to
+    `bulk_cor_wt`: La–Sm and P₂O₅ are trace elements that never enter MAGEMin's modeled major-oxide system,
+    so their mass balance is self-contained within `C0`/`Cliq`/`Csol` (see `TE_prediction`).
+
+    Parameters
+    ----------
+    out : MAGEMin_C.gmin_struct{Float64, Int64}
+        MAGEMin minimization output.
+    KDs_database : custom_KDs_database
+        Trace element partitioning coefficient database (must include "La", "Ce", "Pr", "Nd", "Sm", "P2O5").
+    Cliq : Vector{Float64}
+        Current trace element concentrations in the melt [ppm].
+    C0 : Vector{Float64}
+        Initial bulk trace element composition [ppm].
+    liq_wt : Float64
+        Melt weight fraction.
+    Sat_P2O5_liq : Float64
+        Apatite P₂O₅ saturation concentration in the melt [ppm] (NaN if apatite saturation was not computed).
+    MnzSat_model : String, optional
+        Monazite saturation model (default: "Stepanov12"). Passed to `monazite_saturation`.
+        Valid options: "Stepanov12", "Montel93", "Maimaiti19".
+    X_mnz_LREE : Float64, optional
+        Molar ratio of LREE to all cations (LREE, Y, Th, U) in monazite, from the previous iteration (default: 1.0).
+
+    Returns
+    -------
+    Sat_LREE_liq : Float64
+        ΣLREE saturation concentration in the melt [ppm].
+    mnz_wt : Float64
+        Weight fraction of precipitated monazite.
+"""
+function compute_Mnz_sat_n_part(    out         :: MAGEMin_C.gmin_struct{Float64, Int64},
+                                    KDs_database:: custom_KDs_database,
+                                    Cliq, C0,
+                                    liq_wt      :: Float64,
+                                    Sat_P2O5_liq:: Float64;
+                                    MnzSat_model:: String = "Stepanov12",
+                                    X_mnz_LREE  :: Float64 = 1.0)
+    Sat_LREE_liq    = NaN
+    id_LREE         = [findfirst(KDs_database.element_name .== el) for el in _mnz_LREE_els]
+    id_P2O5         = findfirst(KDs_database.element_name .== "P2O5")
+
+    if liq_wt > 0.0
+        Cliq_LREE       = Cliq[id_LREE]
+        Sat_LREE_liq    = monazite_saturation(out, X_mnz_LREE; model = MnzSat_model)
+
+        if sum(Cliq_LREE) > Sat_LREE_liq
+            Cliq_P2O5       = Cliq[id_P2O5]
+            P2O5_avail      = isnan(Sat_P2O5_liq) ? Cliq_P2O5 : min(Cliq_P2O5, Sat_P2O5_liq)
+
+            mnz_wt, P2O5_wt, LREE_wt    = adjust_bulk_4_monazite(Cliq_LREE, Sat_LREE_liq, liq_wt)
+
+            P2O5_avail_wt   = (P2O5_avail/1e6) * liq_wt
+            if P2O5_wt > P2O5_avail_wt
+                # @warn "Not enough P2O5 available (after apatite) in the melt to saturate in monazite. Increasing the Sat_LREE_liq to the available P2O5 content."
+                factor          = P2O5_avail_wt / P2O5_wt
+                Sat_LREE_liq    = Sat_LREE_liq + (1.0 - factor) * (sum(Cliq_LREE) - Sat_LREE_liq)
+                mnz_wt, P2O5_wt, LREE_wt   = adjust_bulk_4_monazite(Cliq_LREE, Sat_LREE_liq, liq_wt)
+            end
+        else
+            mnz_wt = 0.0
+        end
+    else
+        C0_LREE     = C0[id_LREE]
+        mnz_wt, P2O5_wt, LREE_wt   = adjust_bulk_4_monazite(C0_LREE, 0.0, 1.0)
+    end
+
+    return Sat_LREE_liq, mnz_wt
+end
+
+
+"""
     compute_CO2_sat_n_part(out, KDs_database, Cliq, bulk_cor_wt, C0, liq_wt; CO2Sat_model="SY26")
 
     Check CO₂ saturation and adjust the corrected bulk composition if the melt exceeds the CO₂ saturation limit.
@@ -1024,9 +1132,9 @@ end
 
 
 """
-    TE_prediction(out, C0, KDs_database, dtb; ZrSat_model="none", SSat_model="none", P2O5Sat_model="none", norm_TE=false)
+    TE_prediction(out, C0, KDs_database, dtb; ZrSat_model="none", SSat_model="none", P2O5Sat_model="none", MnzSat_model="none", norm_TE=false)
 
-    Perform trace element partitioning, optionally with zircon, sulfide, and/or apatite saturation corrections.
+    Perform trace element partitioning, optionally with zircon, sulfide, apatite, and/or monazite saturation corrections.
 
     Phases are classified via `mineral_classification`, elements are partitioned using the batch melting equation, and saturation corrections are applied when the corresponding model is not `"none"`. The corrected bulk composition (accounting for precipitated saturation phases) is also returned.
 
@@ -1046,6 +1154,11 @@ end
         Sulfur saturation model — "none" disables S correction (default: "none"). Valid option: "1000ppm".
     P2O5Sat_model : String, optional
         Phosphate saturation model — "none" disables P₂O₅ correction (default: "none"). Valid options: "Klein26", "HWBea92", "Tollari06".
+    MnzSat_model : String, optional
+        Monazite saturation model — "none" disables ΣLREE correction (default: "none"). Valid options: "Stepanov12", "Montel93", "Maimaiti19".
+    X_mnz_LREE : Float64, optional
+        Molar ratio of LREE to all cations (LREE, Y, Th, U) in monazite, carried over from a previous
+        `TE_prediction`/`solve_with_saturation` iteration (default: 1.0, i.e. no Y/Th/U substitution).
     norm_TE : Bool, optional
         Normalize phase fractions before computing KDs (default: false).
 
@@ -1059,6 +1172,8 @@ function TE_prediction( out, C0, KDs_database, dtb;
                         SSat_model      :: String                       = "none",
                         P2O5Sat_model   :: String                       = "none",
                         CO2Sat_model    :: String                       = "none",
+                        MnzSat_model    :: String                       = "none",
+                        X_mnz_LREE      :: Float64                      = 1.0,
                         sat             :: Union{Nothing,SaturationConfig} = nothing,
                         norm_TE         :: Bool                         = false )
 
@@ -1069,6 +1184,7 @@ function TE_prediction( out, C0, KDs_database, dtb;
         SSat_model    = sat.S
         P2O5Sat_model = sat.P2O5
         CO2Sat_model  = sat.CO2
+        MnzSat_model  = sat.Mnz
         KDs_database  = _augment_KDs_for_saturation(KDs_database, sat)
     end
 
@@ -1078,6 +1194,8 @@ function TE_prediction( out, C0, KDs_database, dtb;
     Sat_S_liq, sulf_wt                    = NaN, NaN, NaN
     Sat_P2O5_liq, fapt_wt,                = NaN, NaN, NaN
     Sat_CO2_liq, fl_CO2_wt                = NaN, NaN
+    Sat_LREE_liq, mnz_wt                  = NaN, NaN
+    X_mnz_LREE_out                        = X_mnz_LREE
 
     # input data
     liq_wt      = out.frac_M_wt
@@ -1130,6 +1248,18 @@ function TE_prediction( out, C0, KDs_database, dtb;
                                                                             P2O5Sat_model   = P2O5Sat_model)
         push!(ph,"fapt")
         push!(ph_wt, fapt_wt)
+    end
+
+    if !isnothing(findfirst(KDs_database.element_name .== "La")) && MnzSat_model != "none"
+        Sat_LREE_liq, mnz_wt = compute_Mnz_sat_n_part(                      out,
+                                                                            KDs_database,
+                                                                            Cliq, C0,
+                                                                            liq_wt,
+                                                                            Sat_P2O5_liq;
+                                                                            MnzSat_model = MnzSat_model,
+                                                                            X_mnz_LREE   = X_mnz_LREE)
+        push!(ph,"mnz")
+        push!(ph_wt, mnz_wt)
     end
 
     if !isnothing(findfirst(KDs_database.element_name .== "CO2")) && CO2Sat_model != "none"
@@ -1201,6 +1331,28 @@ function TE_prediction( out, C0, KDs_database, dtb;
                 Csol[id_CO2] = 0.0
             end
         end
+        if !isnothing(findfirst(KDs_database.element_name .== "La"))    && MnzSat_model != "none"
+            id_LREE         = [findfirst(KDs_database.element_name .== el) for el in _mnz_LREE_els]
+            Sat_LREE_liq    = monazite_saturation(  out, X_mnz_LREE;
+                                                    model = MnzSat_model)
+
+            ΣLREE_liq       = sum(Cliq[id_LREE])
+            if ΣLREE_liq > Sat_LREE_liq
+                LREE_excess         = (ΣLREE_liq - Sat_LREE_liq) .* (Cliq[id_LREE] ./ ΣLREE_liq)
+                Cliq[id_LREE]      .= Cliq[id_LREE] .- LREE_excess
+                Csol[id_LREE]      .= (C0[id_LREE] .- Cliq[id_LREE].*liq_wt_norm) ./ (1.0 - liq_wt_norm)
+            end
+
+            id_Y, id_Th, id_U   = findfirst(KDs_database.element_name .== "Y"), findfirst(KDs_database.element_name .== "Th"), findfirst(KDs_database.element_name .== "U")
+            mnz_idx             = findfirst(ph_TE .== "mnz")
+            if !isnothing(mnz_idx)
+                mol_LREE    = sum(Cmin[mnz_idx, id_LREE] ./ _mnz_LREE_mass)
+                mol_Y       = isnothing(id_Y)  ? 0.0 : Cmin[mnz_idx, id_Y]  / 88.90584
+                mol_Th      = isnothing(id_Th) ? 0.0 : Cmin[mnz_idx, id_Th] / 232.0377
+                mol_U       = isnothing(id_U)  ? 0.0 : Cmin[mnz_idx, id_U]  / 238.02891
+                X_mnz_LREE_out = mol_LREE / (mol_LREE + mol_Y + mol_Th + mol_U)
+            end
+        end
     end
 
     # compute corrected bulk molar composition
@@ -1216,7 +1368,10 @@ function TE_prediction( out, C0, KDs_database, dtb;
                         Sat_Zr_liq,     zrc_wt/ sum_wt,
                         Sat_S_liq,      sulf_wt/ sum_wt,
                         Sat_P2O5_liq,   fapt_wt/ sum_wt,
-                        Sat_CO2_liq,    fl_CO2_wt/ sum_wt)
+                        Sat_CO2_liq,    fl_CO2_wt/ sum_wt,
+
+                        Sat_LREE_liq,   mnz_wt/ sum_wt,
+                        X_mnz_LREE_out)
 
     return out_TE
 end
@@ -1274,12 +1429,14 @@ function solve_with_saturation( P           :: Float64,
                                 tol         :: Float64 = 1e-6,
                                 max_iter    :: Int     = 32      )
 
-    X    = copy(X_mol)
-    n0   = 0.0
+    X           = copy(X_mol)
+    n0          = 0.0
+    X_mnz_LREE  = 1.0
     local out, out_TE
     for ite in 1:max_iter
-        out    = single_point_minimization(P, T, data; X=X, Xoxides=Xoxides, sys_in=sys_in)
-        out_TE = TE_prediction(out, C0, KDs_dtb, dtb; sat=sat)
+        out        = single_point_minimization(P, T, data; X=X, Xoxides=Xoxides, sys_in=sys_in)
+        out_TE     = TE_prediction(out, C0, KDs_dtb, dtb; sat=sat, X_mnz_LREE=X_mnz_LREE)
+        X_mnz_LREE = out_TE.X_mnz_LREE
 
         X   = X_mol .- out_TE.bulk_cor_mol
         res = abs(n0 - vec_norm(out_TE.bulk_cor_mol))
@@ -1386,4 +1543,60 @@ function get_CO_KDs_database()
         [p[1] for p in phase_info],
         KDs_expr
     )
+end
+
+
+"""
+    get_Yak25_KDs_database()
+
+Build a `custom_KDs_database` from Table S1 of Yakymchuk, Gareau & Williams (2025,
+J. Metamorphic Geol.) — mineral/melt Kd's for La, Ce, Pr, Nd, Sm, Eu, Gd, Y, Th, U
+across the full UHT-granulite assemblage plus the three accessory saturation
+phases (zircon, apatite, monazite), so that all of them compete for these
+elements through the ordinary Nernst partitioning in `partition_TE`, matching
+the worked-example spreadsheet's "Bulk Kd calcs" table.
+
+Values are from Bédard (2006) unless noted; where Table S1 cites a different
+source (Taylor et al. 2015, Bea et al. 1994, Stepanov et al. 2012, Yakymchuk et
+al. 2018) that value is used instead. Quartz, sapphirine, sillimanite, and
+kyanite are set to 0.0001 for every element, per the paper's stated
+simplification. Magnetite and spinel share the paper's single "Mt / Sp" value
+since `mineral_classification` resolves the spinel-group solvus into "sp"/"smt"
+where Table S1 only distinguishes bulk oxide-mode.
+
+Phase names after `mineral_classification` (dtb == "mp"/"mpe"/"mb"/"ume"/"mbe")
+that are handled: "g", "pl", "afs", "opx", "cd", "FeTiOx", "ru", "sp", "smt",
+"zrc", "fapt", "mnz", "q", "sa", "sill", "ky".
+
+Returns a `custom_KDs_database` ready to pass directly to `TE_prediction`/
+`solve_with_saturation` (with a `SaturationConfig` for Zr/P2O5/Mnz on top, since
+this only supplies the Nernst Kd's — the saturation-front modal abundances of
+zrc/fapt/mnz still come from `zirconium_saturation`/`phosphate_saturation`/
+`monazite_saturation` as usual).
+"""
+function get_Yak25_KDs_database()
+    el = ["La", "Ce", "Pr", "Nd", "Sm", "Eu", "Gd", "Y", "Th", "U", "Zr", "P2O5"]
+    ph = ["g", "pl", "afs", "opx", "cd", "FeTiOx", "ru", "sp", "smt", "zrc", "fapt", "mnz", "q", "sa", "sill", "ky"]
+
+    KDs_str = [
+        "0.03"     "0.03"     "0.07"     "0.2"      "1.6"      "1.6"      "5"        "34.55"    "0.0075"   "0.024"    "0.0"      "0.0"    ;
+        "0.358"    "0.339"    "0.316"    "0.289"    "0.237"    "2.17"     "0.192"    "0.138"    "0.095"    "0.091"    "0.0"      "0.0"    ;
+        "1.01"     "0.86"     "0.87"     "0.51"     "0.42"     "2.32"     "0.6"      "0.5"      "0.3"      "1.98"     "0.0"      "0.0"    ;
+        "0.0003"   "0.0007"   "0.0014"   "0.0028"   "0.0085"   "0.68"     "0.02"     "0.054"    "0.13"     "0.089"    "0.0"      "0.0"    ;
+        "0.06"     "0.07"     "0.09"     "0.09"     "0.1"      "0.01"     "0.29"     "0.72"     "0.1"      "1.61"     "0.0"      "0.0"    ;
+        "0.015"    "0.012"    "0.011"    "0.01"     "0.009"    "0.01"     "0.011"    "0.037"    "0.09"     "0.09"     "0.0"      "0.0"    ;
+        "0.0057"   "0.0065"   "0.0073"   "0.0082"   "0.0954"   "0.00037"  "0.0106"   "0.0118"   "0.2"      "0.2"      "0.0"      "0.0"    ;
+        "0.015"    "0.016"    "0.018"    "0.026"    "0.024"    "0.025"    "0.018"    "0.018"    "0.02"     "0.02"     "0.0"      "0.0"    ;
+        "0.015"    "0.016"    "0.018"    "0.026"    "0.024"    "0.025"    "0.018"    "0.018"    "0.02"     "0.02"     "0.0"      "0.0"    ;
+        "0.6"      "0.9"      "0.9"      "1.4"      "4.2"      "2.6"      "8"        "19.3"     "62"       "298"      "0.0"      "0.0"    ;
+        "12"       "15"       "17"       "19"       "20"       "13"       "20"       "17.5"     "23"       "25"       "0.0"      "0.0"    ;
+        "517"      "505"      "530"      "538"      "493"      "414"      "419"      "130"      "5000"     "22"       "0.0"      "0.0"    ;
+        "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0"      "0.0"    ;
+        "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0"      "0.0"    ;
+        "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0"      "0.0"    ;
+        "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0001"   "0.0"      "0.0"    ;
+    ]
+
+    return create_custom_KDs_database(el, ph, KDs_str;
+        info = "Yakymchuk, Gareau & Williams (2025), J. Metamorphic Geol., Table S1 (after Bédard 2006, Taylor et al. 2015, Bea et al. 1994, Stepanov et al. 2012, Yakymchuk et al. 2018). Zr and P2O5 carry zero Kd everywhere — matching the paper's own treatment, those two are saturation-front-controlled (zircon/apatite) rather than Nernst-partitioned into the silicate assemblage.")
 end
