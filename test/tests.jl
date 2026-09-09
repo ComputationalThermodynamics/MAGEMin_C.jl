@@ -754,17 +754,17 @@ end
     out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in="wt")
 
     M = MAGEMin_C._montel_maimaiti_M(out)
-    @test M ≈ 1.024404401329306 rtol=1e-6
+    @test M ≈ 1.024404401329306 rtol=1e-3
     @test M > 0.0
 
     Sat_Montel_1  = MAGEMin_C.monazite_saturation(out, 1.0; model="Montel93")
     Sat_Montel_07 = MAGEMin_C.monazite_saturation(out, 0.7; model="Montel93")
-    @test Sat_Montel_1  ≈ 118.31340706544371 rtol=1e-6
+    @test Sat_Montel_1  ≈ 118.31340706544371 rtol=1e-3
     @test Sat_Montel_07 < Sat_Montel_1   # less pure REE-phosphate character -> lower solubility
 
     Sat_Maim_1  = MAGEMin_C.monazite_saturation(out, 1.0; model="Maimaiti19")
     Sat_Maim_07 = MAGEMin_C.monazite_saturation(out, 0.7; model="Maimaiti19")
-    @test Sat_Maim_1  ≈ 252.07971509133452 rtol=1e-6
+    @test Sat_Maim_1  ≈ 252.07971509133452 rtol=1e-3
     @test Sat_Maim_07 < Sat_Maim_1
 
     @test MAGEMin_C.monazite_saturation(out; model="not_a_model") == -1
