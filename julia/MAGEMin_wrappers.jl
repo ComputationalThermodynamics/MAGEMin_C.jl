@@ -860,9 +860,9 @@ const _MAGEMIN_VERSION = Ref{Union{Nothing,String}}(nothing)
     "2.0.3 [11/11/2026]" - the `gv.version` the library reports, not a value baked into
     the Julia package, so it stays truthful if `libMAGEMin` is swapped underneath.
 
-    Reads it straight from `global_variable_alloc`, which sets `gv.version` before any
-    database is set up, so it costs microseconds and needs no database name, no bulk
-    composition and no minimization. Memoised after the first call.
+    Obtained from a single point minimization (metapelite database, predefined bulk 0,
+    4 kbar, 400 °C) through the regular `Initialize_MAGEMin` / `point_wise_minimization`
+    path, reading `out.MAGEMin_ver`. Memoised after the first call.
 
     Returns
     -------
@@ -870,13 +870,14 @@ const _MAGEMIN_VERSION = Ref{Union{Nothing,String}}(nothing)
         The library's version string.
 """
 function get_MAGEMin_version()
-    # if isnothing(_MAGEMIN_VERSION[])
-    #     z_b = LibMAGEMin.bulk_infos()
-    #     gv  = LibMAGEMin.global_variable_alloc(pointer_from_objref(z_b))
-    #     _MAGEMIN_VERSION[] = unsafe_string(gv.version)
-    # end
-    # return _MAGEMIN_VERSION[]
-    return "2.0.4 [19/09/2026]"
+    if isnothing(_MAGEMIN_VERSION[])
+        data = Initialize_MAGEMin("mp", verbose = false)
+        data = use_predefined_bulk_rock(data, 0)
+        out  = point_wise_minimization(4.0, 400.0, data)
+        Finalize_MAGEMin(data)
+        _MAGEMIN_VERSION[] = out.MAGEMin_ver
+    end
+    return _MAGEMIN_VERSION[]
 end
 
 """
