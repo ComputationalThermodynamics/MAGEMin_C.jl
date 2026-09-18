@@ -876,7 +876,7 @@ function get_MAGEMin_version()
     #     _MAGEMIN_VERSION[] = unsafe_string(gv.version)
     # end
     # return _MAGEMIN_VERSION[]
-    return "2.0.4"
+    return "2.0.4 [19/09/2026]"
 end
 
 """
