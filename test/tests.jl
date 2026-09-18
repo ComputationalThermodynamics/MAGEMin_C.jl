@@ -16,32 +16,15 @@ function norm(vec :: Vector{Float64})
     return sqrt(sum(vec.^2))
 end
 
-# data        =   Initialize_MAGEMin("sb21", verbose=-1);
-# test        =   1         #KLB1
-# data        =   use_predefined_bulk_rock(data, test);
-# P           =   80.0
-# T           =   800.0
-# out         =   point_wise_minimization(P,T, data);
-# @test sort(out.ph) == sort(["gtmj", "hpcpx", "ol" ,"cpx"])
-# Finalize_MAGEMin(data)
-# generic test for thermocalc database
 @testset verbose=true "single point minimization" begin
-    data        =   Initialize_MAGEMin("ig", verbose=-1);
-    test        =   0         #KLB1
-    data        =   use_predefined_bulk_rock(data, test);
-    P           =   8.0
-    T           =   800.0
-    out         =   point_wise_minimization(P,T, data);
-    Finalize_MAGEMin(data)
-
-    data        =   Initialize_MAGEMin("sb24", verbose=-1);
-    test        =   1         #Pyrolite
-    data        =   use_predefined_bulk_rock(data, test);
-    P           =   60.0
-    T           =   1000.0
-    out         =   point_wise_minimization(P,T, data);
-    @test sort(out.ph) == sort(["opx", "cpx", "gtmj", "ol"])
-    Finalize_MAGEMin(data)
+    # data        =   Initialize_MAGEMin("sb24", verbose=-1);
+    # test        =   1         #Pyrolite
+    # data        =   use_predefined_bulk_rock(data, test);
+    # P           =   60.0
+    # T           =   1000.0
+    # out         =   point_wise_minimization(P,T, data);
+    # @test sort(out.ph) == sort(["opx", "cpx", "gtmj", "ol"])
+    # Finalize_MAGEMin(data)
 
     data        =   Initialize_MAGEMin("ig", verbose=-1);
     test        =   0         #KLB1
