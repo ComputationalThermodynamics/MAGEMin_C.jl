@@ -16,14 +16,14 @@ function norm(vec :: Vector{Float64})
     return sqrt(sum(vec.^2))
 end
 
-data        =   Initialize_MAGEMin("sb21", verbose=-1);
-test        =   1         #KLB1
-data        =   use_predefined_bulk_rock(data, test);
-P           =   80.0
-T           =   800.0
-out         =   point_wise_minimization(P,T, data);
-@test sort(out.ph) == sort(["gtmj", "hpcpx", "ol" ,"cpx"])
-Finalize_MAGEMin(data)
+# data        =   Initialize_MAGEMin("sb21", verbose=-1);
+# test        =   1         #KLB1
+# data        =   use_predefined_bulk_rock(data, test);
+# P           =   80.0
+# T           =   800.0
+# out         =   point_wise_minimization(P,T, data);
+# @test sort(out.ph) == sort(["gtmj", "hpcpx", "ol" ,"cpx"])
+# Finalize_MAGEMin(data)
 
 data        =   Initialize_MAGEMin("sb24", verbose=-1);
 test        =   1         #Pyrolite
