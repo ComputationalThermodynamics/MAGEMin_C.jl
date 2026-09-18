@@ -6,9 +6,14 @@ const HASH_JEN = 0;
 
 
 function __init__()
-    if isfile("libMAGEMin.dylib")
-        global libMAGEMin = joinpath(pwd(),"libMAGEMin.dylib")
-        println("Using locally compiled version of libMAGEMin.dylib")
+    local_lib = joinpath(pwd(), "libMAGEMin.dylib")
+    pkg_lib   = normpath(joinpath(@__DIR__, "..", "libMAGEMin.dylib"))
+    if isfile(local_lib)
+        global libMAGEMin = local_lib
+        println("Using locally compiled version of libMAGEMin.dylib ($local_lib)")
+    elseif isfile(pkg_lib)
+        global libMAGEMin = pkg_lib
+        println("Using locally compiled version of libMAGEMin.dylib ($pkg_lib)")
     else
         global libMAGEMin = MAGEMin_jll.libMAGEMin
         println("Using libMAGEMin.dylib from MAGEMin_jll")

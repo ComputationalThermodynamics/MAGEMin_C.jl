@@ -79,13 +79,21 @@ Base.show(io::IO, ss::SS_data) = show(io, MIME("text/plain"), ss)
 struct mSS_data
     ph_name     ::String
     ph_type     ::String
-    # info      ::String          # unused
+    info        ::String         # tags which mechanism populated this entry:
+                                   # "lpig" = LP-levelling-basis warm-start guess,
+                                   # "ppc" = near-hyperplane candidate (mSS_df_min_add/
+                                   # max_add window), "calib" = calibration_output_struct
+                                   # (gv.calibration==1: every structurally-feasible,
+                                   # locally-minimized, non-duplicate-of-stable phase)
     ph_id       ::Cint
     em_id       ::Cint
     # n_xeos    ::Cint            # unused — SS_ref_db[ph_id].n_xeos used instead
     # n_em      ::Cint            # unused — SS_ref_db[ph_id].n_em used instead
-    # G_Ppc     ::Cdouble         # unused
-    # DF_Ppc    ::Cdouble         # unused
+    G           ::Cdouble         # candidate's own Gibbs energy at its local minimum
+    deltaG      ::Cdouble         # driving force: distance from the Gibbs hyperplane
+                                   # (same quantity/units as SS_data.deltaG for a stable
+                                   # phase, ~0 there; nonzero here since this phase was
+                                   # NOT selected into the stable assemblage)
     comp_Ppc    ::Vector{Cdouble}
     # p_Ppc     ::Vector{Cdouble} # unused
     # mu_Ppc    ::Vector{Cdouble} # unused
@@ -95,9 +103,9 @@ end
 function Base.convert(::Type{mSS_data}, a::mstb_SS_phases)
     return  mSS_data(   unsafe_string(a.ph_name),
                         unsafe_string(a.ph_type),
-                        # unsafe_string(a.info),
+                        unsafe_string(a.info),
                         a.ph_id, a.em_id,
-                        # a.n_xeos, a.n_em, a.G_Ppc, a.DF_Ppc,
+                        a.G_Ppc, a.DF_Ppc,
                         unsafe_wrap( Vector{Cdouble},        a.comp_Ppc,           a.nOx),
                         # unsafe_wrap( Vector{Cdouble},        a.p_Ppc,              a.n_em),
                         # unsafe_wrap( Vector{Cdouble},        a.mu_Ppc,             a.n_em),

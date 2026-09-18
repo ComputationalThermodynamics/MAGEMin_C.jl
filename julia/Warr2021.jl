@@ -15,6 +15,7 @@
 const _warr_dict = let
     dict = Dict{String,String}()
     csv_path = joinpath(@__DIR__, "MAGEMin_Warr2021_mapping.csv")
+    include_dependency(csv_path)
     for line in eachline(csv_path)
         startswith(line, '#') && continue
         isempty(strip(line))  && continue

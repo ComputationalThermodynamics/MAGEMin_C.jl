@@ -88,7 +88,7 @@ end
 @testset verbose=true "test global TC database" begin
 
     using MAGEMin_C
-    ss_list = ["liq_W14", "fsp_H22", "bi_W14", "g_W14", "ep_H11", "ma_W14", "mu_W14", "opx_W14", "sa_W14", "cd_W14", "st_W14", "chl_W14", "ctd_W14", "sp_W02", "ilm_W00", "DEW_S14"]
+    ss_list = ["liq_W14", "fsp_H22", "bi_W14", "g_W14", "ep_H11", "ma_W14", "mu_W14", "opx_W14", "sa_W14", "cd_W14", "st_W14", "chl_W14", "ctd_W14", "sp_W02", "ilm_W00", "DEW_S24"]
     pp_list = ["q", "crst", "trd", "coe", "stv", "law", "ky", "sill", "and", "ru", "sph","prl"]
 
     data    = Initialize_MAGEMin("all", verbose=false, solver=0);
@@ -97,16 +97,16 @@ end
     X       = [0.62212, 0.1122, 0.0, 0.03486, 0.05557, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.17525, 0.0, 0.0];
     sys_in  = "mol";
     out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in, ss_list=ss_list, pp_list=pp_list)
-    @test sort(out.ph) == ["DEW_S14", "chl_W14", "ctd_W14", "prl", "q"]
+    @test sort(out.ph) == ["DEW_S24", "chl_W14", "ctd_W14", "prl", "q"]
 
-    ss_list = ["liq_W14", "fsp_H22", "bi_W14", "g_W14", "ep_H11", "ma_W14", "mu_W14", "opx_W14", "sa_W14", "cd_W14", "st_W14",  "ctd_W14", "sp_W02", "ilm_W00", "DEW_S14"]
+    ss_list = ["liq_W14", "fsp_H22", "bi_W14", "g_W14", "ep_H11", "ma_W14", "mu_W14", "opx_W14", "sa_W14", "cd_W14", "st_W14",  "ctd_W14", "sp_W02", "ilm_W00", "DEW_S24"]
     pp_list = ["q", "crst", "trd", "coe", "stv", "law", "ky", "sill", "and", "ru", "sph"]
     P, T    = 10.0, 400.0;
     Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "MnO"; "Cr2O3"; "H2O"; "CO2"; "S"];
     X       = [0.62212, 0.1122, 0.0, 0.03486, 0.05557, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.17525, 0.0, 0.0];
     sys_in  = "mol";
     out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in, ss_list=ss_list, pp_list=pp_list)
-    @test sort(out.ph) == ["DEW_S14", "ctd_W14", "ky", "q"]
+    @test sort(out.ph) == ["DEW_S24", "ctd_W14", "ky", "q"]
 
     Finalize_MAGEMin(data)
 end
@@ -436,11 +436,52 @@ finalize_MAGEMin(gv,DB,z_b,splx_data)
     n       =   100;
     P       =   fill(8.0,n)
     T       =   fill(800.0,n)
-    db      =   "ig" 
+    db      =   "ig"
     data    =   Initialize_MAGEMin(db, verbose=-1);
     out     =   multi_point_minimization(P, T, data, test=0);
     @test out[end].G_system ≈ -797.7873865220898
     @test sort(out[end].ph) == sort(["spl", "cpx",  "opx", "ol"])
+
+    Finalize_MAGEMin(data)
+end
+
+@testset verbose=true "calibration mode" begin
+    # gv.calibration (default off): after the normal solve, additionally locally
+    # minimizes every structurally-feasible-but-not-stable solution phase and appends
+    # non-duplicate results to out.mSS_vec, tagged info="calib". See
+    # calibration_output_struct in dump_function.c.
+    data = Initialize_MAGEMin("ig", verbose=-1);
+
+    # off by default: byte-identical to the existing "pointwise tests" reference values,
+    # and no "calib"-tagged entries at all -- the new code path must be fully inert
+    out_off = single_point_minimization(8.0, 800.0, data; test=0)
+    @test out_off.G_system ≈ -797.7873865220898
+    @test sort(out_off.ph) == sort(["spl", "cpx", "opx", "ol"])
+    @test !any(m -> m.info == "calib", out_off.mSS_vec)
+
+    # explicit calibration=false must match the implicit default above
+    out_false = single_point_minimization(8.0, 800.0, data; test=0, calibration=false)
+    @test out_false.G_system ≈ out_off.G_system
+    @test !any(m -> m.info == "calib", out_false.mSS_vec)
+
+    # on: same stable assemblage/energy (calibration must not perturb the real solve),
+    # plus new "calib" entries for phases that are structurally feasible but not stable
+    out_on = single_point_minimization(8.0, 800.0, data; test=0, calibration=true)
+    @test out_on.G_system ≈ out_off.G_system
+    @test sort(out_on.ph) == sort(out_off.ph)
+
+    calib_entries = filter(m -> m.info == "calib", out_on.mSS_vec)
+    @test length(calib_entries) > 0
+
+    # dedup rule: no "calib" entry duplicates an already-stable phase (a distinct local
+    # minimum of an already-stable MODEL is legitimate -- see plan doc -- but none of
+    # KLB-1's own stable phases should reappear verbatim here)
+    @test !any(m -> m.ph_name in out_on.ph, calib_entries)
+
+    # every reported driving force is finite and small in magnitude -- not on the order
+    # of gam_tot itself, which is what the double-subtraction bug (see plan doc) produced
+    # before it was fixed (899 for a phase whose real answer was 4.4)
+    @test all(m -> isfinite(m.deltaG) && abs(m.deltaG) < 30.0, calib_entries)
 
     Finalize_MAGEMin(data)
 end
@@ -1295,6 +1336,93 @@ end
     @test norm(out.ph_frac) - 0.45682499466457954 < 0.01
 end
 
+@testset verbose = true "Test gbase override" begin
+
+    #= Additive shift on the reference Gibbs energy of one endmember of "liq" =#
+    dtb         = 2             # igneous
+    ss_id       = 9             # liq
+    n_Gs        = 1
+    em_ids      = [1]
+    dG          = reshape([-50.0, 0.0, 0.0], 1, 3)   # constant -50 kJ shift, no T/P dependence
+    new_gbase   = Vector{MAGEMin_C.gbase_data{Float64,Int64}}(undef, 1)
+    new_gbase[1]= MAGEMin_C.gbase_data(dtb, ss_id, n_Gs, em_ids, dG)
+
+    data        = Initialize_MAGEMin("ig", verbose=-1);
+    P,T         = 10.0, 1100.0
+    Xoxides     = ["SiO2","Al2O3","CaO","MgO","FeO","Fe2O3","K2O","Na2O","TiO2","Cr2O3","H2O"]
+    X           = [48.43,15.19,11.57,10.13,6.65,1.64,0.59,1.87,0.68,0.0,3.0]
+    sys_in      = "wt"
+
+    out_base    = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in)
+    out_shift   = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys_in, gbase=new_gbase)
+    Finalize_MAGEMin(data)
+
+    # lowering one endmember's reference G must lower (or keep equal) the system's total G
+    @test out_shift.G_system < out_base.G_system
+    @test abs(out_shift.G_system + 918.2105250940679) < 1e-4
+end
+
+@testset verbose = true "exclude_DEW_species" begin
+
+    #= resolution is purely db_infos-based - no Initialize_MAGEMin/minimization needed =#
+    excl                    = exclude_DEW_species("all", "H4SiO4")
+    @test length(excl)      == 1
+    @test excl[1].dtb       == 8    # "all"
+    @test excl[1].ss_ids    == 44   # DEW_S24's position in "all"'s solution-phase list
+    @test excl[1].n_Gs      == 1
+    @test excl[1].em_ids    == [38]
+    @test excl[1].dG        == reshape([1.0e6, 0.0, 0.0], 1, 3)
+
+    excl2                   = exclude_DEW_species("all", ["HCOOH", "H4SiO4"])
+    @test length(excl2)     == 1
+    @test excl2[1].n_Gs     == 2
+    @test excl2[1].em_ids   == [43, 38]
+
+    #= unknown species name / database without a DEW phase both error =#
+    @test_throws ErrorException exclude_DEW_species("all", "NOT_A_SPECIES")
+    @test_throws ErrorException exclude_DEW_species("sb11", "HCOOH")
+
+    ss_list = ["liq_W14", "fsp_H22", "bi_W14", "g_W14", "ep_H11", "ma_W14", "mu_W14", "opx_W14",
+               "sa_W14", "cd_W14", "st_W14", "chl_W14", "ctd_W14", "sp_W02", "ilm_W00", "DEW_S24"]
+    pp_list = ["q", "crst", "trd", "coe", "stv", "law", "ky", "sill", "and", "ru", "sph", "prl"]
+
+    data    = Initialize_MAGEMin("all", verbose=false, solver=0)
+    P, T    = 10.0, 400.0
+    Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "MnO"; "Cr2O3"; "H2O"; "CO2"; "S"]
+
+    X1      = [0.62212, 0.1122, 0.0, 0.03486, 0.05557, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.17525, 0.0, 0.0]
+
+    out_base    = single_point_minimization(P, T, data, X=X1, Xoxides=Xoxides, sys_in="mol", ss_list=ss_list, pp_list=pp_list)
+    idx_b       = findfirst(n -> startswith(n, "DEW"), out_base.ph)
+    @test !isnothing(idx_b)
+    ssb         = out_base.SS_vec[idx_b]
+    i_h4        = findfirst(==("H4SiO4"), ssb.emNames)
+    @test i_h4  == 38               # matches excl[1].em_ids above - db_infos and the runtime index agree
+    @test ssb.emFrac[i_h4] > 1e-5  # meaningfully present in the baseline
+    @test abs(out_base.G_system + 865.7668984405251) < 1e-4
+
+    out_shift   = single_point_minimization(P, T, data, X=X1, Xoxides=Xoxides, sys_in="mol", ss_list=ss_list, pp_list=pp_list, gbase=excl)
+    idx_s       = findfirst(n -> startswith(n, "DEW"), out_shift.ph)
+    @test !isnothing(idx_s)
+    sss         = out_shift.SS_vec[idx_s]
+    @test sss.emFrac[findfirst(==("H4SiO4"), sss.emNames)] == 0.0
+    @test out_shift.G_system > out_base.G_system
+    @test abs(out_shift.G_system + 865.7666083401803) < 1e-4
+
+    X2          = [0.61, 0.1122, 0.0, 0.03486, 0.05557, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.17525, 0.012, 0.0]
+
+    out_base2   = single_point_minimization(P, T, data, X=X2, Xoxides=Xoxides, sys_in="mol", ss_list=ss_list, pp_list=pp_list)
+    out_shift2  = single_point_minimization(P, T, data, X=X2, Xoxides=Xoxides, sys_in="mol", ss_list=ss_list, pp_list=pp_list, gbase=excl2)
+    idx_s2      = findfirst(n -> startswith(n, "DEW"), out_shift2.ph)
+    @test !isnothing(idx_s2)
+    sss2        = out_shift2.SS_vec[idx_s2]
+    @test sss2.emFrac[findfirst(==("HCOOH"),  sss2.emNames)] == 0.0
+    @test sss2.emFrac[findfirst(==("H4SiO4"), sss2.emNames)] == 0.0
+    @test out_shift2.G_system > out_base2.G_system
+
+    Finalize_MAGEMin(data)
+end
+
 @testset verbose=true "test matrix (2D grid) input for multi_point_minimization" begin
     data    = Initialize_MAGEMin("ig", verbose=-1);
     Xoxides = ["SiO2","Al2O3","CaO","MgO","FeO","Fe2O3","K2O","Na2O","TiO2","Cr2O3","H2O"]
@@ -1374,111 +1502,66 @@ end
     Finalize_MAGEMin(data)
 end
 
-# @testset verbose=true "test p2x_convert/pc_convert/lm_convert (endmember fractions -> phase Gibbs energy / local minimization)" begin
-#     gv, z_b, DB, splx_data      = init_MAGEMin("all")
-#     gv                          = use_predefined_bulk_rock(gv, 0, "all")
-#     gv, z_b, DB, splx_data      = pwm_init(2.0, 700.0, gv, z_b, DB, splx_data)
+@testset verbose=true "test p2x_convert/pc_convert/lm_convert (endmember fractions -> phase Gibbs energy / local minimization)" begin
+    gv, z_b, DB, splx_data      = init_MAGEMin("all")
+    gv                          = use_predefined_bulk_rock(gv, 0, "all")
+    gv, z_b, DB, splx_data      = pwm_init(2.0, 700.0, gv, z_b, DB, splx_data)
 
-#     p                           = Dict("ab"=>0.2, "an"=>0.2, "san"=>0.6)
-#     SS_ref_db                   = p2x_convert(gv, DB, "fsp_H22", p)
+    p                           = Dict("ab"=>0.2, "an"=>0.2, "san"=>0.6)
+    SS_ref_db                   = p2x_convert(gv, DB, "fsp_H22", p)
 
-#     em_names                    = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, SS_ref_db.EM_list, SS_ref_db.n_em))
-#     cv_names                    = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, SS_ref_db.CV_list, SS_ref_db.n_xeos))
+    em_names                    = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, SS_ref_db.EM_list, SS_ref_db.n_em))
+    cv_names                    = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, SS_ref_db.CV_list, SS_ref_db.n_xeos))
 
-#     @test em_names == ["ab", "an", "san"]
-#     @test cv_names == ["ca", "k"]
-#     @test unsafe_wrap(Vector{Float64}, SS_ref_db.p, SS_ref_db.n_em) ≈ [0.2, 0.2, 0.6]
-#     @test unsafe_wrap(Vector{Float64}, SS_ref_db.xeos, SS_ref_db.n_xeos) ≈ [0.2, 0.6] atol=1e-6
+    @test em_names == ["ab", "an", "san"]
+    @test cv_names == ["ca", "k"]
+    @test unsafe_wrap(Vector{Float64}, SS_ref_db.p, SS_ref_db.n_em) ≈ [0.2, 0.2, 0.6]
+    @test unsafe_wrap(Vector{Float64}, SS_ref_db.xeos, SS_ref_db.n_xeos) ≈ [0.2, 0.6] atol=1e-6
 
-#     SS_ref_db                   = pc_convert(gv, z_b, DB, "fsp_H22", SS_ref_db)
+    SS_ref_db                   = pc_convert(gv, z_b, DB, "fsp_H22", SS_ref_db)
 
-#     @test SS_ref_db.sf_ok == 1
-#     @test isfinite(SS_ref_db.df)
-#     @test SS_ref_db.df < 0.0   # sanity: molar Gibbs energy of a stable silicate is negative
+    @test SS_ref_db.sf_ok == 1
+    @test isfinite(SS_ref_db.df)
+    @test SS_ref_db.df < 0.0   # sanity: molar Gibbs energy of a stable silicate is negative
 
-#     p_bad                       = Dict("ab"=>-0.4, "an"=>0.7, "san"=>0.7)
-#     SS_ref_bad                  = p2x_convert(gv, DB, "fsp_H22", p_bad)
-#     SS_ref_bad                  = pc_convert(gv, z_b, DB, "fsp_H22", SS_ref_bad)
+    p_bad                       = Dict("ab"=>-0.4, "an"=>0.7, "san"=>0.7)
+    SS_ref_bad                  = p2x_convert(gv, DB, "fsp_H22", p_bad)
+    SS_ref_bad                  = pc_convert(gv, z_b, DB, "fsp_H22", SS_ref_bad)
 
-#     @test SS_ref_bad.sf_ok == 0
-#     @test_throws ErrorException p2x_convert(gv, DB, "fsp_H22", Dict("ab"=>0.5, "an"=>0.5))               # missing endmember
-#     @test_throws ErrorException p2x_convert(gv, DB, "fsp_H22", Dict("ab"=>0.2,"an"=>0.2,"san"=>0.5,"xx"=>0.1)) # unknown endmember
-#     @test_throws ErrorException p2x_convert(gv, DB, "not_a_phase", p)                                     # unknown phase
+    @test SS_ref_bad.sf_ok == 0
+    @test_throws ErrorException p2x_convert(gv, DB, "fsp_H22", Dict("ab"=>0.5, "an"=>0.5))               # missing endmember
+    @test_throws ErrorException p2x_convert(gv, DB, "fsp_H22", Dict("ab"=>0.2,"an"=>0.2,"san"=>0.5,"xx"=>0.1)) # unknown endmember
+    @test_throws ErrorException p2x_convert(gv, DB, "not_a_phase", p)                                     # unknown phase
 
-#     gamma0                      = [-973.680237,-1768.944009,-820.744391,-693.029850,-366.575047,-949.528471,-875.814737,-1025.018224,-240.991436,-507.666146,-1306.489776,-385.336776,-592.598340,-88.853592]
-#     xeos0                       = [0.2, 0.6, 0.1]
-#     SS_ref_min                  = lm_convert(gv, z_b, DB, "fsp_H22op", gamma0, xeos0)
-#     @test SS_ref_min.status     == 3
-#     @test SS_ref_min.sf_ok      == 1
-#     @test isfinite(SS_ref_min.df)
+    gamma0                      = [-973.680237,-1768.944009,-820.744391,-693.029850,-366.575047,-949.528471,-875.814737,-1025.018224,-240.991436,-507.666146,-1306.489776,-385.336776,-592.598340,-88.853592]
+    xeos0                       = [0.2, 0.6, 0.1]
+    SS_ref_min                  = lm_convert(gv, z_b, DB, "fsp_H22op", gamma0, xeos0)
+    @test SS_ref_min.status     == 3
+    @test SS_ref_min.sf_ok      == 1
+    @test isfinite(SS_ref_min.df)
 
-#     xeos_min                    = copy(unsafe_wrap(Vector{Float64}, SS_ref_min.xeos, SS_ref_min.n_xeos))
-#     @test xeos_min              ≈ [0.3125135893680029, 0.031900521359415714, 0.07754632896992686] atol=1e-4
-#     @test !isapprox(xeos_min, xeos0, atol=1e-3)
+    xeos_min                    = copy(unsafe_wrap(Vector{Float64}, SS_ref_min.xeos, SS_ref_min.n_xeos))
+    @test xeos_min              ≈ [0.3125135893680029, 0.031900521359415714, 0.07754632896992686] atol=1e-4
+    @test !isapprox(xeos_min, xeos0, atol=1e-3)
 
-#     # re-running from the converged point under the same Gamma is a fixed point
-#     SS_ref_min2                 = lm_convert(gv, z_b, DB, "fsp_H22op", gamma0, xeos_min)
-#     @test SS_ref_min2.status    == 3
-#     @test unsafe_wrap(Vector{Float64}, SS_ref_min2.xeos, SS_ref_min2.n_xeos) ≈ xeos_min atol=1e-6
+    # re-running from the converged point under the same Gamma is a fixed point
+    SS_ref_min2                 = lm_convert(gv, z_b, DB, "fsp_H22op", gamma0, xeos_min)
+    @test SS_ref_min2.status    == 3
+    @test unsafe_wrap(Vector{Float64}, SS_ref_min2.xeos, SS_ref_min2.n_xeos) ≈ xeos_min atol=1e-6
 
-#     @test_throws ErrorException lm_convert(gv, z_b, DB, "fsp_H22op", zeros(gv.len_ox - 1), xeos0) # wrong-length gamma
-#     @test_throws ErrorException lm_convert(gv, z_b, DB, "fsp_H22op", gamma0, [0.2])                # wrong-length xeos
-#     @test_throws ErrorException lm_convert(gv, z_b, DB, "not_a_phase", gamma0, xeos0)             # unknown phase
+    @test_throws ErrorException lm_convert(gv, z_b, DB, "fsp_H22op", zeros(gv.len_ox - 1), xeos0) # wrong-length gamma
+    @test_throws ErrorException lm_convert(gv, z_b, DB, "fsp_H22op", gamma0, [0.2])                # wrong-length xeos
+    @test_throws ErrorException lm_convert(gv, z_b, DB, "not_a_phase", gamma0, xeos0)             # unknown phase
 
-#     finalize_MAGEMin(gv, DB, z_b, splx_data)
-# end
-
-
-#=
-When a melt reaches volatile saturation, it coexists with a separate fluid phase (a supercritical H₂O–CO₂ vapor). That fluid has a composition X_H₂O (mole fraction of H₂O in the bubble). The partial pressures fed to the model are:
+    finalize_MAGEMin(gv, DB, z_b, splx_data)
+end
 
 
-P_H₂O = X_H₂O_fluid × P_total
-P_CO₂ = (1 − X_H₂O_fluid) × P_total
-The model then predicts how much H₂O and CO₂ dissolves in the melt at equilibrium with that fluid.
-=#
 
-#=
-# The following part is not really a test yet, but more an example of how to use initial guesses
-
-using MAGEMin_C
-
-MAGEMin_data    = Initialize_MAGEMin("mp", verbose=-1);
-
-Xoxides         = ["SiO2";  "TiO2";  "Al2O3";  "FeO";   "MnO";   "MgO";   "CaO";   "Na2O";  "K2O"; "H2O"; "O"];
-X1              = [58.509,  1.022,   14.858, 4.371, 0.141, 4.561, 5.912, 3.296, 2.399, 10.0, 0.0];
-sys_in          = "wt"
-
-
-Pvec,Tvec       = [6.0,6.1,6.0,6.1], [710.0,710.0,720.0,720.0]
-Xvec            = [X1,X1,X1,X1] # here the composition can also be slightly varied. how much I am not quite sure yet
-
-Out_XY          = Vector{out_struct}(undef,length(Pvec))
-Out_XY          = multi_point_minimization( Pvec, Tvec, MAGEMin_data;
-                                            X=Xvec, Xoxides=Xoxides, sys_in=sys_in, 
-                                            name_solvus=true); 
-
-# retrieve theinitial guesses
-# The way it works is by retrieving the mSS_vec structure from the 4 previous minimizations and concatenating them into a single vector
-tmp             = [Out_XY[i].mSS_vec for i=1:length(Pvec)]
-Gig             = vcat(tmp...)                  
-
-# note that below we use slightly different P,T conditions and that Gig is passed as an initial guess within square brackets
-# A similar approach can be used in the case of multi_point_minimization but then a vector of P,T, iguess and G must be passed
-# Note that G is a vector of vectors in that case => Gig = Vector{Vector{LibMAGEMin.mSS_data}}(undef,np);
-Out_ig          = single_point_minimization(    6.05, 715.0, MAGEMin_data;
-                                                X=X1, Xoxides=Xoxides, sys_in=sys_in,
-                                                name_solvus=true,
-                                                iguess=true,G=[Gig]);
-
-
-Finalize_MAGEMin(MAGEMin_data)
-
-
-@testset verbose=true "filter_DEW_species — drop chemically infeasible DEW_S14 species" begin
+@testset verbose=true "filter_DEW_species — drop chemically infeasible DEW_S24 species" begin
     data    = Initialize_MAGEMin("all", verbose=false, solver=0)
     ss_list = ["liq_W14", "fsp_H22", "bi_W14", "g_W14", "ep_H11", "ma_W14", "mu_W14", "opx_W14",
-               "sa_W14", "cd_W14", "st_W14", "chl_W14", "ctd_W14", "sp_W02", "ilm_W00", "DEW_S14"]
+               "sa_W14", "cd_W14", "st_W14", "chl_W14", "ctd_W14", "sp_W02", "ilm_W00", "DEW_S24"]
     pp_list = ["q", "crst", "trd", "coe", "stv", "law", "ky", "sill", "and", "ru", "sph", "prl"]
 
     P, T    = 10.0, 400.0
@@ -1488,14 +1571,14 @@ Finalize_MAGEMin(MAGEMin_data)
     out_unfiltered = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in="mol", ss_list=ss_list, pp_list=pp_list)
     out_filtered   = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in="mol", ss_list=ss_list, pp_list=pp_list, filter_DEW_species=true)
 
-    idx_u = findfirst(==("DEW_S14"), out_unfiltered.ph)
-    idx_f = findfirst(==("DEW_S14"), out_filtered.ph)
+    idx_u = findfirst(==("DEW_S24"), out_unfiltered.ph)
+    idx_f = findfirst(==("DEW_S24"), out_filtered.ph)
     @test !isnothing(idx_u) && !isnothing(idx_f)
 
     ss_u = out_unfiltered.SS_vec[idx_u]
     ss_f = out_filtered.SS_vec[idx_f]
 
-    # unfiltered: full DEW_S14 species list regardless of bulk feasibility
+    # unfiltered: full DEW_S24 species list regardless of bulk feasibility
     @test length(ss_u.emNames) == 107
 
     # filtered: only the Al/Fe/Mg/Si/H/O-bearing species survive, since the bulk has
@@ -1523,7 +1606,7 @@ Finalize_MAGEMin(MAGEMin_data)
     # other stable solution phases in the same run must be completely unaffected
     n_SS = length(out_unfiltered.SS_vec)
     for i in 1:n_SS
-        if out_unfiltered.ph[i] != "DEW_S14"
+        if out_unfiltered.ph[i] != "DEW_S24"
             @test length(out_unfiltered.SS_vec[i].emNames) == length(out_filtered.SS_vec[i].emNames)
         end
     end
@@ -1532,4 +1615,3 @@ Finalize_MAGEMin(MAGEMin_data)
 end
 
 
-=#

@@ -10,6 +10,9 @@ magemin_name,type,mineral_full_name,warr_symbol
 abc,ss,Albite (ordered),Ab
 abc_H11,ss,Albite (ordered),Ab
 ak,ss,Akimotoite,Aki
+ak_SB11,ss,Akimotoite,Aki
+ak_SB21,ss,Akimotoite,Aki
+ak_SB24,ss,Akimotoite,Aki
 aki,ss,Akimotoite,Aki
 amp,ss,Amphibole,Amp
 amp_G16,ss,Amphibole,Amp
@@ -33,6 +36,12 @@ carp_W14,ss,Carpholite,Cph
 cd,ss,Cordierite,Crd
 cd_G25,ss,Cordierite,Crd
 cd_W14,ss,Cordierite,Crd
+cf_SB11,ss,Ca-ferrite phase,cf
+cf_SB21,ss,Ca-ferrite phase,cf
+cf_SB24,ss,Ca-ferrite phase,cf
+cpx_SB11,ss,Clinopyroxene,Cpx
+cpx_SB21,ss,Clinopyroxene,Cpx
+cpx_SB24,ss,Clinopyroxene,Cpx
 crd,ss,Cordierite,Crd
 cf,ss,Ca-ferrite phase,cf
 ch,ss,Clinohumite,Chu
@@ -52,7 +61,7 @@ ep,ss,Epidote,Ep
 ep_H11,ss,Epidote,Ep
 fl,ss,Fluid,fl
 DEW,ss,DEW aqueous fluid (Sverjensky et al. 2014),DEW
-DEW_S14,ss,DEW aqueous fluid (Sverjensky et al. 2014),DEW
+DEW_S24,ss,DEW aqueous fluid (Sverjensky et al. 2014),DEW
 fl_EF21,ss,Fluid,fl
 fl_G25,ss,Fluid,fl
 fl_H03,ss,Fluid,fl
@@ -69,7 +78,13 @@ g_W14,ss,Garnet,Grt
 g_W24,ss,Garnet,Grt
 grt,ss,Garnet (Py-Alm; Berman/Pourteau),Grt
 gtmj,ss,Garnet-majorite,Grt
+gtmj_SB11,ss,Garnet-majorite,Grt
+gtmj_SB21,ss,Garnet-majorite,Grt
+gtmj_SB24,ss,Garnet-majorite,Grt
 hpcpx,ss,High-pressure clinopyroxene,hpcpx
+hpcpx_SB11,ss,High-pressure clinopyroxene,hpcpx
+hpcpx_SB21,ss,High-pressure clinopyroxene,hpcpx
+hpcpx_SB24,ss,High-pressure clinopyroxene,hpcpx
 hpx,ss,High-pressure pyroxene,hpx
 ilm,ss,Ilmenite,Ilm
 ilm_W00,ss,Ilmenite,Ilm
@@ -96,32 +111,60 @@ mt_W00,ss,Magnetite,Mag
 mu,ss,Muscovite,Ms
 mu_W14,ss,Muscovite,Ms
 mica,ss,Mica (Ms-Pg-Cel-Prl model; Berman/Pourteau),Ms
+mw_SB11,ss,Ferropericlase,Fper
+mw_SB21,ss,Ferropericlase,Fper
+mw_SB24,ss,Ferropericlase,Fper
 nal,ss,Na-Al high-pressure phase,nal
+nal_SB21,ss,Na-Al high-pressure phase,nal
+nal_SB24,ss,Na-Al high-pressure phase,nal
 nph,ss,Nepheline,Nph
 nph_W24,ss,Nepheline,Nph
 oamp,ss,Orthoamphibole,oamp
 oamp_D07,ss,Orthoamphibole,oamp
 occm,ss,Carbonate (calcite-dolomite-magnesite),occm
 occm_F11,ss,Carbonate (calcite-dolomite-magnesite),occm
+ol_SB11,ss,Olivine,Ol
+ol_SB21,ss,Olivine,Ol
+ol_SB24,ss,Olivine,Ol
 omph,ss,Omphacite (Di-Jd-Hd model; Berman/Pourteau),Omp
 ol,ss,Olivine,Ol
 ol_H11,ss,Olivine,Ol
 ol_H18,ss,Olivine,Ol
 opx,ss,Orthopyroxene,Opx
+opx_SB11,ss,Orthopyroxene,Opx
+opx_SB21,ss,Orthopyroxene,Opx
+opx_SB24,ss,Orthopyroxene,Opx
 opx_W14,ss,Orthopyroxene,Opx
 opx_T21,ss,Orthopyroxene,Opx
 opx_W24,ss,Orthopyroxene,Opx
 pl4tr,ss,Plagioclase,Pl
 plc,ss,Plagioclase,Pl
 plc_B05,ss,Plagioclase,Pl
+plg,ss,Plagioclase,Pl
+plg_SB11,ss,Plagioclase,Pl
+plg_SB21,ss,Plagioclase,Pl
+plg_SB24,ss,Plagioclase,Pl
 po,ss,Pyrrhotite,Po
 po_E10,ss,Pyrrhotite,Po
 ppv,ss,Post-perovskite,ppv
+ppv_SB11,ss,Post-perovskite,ppv
+ppv_SB21,ss,Post-perovskite,ppv
+ppv_SB24,ss,Post-perovskite,ppv
 pv,ss,Perovskite,pv
+pv_SB11,ss,Perovskite,pv
+pv_SB21,ss,Perovskite,pv
+pv_SB24,ss,Perovskite,pv
+ri,ss,Ringwoodite,Rwd
+ri_SB11,ss,Ringwoodite,Rwd
+ri_SB21,ss,Ringwoodite,Rwd
+ri_SB24,ss,Ringwoodite,Rwd
 ring,ss,Ringwoodite,ring
 sa,ss,Sapphirine,Spr
 sa_W14,ss,Sapphirine,Spr
 sp,ss,Spinel,Spl
+sp_SB11,ss,Spinel,Spl
+sp_SB21,ss,Spinel,Spl
+sp_SB24,ss,Spinel,Spl
 sp_W02,ss,Spinel,Spl
 spi,ss,Spinel,Spl
 spi_W02,ss,Spinel,Spl
@@ -134,6 +177,10 @@ stau,ss,Staurolite,St
 ta,ss,Talc,Tlc
 ta_EF21,ss,Talc,Tlc
 talc,ss,Talc,Tlc
+wa,ss,Wadsleyite,Wds
+wa_SB11,ss,Wadsleyite,Wds
+wa_SB21,ss,Wadsleyite,Wds
+wa_SB24,ss,Wadsleyite,Wds
 wad,ss,Wadsleyite,Wds
 #
 # === ENDMEMBER NAMES (em) ===

@@ -224,39 +224,44 @@ else                        mineral_name = "ged"
 
 ### List of mineral abbreviations (for solvus)
 
-| Acronym   | Full Mineral Name                |
-|-----------|----------------------------------|
-| act       | Actinolite                       |
-| afs       | Alkali Feldspar                  |
-| amp       | Amphibole                        |
-| ank       | Ankerite                         |
-| anth      | Anthophyllite                    |
-| cc        | Calcite                          |
-| cm        | Chromite                         |
-| cpx       | Clinopyroxene                    |
-| cumm      | Cummingtonite                    |
-| dio       | Diopside                         |
-| fsp       | Feldspar                         |
-| ged       | Gedrite                          |
-| gl        | Glaucophane                      |
-| hem/hemm  | Hematite                         |
-| ilm/ilmm  | Ilmenite                         |
-| jd        | Jadeite                          |
-| K-nph     | Potassic Nepheline               |
-| mt/mgt/mag| Magnetite                        |
-| mu        | Muscovite                        |
-| nph       | Nepheline                        |
-| Na-cpx    | Sodium Clinopyroxene             |
-| occm      | Carbonate (calcite group)        |
-| oamp      | Ortho-amphibole                  |
-| omph      | Omphacite                        |
-| pat       | Paragonite                       |
-| pig       | Pigeonite                        |
-| pl        | Plagioclase                      |
-| sid       | Siderite                         |
-| sp/spl/spi| Spinel                           |
-| tr        | Tremolite                        |
-| usp       | Ulvöspinel                       |
+Names `get_mineral_name` can return when `name_solvus = true`, with the parent solution
+phase each one is produced from.
+
+| Acronym | Full mineral name | Returned for |
+|---|---|---|
+| `K-nph` | K-nepheline | `nph` |
+| `Na-cpx` | Na-rich clinopyroxene | `cpx` |
+| `act` | Actinolite | `amp` |
+| `afs` | Alkali feldspar | `fsp` |
+| `amp` | Amphibole | `amp` |
+| `ank` | Ankerite | `occm` |
+| `anth` | Anthophyllite | `oamp` |
+| `cc` | Calcite | `occm` |
+| `cm` | Chromite | `spl` |
+| `cpx` | Clinopyroxene | `cpx` |
+| `cumm` | Cummingtonite | `amp` |
+| `dio` | Clinopyroxene (dio/omphacite model) | `dio` |
+| `ged` | Gedrite | `oamp` |
+| `gl` | Glaucophane | `amp` |
+| `hem` | Hematite | `ilm` |
+| `hemm` | Hematite (Mn-bearing ilm model) | `ilmm` |
+| `ilm` | Ilmenite | `ilm` |
+| `ilmm` | Ilmenite-hematite (Mn-bearing) | `ilmm` |
+| `jd` | Jadeite | `dio` |
+| `mag` | Magnesite (in carbonate context) | `occm` |
+| `mgt` | Magnetite | `spl` |
+| `mu` | Muscovite | `mu` |
+| `nph` | Nepheline | `nph` |
+| `omph` | Omphacite (Di-Jd-Hd model; Berman/Pourteau) | `dio` |
+| `pat` | Paragonite-Al mica component | `mu` |
+| `pig` | Pigeonite | `cpx` |
+| `pl` | Plagioclase | `fsp` |
+| `sid` | Siderite | `occm` |
+| `smt` | Magnetite-dominated spinel | `sp` |
+| `sp` | Spinel | `sp` |
+| `spl` | Spinel | `spl` |
+| `tr` | Tremolite | `amp` |
+| `usp` | Ulvöspinel | `spl` |
 
 ## References
 

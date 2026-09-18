@@ -836,8 +836,8 @@ All export options are located in the Path options panel:
 
 Provides static reference data across three sections:
 
-- **Solution phases table** - name, abbreviation, and solvus flag for all solution phases in the selected database (filterable, 16 rows per page)
-- **End-members table** - end-member name, abbreviation, and stoichiometric formula (filterable, 16 rows per page)
+- **Solution phases table** - full mineral name, abbreviation, Warr (2021) symbol and solvus daughters, for every solution phase of every database (short and citation-tagged names alike), sorted alphabetically; `-` marks a phase with no Warr equivalent or no solvus (filterable, 16 rows per page)
+- **End-members table** - full mineral name, abbreviation, Warr (2021) symbol and composition in the 15-oxide basis of the global database, sorted alphabetically (filterable, 16 rows per page)
 - **CSV bulk-rock format** - example table showing the required column structure for bulk-rock input files (title, comments, db, sysUnit, oxide columns, optional _frac2 variants), followed by the full field documentation including the thermodynamic dataset acronym table (mtl, mp, mb, ig, igd, igad, um, sb11, sb21, sb24, ume, mpe, mbe, all)
 - **Trace-element Kd tables** - three tabs subdivided by SiO₂ content of the melt (`SiO2 < 52 wt%`, `52 wt% <= SiO2 < 63 wt%`, `63 wt% <= SiO2`); each shows the element × mineral Kd matrix (filterable, 32 rows per page)
 - **Calculation details** - static reference cards describing phase deactivation logic, oxide activity formulation, water saturation methodology, specific heat capacity calculation, the site fraction calculator, and seismic velocity corrections (melt/anelastic/shallow, cross-referencing the PTX path [Configuration panel](#6.1.-Configuration-panel) controls)
