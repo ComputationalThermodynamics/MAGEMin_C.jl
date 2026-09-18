@@ -17321,7 +17321,7 @@ void TC_all_P2X_init(	            P2X_type 			*P2X_read,
 			P2X_read[iss]  = p2x_um_ta; 		}
 		else if (strcmp( gv.SS_list[iss], "oamp_D07")  == 0){
 			P2X_read[iss]  = p2x_mb_oamp; 		}
-		else if (strcmp( gv.SS_list[iss], "DEW_S14") == 0){
+		else if (strcmp( gv.SS_list[iss], "DEW_S24") == 0){
 			P2X_read[iss]  = p2x_DEW; 		}
 		else if (strcmp( gv.SS_list[iss], "cpx_W24")   == 0){
 			P2X_read[iss]  = p2x_ig_cpx; 		}
@@ -17977,7 +17977,7 @@ void TC_all_objective_init_function(	obj_type 			*SS_objective,
 			SS_objective[iss]  = obj_um_ta; 		}
 		else if (strcmp( gv.SS_list[iss], "oamp_D07")  == 0){
 			SS_objective[iss]  = obj_mb_oamp; 		}
-		else if (strcmp( gv.SS_list[iss], "DEW_S14") == 0){
+		else if (strcmp( gv.SS_list[iss], "DEW_S24") == 0){
 			SS_objective[iss]  = obj_DEW; 		}
 		else if (strcmp( gv.SS_list[iss], "cpx_W24")   == 0){
 			SS_objective[iss]  = obj_ig_cpx; 		}
@@ -18627,7 +18627,7 @@ void TC_all_PC_init(	                PC_type 			*PC_read,
 			PC_read[iss]  = obj_um_ta; 		}
 		else if (strcmp( gv.SS_list[iss], "oamp_D07")  == 0){
 			PC_read[iss]  = obj_mb_oamp; 		}
-		else if (strcmp( gv.SS_list[iss], "DEW_S14") == 0){
+		else if (strcmp( gv.SS_list[iss], "DEW_S24") == 0){
 			PC_read[iss]  = obj_DEW; 		}
 		else if (strcmp( gv.SS_list[iss], "cpx_W24")   == 0){
 			PC_read[iss]  = obj_ig_cpx; 		}

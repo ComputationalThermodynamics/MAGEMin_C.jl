@@ -1259,7 +1259,7 @@ global_variable update_cp_after_LP(					bulk_info 	 		 z_b,
 			   (this case: ~0.2) from the worst-case innocent trace-level asymmetry of a
 			   never-elevated baseline seed (~1e-4 at most, ~100 suppressed-or-not
 			   species at 1e-6 each). */
-			if ((strcmp(gv.SS_list[ph_id], "DEW") == 0 || strcmp(gv.SS_list[ph_id], "DEW_S14") == 0) && SS_ref_db[ph_id].sf_ok == 1){
+			if ((strcmp(gv.SS_list[ph_id], "DEW") == 0 || strcmp(gv.SS_list[ph_id], "DEW_S24") == 0) && SS_ref_db[ph_id].sf_ok == 1){
 				/* SS_ref_db[ph_id] is a shared per-PHASE-TYPE scratch struct, not
 				   per-cp[]-instance - .xeos in particular is only ever written by
 				   NLopt_opt_DEW_function (S.x), never by PC_function/obj_DEW

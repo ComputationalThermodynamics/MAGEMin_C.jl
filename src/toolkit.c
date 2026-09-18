@@ -258,31 +258,31 @@ bulk_info retrieve_bulk_PT(				global_variable      gv,
 				printf("  - Database                  : Metabasite (Green et al., 2016)\n"	);
 			}
 			if (gv.EM_database 		== 11){
-				printf("  - Database                  : Metabasite extended (Green et al., 2016; oamp from Diener et al., 2007)\n"	);
+				printf("  - Database                  : Metabasite extended (Green et al., 2016 with oamp from Diener et al., 2007 and ta from Rebay et al., 2022)\n"	);
 			}
 			else if (gv.EM_database == 2){
-				printf("  - Database                  : Igneous (Holland et al., 2018 -> Green et al., 2024)\n"	);
+				printf("  - Database                  : Igneous (Green et al., 2025, corrected after Holland et al., 2018)\n"	);
 			}
 			else if (gv.EM_database == 22){
-				printf("  - Database                  : Igneous dry (Tomlinson & Holland, 2021 -> Su et al., 2026)\n"	);
+				printf("  - Database                  : Igneous dry (Su et al., 2026, corrected after Tomlinson & Holland, 2021)\n"	);
 			}
 			else if (gv.EM_database == 3){
 				printf("  - Database                  : Igneous alkaline dry (Weller et al., 2024)\n"	);
 			}
 			else if (gv.EM_database == 4 ){
-				printf("  - Database                  : Ultramafic (Evans & Frost, 2021)\n"	);
+				printf("  - Database                  : Ultramafic (Evans & Frost., 2021)\n"	);
 			}
 			else if (gv.EM_database == 5 ){
-				printf("  - Database                  : Ultramafic extended (Evans & Frost, 2021 + pl, amp and aug from Green et al., 2016)\n"	);
+				printf("  - Database                  : Ultramafic extended (Evans & Frost., 2021 with pl, amp and aug from Green et al., 2016)\n"	);
 			}
 			else if (gv.EM_database == 6 ){
-				printf("  - Database                  : Uppermost lower mantle to upper mantle database (Holland et al., 2013)\n"	);
+				printf("  - Database                  : Mantle (Holland et al., 2013)\n"	);
 			}
 			else if (gv.EM_database == 7 ){
-				printf("  - Database                  : Metapelite extended (White et al., 2014; po from Evans & Frost, 2021;  amp, dio and aug from Green et al., 2016)\n"	);
+				printf("  - Database                  : Metapelite extended (White et al., 2014 with po from Evans & Frost., 2021, amp dio and aug from Green et al., 2016)\n"	);
 			}
 			else if (gv.EM_database == 8 ){
-				printf("  - Database                  : All (union of mp/mb/mbe/ig/igd/igad/um/ume/mpe - White 2014, Green 2016, Holland 2018/2022/2024/2025, Tomlinson 2021, Evans & Frost 2021, Weller 2024, Baldwin 2005; mtl excluded; default ds636, some phases run off their originally-calibrated dataset)\n"	);
+				printf("  - Database                  : Global solution dataset - union of mp/mb/mbe/ig/igd/igad/um/ume/mpe - White 2014, Green 2016, Holland 2018/2022/2024/2025, Tomlinson 2021, Evans & Frost 2021, Weller 2024, Baldwin 2005; mtl excluded; default ds636, some phases run off their originally-calibrated dataset)\n"	);
 			}
 		}
 		else if (strcmp(gv.research_group, "sb") == 0) {
@@ -1794,7 +1794,7 @@ global_variable compute_density_volume_modulus(				int 				 EM_database,
 
 			if (strcmp( cp[i].name, "liq") != 0 && strcmp( cp[i].name, "fl") != 0 && strcmp( cp[i].name, "DEW") != 0
 			 && strcmp( cp[i].name, "liq_W14") != 0 && strcmp( cp[i].name, "liq_G16") != 0 && strcmp( cp[i].name, "liq_G25w") != 0 && strcmp( cp[i].name, "liq_S26") != 0
-			 && strcmp( cp[i].name, "fl_G25") != 0 && strcmp( cp[i].name, "fl_EF21") != 0 && strcmp( cp[i].name, "fl_H03") != 0 && strcmp( cp[i].name, "DEW_S14") != 0){
+			 && strcmp( cp[i].name, "fl_G25") != 0 && strcmp( cp[i].name, "fl_EF21") != 0 && strcmp( cp[i].name, "fl_H03") != 0 && strcmp( cp[i].name, "DEW_S24") != 0){
 				// sum_volume_sol 		+= cp[i].volume*cp[i].ss_n_mol*cp[i].factor;
 				sum_volume_sol 		+=  cp[i].ss_n_wt/cp[i].phase_density;
 
@@ -1926,7 +1926,7 @@ global_variable compute_density_volume_modulus(				int 				 EM_database,
 			b2 += (cp[i].ss_n_wt/cp[i].phase_density/sum_volume) / (cp[i].phase_bulkModulus /10.0);
 			if (strcmp( cp[i].name, "liq") != 0 && strcmp( cp[i].name, "fl") != 0 && strcmp( cp[i].name, "DEW") != 0
 			 && strcmp( cp[i].name, "liq_W14") != 0 && strcmp( cp[i].name, "liq_G16") != 0 && strcmp( cp[i].name, "liq_G25w") != 0 && strcmp( cp[i].name, "liq_S26") != 0
-			 && strcmp( cp[i].name, "fl_G25") != 0 && strcmp( cp[i].name, "fl_EF21") != 0 && strcmp( cp[i].name, "fl_H03") != 0 && strcmp( cp[i].name, "DEW_S14") != 0){
+			 && strcmp( cp[i].name, "fl_G25") != 0 && strcmp( cp[i].name, "fl_EF21") != 0 && strcmp( cp[i].name, "fl_H03") != 0 && strcmp( cp[i].name, "DEW_S24") != 0){
 				s1S +=  cp[i].ss_n_wt/cp[i].phase_density/sum_volume_sol *  (cp[i].phase_shearModulus/10.0);
 				s2S += (cp[i].ss_n_wt/cp[i].phase_density/sum_volume_sol) / (cp[i].phase_shearModulus/10.0);
 				b1S +=  cp[i].ss_n_wt/cp[i].phase_density/sum_volume_sol *  (cp[i].phase_bulkModulus /10.0);
@@ -1967,7 +1967,7 @@ global_variable compute_density_volume_modulus(				int 				 EM_database,
 			if (Gi > G_max) G_max = Gi;  if (Gi < G_min) G_min = Gi;
 			if (strcmp(cp[i].name, "liq") != 0 && strcmp(cp[i].name, "fl") != 0 && strcmp(cp[i].name, "DEW") != 0
 			 && strcmp(cp[i].name, "liq_W14") != 0 && strcmp(cp[i].name, "liq_G16") != 0 && strcmp(cp[i].name, "liq_G25w") != 0 && strcmp(cp[i].name, "liq_S26") != 0
-			 && strcmp(cp[i].name, "fl_G25") != 0 && strcmp(cp[i].name, "fl_EF21") != 0 && strcmp(cp[i].name, "fl_H03") != 0 && strcmp(cp[i].name, "DEW_S14") != 0){
+			 && strcmp(cp[i].name, "fl_G25") != 0 && strcmp(cp[i].name, "fl_EF21") != 0 && strcmp(cp[i].name, "fl_H03") != 0 && strcmp(cp[i].name, "DEW_S24") != 0){
 				if (Ki > K_maxS) K_maxS = Ki;  if (Ki < K_minS) K_minS = Ki;
 				if (Gi > G_maxS) G_maxS = Gi;  if (Gi < G_minS) G_minS = Gi;
 			}

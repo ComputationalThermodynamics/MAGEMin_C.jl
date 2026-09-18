@@ -709,11 +709,11 @@ function compute_TE_partitioning(   KDs_database:: custom_KDs_database,
         Cliq, Cmin, Csol, ph_TE, ph_wt_norm, liq_wt_norm, bulk_D = partition_TE(    KDs_database, out, C0, 
                                                                                     ph, ph_wt, liq_wt; norm_TE=norm_TE)
     elseif liq_wt == 0.0
-        Csol        = C0
+        Csol        = copy(C0)
         Cliq, Cmin, ph_TE, ph_wt_norm, liq_wt_norm, bulk_D = C0.*0.0, NaN, nothing, NaN, NaN, NaN
 
     elseif liq_wt == 1.0 || (sol_wt == 0.0 && liq_wt > 0.0) #latter means there is fluid + melt
-        Cliq        = C0
+        Cliq        = copy(C0)
         Csol, Cmin, ph_TE, ph_wt_norm, bulk_D  = C0.*0.0, NaN, nothing, NaN, NaN
         liq_wt_norm = 1.0
     else
@@ -1132,6 +1132,29 @@ end
 
 
 """
+    _rescale_Cmin!(Cmin, Cliq, Cliq_pre)
+
+    Internal helper. Brings `Cmin` back into agreement with `Cliq` after a
+    saturation model has overwritten one or more melt concentrations: each column
+    whose `Cliq` differs from the snapshot `Cliq_pre` is scaled by
+    `Cliq / Cliq_pre`, and `Cliq_pre` is advanced to match.
+
+    Idempotent, and a no-op when `Cmin` is not a matrix (no melt, or no solid).
+"""
+function _rescale_Cmin!(Cmin, Cliq, Cliq_pre)
+    (Cmin isa Matrix{Float64} && length(Cliq_pre) == length(Cliq)) || return nothing
+    @inbounds for j in eachindex(Cliq)
+        (Cliq_pre[j] > 0.0 && Cliq[j] != Cliq_pre[j]) || continue
+        f = Cliq[j] / Cliq_pre[j]
+        for i in axes(Cmin, 1)
+            Cmin[i,j] *= f
+        end
+        Cliq_pre[j] = Cliq[j]
+    end
+    return nothing
+end
+
+"""
     TE_prediction(out, C0, KDs_database, dtb; ZrSat_model="none", SSat_model="none", P2O5Sat_model="none", MnzSat_model="none", norm_TE=false)
 
     Perform trace element partitioning, optionally with zircon, sulfide, apatite, and/or monazite saturation corrections.
@@ -1285,6 +1308,8 @@ function TE_prediction( out, C0, KDs_database, dtb;
                                                                                             sol_wt;
                                                                                             norm_TE = norm_TE)
 
+    Cliq_pre = Cmin isa Matrix{Float64} ? copy(Cliq) : Float64[]
+
     if liq_wt > 0.0
         if !isnothing(findfirst(KDs_database.element_name .== "Zr"))    && ZrSat_model != "none"
             id_Zr           = findfirst(KDs_database.element_name .== "Zr")
@@ -1331,6 +1356,8 @@ function TE_prediction( out, C0, KDs_database, dtb;
                 Csol[id_CO2] = 0.0
             end
         end
+        _rescale_Cmin!(Cmin, Cliq, Cliq_pre)
+
         if !isnothing(findfirst(KDs_database.element_name .== "La"))    && MnzSat_model != "none"
             id_LREE         = [findfirst(KDs_database.element_name .== el) for el in _mnz_LREE_els]
             Sat_LREE_liq    = monazite_saturation(  out, X_mnz_LREE;
@@ -1449,6 +1476,128 @@ function solve_with_saturation( P           :: Float64,
 
     @warn "solve_with_saturation: did not converge in $max_iter iterations"
     return out, out_TE, false, max_iter
+end
+
+
+"""
+    solve_with_saturation(P, T, data, X_mol, Xoxides, C0, KDs_dtb, dtb; sat, sys_in, tol, max_iter, progressbar, kwargs...)
+
+    Vectorised form of `solve_with_saturation`: solves the bulk-composition /
+    saturation fixed point for a whole set of P-T points, using
+    `multi_point_minimization` for the equilibrium step so the minimisations of one
+    iteration run across all available threads.
+
+    Each point carries its own corrected bulk composition and its own residual.
+    Points drop out of the active set as they converge, so later iterations only
+    minimise what is still moving.
+
+    Parameters
+    ----------
+    P, T : Vector{Float64}
+        Pressures [kbar] and temperatures [C], same length.
+    data : MAGEMin_Data
+        Initialised MAGEMin database.
+    X_mol : Vector{Float64} or Vector{Vector{Float64}}
+        Starting bulk composition — one shared composition, or one per point.
+    Xoxides : Vector{String}
+        Oxide names of `X_mol`.
+    C0 : Vector{Float64}
+        Initial bulk trace element composition [ppm], shared by all points.
+    KDs_dtb : custom_KDs_database
+        Compiled KD database.
+    dtb : String
+        Database identifier for mineral classification (e.g. "ig", "mp").
+    sat : SaturationConfig, optional
+        Saturation models to apply (default: all disabled).
+    sys_in : String, optional
+        "mol" (default) or "wt". The saturation feedback subtracts `bulk_cor_mol`,
+        so only "mol" is self-consistent.
+    tol : Float64, optional
+        Convergence tolerance on the change in `norm(bulk_cor_mol)` (default 1e-6).
+    max_iter : Int, optional
+        Maximum iterations (default 32).
+    progressbar : Bool, optional
+        Forwarded to `multi_point_minimization` (default false).
+    kwargs...
+        Any other keyword accepted by `multi_point_minimization`.
+
+    Returns
+    -------
+    out : Vector{gmin_struct}
+        Minimisation output per point.
+    out_TE : Vector{out_tepm}
+        Trace element output per point.
+    converged : Vector{Bool}
+        Per-point convergence flag.
+    n_iter : Vector{Int}
+        Iterations used per point (`max_iter` for points that never converged).
+"""
+function solve_with_saturation( P           :: Vector{Float64},
+                                T           :: Vector{Float64},
+                                data,
+                                X_mol       :: Union{Vector{Float64}, Vector{Vector{Float64}}},
+                                Xoxides     :: Vector{String},
+                                C0          :: Vector{Float64},
+                                KDs_dtb     :: custom_KDs_database,
+                                dtb         :: String;
+                                sat         :: SaturationConfig = SaturationConfig(),
+                                sys_in      :: String  = "mol",
+                                tol         :: Float64 = 1e-6,
+                                max_iter    :: Int     = 32,
+                                progressbar :: Bool    = false,
+                                kwargs... )
+
+    length(P) == length(T) || error("solve_with_saturation: P and T must have the same length")
+    n = length(P)
+
+    X0 = isa(X_mol, Vector{Float64}) ? [copy(X_mol) for _ in 1:n] : [copy(x) for x in X_mol]
+    length(X0) == n || error("solve_with_saturation: X_mol must hold one composition per point")
+
+    X          = [copy(x) for x in X0]
+    n0         = zeros(n)
+    X_mnz_LREE = ones(n)
+    converged  = falses(n)
+    n_iter     = fill(max_iter, n)
+
+    out    = Vector{Any}(undef, n)
+    out_TE = Vector{out_tepm}(undef, n)
+    active = collect(1:n)
+
+    for ite in 1:max_iter
+        outs = multi_point_minimization(P[active], T[active], data;
+                                        X = X[active], Xoxides = Xoxides,
+                                        sys_in = sys_in, progressbar = progressbar,
+                                        kwargs...)
+
+        for (k, i) in enumerate(active)
+            out[i]          = outs[k]
+            out_TE[i]       = TE_prediction(out[i], C0, KDs_dtb, dtb;
+                                            sat = sat, X_mnz_LREE = X_mnz_LREE[i])
+            X_mnz_LREE[i]   = out_TE[i].X_mnz_LREE
+
+            X[i]            = X0[i] .- out_TE[i].bulk_cor_mol
+            nrm             = vec_norm(out_TE[i].bulk_cor_mol)
+            res             = abs(n0[i] - nrm)
+            n0[i]           = nrm
+
+            if res < tol
+                converged[i] = true
+                n_iter[i]    = ite
+            end
+        end
+
+        active = [i for i in active if !converged[i]]
+        isempty(active) && break
+    end
+
+    bad = findall(!, converged)
+    if !isempty(bad)
+        shown = join(["P=$(P[i]) kbar, T=$(T[i]) C" for i in first(bad, 5)], "; ")
+        length(bad) > 5 && (shown *= "; ...")
+        @warn "solve_with_saturation: $(length(bad)) of $n points did not converge in $max_iter iterations ($shown)"
+    end
+
+    return identity.(out), out_TE, converged, n_iter
 end
 
 

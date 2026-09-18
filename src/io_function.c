@@ -20,7 +20,6 @@
 #include "MAGEMin.h"
 
 
-#define n_ox 11
 /** 
   read in input data from file 
 */
@@ -38,26 +37,34 @@ void read_in_data(		global_variable 	 gv,
 			/* if this is the first line belonging to a PT point to take into account */
 			if (l == 0){
 				/* first allocate memory to fill gamma array */
-				input_data[k].in_bulk      = malloc (n_ox * sizeof (double) ); 
-				for (int z = 0; z < n_ox; z++){
+				input_data[k].in_bulk      = malloc (gv.len_ox * sizeof (double) ); 
+				for (int z = 0; z < gv.len_ox; z++){
 					input_data[k].in_bulk[z] = 0.0; 
 				}
 
-				sscanf(line, "%i %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", 
-					&input_data[k].n_phase, 
-					&input_data[k].P, 
-					&input_data[k].T,
-					&input_data[k].in_bulk[0],
-					&input_data[k].in_bulk[1],
-					&input_data[k].in_bulk[2],
-					&input_data[k].in_bulk[3],
-					&input_data[k].in_bulk[4],
-					&input_data[k].in_bulk[5],
-					&input_data[k].in_bulk[6],
-					&input_data[k].in_bulk[7],
-					&input_data[k].in_bulk[8],
-					&input_data[k].in_bulk[9],
-					&input_data[k].in_bulk[10]	);
+				input_data[k].n_phase = 0;
+				input_data[k].P       = 0.0;
+				input_data[k].T       = 0.0;
+
+				{
+					char   *cur = line;
+					char   *nxt = NULL;
+					double  v;
+
+					v = strtod(cur, &nxt);
+					if (nxt != cur){ input_data[k].n_phase = (int)v; cur = nxt; }
+					v = strtod(cur, &nxt);
+					if (nxt != cur){ input_data[k].P = v; cur = nxt; }
+					v = strtod(cur, &nxt);
+					if (nxt != cur){ input_data[k].T = v; cur = nxt; }
+
+					for (int z = 0; z < gv.len_ox; z++){
+						v = strtod(cur, &nxt);
+						if (nxt == cur){ break; }
+						input_data[k].in_bulk[z] = v;
+						cur = nxt;
+					}
+				}
 				
 				/* allocate memory depending on the number of provided solution phases */
 				input_data[k].phase_names = malloc(input_data[k].n_phase * sizeof(char*));
@@ -69,11 +76,11 @@ void read_in_data(		global_variable 	 gv,
 				//input_data[k].sum_phase_xeos = malloc(input_data[k].n_phase * sizeof(double));
 				input_data[k].phase_xeos 	 = malloc(input_data[k].n_phase * sizeof(double*));
 				for (int i = 0; i < input_data[k].n_phase; i++){
-					input_data[k].phase_xeos[i] = malloc((n_ox) * sizeof(double));
+					input_data[k].phase_xeos[i] = malloc((gv.len_ox) * sizeof(double));
 				}
 				/* initialize x-eos to zeros in case there is mistake in the input file */
 				for (int i = 0; i < input_data[k].n_phase; i++){
-					for (int j = 0; j < (n_ox); j++){
+					for (int j = 0; j < (gv.len_ox); j++){
 						input_data[k].phase_xeos[i][j] = gv.bnd_val;
 					}
 				}
@@ -82,11 +89,11 @@ void read_in_data(		global_variable 	 gv,
 				//input_data[k].sum_phase_emp = malloc(input_data[k].n_phase * sizeof(double));
 				input_data[k].phase_emp 	= malloc(input_data[k].n_phase * sizeof(double*));
 				for (int i = 0; i < input_data[k].n_phase; i++){
-					input_data[k].phase_emp[i] = malloc((n_ox+1) * sizeof(double));
+					input_data[k].phase_emp[i] = malloc((gv.len_ox+1) * sizeof(double));
 				}
 				/* initialize x-eos to zeros in case there is mistake in the input file */
 				for (int i = 0; i < input_data[k].n_phase; i++){
-					for (int j = 0; j < (n_ox+1); j++){
+					for (int j = 0; j < (gv.len_ox+1); j++){
 						input_data[k].phase_emp[i][j] = 0.0;
 					}
 				}
@@ -95,32 +102,27 @@ void read_in_data(		global_variable 	 gv,
 			/* Lines belonging to the provided x-eos for each solution phase listed */
 			/* allocates memory only if the number of phases is not 0 				*/
 			if(l > 0 && l < input_data[k].n_phase+1){
-				sscanf(line, "%s %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", 
-					 input_data[k].phase_names[l-1], 
-					&input_data[k].phase_xeos[l-1][0],
-					&input_data[k].phase_xeos[l-1][1],
-					&input_data[k].phase_xeos[l-1][2],
-					&input_data[k].phase_xeos[l-1][3],
-					&input_data[k].phase_xeos[l-1][4],
-					&input_data[k].phase_xeos[l-1][5],
-					&input_data[k].phase_xeos[l-1][6],
-					&input_data[k].phase_xeos[l-1][7],
-					&input_data[k].phase_xeos[l-1][8],
-					&input_data[k].phase_xeos[l-1][9],
-					&input_data[k].phase_xeos[l-1][10],
+				char   *cur = line;
+				char   *nxt = NULL;
+				double  v;
 
-					&input_data[k].phase_emp[l-1][0],
-					&input_data[k].phase_emp[l-1][1],
-					&input_data[k].phase_emp[l-1][2],
-					&input_data[k].phase_emp[l-1][3],
-					&input_data[k].phase_emp[l-1][4],
-					&input_data[k].phase_emp[l-1][5],
-					&input_data[k].phase_emp[l-1][6],
-					&input_data[k].phase_emp[l-1][7],
-					&input_data[k].phase_emp[l-1][8],
-					&input_data[k].phase_emp[l-1][9],
-					&input_data[k].phase_emp[l-1][10],
-					&input_data[k].phase_emp[l-1][11]	);	
+				if (sscanf(line, "%19s", input_data[k].phase_names[l-1]) == 1){
+					cur = line + strspn(line, " \t");
+					cur += strcspn(cur, " \t\n");
+				}
+
+				for (int j = 0; j < gv.len_ox; j++){
+					v = strtod(cur, &nxt);
+					if (nxt == cur){ break; }
+					input_data[k].phase_xeos[l-1][j] = v;
+					cur = nxt;
+				}
+				for (int j = 0; j < gv.len_ox+1; j++){
+					v = strtod(cur, &nxt);
+					if (nxt == cur){ break; }
+					input_data[k].phase_emp[l-1][j] = v;
+					cur = nxt;
+				}
 			}
 			
 			l++;

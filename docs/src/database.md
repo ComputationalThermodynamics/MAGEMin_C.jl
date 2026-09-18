@@ -11,6 +11,7 @@ A comprehensive overview of all thermodynamic databases available in MAGEMin, in
     - [Deep Earth Water (DEW) aqueous fluid model](#Deep-Earth-Water-DEW-aqueous-fluid-model)
     - [Trace-element partitioning models](#Trace-element-partitioning-models)
         - [OL fixed Kd database](#OL-fixed-Kd-database)
+        - [Yak25 fixed Kd database](#Yak25-fixed-Kd-database)
         - [CO lattice strain model](#CO-lattice-strain-model)
 
 !!! important
@@ -195,7 +196,7 @@ The metapelitic model (extended with MnO, White et al., 2014) allows to compute 
     <li>Added August 2026</li>
     <li>Union of every unique solution-phase model across the mp, mb, mbe, ig, igd, igad, um, ume, and mpe databases, plus the DEW aqueous fluid model (see the dedicated section below) - one database exposing every citation-tagged phase variant instead of switching between <code>--db=</code> values.</li>
     <li>SiO2-Al2O3-CaO-MgO-FeO-K2O-Na2O-TiO2-O-MnO-Cr2O3-H2O-CO2-S chemical system (14 oxides, the union of every source database's own system)</li>
-    <li>56 solution phases, 36 pure phases - see the <a href="#Phase-and-End-member-Listing">Phase and End-member Listing</a> section below for the full table</li>
+    <li>60 solution phases, 36 pure phases - see the <a href="#Phase-and-End-member-Listing">Phase and End-member Listing</a> section below for the full table</li>
     <li>Default dataset is <code>ds636</code> (the newest Holland-Green table). Phases sourced from mp/mb/mbe (calibrated against ds62) and um/ume (calibrated against ds633) therefore run "off-label" against ds636 endmember values in <code>all</code> - a known scientific caveat, not a bug, and the reason the single-system databases above remain the recommended starting point for focused work.</li>
     <li>Where two source databases defined genuinely different mixing models under the same short phase name (e.g. <code>liq</code>, <code>g</code>, <code>opx</code>), both are kept as separate, citation-tagged entries (<code>liq_W14</code> vs <code>liq_G16</code> vs …) rather than one being silently dropped - see the Phase and End-member Listing table for the full disambiguation.</li>
     <li>Database-specific mutual-exclusion toggles that exist on the single-system databases (<code>mbCpx</code>, <code>mbIlm</code>, <code>mpSp</code>, <code>mpIlm</code> - see MAGEMin_C.jl: options) do not apply here: both phase variants each toggle would otherwise switch between (e.g. <code>dio</code>/<code>aug</code>, <code>ilm</code>/<code>ilmm</code>) are simply present as independent, separately selectable phases. Use <code>select_phases</code>/<code>pp_list=</code>/<code>ss_list=</code> or <code>remove_phases</code>/<code>rm_list=</code> instead.</li>
@@ -304,7 +305,7 @@ Complete list of solution phases, end-members and pure phases for each supported
 | Phase | Warr (2021) | Model | em | End-members |
 |---|---|---|:---:|---|
 | `sp` | Spl | sp_W02 | 4 | herc · sp · mt · usp |
-| `spl` | Spl | spl_W02 | 3 | herc · sp · usp |
+| `opx` | Opx | opx_W14 | 6 | en · fs · fm · mgts · fopx · odi |
 | `fsp` | Fsp | fsp_H22 | 3 | ab · an · san |
 | `liq` | liq | liq_G16 | 9 | q4L · abL · kspL · wo1L · sl1L · fa2L · fo2L · h2oL · anoL |
 | `mu` | Ms | mu_W14 | 6 | mu · cel · fcel · pa · mam · fmu |
@@ -316,10 +317,10 @@ Complete list of solution phases, end-members and pure phases for each supported
 | `g` | Grt | g_W14 | 4 | py · alm · gr · kho |
 | `chl` | Chl | chl_W14 | 7 | clin · afchl · ames · daph · ochl1 · ochl4 · f3clin |
 | `bi` | Bt | bi_W14 | 6 | phl · annm · obi · east · tbi · fbi |
-| `opx` | Opx | opx_W14 | 6 | en · fs · fm · mgts · fopx · odi |
 | `dio` | Cpx | dio_G16 | 7 | jd · di · hed · acmm · om · cfm · jac |
 | `aug` | Aug | aug_G16 | 8 | di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
 | `abc` | Ab | abc_H11 | 2 | abm · anm |
+| `spl` | Spl | spl_W02 | 3 | herc · sp · usp |
 
 **Pure phases:** q · crst · trd · coe · law · ky · sill · and · ru · sph · O2 · ab · H2O · zo · cor
 
@@ -331,11 +332,30 @@ Extends `mb` with two additional solution phases.
 
 | Phase | Warr (2021) | Model | em | End-members |
 |---|---|---|:---:|---|
-| *(all mb phases)* | - | - | - | *(see Metabasite tab)* |
-| `ta` | Tlc | - (Rebay 2022) | 5 | ta · fta · ota · tap · tats |
-| `oamp` | oamp | - (Diener 2007) | 9 | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
+| `sp` | Spl | sp_W02 | 4 | herc · sp · mt · usp |
+| `opx` | Opx | opx_W14 | 6 | en · fs · fm · mgts · fopx · odi |
+| `fsp` | Fsp | fsp_H22 | 3 | ab · an · san |
+| `liq` | liq | liq_G16 | 9 | q4L · abL · kspL · wo1L · sl1L · fa2L · fo2L · h2oL · anoL |
+| `mu` | Ms | mu_W14 | 6 | mu · cel · fcel · pa · mam · fmu |
+| `ilmm` | Ilm | ilmm_W14 | 4 | oilm · dilm · dhem · geik |
+| `ilm` | Ilm | ilm_W00 | 3 | oilm · dilm · dhem |
+| `ol` | Ol | ol_H11 | 2 | fo · fa |
+| `amp` | Amp | amp_G16 | 11 | tr · tsm · prgm · glm · cumm · grnm · a · b · mrb · kprg · tts |
+| `ep` | Ep | ep_H11 | 3 | cz · ep · fep |
+| `g` | Grt | g_W14 | 4 | py · alm · gr · kho |
+| `chl` | Chl | chl_W14 | 7 | clin · afchl · ames · daph · ochl1 · ochl4 · f3clin |
+| `bi` | Bt | bi_W14 | 6 | phl · annm · obi · east · tbi · fbi |
+| `dio` | Cpx | dio_G16 | 7 | jd · di · hed · acmm · om · cfm · jac |
+| `aug` | Aug | aug_G16 | 8 | di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
+| `abc` | Ab | abc_H11 | 2 | abm · anm |
+| `spl` | Spl | spl_W02 | 3 | herc · sp · usp |
+| `ta` | Tlc | ta_EF21 | 5 | ta · fta · ota · tap · tats |
+| `oamp` | oamp | oamp_D07 | 9 | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
+| `DEW` | DEW | DEW_S24 | 32 | *32 aqueous species — see the DEW section below* |
 
-**Pure phases, Buffers, Activities:** identical to `mb`.
+**Pure phases:** q · crst · trd · coe · law · ky · sill · and · ru · sph · O2 · ab · H2O · zo · cor
+
+**Buffers:** qfm · mw · qif · nno · hm · iw · cco &nbsp;&nbsp; **Activities:** aH2O · aO2 · aMgO · aFeO · aAl2O3 · aTiO2
 
 == Igneous (ig)
 
@@ -387,7 +407,7 @@ Extends `mb` with two additional solution phases.
 | `cpx` | Cpx | cpx_W24 | 10 | di · cfs · cats · crdi · cess · cbuf · jd · cen · cfm · kjd |
 | `g` | Grt | g_W24 | 6 | py · alm · gr · andr · knr · tig |
 | `ilm` | Ilm | ilm_W24 | 5 | oilm · dilm · hm · ogk · dgk |
-| `liq` | liq | liq_W24d | 14 | q3L · sl1L · wo1L · fo2L · fa2L · nmL · hmL · ekL · tiL · kmL · anL · ab1L · enL · kfL |
+| `liq` | liq | liq_S26 | 14 | q3L · sl1L · wo1L · fo2L · fa2L · nmL · hmL · ekL · tiL · kmL · anL · ab1L · enL · kfL |
 | `ol` | Ol | ol_H18 | 4 | mnt · fa · fo · cfm |
 | `opx` | Opx | opx_W24 | 9 | en · fs · fm · odi · mgts · cren · obuf · mess · ojd |
 | `fsp` | Fsp | fsp_H22 | 3 | ab · an · san |
@@ -427,13 +447,25 @@ Extends `um` with plagioclase, amphibole, augite, spinel, carbonated fluid and c
 
 | Phase | Warr (2021) | Model | em | End-members |
 |---|---|---|:---:|---|
-| *(all um phases)* | - | - | - | *(see Ultramafic tab)* |
+| `fl` | fl | fl_EF21 | 2 | H2 · H2O |
+| `ol` | Ol | ol_H11 | 2 | fo · fa |
+| `br` | Brc | br_E13 | 2 | br · fbr |
+| `ch` | Chu | ch_EF21 | 2 | chum · chuf |
+| `atg` | Atg | atg_EF21 | 5 | atgf · fatg · atgo · aatg · oatg |
+| `g` | Grt | g_H18 | 2 | py · alm |
+| `ta` | Tlc | ta_EF21 | 6 | ta · fta · tao · tats · ota · tap |
+| `chl` | Chl | chl_W14 | 7 | clin · afchl · ames · daph · ochl1 · ochl4 · f3clin |
+| `spi` | Spl | spi_W02 | 3 | herc · sp · mt |
+| `opx` | Opx | opx_W14 | 5 | en · fs · fm · mgts · fopx |
+| `po` | Po | po_E10 | 2 | trov · trot |
+| `anth` | Ath | anth_D07 | 5 | anth · gedf · fant · a · b |
 | `pl4tr` | Pl | fsp_H22 | 2 | ab · an |
 | `amp` | Amp | amp_G16 | 9 | tr · tsm · prgm · glm · cumm · grnm · a · b · mrb |
 | `aug` | Aug | aug_G16 | 8 | di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
-| `spl` | Spl | - | 7 | nsp · isp · nhc · ihc · nmt · imt · pcr |
+| `spl` | Spl | spl_T21 | 7 | nsp · isp · nhc · ihc · nmt · imt · pcr |
 | `flc` | flc | fl_H03 | 2 | H2O · CO2 |
 | `occm` | occm | occm_F11 | 5 | cc · odo · mag · sid · oank |
+| `DEW` | DEW | DEW_S24 | 100 | *100 aqueous species — see the DEW section below* |
 
 **Pure phases:** q · crst · trd · coe · stv · ky · sill · and · pyr · O2 · hem · H2O · cor · gph
 
@@ -466,17 +498,35 @@ Extends `mp` with phases from Green et al. (2016), Evans & Frost (2021), and Die
 
 | Phase | Warr (2021) | Model | em | End-members |
 |---|---|---|:---:|---|
-| *(all mp phases)* | - | - | - | *(see Metapelite tab)* |
+| `liq` | liq | liq_W14 | 8 | q4L · abL · kspL · anL · slL · fo2L · fa2L · h2oL |
+| `fsp` | Fsp | fsp_H22 | 3 | ab · an · san |
+| `bi` | Bt | bi_W14 | 7 | phl · annm · obi · east · tbi · fbi · mmbi |
+| `g` | Grt | g_W14 | 5 | py · alm · spss · gr · kho |
+| `ep` | Ep | ep_H11 | 3 | cz · ep · fep |
+| `ma` | Mrg | ma_W14 | 6 | mut · celt · fcelt · pat · ma · fmu |
+| `mu` | Ms | mu_W14 | 6 | mut · cel · fcel · pat · ma · fmu |
+| `opx` | Opx | opx_W14 | 7 | en · fs · fm · mgts · fopx · mnopx · odi |
+| `sa` | Spr | sa_W14 | 5 | spr4 · spr5 · fspm · spro · ospr |
+| `cd` | Crd | cd_W14 | 4 | crd · fcrd · hcrd · mncd |
+| `st` | St | st_W14 | 5 | mstm · fst · mnstm · msto · mstt |
+| `chl` | Chl | chl_W14 | 8 | clin · afchl · ames · daph · ochl1 · ochl4 · f3clin · mmchl |
+| `ctd` | Cld | ctd_W14 | 4 | mctd · fctd · mnct · ctdo |
+| `sp` | Spl | sp_W02 | 4 | herc · sp · mt · usp |
+| `mt` | Mag | mt_W00 | 3 | imt · dmt · usp |
+| `ilm` | Ilm | ilm_W00 | 3 | oilm · dilm · dhem |
+| `ilmm` | Ilm | ilmm_W14 | 5 | oilm · dilm · dhem · geik · pnt |
 | `occm` | occm | occm_F11 | 5 | cc · odo · mag · sid · oank |
 | `fl` | fl | fl_H03 | 2 | H2O · CO2 |
 | `po` | Po | po_E10 | 2 | trov · trot |
 | `dio` | Cpx | dio_G16 | 7 | jd · di · hed · acmm · om · cfm · jac |
 | `aug` | Aug | aug_G16 | 8 | di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
 | `amp` | Amp | amp_G16 | 11 | tr · tsm · prgm · glm · cumm · grnm · a · b · mrb · kprg · tts |
-| `oamp` | oamp | - (Diener 2007) | 9 | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
-| `carp` | Cph | - | 2 | mcar · fcar |
+| `oamp` | oamp | oamp_D07 | 9 | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
+| `carp` | Cph | carp_W14 | 2 | mcar · fcar |
+| `plc` | Pl | plc_B05 | 3 | ab · an · san |
+| `DEW` | DEW | DEW_S24 | 102 | *102 aqueous species — see the DEW section below* |
 
-**Pure phases:** q · crst · trd · coe · stv · ky · sill · and · ru · sph · O2 · pyr · gph · law · zo · prl · mpm · pre · cor
+**Pure phases:** q · crst · trd · coe · stv · ky · sill · and · ru · sph · O2 · pyr · gph · law · zo · prl · mpm · pre · cor · H2O
 
 **Buffers:** qfm · mw · qif · nno · hm · iw · cco &nbsp;&nbsp; **Activities:** aH2O · aO2 · aMgO · aFeO · aAl2O3 · aTiO2
 
@@ -510,144 +560,151 @@ Berman (1988) formalism (`br` research group), not the Holland-Powell-family dat
 
 Stixrude & Lithgow-Bertelloni (2011). End-member names follow the SLB internal convention.
 
-| Phase | Warr (2021) | em | End-members |
-|---|---|:---:|---|
-| `plg` | Pl | 2 | an · ab |
-| `sp` | Spl | 2 | sp · hc |
-| `ol` | Ol | 2 | fo · fa |
-| `wa` | Wds | 2 | mgwa · fewa |
-| `ri` | ring | 2 | mgri · feri |
-| `opx` | Opx | 4 | en · fs · mgts · odi |
-| `cpx` | Cpx | 5 | di · he · cen · cats · jd |
-| `hpcpx` | hpcpx | 2 | hpcen · hpcfs |
-| `ak` | Aki | 3 | mgak · feak · co |
-| `gtmj` | Grt | 5 | py · alm · gr · mgmj · jdmj |
-| `pv` | pv | 3 | mgpv · fepv · alpv |
-| `ppv` | ppv | 3 | mppv · fppv · appv |
-| `mw` | Fper | 2 | pe · wu |
-| `cf` | cf | 3 | mgcf · fecf · nacf |
+| Phase | Warr (2021) | Model | em | End-members |
+|---|---|---|:---:|---|
+| `plg` | Pl | plg_SB11 | 2 | an · ab |
+| `sp` | Spl | sp_SB11 | 2 | sp · hc |
+| `ol` | Ol | ol_SB11 | 2 | fo · fa |
+| `wa` | Wds | wa_SB11 | 2 | mgwa · fewa |
+| `ri` | Rwd | ri_SB11 | 2 | mgri · feri |
+| `opx` | Opx | opx_SB11 | 4 | en · fs · mgts · odi |
+| `cpx` | Cpx | cpx_SB11 | 5 | di · he · cen · cats · jd |
+| `hpcpx` | hpcpx | hpcpx_SB11 | 2 | hpcen · hpcfs |
+| `ak` | Aki | ak_SB11 | 3 | mgak · feak · co |
+| `gtmj` | Grt | gtmj_SB11 | 5 | py · alm · gr · mgmj · jdmj |
+| `pv` | pv | pv_SB11 | 3 | mgpv · fepv · alpv |
+| `ppv` | ppv | ppv_SB11 | 3 | mppv · fppv · appv |
+| `mw` | mw | mw_SB11 | 2 | pe · wu |
+| `cf` | cf | cf_SB11 | 3 | mgcf · fecf · nacf |
 
-**Pure phases:** neph · ky · st · coe · qtz · capv · co &nbsp;&nbsp; **Activities:** aMgO · aFeO · aAl2O3
+**Pure phases:** neph · ky · st · coe · qtz · capv · co
+
+**Activities:** aMgO · aFeO · aAl2O3
 
 == Mantle SB21
 
 Stixrude & Lithgow-Bertelloni (2021). Extends SB11 with new-aluminium-phase (`nal`) and an extra end-member in `mw`.
 
-| Phase | Warr (2021) | em | End-members |
-|---|---|:---:|---|
-| `plg` | Pl | 2 | an · ab |
-| `sp` | Spl | 2 | sp · hc |
-| `ol` | Ol | 2 | fo · fa |
-| `wa` | Wds | 2 | mgwa · fewa |
-| `ri` | ring | 2 | mgri · feri |
-| `opx` | Opx | 4 | en · fs · mgts · odi |
-| `cpx` | Cpx | 5 | di · he · cen · cats · jd |
-| `hpcpx` | hpcpx | 2 | hpcen · hpcfs |
-| `ak` | Aki | 3 | mgak · feak · co |
-| `gtmj` | Grt | 5 | py · alm · gr · mgmj · jdmj |
-| `pv` | pv | 3 | mgpv · fepv · alpv |
-| `ppv` | ppv | 3 | mppv · fppv · appv |
-| `cf` | cf | 3 | mgcf · fecf · nacf |
-| `mw` | Fper | 3 | pe · wu · anao |
-| `nal` | nal | 3 | mnal · fnal · nnal |
+| Phase | Warr (2021) | Model | em | End-members |
+|---|---|---|:---:|---|
+| `plg` | Pl | plg_SB21 | 2 | an · ab |
+| `sp` | Spl | sp_SB21 | 2 | sp · hc |
+| `ol` | Ol | ol_SB21 | 2 | fo · fa |
+| `wa` | Wds | wa_SB21 | 2 | mgwa · fewa |
+| `ri` | Rwd | ri_SB21 | 2 | mgri · feri |
+| `opx` | Opx | opx_SB21 | 4 | en · fs · mgts · odi |
+| `cpx` | Cpx | cpx_SB21 | 5 | di · he · cen · cats · jd |
+| `hpcpx` | hpcpx | hpcpx_SB21 | 2 | hpcen · hpcfs |
+| `ak` | Aki | ak_SB21 | 3 | mgak · feak · co |
+| `gtmj` | Grt | gtmj_SB21 | 5 | py · alm · gr · mgmj · jdmj |
+| `pv` | pv | pv_SB21 | 3 | mgpv · fepv · alpv |
+| `ppv` | ppv | ppv_SB21 | 3 | mppv · fppv · appv |
+| `cf` | cf | cf_SB21 | 3 | mgcf · fecf · nacf |
+| `mw` | mw | mw_SB21 | 3 | pe · wu · anao |
+| `nal` | nal | nal_SB21 | 3 | mnal · fnal · nnal |
 
-**Pure phases:** neph · ky · st · coe · qtz · capv · co &nbsp;&nbsp; **Activities:** aMgO · aFeO · aAl2O3
+**Pure phases:** neph · ky · st · coe · qtz · capv · co
+
+**Activities:** aMgO · aFeO · aAl2O3
 
 == Mantle SB24
 
 Stixrude & Lithgow-Bertelloni (2024). Expanded solid solutions throughout; new iron polymorphs and high-pressure phases as pure phases.
 
-| Phase | Warr (2021) | em | End-members |
-|---|---|:---:|---|
-| `plg` | Pl | 2 | an · ab |
-| `sp` | Spl | 4 | sp · hc · smag · picr |
-| `ol` | Ol | 2 | fo · fa |
-| `wa` | Wds | 2 | mgwa · fewa |
-| `ri` | ring | 2 | mgri · feri |
-| `opx` | Opx | 4 | en · fs · mgts · odi |
-| `cpx` | Cpx | 6 | di · he · cen · cats · jd · acm |
-| `hpcpx` | hpcpx | 2 | mgc2 · fec2 |
-| `ak` | Aki | 5 | mgak · feak · co · hem · esk |
-| `gtmj` | Grt | 7 | py · alm · gr · mgmj · jdmj · knor · andr |
-| `pv` | pv | 7 | mgpv · fepv · alpv · hepv · hlpv · fapv · crpv |
-| `ppv` | ppv | 5 | mppv · fppv · appv · hppv · cppv |
-| `cf` | cf | 5 | mgcf · fecf · nacf · hmag · crcf |
-| `mw` | Fper | 5 | pe · wu · wuls · mag · anao |
-| `nal` | nal | 3 | mnal · fnal · nnal |
+| Phase | Warr (2021) | Model | em | End-members |
+|---|---|---|:---:|---|
+| `plg` | Pl | plg_SB24 | 2 | an · ab |
+| `sp` | Spl | sp_SB24 | 4 | sp · hc · smag · picr |
+| `ol` | Ol | ol_SB24 | 2 | fo · fa |
+| `wa` | Wds | wa_SB24 | 2 | mgwa · fewa |
+| `ri` | Rwd | ri_SB24 | 2 | mgri · feri |
+| `opx` | Opx | opx_SB24 | 4 | en · fs · mgts · odi |
+| `cpx` | Cpx | cpx_SB24 | 6 | di · he · cen · cats · jd · acm |
+| `hpcpx` | hpcpx | hpcpx_SB24 | 2 | mgc2 · fec2 |
+| `ak` | Aki | ak_SB24 | 5 | mgak · feak · co · hem · esk |
+| `gtmj` | Grt | gtmj_SB24 | 7 | py · alm · gr · mgmj · jdmj · knor · andr |
+| `pv` | pv | pv_SB24 | 7 | mgpv · fepv · alpv · hepv · hlpv · fapv · crpv |
+| `ppv` | ppv | ppv_SB24 | 5 | mppv · fppv · appv · hppv · cppv |
+| `cf` | cf | cf_SB24 | 5 | mgcf · fecf · nacf · hmag · crcf |
+| `mw` | mw | mw_SB24 | 5 | pe · wu · wuls · mag · anao |
+| `nal` | nal | nal_SB24 | 3 | mnal · fnal · nnal |
 
-**Pure phases:** neph · ky · st · coe · qtz · capv · O2 · fea · fee · feg · apbo · wo · lppv · pwo &nbsp;&nbsp; **Activities:** aMgO · aFeO · aAl2O3
+**Pure phases:** neph · ky · st · coe · qtz · capv · O2 · fea · fee · feg · apbo · wo · lppv · pwo
+
+**Buffers:** qfm · qif · mw · iw · hm &nbsp;&nbsp; **Activities:** aMgO · aFeO · aAl2O3 · aO2
 
 == Global (all)
 
-56 solution phases, generated live from the database itself (`print_phase_info("all"; level=1)`)
-rather than hand-transcribed, to avoid drift from this table.
-
 | Phase | Warr (2021) | Model | em | End-members |
 |---|---|---|:---:|---|
-| `liq` | liq | liq_W24d | 14 | q3L · sl1L · wo1L · fo2L · fa2L · neL · hmL · ekL · tiL · kjL · anL · ab1L · enL · kfL |
-| `liq` | liq | liq_G16 | 9 | q4L · abL · kspL · wo1L · sl1L · fa2L · fo2L · h2oL · anoL |
-| `liq` | liq | liq_W14 | 8 | q4L · abL · kspL · anL · slL · fo2L · fa2L · h2oL |
-| `liq` | liq | liq_G25w | 12 | q4L · slL · wo1L · fo2L · fa2L · jdL · hmL · ekL · tiL · kjL · ctL · h2o1L |
-| `fsp` | Fsp | fsp_H22 | 3 | ab · an · san |
-| `fsp` | Fsp | fsp_H22 * | 4 | ab · an · san · op |
-| `g` | Grt | g_W24 | 6 | py · alm · gr · andr · knom · tig |
-| `g` | Grt | g_W14 | 5 | py · alm · spss · gr · kho |
-| `g` | Grt | g_H18 | 2 | py · alm |
-| `opx` | Opx | opx_W24 | 9 | en · fs · fm · odi · mgts · cren · obuf · mess · ojd |
-| `opx` | Opx | opx_W14 | 7 | en · fs · fm · mgts · fopx · mnopx · odi |
-| `ol` | Ol | ol_H18 | 4 | mnt · fa · fo · cfm |
-| `ol` | Ol | ol_H11 | 2 | fo · fa |
-| `ilm` | Ilm | ilm_W24 | 5 | oilm · dilm · hm · ogk · dgk |
-| `ilm` | Ilm | ilm_W00 | 3 | oilm · dilm · dhem |
-| `spl` | Spl | spl_T21 | 7 | nsp · isp · nhc · ihc · nmt · imt · pcr |
-| `spl` | Spl | spl_W02 | 3 | herc · sp · usp |
-| `bi` | Bt | bi_G25 | 6 | phl · annm · obi · eas · tbi · fbi |
-| `bi` | Bt | bi_W14 | 7 | phl · annm · obi · east · tbi · fbi · mmbi |
-| `cd` | Crd | cd_G25 | 3 | crd · fcrd · hcrd |
-| `cd` | Crd | cd_W14 | 4 | crd · fcrd · hcrd · mncd |
-| `fl` | fl | fl_G25 | 11 | qfL · slfL · wofL · fofL · fafL · jdfL · hmfL · ekfL · tifL · kjfL · H2O |
-| `fl` | fl | fl_EF21 | 2 | H2 · H2O |
-| `fl` | fl | fl_H03 | 2 | H2O · CO2 |
-| `ep` | Ep | ep_H11 | 3 | cz · ep · fep |
-| `ma` | Mrg | ma_W14 | 6 | mut · celt · fcelt · pat · ma · fmu |
-| `mu` | Ms | mu_W14 | 6 | mut · cel · fcel · pat · ma · fmu |
-| `sa` | Spr | sa_W14 | 5 | spr4 · spr5 · fspm · spro · ospr |
-| `st` | St | st_W14 | 5 | mstm · fst · mnstm · msto · mstt |
-| `chl` | Chl | chl_W14 | 8 | clin · afchl · ames · daph · ochl1 · ochl4 · f3clin · mmchl |
-| `ctd` | Cld | ctd_W14 | 4 | mctd · fctd · mnct · ctdo |
-| `sp` | Spl | sp_W02 | 4 | herc · sp · mt · usp |
-| `mt` | Mag | mt_W00 | 3 | imt · dmt · usp |
-| `ilmm` | Ilm | ilmm_W14 | 4 | oilm · dilm · dhem · geik |
-| `amp` | Amp | amp_G16 | 11 | tr · tsm · prgm · glm · cumm · grnm · a · b · mrb · kprg · tts |
-| `dio` | Cpx | dio_G16 | 7 | jd · di · hed · acmm · om · cfm · jac |
-| `aug` | Aug | aug_G16 | 8 | di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
-| `abc` | Ab | abc_H11 | 2 | abm · anm |
-| `ta` | Tlc | ta_EF21 | 6 | ta · fta · tao · tats · ota · tap |
-| `oamp` | oamp | oamp_D07 | 9 | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
-| `DEW` | - | DEW_S14 | 107 | see the [DEW aqueous fluid model](#Deep-Earth-Water-DEW-aqueous-fluid-model) section below |
-| `cpx` | Cpx | cpx_W24 | 10 | di · cfs · cats · crdi · cess · cbuf · jd · cen · cfm · kjd |
+| `liq_S26` | liq | liq_S26 | 14 | q3L · sl1L · wo1L · fo2L · fa2L · neL · hmL · ekL · tiL · kjL · anL · ab1L · enL · kfL |
+| `liq_G16` | liq | liq_G16 | 9 | q4L · abL · kspL · wo1L · sl1L · fa2L · fo2L · h2oL · anoL |
+| `liq_W14` | liq | liq_W14 | 8 | q4L · abL · kspL · anL · slL · fo2L · fa2L · h2oL |
+| `liq_G25w` | liq | liq_G25w | 12 | q4L · slL · wo1L · fo2L · fa2L · jdL · hmL · ekL · tiL · kjL · ctL · h2o1L |
+| `fsp_H22` | Fsp | fsp_H22 | 3 | ab · an · san |
+| `fsp_H22op` | Fsp | fsp_H22 | 4 | ab · an · san · op |
+| `g_W24` | Grt | g_W24 | 6 | py · alm · gr · andr · knom · tig |
+| `g_W14` | Grt | g_W14 | 5 | py · alm · spss · gr · kho |
+| `g_H18` | Grt | g_H18 | 2 | py · alm |
+| `g_T21` | Grt | g_T21 | 6 | py · alm · gr · andr · knr · tig |
+| `opx_W24` | Opx | opx_W24 | 9 | en · fs · fm · odi · mgts · cren · obuf · mess · ojd |
+| `opx_W14` | Opx | opx_W14 | 7 | en · fs · fm · mgts · fopx · mnopx · odi |
+| `opx_T21` | Opx | opx_T21 | 9 | en · fs · fm · odi · mgts · cren · obuf · mess · ojd |
+| `ol_H18` | Ol | ol_H18 | 4 | mnt · fa · fo · cfm |
+| `ol_H11` | Ol | ol_H11 | 2 | fo · fa |
+| `ilm_W24` | Ilm | ilm_W24 | 5 | oilm · dilm · hm · ogk · dgk |
+| `ilm_W00` | Ilm | ilm_W00 | 3 | oilm · dilm · dhem |
+| `ilm_T21` | Ilm | ilm_T21 | 5 | oilm · dilm · hm · ogk · dgk |
+| `spl_T21` | Spl | spl_T21 | 7 | nsp · isp · nhc · ihc · nmt · imt · pcr |
+| `spl_W02` | Spl | spl_W02 | 3 | herc · sp · usp |
+| `bi_G25` | Bt | bi_G25 | 6 | phl · annm · obi · eas · tbi · fbi |
+| `bi_W14` | Bt | bi_W14 | 7 | phl · annm · obi · east · tbi · fbi · mmbi |
+| `cd_G25` | Crd | cd_G25 | 3 | crd · fcrd · hcrd |
+| `cd_W14` | Crd | cd_W14 | 4 | crd · fcrd · hcrd · mncd |
+| `fl_G25` | fl | fl_G25 | 11 | qfL · slfL · wofL · fofL · fafL · jdfL · hmfL · ekfL · tifL · kjfL · H2O |
+| `fl_EF21` | fl | fl_EF21 | 2 | H2 · H2O |
+| `fl_H03` | fl | fl_H03 | 2 | H2O · CO2 |
+| `ep_H11` | Ep | ep_H11 | 3 | cz · ep · fep |
+| `ma_W14` | Mrg | ma_W14 | 6 | mut · celt · fcelt · pat · ma · fmu |
+| `mu_W14` | Ms | mu_W14 | 6 | mut · cel · fcel · pat · ma · fmu |
+| `sa_W14` | Spr | sa_W14 | 5 | spr4 · spr5 · fspm · spro · ospr |
+| `st_W14` | St | st_W14 | 5 | mstm · fst · mnstm · msto · mstt |
+| `chl_W14` | Chl | chl_W14 | 8 | clin · afchl · ames · daph · ochl1 · ochl4 · f3clin · mmchl |
+| `ctd_W14` | Cld | ctd_W14 | 4 | mctd · fctd · mnct · ctdo |
+| `sp_W02` | Spl | sp_W02 | 4 | herc · sp · mt · usp |
+| `mt_W00` | Mag | mt_W00 | 3 | imt · dmt · usp |
+| `ilmm_W14` | Ilm | ilmm_W14 | 4 | oilm · dilm · dhem · geik |
+| `amp_G16` | Amp | amp_G16 | 11 | tr · tsm · prgm · glm · cumm · grnm · a · b · mrb · kprg · tts |
+| `dio_G16` | Cpx | dio_G16 | 7 | jd · di · hed · acmm · om · cfm · jac |
+| `aug_G16` | Aug | aug_G16 | 8 | di · cenh · cfs · jdm · acmm · ocats · dcats · fmc |
+| `abc_H11` | Ab | abc_H11 | 2 | abm · anm |
+| `ta_EF21` | Tlc | ta_EF21 | 6 | ta · fta · tao · tats · ota · tap |
+| `oamp_D07` | oamp | oamp_D07 | 9 | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
+| `DEW_S24` | DEW | DEW_S24 | 107 | *107 aqueous species — see the DEW section below* |
+| `cpx_W24` | Cpx | cpx_W24 | 10 | di · cfs · cats · crdi · cess · cbuf · jd · cen · cfm · kjd |
+| `cpx_T21` | Cpx | cpx_T21 | 10 | di · cfs · cats · crdi · cess · cbuf · jd · cen · cfm · kjd |
 | `fper` | Fper | fper | 2 | per · wu |
-| `lct` | Lct | lct_W24 | 2 | nlc · klc |
-| `mel` | Mel | mel_W24 | 5 | geh · ak · fak · nml · fge |
-| `nph` | Nph | nph_W24 | 6 | neN · neS · neK · neO · neC · neF |
-| `kals` | Kls | kals_W24 | 2 | nks · kls |
-| `br` | Brc | br_E13 | 2 | br · fbr |
-| `ch` | Chu | ch_EF21 | 2 | chum · chuf |
-| `atg` | Atg | atg_EF21 | 5 | atgf · fatg · atgo · aatg · oatg |
-| `spi` | Spl | spi_W02 | 3 | herc · sp · mt |
-| `po` | Po | po_E10 | 2 | trov · trot |
-| `anth` | Ath | anth_D07 | 5 | anth · gedf · fant · a · b |
-| `occm` | occm | occm_F11 | 5 | cc · odo · mag · sid · oank |
-| `carp` | Cph | carp_W14 | 2 | mcar · fcar |
-| `plc` | - | plc_B05 | 3 | ab · an · san |
-
-\* The two `fsp_H22` rows share the same internal citation tag despite differing endmember
-counts (a known, pre-existing data labelling quirk carried over from the source databases, not
-introduced by `all`) - distinguish them by endmember count/list in practice.
+| `lct_W24` | Lct | lct_W24 | 2 | nlc · klc |
+| `mel_W24` | Mel | mel_W24 | 5 | geh · ak · fak · nml · fge |
+| `nph_W24` | Nph | nph_W24 | 6 | neN · neS · neK · neO · neC · neF |
+| `kals_W24` | Kls | kals_W24 | 2 | nks · kls |
+| `br_E13` | Brc | br_E13 | 2 | br · fbr |
+| `ch_EF21` | Chu | ch_EF21 | 2 | chum · chuf |
+| `atg_EF21` | Atg | atg_EF21 | 5 | atgf · fatg · atgo · aatg · oatg |
+| `spi_W02` | Spl | spi_W02 | 3 | herc · sp · mt |
+| `po_E10` | Po | po_E10 | 2 | trov · trot |
+| `anth_D07` | Ath | anth_D07 | 5 | anth · gedf · fant · a · b |
+| `occm_F11` | occm | occm_F11 | 5 | cc · odo · mag · sid · oank |
+| `carp_W14` | Cph | carp_W14 | 2 | mcar · fcar |
+| `plc_B05` | Pl | plc_B05 | 3 | ab · an · san |
 
 **Pure phases:** q · crst · trd · coe · stv · law · ky · sill · and · ru · sph · O2 · H2O · ab · zo · cor · pyr · hem · gph · ne · prl · mpm · pre
 
 **Buffers:** qfm · mw · qif · nno · hm · iw · cco &nbsp;&nbsp; **Activities:** aH2O · aO2 · aMgO · aFeO · aAl2O3 · aTiO2
+
+\* The two `fsp_H22` rows share the same internal citation tag despite differing endmember
+counts (a known, pre-existing data labelling quirk carried over from the source databases, not
+introduced by `all`) - distinguish them by endmember count/list in practice.
 
 :::
 
@@ -655,14 +712,14 @@ introduced by `all`) - distinguish them by endmember count/list in practice.
 
 ## Deep Earth Water (DEW) aqueous fluid model
 
-Unlike every other phase in MAGEMin, `DEW_S14` is not a solid solution - it is a 107-species
+Unlike every other phase in MAGEMin, `DEW_S24` is not a solid solution - it is a 107-species
 ionic aqueous-fluid speciation model (charged and neutral species such as `Na+`, `Cl-`, `H+`,
 `OH-`, `CO2`, `CH4`, and larger organic/complex species), solved self-consistently for molality
 and activity coefficients at the system's pressure, temperature and oxide chemical potentials,
 following the Deep Earth Water (DEW) model. It is available today in the `all` master database
 and, as `fl_DEW`, in the `mb`, `mbe`, `ig`, `um`, `ume`, and `mpe` databases.
 
-There is **no separate activation flag** - `DEW_S14`/`fl_DEW` is a normal solution phase that
+There is **no separate activation flag** - `DEW_S24`/`fl_DEW` is a normal solution phase that
 participates in the Gibbs energy minimization whenever it is present in the chosen database's
 phase list, exactly like any other phase, and can be excluded the same way (`remove_phases`/
 `rm_list=`, or `select_phases`/`pp_list=`/`ss_list=` - see
@@ -673,8 +730,7 @@ phase list, exactly like any other phase, and can be excluded the same way (`rem
 - Sverjensky, D. A., Harrison, B., & Azzolini, D. (2014). Water in the deep Earth: The dielectric
   constant and the solubilities of quartz and corundum to 60 kb and 1200 °C. *Geochimica et
   Cosmochimica Acta*, 129, 125–145. [doi: 10.1016/j.gca.2013.12.019](https://doi.org/10.1016/j.gca.2013.12.019) -
-  the dielectric-constant / activity-coefficient methodology (the "S14" in the `DEW_S14` model
-  tag).
+  the dielectric-constant / activity-coefficient methodology the model is built on.
 - Huang, F., & Sverjensky, D. A. (2019). Extended Deep Earth Water Model for predicting major
   element mantle metasomatism. *Geochimica et Cosmochimica Acta*, 254, 192–230.
   [doi: 10.1016/j.gca.2019.03.036](https://doi.org/10.1016/j.gca.2019.03.036) - the "DEW2019"
@@ -687,7 +743,7 @@ phase list, exactly like any other phase, and can be excluded the same way (`rem
 107 species (of the 229 in the full DEW2019 release - MAGEMin currently includes those whose
 formula is expressible in its tracked oxide set):
 
-::: details Show all 107 DEW_S14 species
+::: details Show all 107 DEW_S24 species
 
 Al(OH)3 · Al(OH)4- · Al(OH)Si(OH)- · Al+3 · C2H5COOH · CH3CH2COO- · CH3COO- · CH3COOH · CO2 ·
 CO3-2 · Ca(H3SiO4)+ · Ca(HCO3)+ · Ca(HCOO)+ · Ca(OH)+ · Ca+2 · CaCO3 · CaO · CaSO4 · Co · Cr+2 ·
@@ -697,18 +753,11 @@ HCOO- · HCOOH · HCrO4- · HS- · HSO3- · HSO4- · HSO5- · H_SUCCINa · K+ ·
 Mg(H3SiO4)+ · Mg(HCO3)+ · Mg(OH)+ · Mg(OH)2 · Mg+2 · MgCO3 · MgSO4 · MgSiC+ · Mn+2 · MnO4- ·
 MnO4-2 · MnSO4 · Na(AC) · Na(AC)2- · Na+ · NaCO3- · NaHCO3 · NaHSiO3 · NaOH · O2 · OH- · S2-2 ·
 S2O3-2 · S2O4-2 · S2O5-2 · S2O6-2 · S2O8-2 · S3- · S3-2 · S3O6-2 · S4-2 · S4O6-2 · S5-2 ·
-S506-2 · SO2 · SO3-2 · SO4-2 · benzene · ethane · ethanol · ethylene · glutarate- · glutaric ·
+S3O6-2 · SO2 · SO3-2 · SO4-2 · benzene · ethane · ethanol · ethylene · glutarate- · glutaric ·
 glycolate- · glycolic · hexane · isobutane · lactate- · lactic · methane · methanol · propane ·
 propanol · toluene · H2O
 
 :::
-
-### Known limitations
-
-- Only species active for the current bulk-rock oxide set participate - most compositions only
-  see a handful of the 107 species actually enter the stable assemblage.
-
----
 
 ## Trace-element partitioning models
 
@@ -845,6 +894,42 @@ Phases `and`, `sill` and `mu` are absent in this range; `ep` reappears.
 | V | 1.581 | 0.0671 | 2.449 | 1.000 | 0.0775 | 4.899 | 3.162 | 0.112 | 5.48 | 0.224 | 0.100 | 0.100 | 1.00 | 6.32 | 3.16 | 11.2 | 8.37 | 0.447 | 0.00316 |
 
 ---
+
+### Yak25 fixed Kd database
+
+Fixed mineral/melt partition coefficients from Yakymchuk, Gareau & Williams (2025),
+Table S1, compiled after Bédard (2006), Taylor et al. (2015), Bea et al. (1994),
+Stepanov et al. (2012) and Yakymchuk et al. (2018). Selected with
+`get_Yak25_KDs_database()`.
+
+Zr and P₂O₅ carry no Kd in any phase (shown as –): following the paper's own treatment
+they are controlled by the zircon and apatite saturation fronts rather than partitioned
+into the silicate assemblage, so they are handled by the saturation models rather than
+by a Nernst coefficient. See [Saturation models](MAGEMin_C/saturation_models.md).
+
+| Element | g | pl | afs | opx | cd | FeTiOx | ru | sp | smt | zrc | fapt | mnz | q | sa | sill | ky |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| La | 0.03 | 0.358 | 1.01 | 0.0003 | 0.06 | 0.015 | 0.0057 | 0.015 | 0.015 | 0.6 | 12 | 517 | 0.0001 | 0.0001 | 0.0001 | 0.0001 |
+| Ce | 0.03 | 0.339 | 0.86 | 0.0007 | 0.07 | 0.012 | 0.0065 | 0.016 | 0.016 | 0.9 | 15 | 505 | 0.0001 | 0.0001 | 0.0001 | 0.0001 |
+| Pr | 0.07 | 0.316 | 0.87 | 0.0014 | 0.09 | 0.011 | 0.0073 | 0.018 | 0.018 | 0.9 | 17 | 530 | 0.0001 | 0.0001 | 0.0001 | 0.0001 |
+| Nd | 0.2 | 0.289 | 0.51 | 0.0028 | 0.09 | 0.01 | 0.0082 | 0.026 | 0.026 | 1.4 | 19 | 538 | 0.0001 | 0.0001 | 0.0001 | 0.0001 |
+| Sm | 1.6 | 0.237 | 0.42 | 0.0085 | 0.1 | 0.009 | 0.0954 | 0.024 | 0.024 | 4.2 | 20 | 493 | 0.0001 | 0.0001 | 0.0001 | 0.0001 |
+| Eu | 1.6 | 2.17 | 2.32 | 0.68 | 0.01 | 0.01 | 0.00037 | 0.025 | 0.025 | 2.6 | 13 | 414 | 0.0001 | 0.0001 | 0.0001 | 0.0001 |
+| Gd | 5 | 0.192 | 0.6 | 0.02 | 0.29 | 0.011 | 0.0106 | 0.018 | 0.018 | 8 | 20 | 419 | 0.0001 | 0.0001 | 0.0001 | 0.0001 |
+| Y | 34.55 | 0.138 | 0.5 | 0.054 | 0.72 | 0.037 | 0.0118 | 0.018 | 0.018 | 19.3 | 17.5 | 130 | 0.0001 | 0.0001 | 0.0001 | 0.0001 |
+| Th | 0.0075 | 0.095 | 0.3 | 0.13 | 0.1 | 0.09 | 0.2 | 0.02 | 0.02 | 62 | 23 | 5000 | 0.0001 | 0.0001 | 0.0001 | 0.0001 |
+| U | 0.024 | 0.091 | 1.98 | 0.089 | 1.61 | 0.09 | 0.2 | 0.02 | 0.02 | 298 | 25 | 22 | 0.0001 | 0.0001 | 0.0001 | 0.0001 |
+| Zr | – | – | – | – | – | – | – | – | – | – | – | – | – | – | – | – |
+| P2O5 | – | – | – | – | – | – | – | – | – | – | – | – | – | – | – | – |
+
+#### References
+
+- Yakymchuk, C., Gareau, J., & Williams, M. (2025). Location, location, location: monazite behaviour during UHT metamorphism and melt crystallization. Journal of Metamorphic Geology, 44(2), 158–175.
+- Bédard, J. H. (2006). Trace element partitioning in plagioclase feldspar. Geochimica et Cosmochimica Acta, 70(14), 3717–3742.
+- Bea, F., Pereira, M. D., & Stroh, A. (1994). Mineral/leucosome trace-element partitioning in a peraluminous migmatite (a laser ablation-ICP-MS study). Chemical Geology, 117(1–4), 291–312.
+- Stepanov, A. S., Hermann, J., Rubatto, D., & Rapp, R. P. (2012). Experimental study of monazite/melt partitioning with implications for the REE, Th and U geochemistry of crustal rocks. Chemical Geology, 300–301, 200–220.
+- Taylor, R. J. M., Clark, C., Harley, S. L., Kylander-Clark, A. R. C., Hacker, B. R., & Kinny, P. D. (2015). Interpreting granulite facies events through rare earth element partitioning arrays. Journal of Metamorphic Geology, 33(7), 763–781.
+- Yakymchuk, C., Kirkland, C. L., & Clark, C. (2018). Th/U ratios in metamorphic zircon. Journal of Metamorphic Geology, 36(6), 715–737.
 
 ### CO lattice strain model
 

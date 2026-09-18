@@ -44,7 +44,7 @@ SS_ref G_SS_DEW_function(SS_ref SS_ref_db, char* research_group, int EM_dataset,
     int n_em    = SS_ref_db.n_em;
     double eps2 = 1e-15;
 
-    strcpy(SS_ref_db.fName, "DEW_S14");   /* citation tag (Sverjensky et al. 2014 dielectric model), matching every other phase's G_SS_xxx_function setting fName - unset here left it as uninitialized malloc'd garbage, which crashed fill_output_struct's strcpy the first time a DEW instance was ever exercised */
+    strcpy(SS_ref_db.fName, "DEW_S24");   /* citation tag (Sverjensky et al. 2014 dielectric model), matching every other phase's G_SS_xxx_function setting fName - unset here left it as uninitialized malloc'd garbage, which crashed fill_output_struct's strcpy the first time a DEW instance was ever exercised */
 
     AQ_data AQ = init_DEW_aqueous_model_at_point(  DEW_N_SPECIES_DB,
                                                     EM_dataset,
@@ -20488,7 +20488,7 @@ SS_ref G_SS_all_EM_function(	global_variable 	 gv,
 				SS_ref_db.ss_flags[0]  = 0;
 			}
 			SS_ref_db  = G_SS_mb_oamp_function(SS_ref_db, gv.research_group, EM_dataset, gv.len_ox, z_b, eps);	}
-		else if (strcmp( name, "DEW_S14") == 0 ){
+		else if (strcmp( name, "DEW_S24") == 0 ){
 			if (z_b.bulk_rock[gv.H2O_id] == 0.){
 				SS_ref_db.ss_flags[0]  = 0;
 			}

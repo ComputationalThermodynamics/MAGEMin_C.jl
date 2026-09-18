@@ -953,18 +953,8 @@ double compute_G0_burnman(	double t,
 	double F  = helmholtz_free_energy(p, t, v, v0, T0, f0, k00, k0p, n_abs, gamma0, q0, z00) + fel;
 	double G0 = F + p * v - t * cme;
 
-	/* Magnetic contribution to Gibbs free energy (Chin-Hertzman-Sundman model) */
-	if (nativeFe == 1) { // only fea is assumed magnetic
-		D    = (518.0/1125.0)+(11692.0/15975.0)*(1.0/0.4 - 1.0);
-		Klro = 9.46 / D;
-		Ksro = (474.0/497.0)*(1.0/0.4 - 1.0)*Klro;
-		if (tau <= 1.0) {
-			Gmag = t/D*9.46*( 1.0 - (79.0*pow(tau, -1.0)/140/0.4 + 474.0/497.0*(1.0/0.4 - 1.0)) * (pow(tau, 3.0)/6 + pow(tau, 9.0)/135 + pow(tau, 15.0)/600) );
-		} else {
-			Gmag = -t/D*9.46*(pow(tau, -5.0)/10.0 + pow(tau, -15.0)/315.0 + pow(tau, -25.0)/1500.0);
-		}
-		G0 += Gmag;
-	}
+	/* the Chin-Hertzman-Sundman magnetic term now comes from the endmember table,
+	   applied once in SB_G_EM_function() via sb_property_modifier() */
 
 	return G0;
 }
@@ -1037,18 +1027,8 @@ double compute_G0_burnman_bounded(	double t,
 	double F  = helmholtz_free_energy(p, t, v, v0, T0, f0, k00, k0p, n_abs, gamma0, q0, z00) + fel;
 	double G0 = F + p * v - t * cme;
 
-	/* Magnetic contribution to Gibbs free energy (Chin-Hertzman-Sundman model) */
-	if (nativeFe == 1) { // only fea is assumed magnetic
-		D    = (518.0/1125.0)+(11692.0/15975.0)*(1.0/0.4 - 1.0);
-		Klro = 9.46 / D;
-		Ksro = (474.0/497.0)*(1.0/0.4 - 1.0)*Klro;
-		if (tau <= 1.0) {
-			Gmag = t/D*9.46*( 1.0 - (79.0*pow(tau, -1.0)/140/0.4 + 474.0/497.0*(1.0/0.4 - 1.0)) * (pow(tau, 3.0)/6 + pow(tau, 9.0)/135 + pow(tau, 15.0)/600) );
-		} else {
-			Gmag = -t/D*9.46*(pow(tau, -5.0)/10.0 + pow(tau, -15.0)/315.0 + pow(tau, -25.0)/1500.0);
-		}
-		G0 += Gmag;
-	}
+	/* the Chin-Hertzman-Sundman magnetic term now comes from the endmember table,
+	   applied once in SB_G_EM_function() via sb_property_modifier() */
 
 	return G0;
 }
@@ -1251,22 +1231,52 @@ double compute_G0(	double t,
 
     G0 = a + p * v - t * cme;
 
-    // Magnetic contribution to Gibbs free energy
-    if (nativeFe == 1) { // only fea is assumed magnetic
-        // Tc=1043.01 K | SD=9.46 J/mol/K | tau=t/Tc | p=0.4 (nondimentional standard for bcc (fea); see Roslyakova et al. 2016)
-        D = (518.0/1125.0)+(11692.0/15975.0)*(1.0/0.4 - 1.0);
-        Klro = 9.46 / D;
-        Ksro = (474.0/497.0)*(1.0/0.4 - 1.0)*Klro;
-        if (tau <= 1.0) {
-            Gmag = t/D*9.46*( 1.0 - (79.0*pow(tau, -1.0)/140/0.4 + 474.0/497.0*(1.0/0.4 - 1.0)) * (pow(tau, 3.0)/6 + pow(tau, 9.0)/135 + pow(tau, 15.0)/600) );
-        } else {
-            Gmag = -t/D*9.46*(pow(tau, -5.0)/10.0 + pow(tau, -15.0)/315.0 + pow(tau, -25.0)/1500.0);
-        }
-        G0 += Gmag;
-    }
+    /* the Chin-Hertzman-Sundman magnetic term now comes from the endmember table,
+       applied once in SB_G_EM_function() via sb_property_modifier() */
 
 	return G0;
 }
+
+/*
+	SLB2022/2024 property modifiers, ported from burnman's property_modifiers.py.
+	mod = {type, m1..m5}: 1 = tricritical Landau ordering, 2 = magnetic CHS + linear.
+*/
+double sb_property_modifier(double P_bar, double T, const double *mod){
+
+	if (mod[0] < 0.5) return 0.0;
+
+	double P = P_bar * bar2pa;
+
+	if (mod[0] < 1.5) {
+		/* tricritical Landau, taken relative to the fully ordered (Q = 1) state */
+		double S_D = mod[1], Tc_0 = mod[2], V_D = mod[3];
+		double Tc  = Tc_0 + V_D * P / S_D;
+		double G   = -S_D * ((T - Tc) + Tc_0 / 3.0);
+
+		if (T < Tc) {
+			double Q2 = sqrt((Tc - T) / Tc_0);
+			if (Q2 > 4.0) Q2 = 4.0;
+			G += S_D * ((T - Tc) * Q2 + Tc_0 * Q2 * Q2 * Q2 / 3.0);
+		}
+		return G;
+	}
+
+	/* Chin-Hertzman-Sundman magnetic term plus the linear (delta_E, delta_S) offset */
+	double Tc = mod[1], moment = mod[2], sp = mod[3], dE = mod[4], dS = mod[5];
+	double tau = T / Tc;
+	double A   = (518.0/1125.0) + (11692.0/15975.0)*(1.0/sp - 1.0);
+	double f;
+
+	if (tau < 1.0) {
+		f = 1.0 - (1.0/A)*( 79.0/(140.0*sp*tau)
+		    + (474.0/497.0)*(1.0/sp - 1.0)*( pow(tau,3.0)/6.0 + pow(tau,9.0)/135.0 + pow(tau,15.0)/600.0 ) );
+	} else {
+		f = -(1.0/A)*( pow(tau,-5.0)/10.0 + pow(tau,-15.0)/315.0 + pow(tau,-25.0)/1500.0 );
+	}
+
+	return R * T * log(moment + 1.0) * f + dE - T * dS;
+}
+
 
 PP_ref SB_G_EM_function(	int 		 EM_dataset, 
 							int 		 len_ox,
@@ -1382,6 +1392,9 @@ PP_ref SB_G_EM_function(	int 		 EM_dataset,
                             g0p,
                             nativeFe);
     }
+
+    /* SLB ordering/magnetic modifiers; identically zero for endmembers without one */
+    gbase += sb_property_modifier(P, T, &EM_return.input_2[3]);
 
     if (isnan(gbase) || isinf(gbase)) {
         /* Genuine volume/Gibbs solve failure (vibrational or spinodal

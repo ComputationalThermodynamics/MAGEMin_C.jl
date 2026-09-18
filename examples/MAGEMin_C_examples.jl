@@ -11,7 +11,7 @@
 
 
 #=
-SS = ["liq_W14", "fsp_H22", "bi_W14", "g_W14", "ep_H11", "ma_W14", "mu_W14", "opx_W14", "sa_W14", "cd_W14", "st_W14", "chl_W14", "ctd_W14", "sp_W02", "ilm_W00","DEW_S14"],
+SS = ["liq_W14", "fsp_H22", "bi_W14", "g_W14", "ep_H11", "ma_W14", "mu_W14", "opx_W14", "sa_W14", "cd_W14", "st_W14", "chl_W14", "ctd_W14", "sp_W02", "ilm_W00","DEW_S24"],
 PP = ["q"	,"crst"	,"trd"	,"coe"	,"stv"	,"law"	,"ky"	,"sill"	,"and"	,"ru"	,"sph","H2O"]
 
 =#
@@ -36,7 +36,7 @@ out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys
 Finalize_MAGEMin(data)
 
 using MAGEMin_C
-ss_list = ["liq_W14", "fsp_H22", "bi_W14", "g_W14", "ep_H11", "ma_W14", "mu_W14", "opx_W14", "sa_W14", "cd_W14", "st_W14", "chl_W14", "ctd_W14", "sp_W02", "ilm_W00", "DEW_S14"]
+ss_list = ["liq_W14", "fsp_H22", "bi_W14", "g_W14", "ep_H11", "ma_W14", "mu_W14", "opx_W14", "sa_W14", "cd_W14", "st_W14", "chl_W14", "ctd_W14", "sp_W02", "ilm_W00", "DEW_S24"]
 pp_list = ["q", "crst", "trd", "coe", "stv", "law", "ky", "sill", "and", "ru", "sph","prl"]
 
 data    = Initialize_MAGEMin("all", verbose=false, solver=0);
@@ -72,14 +72,14 @@ using Printf
 for i=1:length(Xoxides)
     @printf(" %-12s %10.6f\n", Xoxides[i], X[i])
 end
-for i=1:length(out.PH_vec[:DEW_S14].emFrac)
-    if out.PH_vec[:DEW_S14].emFrac[i] > 0.0
-        @printf(" %-12s %12.10f\n", out.PH_vec[:DEW_S14].emNames[i], out.PH_vec[:DEW_S14].emFrac[i])
+for i=1:length(out.PH_vec[:DEW_S24].emFrac)
+    if out.PH_vec[:DEW_S24].emFrac[i] > 0.0
+        @printf(" %-12s %12.10f\n", out.PH_vec[:DEW_S24].emNames[i], out.PH_vec[:DEW_S24].emFrac[i])
     end
 end
-for i=1:length(out.PH_vec[:DEW_S14].emFrac)
-    if out.PH_vec[:DEW_S14].emFrac[i] > 0.0
-        @printf(" %-12s %12.10f\n", out.PH_vec[:DEW_S14].emNames[i], out.PH_vec[:DEW_S14].molality[i])
+for i=1:length(out.PH_vec[:DEW_S24].emFrac)
+    if out.PH_vec[:DEW_S24].emFrac[i] > 0.0
+        @printf(" %-12s %12.10f\n", out.PH_vec[:DEW_S24].emNames[i], out.PH_vec[:DEW_S24].molality[i])
     end
 end
 
@@ -95,7 +95,7 @@ out     = single_point_minimization(P, T, data, X=X, Xoxides=Xoxides, sys_in=sys
 Finalize_MAGEMin(data)
 
 using MAGEMin_C
-data        =   Initialize_MAGEMin("ig", verbose=-1);
+data        =   Initialize_MAGEMin("mp", verbose=-1);
 test        =   0         #KLB1
 data        =   use_predefined_bulk_rock(data, test);
 P           =   8.0

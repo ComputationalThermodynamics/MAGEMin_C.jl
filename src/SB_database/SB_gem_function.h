@@ -22,6 +22,8 @@ void SB_set_eos_formulation(int mode);
    silently using the unconverged volume, and tighten the v/v0 sanity bound */
 void SB_set_eos_correction(int mode);
 
+double sb_property_modifier(double P_bar, double T, const double *mod);
+
 PP_ref SB_G_EM_function(    int          EM_database, 
                             int          len_ox,
                             int         *id,

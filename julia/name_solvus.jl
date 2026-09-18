@@ -9,6 +9,95 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ =#
 """
+    SOLVUS_FAMILY
+
+    For each database and solution phase that straddles a solvus, every mineral name
+    [`get_mineral_name`](@ref) can return for it, including the parent name where that is
+    still reachable.
+
+    This is the declared counterpart of `get_mineral_name`'s branches: the function picks
+    *which* name applies at a given composition, this table states which names are
+    *possible*. Code that needs the whole family up front - building a phase list, or
+    matching a phase along a path where `name_solvus=true` has already renamed it - reads
+    this instead of keeping its own copy.
+
+    Keys are `(database, solution phase)`, the phase spelled as that database spells it, so
+    the "all" database uses citation-tagged names. Only pairs the database actually has are
+    listed. `test/test_db_infos.jl` sweeps `get_mineral_name` over random compositional
+    variables and fails if it ever returns a name this table does not list.
+"""
+const SOLVUS_FAMILY = Dict{Tuple{String,String},Vector{String}}(
+    # ig, igad, igd
+    ("ig",   "spl")         => ["cm", "mgt", "spl", "usp"],
+    ("ig",   "fsp")         => ["afs", "pl"],
+    ("ig",   "mu")          => ["mu", "pat"],
+    ("ig",   "amp")         => ["act", "amp", "cumm", "gl", "tr"],
+    ("ig",   "ilm")         => ["hem", "ilm"],
+    ("ig",   "cpx")         => ["Na-cpx", "cpx", "pig"],
+    ("igad", "spl")         => ["cm", "mgt", "spl", "usp"],
+    ("igad", "fsp")         => ["afs", "pl"],
+    ("igad", "ilm")         => ["hem", "ilm"],
+    ("igad", "nph")         => ["K-nph", "nph"],
+    ("igad", "cpx")         => ["Na-cpx", "cpx", "pig"],
+    ("igd",  "spl")         => ["cm", "mgt", "spl", "usp"],
+    ("igd",  "fsp")         => ["afs", "pl"],
+    ("igd",  "ilm")         => ["hem", "ilm"],
+    ("igd",  "cpx")         => ["Na-cpx", "cpx", "pig"],
+    # mp, mpe, mb, ume, mbe
+    ("mp",   "sp")          => ["smt", "sp"],
+    ("mp",   "fsp")         => ["afs", "pl"],
+    ("mp",   "mu")          => ["mu", "pat"],
+    ("mp",   "ilmm")        => ["hemm", "ilmm"],
+    ("mp",   "ilm")         => ["hem", "ilm"],
+    ("mpe",  "sp")          => ["smt", "sp"],
+    ("mpe",  "fsp")         => ["afs", "pl"],
+    ("mpe",  "mu")          => ["mu", "pat"],
+    ("mpe",  "amp")         => ["act", "amp", "cumm", "gl", "tr"],
+    ("mpe",  "ilmm")        => ["hemm", "ilmm"],
+    ("mpe",  "ilm")         => ["hem", "ilm"],
+    ("mpe",  "dio")         => ["dio", "jd", "omph"],
+    ("mpe",  "occm")        => ["ank", "cc", "mag", "sid"],
+    ("mpe",  "oamp")        => ["anth", "ged"],
+    ("mb",   "sp")          => ["smt", "sp"],
+    ("mb",   "spl")         => ["cm", "mgt", "spl"],
+    ("mb",   "fsp")         => ["afs", "pl"],
+    ("mb",   "mu")          => ["mu", "pat"],
+    ("mb",   "amp")         => ["act", "amp", "cumm", "gl", "tr"],
+    ("mb",   "ilmm")        => ["hemm", "ilmm"],
+    ("mb",   "ilm")         => ["hem", "ilm"],
+    ("mb",   "dio")         => ["dio", "jd", "omph"],
+    ("ume",  "spl")         => ["cm", "mgt", "spl"],
+    ("ume",  "amp")         => ["act", "amp", "cumm", "gl", "tr"],
+    ("ume",  "occm")        => ["ank", "cc", "mag", "sid"],
+    ("mbe",  "sp")          => ["smt", "sp"],
+    ("mbe",  "spl")         => ["cm", "mgt", "spl"],
+    ("mbe",  "fsp")         => ["afs", "pl"],
+    ("mbe",  "mu")          => ["mu", "pat"],
+    ("mbe",  "amp")         => ["act", "amp", "cumm", "gl", "tr"],
+    ("mbe",  "ilmm")        => ["hemm", "ilmm"],
+    ("mbe",  "ilm")         => ["hem", "ilm"],
+    ("mbe",  "dio")         => ["dio", "jd", "omph"],
+    ("mbe",  "oamp")        => ["anth", "ged"],
+    # all
+    ("all",  "fsp_H22")     => ["afs", "pl"],
+    ("all",  "fsp_H22op")   => ["afs", "pl"],
+    ("all",  "spl_T21")     => ["cm", "mgt", "spl"],
+    ("all",  "sp_W02")      => ["smt", "sp"],
+    ("all",  "ilm_T21")     => ["hem", "ilm"],
+    ("all",  "ilm_W24")     => ["hem", "ilm"],
+    ("all",  "ilm_W00")     => ["hem", "ilm"],
+    ("all",  "ilmm_W14")    => ["hemm", "ilmm"],
+    ("all",  "amp_G16")     => ["act", "amp", "cumm", "gl", "tr"],
+    ("all",  "mu_W14")      => ["mu", "pat"],
+    ("all",  "cpx_T21")     => ["Na-cpx", "cpx", "pig"],
+    ("all",  "cpx_W24")     => ["Na-cpx", "cpx", "pig"],
+    ("all",  "nph_W24")     => ["K-nph", "nph"],
+    ("all",  "dio_G16")     => ["dio", "jd", "omph"],
+    ("all",  "occm_F11")    => ["ank", "cc", "mag", "sid"],
+    ("all",  "oamp_D07")    => ["anth", "ged"],
+)
+
+"""
     get_mineral_name(db, ss, SS_vec)
 
     Return a mineralogically meaningful name for a solution phase based on its compositional variables (solvus disambiguation).

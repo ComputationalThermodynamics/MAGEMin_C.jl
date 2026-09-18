@@ -13,9 +13,14 @@ const HASH_JEN = 0;
 
 
 function __init__()
-    if isfile("libMAGEMin.dylib")
-        global libMAGEMin = joinpath(pwd(),"libMAGEMin.dylib")
-        println("Using locally compiled version of libMAGEMin.dylib")
+    local_lib = joinpath(pwd(), "libMAGEMin.dylib")
+    pkg_lib   = normpath(joinpath(@__DIR__, "..", "libMAGEMin.dylib"))
+    if isfile(local_lib)
+        global libMAGEMin = local_lib
+        println("Using locally compiled version of libMAGEMin.dylib ($local_lib)")
+    elseif isfile(pkg_lib)
+        global libMAGEMin = pkg_lib
+        println("Using locally compiled version of libMAGEMin.dylib ($pkg_lib)")
     else
         global libMAGEMin = MAGEMin_jll.libMAGEMin
         println("Using libMAGEMin.dylib from MAGEMin_jll")
@@ -160,7 +165,7 @@ mutable struct EM_db_sb_
     Equation::NTuple{90, Cchar}
     Comp::NTuple{17, Cdouble}
     input_1::NTuple{10, Cdouble}
-    input_2::NTuple{3, Cdouble}
+    input_2::NTuple{9, Cdouble}
     EM_db_sb_() = new()
 end
 
@@ -176,6 +181,10 @@ end
 
 function SB_set_eos_correction(mode)
     ccall((:SB_set_eos_correction, libMAGEMin), Cvoid, (Cint,), mode)
+end
+
+function sb_property_modifier(P_bar, T, mod)
+    ccall((:sb_property_modifier, libMAGEMin), Cdouble, (Cdouble, Cdouble, Ptr{Cdouble}), P_bar, T, mod)
 end
 
 function SB_G_EM_function(EM_database, len_ox, id, bulk_rock, apo, P, T, name, state)
@@ -751,6 +760,7 @@ mutable struct global_variables
     BR_rel_norm::Cint
     gh_multistart_order::Cint
     fixed_bulk::Cint
+    calibration::Cint
     DEW_solve_algorithm::Cint
     warm_start::Cint
     SB_eos::Cint
@@ -3805,6 +3815,10 @@ function PC_convert_function(gv, SS_ref_db, z_b, ph_id)
     ccall((:PC_convert_function, libMAGEMin), SS_ref, (global_variable, SS_ref, bulk_info, Cint), gv, SS_ref_db, z_b, ph_id)
 end
 
+function LM_convert_function(gv, SS_ref_db, z_b, ph_id, gamma, n_gamma, xeos, n_xeos)
+    ccall((:LM_convert_function, libMAGEMin), SS_ref, (global_variable, SS_ref, bulk_info, Cint, Ptr{Cdouble}, Cint, Ptr{Cdouble}, Cint), gv, SS_ref_db, z_b, ph_id, gamma, n_gamma, xeos, n_xeos)
+end
+
 function CP_UPDATE_function(gv, SS_ref_db, cp, z_b)
     ccall((:CP_UPDATE_function, libMAGEMin), csd_phase_set, (global_variable, SS_ref, csd_phase_set, bulk_info), gv, SS_ref_db, cp, z_b)
 end
@@ -4049,6 +4063,20 @@ const NLOPT_MINF_MAX_REACHED = NLOPT_STOPVAL_REACHED
 
 # Skipping MacroDefinition: NLOPT_DEPRECATED __attribute__ ( ( deprecated ) )
 
+const len_gv_outpath = 512
+
+const len_gv_version = 50
+
+const len_gv_file = 512
+
+const len_gv_db = 20
+
+const len_gv_research_group = 20
+
+const len_gv_sys_in = 20
+
+const len_gv_buffer = 20
+
 const n_ox_all = 16
 
 # Skipping MacroDefinition: UTHASH_VERSION 2.1.0
@@ -4168,13 +4196,21 @@ Base.show(io::IO, ss::SS_data) = show(io, MIME("text/plain"), ss)
 struct mSS_data
     ph_name     ::String
     ph_type     ::String
-    # info      ::String          # unused
+    info        ::String         # tags which mechanism populated this entry:
+                                   # "lpig" = LP-levelling-basis warm-start guess,
+                                   # "ppc" = near-hyperplane candidate (mSS_df_min_add/
+                                   # max_add window), "calib" = calibration_output_struct
+                                   # (gv.calibration==1: every structurally-feasible,
+                                   # locally-minimized, non-duplicate-of-stable phase)
     ph_id       ::Cint
     em_id       ::Cint
     # n_xeos    ::Cint            # unused — SS_ref_db[ph_id].n_xeos used instead
     # n_em      ::Cint            # unused — SS_ref_db[ph_id].n_em used instead
-    # G_Ppc     ::Cdouble         # unused
-    # DF_Ppc    ::Cdouble         # unused
+    G           ::Cdouble         # candidate's own Gibbs energy at its local minimum
+    deltaG      ::Cdouble         # driving force: distance from the Gibbs hyperplane
+                                   # (same quantity/units as SS_data.deltaG for a stable
+                                   # phase, ~0 there; nonzero here since this phase was
+                                   # NOT selected into the stable assemblage)
     comp_Ppc    ::Vector{Cdouble}
     # p_Ppc     ::Vector{Cdouble} # unused
     # mu_Ppc    ::Vector{Cdouble} # unused
@@ -4184,9 +4220,9 @@ end
 function Base.convert(::Type{mSS_data}, a::mstb_SS_phases)
     return  mSS_data(   unsafe_string(a.ph_name),
                         unsafe_string(a.ph_type),
-                        # unsafe_string(a.info),
+                        unsafe_string(a.info),
                         a.ph_id, a.em_id,
-                        # a.n_xeos, a.n_em, a.G_Ppc, a.DF_Ppc,
+                        a.G_Ppc, a.DF_Ppc,
                         unsafe_wrap( Vector{Cdouble},        a.comp_Ppc,           a.nOx),
                         # unsafe_wrap( Vector{Cdouble},        a.p_Ppc,              a.n_em),
                         # unsafe_wrap( Vector{Cdouble},        a.mu_Ppc,             a.n_em),

@@ -192,6 +192,85 @@ SS_ref PC_convert_function(		global_variable 	 gv,
 
 
 /**
+  Given a solution phase's initial compositional-variable guess (xeos) and a
+  caller-supplied Gamma (chemical potential of components, same convention
+  and length gv.len_ox as gv.gam_tot), run MAGEMin's own per-model local
+  minimization (NLopt) for that phase starting from xeos, with its
+  endmembers' reference energies rotated against the supplied Gamma - the
+  same rotate_hyperplane + NLopt_opt + PC_function + SS_UPDATE_function
+  pipeline ss_min_PGE/ss_min_LP run internally during a normal
+  minimization, but for a single phase driven by an externally-supplied
+  Gamma instead of the solver's own, and without restricting the search
+  hypervolume (uses the phase's full bounds_ref). research_group must be
+  "tc". See ss_min_function.h for the full contract.
+*/
+SS_ref LM_convert_function(			global_variable 	 gv,
+									SS_ref 				 SS_ref_db,
+									bulk_info 	 		 z_b,
+									int 				 ph_id,
+									double 				*gamma,
+									int 				 n_gamma,
+									double 				*xeos,
+									int 				 n_xeos			){
+
+	if (strcmp(gv.research_group, "tc") != 0){
+		printf(" ERROR: LM_convert_function: research_group '%s' not supported (only 'tc')\n", gv.research_group);
+		return SS_ref_db;
+	}
+	if (n_gamma != gv.len_ox){
+		printf(" ERROR: LM_convert_function: expected %d Gamma entries (gv.len_ox), got %d\n", gv.len_ox, n_gamma);
+		return SS_ref_db;
+	}
+	if (n_xeos != SS_ref_db.n_xeos){
+		printf(" ERROR: LM_convert_function: '%s' has %d compositional variables, got %d\n", gv.SS_list[ph_id], SS_ref_db.n_xeos, n_xeos);
+		return SS_ref_db;
+	}
+
+	for (int i = 0; i < n_gamma; i++){
+		gv.gam_tot[i] = gamma[i];
+	}
+	for (int i = 0; i < n_xeos; i++){
+		SS_ref_db.iguess[i] = xeos[i];
+	}
+
+	/* full bounds_ref, no restrict_SS_HyperVolume - see P2X_convert_function
+	   for why .bounds needs refreshing here rather than relying on caller
+	   ordering */
+	for (int i = 0; i < SS_ref_db.n_xeos; i++){
+		SS_ref_db.bounds[i][0] = SS_ref_db.bounds_ref[i][0];
+		SS_ref_db.bounds[i][1] = SS_ref_db.bounds_ref[i][1];
+	}
+
+	SS_ref_db = rotate_hyperplane(		gv,
+										SS_ref_db			);
+
+	NLopt_type NLopt_opt[gv.len_ss];
+	TC_NLopt_opt_init(					NLopt_opt,
+										gv					);
+
+	SS_ref_db = (*NLopt_opt[ph_id])(	gv,
+										SS_ref_db			);
+
+	PC_type PC_read[gv.len_ss];
+	TC_PC_init(							PC_read,
+										gv					);
+
+	SS_ref_db = PC_function(			gv,
+										PC_read,
+										SS_ref_db,
+										z_b,
+										ph_id				);
+
+	SS_ref_db = SS_UPDATE_function(		gv,
+										SS_ref_db,
+										z_b,
+										gv.SS_list[ph_id]	);
+
+	return SS_ref_db;
+}
+
+
+/**
 Function to update xi and sum_xi for the considered phases list (during the inner loop of the PGE stage).
 NOTE: When the phase is "liq", the normalization factor is also updated as it depends on the endmember fractions
 */
