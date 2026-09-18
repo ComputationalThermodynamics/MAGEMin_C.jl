@@ -46,7 +46,7 @@ MAGEMin_Handle *MAGEMin_Init(	const char *database,
 
 	h->gv.verbose = verbose;
 	if (database != NULL){
-		strcpy(h->gv.db,database);
+		snprintf(h->gv.db, len_gv_db, "%s", database);
 	}
 
 	h->gv = SetupDatabase(				h->gv,
@@ -84,7 +84,7 @@ stb_system *MAGEMin_ComputeEquilibrium(	MAGEMin_Handle *h,
 		printf(" MAGEMin_ComputeEquilibrium error: sys_in must be \"mol\" or \"wt\"\n");
 		return NULL;
 	}
-	strcpy(h->gv.sys_in,sys_in);
+	snprintf(h->gv.sys_in, len_gv_sys_in, "%s", sys_in);
 
 	h->z_b.P = P;
 	h->z_b.T = T + 273.15;

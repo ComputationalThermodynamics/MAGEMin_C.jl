@@ -44,6 +44,14 @@ typedef double (*PC_type) (			unsigned         n,
 /** 
 	Store oxide informations 
 **/
+#define len_gv_outpath          512
+#define len_gv_version          50
+#define len_gv_file             512
+#define len_gv_db               20
+#define len_gv_research_group   20
+#define len_gv_sys_in           20
+#define len_gv_buffer           20
+
 #define n_ox_all 16
 typedef struct oxide_datas {
 	int 	n_ox;
@@ -98,6 +106,14 @@ typedef struct global_variables {
 	int      BR_rel_norm;		/** 1: PGE mass-residual convergence norm (BR_norm) is computed per-oxide-relative (normalized by each oxide's own bulk abundance), 0: off (unmodified legacy absolute norm) */
 	int      gh_multistart_order;	/** gh phases with an embedded order-parameter solve (e.g. spinel): 0 (default) = single physically-motivated starting guess, exactly matching real xMELTS' own order() function; 1 (legacy/opt-in) = multi-start over several starting points, keeping the lowest-G result - finds a lower true minimum at extreme near-single-endmember compositions but can disagree with what real MELTS itself would compute there */
 	int      fixed_bulk;
+	int      calibration;		/** 0 (default): off, unmodified behavior. 1: after the normal point solve, additionally
+									locally minimize every structurally-feasible-but-not-stable solution phase
+									(SS_ref_db[i].ss_flags[0]==1) from ~n_em starting pseudocompounds sampled evenly
+									(stride) across its tot_Ppc list, and append any converged minimum that is not a
+									near-duplicate of an already-stable phase to stb_system.mSS (tagged info="calib"),
+									via calibration_output_struct() in dump_function.c. See
+									~/.claude/working_tree/Lila_inversion/plans/magemin-calibration-mode.md (Lila_inversion
+									project) for the full design/rationale. */
 	int      DEW_solve_algorithm;	/** DEW inner speciation solver (DEW_aq_min_iterative family): 0 (default) = original plain (unmixed) Picard fixed-point iteration, bisection mu_Hp solve; 1 = damped/mixed variant that under-relaxes the composition<->activity-coefficient feedback loop, aimed at the high-ionic-strength (deep/hot P-T) regime where plain Picard oscillates/overshoots, bisection mu_Hp solve; 2 = same outer loop as 0 but with the mu_Hp charge-balance root-find replaced by a Newton step safeguarded by bisection (DEW_solve_mu_Hp_safeguarded) - same bracketing guarantee as algorithm 0's bisection (can never leave a verified sign-changing bracket) but converges quadratically, cutting residual evaluations per solve by 40-1000x; benchmarked with 0 regressions over an 84-point mpe/ume/mbe P-T sweep - see DEW_aq_solver.c. All three are exact fixed points of the same equilibrium condition when converged; algorithms 1 and 2 are opt-in pending broader validation. */
 	int      warm_start;		/** DEW outer-PGE-loop warm start (NLopt_opt_DEW_function/SS_ref.dew_warm_ok): 1 (default) = after a point's first DEW solve (always the full 8-start DEW_aq_min_multistart grid), later outer iterations of the SAME point first try a single solve warm-started from the previous converged composition, falling back to the full grid only if that fails to converge; 0 = disable the shortcut entirely and always re-run the full 8-start grid, every outer iteration, every point - a debugging/comparison knob to isolate whether the warm-start path itself is implicated in a given issue. */
 	int      SB_eos;			/** 0: legacy (Perple_X-style) SLB EOS solver, 1: burnman-style (Brent volume solve + 3rd order shear), 2: same as 1 but with HeFESTo's analytic vibrational/spinodal volume bounds */

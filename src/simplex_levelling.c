@@ -1427,7 +1427,7 @@ void SS_all_pc_init_function(	PC_ref 	*SS_pc_xeos,
 		SS_um_pc_init_function(		SS_pc_xeos, iss, "ta", gv		);	}
 	else if (strcmp( name, "oamp_D07")  == 0){
 		SS_mb_pc_init_function(			SS_pc_xeos, iss, "oamp", gv		);	}
-	else if (strcmp( name, "DEW_S14") == 0){
+	else if (strcmp( name, "DEW_S24") == 0){
 		SS_mpe_pc_init_function(		SS_pc_xeos, iss, "DEW", gv	);	}
 	else if (strcmp( name, "cpx_W24")   == 0){
 		SS_ig_pc_init_function(		SS_pc_xeos, iss, "cpx", gv		);	}

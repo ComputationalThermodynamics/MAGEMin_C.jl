@@ -18,7 +18,8 @@
         char   Equation[90];		/** pure species name 														*/
         double Comp[17];       	 	/** pure species composition [0-16] + number of atom [17] 					*/
         double input_1[10];         /** second line of the thermodynamics datable 								*/
-        double input_2[3];          /** second line of the thermodynamics datable 								*/
+        double input_2[9];          /** shear G0, G0', td, then the SLB property modifier:				*/
+                                    /** {type, m1..m5}; type 0 = none, 1 = Landau, 2 = magnetic CHS	*/
     } EM_db_sb;
 
     EM_db_sb Access_SB_EM_DB(int id, int EM_dataset);

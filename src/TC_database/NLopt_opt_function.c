@@ -13389,7 +13389,7 @@ void TC_all_NLopt_opt_init(	        NLopt_type 			*NLopt_opt,
 			NLopt_opt[iss]  = NLopt_opt_um_ta_function; 		}
 		else if (strcmp( gv.SS_list[iss], "oamp_D07")  == 0){
 			NLopt_opt[iss]  = NLopt_opt_mb_oamp_function; 		}
-		else if (strcmp( gv.SS_list[iss], "DEW_S14") == 0){
+		else if (strcmp( gv.SS_list[iss], "DEW_S24") == 0){
 			NLopt_opt[iss]  = NLopt_opt_DEW_function; 		}
 		else if (strcmp( gv.SS_list[iss], "cpx_W24")   == 0){
 			NLopt_opt[iss]  = NLopt_opt_ig_cpx_function; 		}

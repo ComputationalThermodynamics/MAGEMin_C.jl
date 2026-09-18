@@ -892,11 +892,11 @@ global_variable ReadCommandLineOptions(	global_variable 	 gv,
 		else if (c == 306){ z_b->T				= strtold(opt.arg,NULL)+273.15;}
 		else if (c == 307){ z_b->P 				= strtold(opt.arg,NULL); 	}
 
-		else if (c == 312){ strcpy(gv.research_group,opt.arg); 				}
-		else if (c == 319){ strcpy(gv.buffer,opt.arg);						} 	
-		else if (c == 303){ strcpy(gv.File,opt.arg);		 				}
-		else if (c == 302){ strcpy(gv.db,opt.arg);		 					}
-		else if (c == 317){ strcpy(gv.sys_in,opt.arg);		 				}
+		else if (c == 312){ snprintf(gv.research_group, len_gv_research_group, "%s", opt.arg);	}
+		else if (c == 319){ snprintf(gv.buffer, len_gv_buffer, "%s", opt.arg);					} 	
+		else if (c == 303){ snprintf(gv.File, len_gv_file, "%s", opt.arg);		 				}
+		else if (c == 302){ snprintf(gv.db, len_gv_db, "%s", opt.arg);		 					}
+		else if (c == 317){ snprintf(gv.sys_in, len_gv_sys_in, "%s", opt.arg);		 			}
 
 		else if (c == 310){
 			char *p = strtok(opt.arg,",");
@@ -1459,7 +1459,7 @@ void FreeDatabases(		global_variable gv,
 		free(DB.SS_ref_db[i].Comp);
 		free(DB.SS_ref_db[i].dp_dx);
 
-		if (strcmp(gv.SS_list[i], "DEW") == 0 || strcmp(gv.SS_list[i], "DEW_S14") == 0){
+		if (strcmp(gv.SS_list[i], "DEW") == 0 || strcmp(gv.SS_list[i], "DEW_S24") == 0){
 			for (j = 0; j < n_em; j++){ free(DB.SS_ref_db[i].mu_comp[j]); }
 			free(DB.SS_ref_db[i].mu_comp);
 		}

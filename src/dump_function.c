@@ -37,6 +37,15 @@
 #include "all_solution_phases.h"
 #include "TC_database/DEW_aq_solver.h"
 #include "toolkit.h"
+#include "ss_min_function.h"
+#include "TC_database/objective_functions.h"
+#include "TC_database/NLopt_opt_function.h"
+#include "SB_database/sb_objective_functions.h"
+#include "SB_database/SB_NLopt_opt_function.h"
+#include "GH_database/gh_objective_functions.h"
+#include "GH_database/GH_NLopt_opt_function.h"
+#include "BR_database/br_objective_functions.h"
+#include "BR_database/BR_NLopt_opt_function.h"
 
 /**
   Initialize dumping function by creating needed files
@@ -463,7 +472,7 @@ void mSS_output_struct(			global_variable 	 gv,
 	int n_xeos, n_em;
 	for (int i = 0; i < gv.len_ss; i++){
 		if (SS_ref_db[i].ss_flags[0] == 1){
-			if (strcmp(gv.SS_list[i], "DEW") == 0 || strcmp(gv.SS_list[i], "DEW_S14") == 0){ continue; }
+			if (strcmp(gv.SS_list[i], "DEW") == 0 || strcmp(gv.SS_list[i], "DEW_S24") == 0){ continue; }
 
 			n_em 	 = SS_ref_db[i].n_em;
 			n_xeos 	 = SS_ref_db[i].n_xeos;
@@ -506,8 +515,198 @@ void mSS_output_struct(			global_variable 	 gv,
 	if (m >= gv.max_n_mSS){
 		printf("WARNING: maximum number of metastable pseudocompounds has been reached, increase the value in tc_gss_init_function.c (SP_INIT_function)\n");
 	}
-	
+
 }
+
+/**
+	calibration_output_struct
+
+	Only runs when gv.calibration == 1 (default 0, off). For every solution phase model
+	that is structurally feasible for the current bulk (SS_ref_db[i].ss_flags[0] == 1) --
+	a strictly broader set than the final stable assemblage, and not limited to the
+	narrow near-hyperplane window mSS_output_struct's own near-miss loop uses -- this
+	locally minimizes from ~n_em starting points, sampled by even stride across that
+	model's full tot_Ppc pseudocompound list (not just the best point, and not a fixed
+	percentage: the sample count tracks each model's own compositional dimensionality).
+	The best (lowest driving force) of those converged local minima is kept.
+
+	That candidate is then checked against every phase already in the FINAL stable
+	assemblage (cp[j].ss_flags[1] == 1, not ss_flags[0] which only means "considered
+	during search") of the SAME model: if its compositional variables are within
+	gv.PC_min_dist * gv.SS_PC_stp[i] * sqrt(n_xeos) of an already-stable instance (the
+	same scale-aware distance metric phase_update_function.c already uses for a related
+	purpose), it is rejected as a redundant rediscovery of that stable phase. Otherwise
+	it is APPENDED to sp[0].mSS[] (mSS_output_struct itself is never modified -- this is
+	strictly additive, continuing whatever m/n_mSS it already left), tagged
+	info="calib" so callers can tell these apart from mSS_output_struct's own "lpig"
+	(LP-levelling-basis warm-start) and "ppc" (near-miss) entries. A kept result whose
+	OWN model is already stable elsewhere in the assemblage under a different
+	composition is intentionally NOT rejected -- that is precisely the case (a second,
+	distinct local minimum of an already-stable model) that signals a nearby solvus.
+
+	Self-contained: builds its own local SS_objective/NLopt_opt/PC_read/P2X_read tables
+	(same research-group-branching pattern ComputeEquilibrium_Point and
+	mSS_output_struct already use), rather than threading them through
+	fill_output_struct's signature -- keeps this an additive, low-risk change with no
+	existing function signature touched except the one new call site in
+	fill_output_struct.
+*/
+void calibration_output_struct(		global_variable 	 gv,
+										bulk_info 	 		 z_b,
+										SS_ref 				*SS_ref_db,
+										csd_phase_set  		*cp,
+										stb_system  		*sp
+){
+	obj_type 				SS_objective[gv.len_ss];
+	PC_type 				PC_read[gv.len_ss];
+	P2X_type 				P2X_read[gv.len_ss];
+	NLopt_type 				NLopt_opt[gv.len_ss];
+
+	if (strcmp(gv.research_group, "tc") 	== 0 ){
+		TC_SS_objective_init_function(		SS_objective,	gv	);
+		TC_NLopt_opt_init(					NLopt_opt,		gv	);
+		TC_PC_init(							PC_read,		gv	);
+		TC_P2X_init(						P2X_read,		gv	);
+	}
+	else if (strcmp(gv.research_group, "sb") 	== 0 ){
+		SB_SS_objective_init_function(		SS_objective,	gv	);
+		SB_NLopt_opt_init(					NLopt_opt,		gv	);
+		SB_PC_init(							PC_read,		gv	);
+	}
+	else if (strcmp(gv.research_group, "gh") 	== 0 ){
+		GH_SS_objective_init_function(		SS_objective,	gv	);
+		GH_NLopt_opt_init(					NLopt_opt,		gv	);
+		GH_PC_init(							PC_read,		gv	);
+		GH_P2X_init(						P2X_read,		gv	);
+	}
+	else if (strcmp(gv.research_group, "br") 	== 0 ){
+		BR_SS_objective_init_function(		SS_objective,	gv	);
+		BR_NLopt_opt_init(					NLopt_opt,		gv	);
+		BR_PC_init(							PC_read,		gv	);
+	}
+
+	int m = sp[0].n_mSS;		/* continue directly from wherever mSS_output_struct left off */
+
+	for (int i = 0; i < gv.len_ss; i++){
+		if (SS_ref_db[i].ss_flags[0] != 1){ continue; }
+		if (m >= gv.max_n_mSS){ break; }
+
+		int n_em   = SS_ref_db[i].n_em;
+		int n_xeos = SS_ref_db[i].n_xeos;
+		int tot    = SS_ref_db[i].tot_Ppc;
+		if (tot <= 0 || n_em <= 0 || n_xeos <= 0){ continue; }
+
+		int stride = tot / n_em;
+		if (stride < 1){ stride = 1; }
+
+		int    best_found = 0;
+		double best_df    = 0.0;
+		double best_xeos[n_xeos];
+		double best_comp[gv.len_ox];
+		double best_p[n_em];
+		double best_mu[n_em];
+
+		for (int l = 0; l < tot; l += stride){
+			for (int k = 0; k < n_xeos; k++){
+				SS_ref_db[i].iguess[k] = SS_ref_db[i].xeos_Ppc[l][k];
+			}
+
+			SS_ref_db[i] = rotate_hyperplane(				gv,
+															SS_ref_db[i]			);
+
+			SS_ref_db[i] = restrict_SS_HyperVolume(		gv,
+															SS_ref_db[i],
+															gv.box_size_mode_PGE	);
+
+			SS_ref_db[i] = (*NLopt_opt[i])(				gv,
+															SS_ref_db[i]			);
+
+			if (SS_ref_db[i].sf_ok != 1){ continue; }
+
+			SS_ref_db[i] = PC_function(					gv,
+															PC_read,
+															SS_ref_db[i],
+															z_b,
+															i						);
+
+			if (best_found == 0 || SS_ref_db[i].df < best_df){
+				best_found = 1;
+				best_df    = SS_ref_db[i].df;
+				for (int k = 0; k < n_xeos; k++){ best_xeos[k] = SS_ref_db[i].xeos[k]; }
+				for (int j = 0; j < gv.len_ox; j++){ best_comp[j] = SS_ref_db[i].ss_comp[j]*SS_ref_db[i].factor; }
+				for (int k = 0; k < n_em; k++){
+					best_p[k]  = SS_ref_db[i].p[k];
+					best_mu[k] = SS_ref_db[i].mu[k]*SS_ref_db[i].z_em[k];
+				}
+			}
+		}
+
+		if (best_found == 0){ continue; }
+
+		/* reject only if this SPECIFIC converged minimum duplicates an already-stable
+		   instance of THIS model -- a different local minimum of an already-stable
+		   model is kept on purpose (possible nearby solvus) */
+		int is_dup = 0;
+		for (int j = 0; j < gv.len_cp; j++){
+			if (cp[j].ss_flags[1] != 1){ continue; }
+			if (cp[j].id != i){ continue; }
+			if (cp[j].n_xeos != n_xeos){ continue; }
+
+			double dist = 0.0;
+			for (int k = 0; k < n_xeos; k++){
+				double d = best_xeos[k] - cp[j].xeos[k];
+				dist += d*d;
+			}
+			dist = sqrt(dist);
+
+			if (dist < gv.PC_min_dist * gv.SS_PC_stp[i] * sqrt((double)n_xeos)){
+				is_dup = 1;
+				break;
+			}
+		}
+		if (is_dup == 1){ continue; }
+
+		strcpy(sp[0].mSS[m].info,		"calib");
+		strcpy(sp[0].mSS[m].ph_type,	"ss");
+		strcpy(sp[0].mSS[m].ph_name,	gv.SS_list[i]);
+		sp[0].mSS[m].ph_id    = i;
+		sp[0].mSS[m].em_id    = 0;
+		sp[0].mSS[m].nOx      = gv.len_ox;
+		sp[0].mSS[m].n_xeos   = n_xeos;
+		sp[0].mSS[m].n_em     = n_em;
+
+		/* best_df is NLopt_opt[i]'s own returned minf, i.e. SS_ref_db[i].df straight
+		   after the (*NLopt_opt[i])() call above -- unlike the LP-basis/near-miss loops
+		   in mSS_output_struct (which call non_rot_hyperplane, leaving gb_lvl un-
+		   projected, so THEY still need an explicit -comp*gam_tot step afterward), this
+		   function calls rotate_hyperplane first, which already sets
+		   gb_lvl[k] = gbase[k] - sum(Comp[k][j]*gam_tot[j]) -- confirmed directly in
+		   objective_functions.c: obj_ig_g (the NLopt objective for e.g. garnet) reads
+		   gb_lvl, not gbase. So best_df is ALREADY the Gamma-hyperplane driving force;
+		   subtracting comp*gam_tot again here would double-count that projection (this
+		   was tried first and produced deltaG ~899 for a phase whose own G was ~4 --
+		   confirmed as the cause by checking obj_ig_g's source directly, not guessed). */
+		sp[0].mSS[m].G_Ppc  = best_df;
+		sp[0].mSS[m].DF_Ppc = best_df;
+		for (int j = 0; j < gv.len_ox; j++){
+			sp[0].mSS[m].comp_Ppc[j] = best_comp[j];
+		}
+		for (int k = 0; k < n_xeos; k++){
+			sp[0].mSS[m].xeos_Ppc[k] = best_xeos[k];
+		}
+		for (int k = 0; k < n_em; k++){
+			sp[0].mSS[m].p_Ppc[k]  = best_p[k];
+			sp[0].mSS[m].mu_Ppc[k] = best_mu[k];
+		}
+
+		sp[0].n_mSS += 1;
+		m += 1;
+	}
+
+	if (m >= gv.max_n_mSS){
+		printf("WARNING: maximum number of metastable pseudocompounds has been reached during calibration_output_struct, increase the value in tc_gss_init_function.c (SP_INIT_function)\n");
+	}
+};
 
 /**
   Save final result of minimization
@@ -615,7 +814,7 @@ void fill_output_struct(		global_variable 	 gv,
 				sp[0].SS[m].molality[j] = NAN;
 				sp[0].SS[m].activity[j] = NAN;
 			}
-			if (strcmp( cp[i].name, "DEW") == 0 || strcmp( cp[i].name, "DEW_S14") == 0){
+			if (strcmp( cp[i].name, "DEW") == 0 || strcmp( cp[i].name, "DEW_S24") == 0){
 				AQ_data AQ_pH = init_DEW_aqueous_model_at_point(	DEW_N_SPECIES_DB,
 																	gv.EM_dataset,
 																	gv.len_ox,
@@ -740,7 +939,7 @@ void fill_output_struct(		global_variable 	 gv,
 
 			if (strcmp( cp[i].name, "liq") == 0 || strcmp( cp[i].name, "fl") == 0 || strcmp( cp[i].name, "DEW") == 0
 			 || strcmp( cp[i].name, "liq_W14") == 0 || strcmp( cp[i].name, "liq_G16") == 0 || strcmp( cp[i].name, "liq_G25w") == 0 || strcmp( cp[i].name, "liq_S26") == 0
-			 || strcmp( cp[i].name, "fl_G25") == 0 || strcmp( cp[i].name, "fl_EF21") == 0 || strcmp( cp[i].name, "fl_H03") == 0 || strcmp( cp[i].name, "DEW_S14") == 0){
+			 || strcmp( cp[i].name, "fl_G25") == 0 || strcmp( cp[i].name, "fl_EF21") == 0 || strcmp( cp[i].name, "fl_H03") == 0 || strcmp( cp[i].name, "DEW_S24") == 0){
 				if (strcmp( cp[i].name, "liq") == 0 || strcmp( cp[i].name, "liq_W14") == 0 || strcmp( cp[i].name, "liq_G16") == 0 || strcmp( cp[i].name, "liq_G25w") == 0 || strcmp( cp[i].name, "liq_S26") == 0){
 					if (gv.n_phase == 1){
 						sp[0].entropy_M 			= cp[i].phase_entropy;
@@ -898,7 +1097,7 @@ void fill_output_struct(		global_variable 	 gv,
 
 			if (strcmp( cp[i].name, "liq") == 0 || strcmp( cp[i].name, "fl") == 0 || strcmp( cp[i].name, "DEW") == 0
 			 || strcmp( cp[i].name, "liq_W14") == 0 || strcmp( cp[i].name, "liq_G16") == 0 || strcmp( cp[i].name, "liq_G25w") == 0 || strcmp( cp[i].name, "liq_S26") == 0
-			 || strcmp( cp[i].name, "fl_G25") == 0 || strcmp( cp[i].name, "fl_EF21") == 0 || strcmp( cp[i].name, "fl_H03") == 0 || strcmp( cp[i].name, "DEW_S14") == 0){
+			 || strcmp( cp[i].name, "fl_G25") == 0 || strcmp( cp[i].name, "fl_EF21") == 0 || strcmp( cp[i].name, "fl_H03") == 0 || strcmp( cp[i].name, "DEW_S24") == 0){
 				if (strcmp( cp[i].name, "liq") == 0 || strcmp( cp[i].name, "liq_W14") == 0 || strcmp( cp[i].name, "liq_G16") == 0 || strcmp( cp[i].name, "liq_G25w") == 0 || strcmp( cp[i].name, "liq_S26") == 0){
 						sp[0].frac_M_vol      = sp[0].ph_frac_vol[n];
 				}
@@ -1045,6 +1244,13 @@ void fill_output_struct(		global_variable 	 gv,
 						cp,
 						sp 			);
 
+	if (gv.calibration == 1){
+		calibration_output_struct(	gv,
+									z_b,
+									SS_ref_db,
+									cp,
+									sp			);
+	}
 
 }
 

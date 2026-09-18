@@ -44,6 +44,25 @@ SS_ref PC_convert_function(			global_variable 	 gv,
 										bulk_info 	 		 z_b,
 										int 				 ph_id			);
 
+/** Given a solution phase's initial compositional-variable guess (xeos) and
+    a caller-supplied Gamma (same convention/length gv.len_ox as
+    gv.gam_tot), run MAGEMin's own per-model local minimization (NLopt) for
+    that phase starting from xeos, with its endmembers' reference energies
+    rotated against the supplied Gamma - the same rotate_hyperplane +
+    NLopt_opt + PC_function + SS_UPDATE_function pipeline ss_min_PGE/
+    ss_min_LP run internally, but for one phase driven by an
+    externally-supplied Gamma, and without restricting the search
+    hypervolume (uses the phase's full bounds_ref). research_group must be
+    "tc". Writes gv.gam_tot as a side effect (shared heap array). */
+SS_ref LM_convert_function(			global_variable 	 gv,
+										SS_ref 				 SS_ref_db,
+										bulk_info 	 		 z_b,
+										int 				 ph_id,
+										double 				*gamma,
+										int 				 n_gamma,
+										double 				*xeos,
+										int 				 n_xeos			);
+
 
 csd_phase_set CP_UPDATE_function(		global_variable 	 gv,
 										SS_ref 				 SS_ref_db,

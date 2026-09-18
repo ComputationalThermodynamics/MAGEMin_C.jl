@@ -142,13 +142,13 @@ global_variable global_variable_alloc( bulk_info  *z_b ){
 	*/
 	/* system parameters 		*/
 	gv.maxlen_ox 		= 16;
-	gv.outpath 			= malloc (100 	* sizeof(char)			);
-	gv.version 			= malloc (50  	* sizeof(char)			);
-	gv.File 			= malloc (50 	* sizeof(char)			);
-	gv.research_group 	= malloc (5 	* sizeof(char)			);
-	gv.db 				= malloc (5 	* sizeof(char)			);
-	gv.sys_in 			= malloc (5 	* sizeof(char)			);
-	gv.buffer 			= malloc (10 	* sizeof(char)			);
+	gv.outpath 			= malloc (len_gv_outpath        * sizeof(char)	);
+	gv.version 			= malloc (len_gv_version        * sizeof(char)	);
+	gv.File 			= malloc (len_gv_file           * sizeof(char)	);
+	gv.research_group 	= malloc (len_gv_research_group * sizeof(char)	);
+	gv.db 				= malloc (len_gv_db             * sizeof(char)	);
+	gv.sys_in 			= malloc (len_gv_sys_in         * sizeof(char)	);
+	gv.buffer 			= malloc (len_gv_buffer         * sizeof(char)	);
 
 	gv.arg_bulk 		= malloc (gv.maxlen_ox * sizeof(double)	);
 	gv.arg_gamma 		= malloc (gv.maxlen_ox * sizeof(double)	);
@@ -163,7 +163,7 @@ global_variable global_variable_alloc( bulk_info  *z_b ){
 	}
 
 	strcpy(gv.outpath,"./output/");					/** define the outpath to save logs and final results file	 						*/
-	strcpy(gv.version,"2.0.2 [20/10/2026]");		/** MAGEMin version 																*/
+	strcpy(gv.version,"2.0.4 [19/09/2026]");		/** MAGEMin version 																*/
 
 	/* generate parameters        		*/
 	strcpy(gv.buffer,"none");
@@ -179,6 +179,7 @@ global_variable global_variable_alloc( bulk_info  *z_b ){
 	gv.limitCaOpx       	=  0;					/** limit Ca-bearing  orthopyroxene (add-hoc correction) 							*/
 	gv.CaOpxLim         	=  1.0;					/** limit Ca-bearing  orthopyroxene (add-hoc correction) 							*/
 	gv.fixed_bulk	    	=  0;                   /** by default we don't activate the initial guess for fixed bulk 					*/
+	gv.calibration			=  0;					/** by default off, see MAGEMin.h's gv.calibration doc comment 						*/
 
 	/* Phase selection 					*/
 	gv.mbCpx 				=  0;					/** 0: omphacite LT, 1: augite HT													*/
@@ -464,18 +465,18 @@ SS_ref G_SS_init_EM_function(		SS_init_type		*SS_init,
 
     SS_ref_db.orderVar       = 0;
 	SS_ref_db.dew_warm_ok    = 0;
-	SS_ref_db.fName 		 = malloc(20 * sizeof(char)		);		
+	SS_ref_db.fName 		 = calloc(20, sizeof(char)		);		
 	SS_ref_db.EM_list 		 = malloc ((n_em) * sizeof (char*)	);
 	for (int i = 0; i < n_em; i++){ 
-		SS_ref_db.EM_list[i] = malloc(20 * sizeof(char)		);		
+		SS_ref_db.EM_list[i] = calloc(20, sizeof(char)		);		
 	}
 	SS_ref_db.CV_list 		 = malloc ((n_xeos) * sizeof (char*)	);
 	for (int i = 0; i < n_xeos; i++){ 
-		SS_ref_db.CV_list[i] = malloc(20 * sizeof(char)		);		
+		SS_ref_db.CV_list[i] = calloc(20, sizeof(char)		);		
 	}
 	SS_ref_db.SF_list 		 = malloc ((n_sf) * sizeof (char*)	);
 	for (int i = 0; i < n_sf; i++){ 
-		SS_ref_db.SF_list[i] = malloc(20 * sizeof(char)		);		
+		SS_ref_db.SF_list[i] = calloc(20, sizeof(char)		);		
 	}
 	if (sym == 0){
 		SS_ref_db.W   		= malloc (SS_ref_db.n_w * sizeof (double) ); 
@@ -515,7 +516,7 @@ SS_ref G_SS_init_EM_function(		SS_init_type		*SS_init,
 	/* DEW (DEW2019 aqueous model) needs each species' formation-reaction
 	   stoichiometry vs oxide components + H+, not just its mass-balance composition -
 	   see MAGEMin.h's SS_ref.mu_comp doc comment. NULL/unallocated for every other phase. */
-	if (strcmp(name, "DEW") == 0 || strcmp(name, "DEW_S14") == 0){
+	if (strcmp(name, "DEW") == 0 || strcmp(name, "DEW_S24") == 0){
 		SS_ref_db.mu_comp = malloc (n_em * sizeof (double*));
 		for (int i = 0; i < n_em; i++){
 			SS_ref_db.mu_comp[i] = malloc ((gv.len_ox+1) * sizeof (double));
@@ -786,6 +787,7 @@ global_variable reset_gv(					global_variable 	 gv,
 	}
 	gv.leveling_mode	  = 0;
 	gv.fixed_bulk		  = 0;
+	gv.calibration		  = 0;
 	gv.tot_time 	  	  = 0.0;
 	gv.tot_min_time 	  = 0.0;
 	gv.melt_fraction	  = 0.;
