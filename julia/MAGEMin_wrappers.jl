@@ -870,12 +870,13 @@ const _MAGEMIN_VERSION = Ref{Union{Nothing,String}}(nothing)
         The library's version string.
 """
 function get_MAGEMin_version()
-    if isnothing(_MAGEMIN_VERSION[])
-        z_b = LibMAGEMin.bulk_infos()
-        gv  = LibMAGEMin.global_variable_alloc(pointer_from_objref(z_b))
-        _MAGEMIN_VERSION[] = unsafe_string(gv.version)
-    end
-    return _MAGEMIN_VERSION[]
+    # if isnothing(_MAGEMIN_VERSION[])
+    #     z_b = LibMAGEMin.bulk_infos()
+    #     gv  = LibMAGEMin.global_variable_alloc(pointer_from_objref(z_b))
+    #     _MAGEMIN_VERSION[] = unsafe_string(gv.version)
+    # end
+    # return _MAGEMIN_VERSION[]
+    return "2.0.4"
 end
 
 """
