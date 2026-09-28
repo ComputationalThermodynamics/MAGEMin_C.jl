@@ -712,18 +712,245 @@ introduced by `all`) - distinguish them by endmember count/list in practice.
 
 ## Deep Earth Water (DEW) aqueous fluid model
 
-Unlike every other phase in MAGEMin, `DEW_S24` is not a solid solution - it is a 107-species
-ionic aqueous-fluid speciation model (charged and neutral species such as `Na+`, `Cl-`, `H+`,
-`OH-`, `CO2`, `CH4`, and larger organic/complex species), solved self-consistently for molality
-and activity coefficients at the system's pressure, temperature and oxide chemical potentials,
-following the Deep Earth Water (DEW) model. It is available today in the `all` master database
-and, as `fl_DEW`, in the `mb`, `mbe`, `ig`, `um`, `ume`, and `mpe` databases.
+Unlike every other phase in MAGEMin, the DEW phase is not a solid solution. It is an ionic aqueous-fluid speciation model: charged and neutral species such as `Na+`, `K+`, `H+`, `OH-`, `H4SiO4`, `CO2`, `CH4`, and larger organic or complex species. Their molalities and activity coefficients are solved self-consistently at the system's pressure, temperature and oxide chemical potentials, following the Deep Earth Water (DEW) model.
 
-There is **no separate activation flag** - `DEW_S24`/`fl_DEW` is a normal solution phase that
-participates in the Gibbs energy minimization whenever it is present in the chosen database's
-phase list, exactly like any other phase, and can be excluded the same way (`remove_phases`/
-`rm_list=`, or `select_phases`/`pp_list=`/`ss_list=` - see
-[MAGEMin_C.jl: options](MAGEMin_C/options.md)).
+### Availability
+
+| Database | Phase name | Model | Species |
+|---|---|---|:---:|
+| `mbe` | `DEW` | DEW_S24 | 32 |
+| `ume` | `DEW` | DEW_S24 | 100 |
+| `mpe` | `DEW` | DEW_S24 | 102 |
+| `all` | `DEW_S24` | DEW_S24 | 107 |
+
+MAGEMin holds a 120-species table taken from DEW2019. Each database only keeps the species whose formula can be written with that database's oxides, which is why the number of species differs between databases.
+
+There is **no separate activation flag**. The DEW phase is a normal solution phase that takes part in the Gibbs energy minimization whenever it is in the chosen database's phase list. It can be excluded the same way as any other phase (`remove_phases`/`rm_list=`, or `select_phases`/`pp_list=`/`ss_list=`, see [MAGEMin_C.jl: options](MAGEMin_C/options.md)).
+
+### Formulation
+
+The fluid is described by $n$ solute species $i$ (molality $m_i$, charge $z_i$) dissolved in water $w$. The formulation has five parts:
+
+1. standard-state Gibbs energy of every species;
+2. properties of the solvent;
+3. activity model;
+4. equilibrium speciation at the system's oxide chemical potentials;
+5. Gibbs energy of the fluid phase in the minimization.
+
+#### Composition and formation reactions
+
+Each species carries two sets of stoichiometric coefficients:
+
+- its composition $c_{ij}$ in the oxide components $j$ of the database. The `O` component takes up the charge: a cation carries a negative `O` coefficient and an anion a positive one. For example:
+
+```math
+\mathrm{Na^+} = \tfrac{1}{2}\,\mathrm{Na_2O} - \tfrac{1}{2}\,\mathrm{O}, \qquad
+\mathrm{OH^-} = \tfrac{1}{2}\,\mathrm{H_2O} + \tfrac{1}{2}\,\mathrm{O}, \qquad
+\mathrm{H^+} = \tfrac{1}{2}\,\mathrm{H_2O} - \tfrac{1}{2}\,\mathrm{O}
+```
+
+- its formation reaction $\nu_{ij}$ from the oxide components, water and `H+`, used in the mass-action equation below:
+
+```math
+\mathrm{Na^+} = \tfrac{1}{2}\,\mathrm{Na_2O} - \tfrac{1}{2}\,\mathrm{H_2O} + \mathrm{H^+}, \qquad
+\mathrm{OH^-} = \mathrm{H_2O} - \mathrm{H^+}, \qquad
+\mathrm{HCO_3^-} = \mathrm{H_2O} + \mathrm{CO_2} - \mathrm{H^+}
+```
+
+The two are consistent through $\mathrm{H^+} \equiv \tfrac{1}{2}\mathrm{H_2O} - \tfrac{1}{2}\mathrm{O}$. A species is kept only if all its $c_{ij}$ fall on oxides of the database.
+
+#### Standard-state Gibbs energy of the species
+
+The standard-state Gibbs energy of each species, $G_i^0(P,T)$, follows the revised Helgeson-Kirkham-Flowers (HKF) equation of state (Tanger & Helgeson, 1988; Shock et al., 1992), with the DEW2019 parameters. $P$ is in bar and $T$ in K, with $T_r = 298.15$ K, $P_r = 1$ bar, $\Theta = 228$ K and $\Psi = 2600$ bar:
+
+```math
+\begin{aligned}
+G_i^0 ={}& G_{r} - S_{r}\,(T - T_r)
+ + \left(a_1 + \frac{a_3}{T-\Theta}\right)(P - P_r)
+ + \left(a_2 + \frac{a_4}{T-\Theta}\right)\ln\frac{\Psi + P}{\Psi + P_r} \\
+&- c_1\left[T\ln\frac{T}{T_r} - T + T_r\right]
+ - c_2\left[\left(\frac{1}{T-\Theta} - \frac{1}{T_r-\Theta}\right)\frac{\Theta - T}{\Theta}
+ - \frac{T}{\Theta^2}\ln\frac{T_r\,(T-\Theta)}{T\,(T_r-\Theta)}\right] \\
+&+ \omega\left(\frac{1}{\varepsilon} - 1\right)
+ - \omega_r\left(\frac{1}{\varepsilon_r} - 1\right)
+ + \omega_r Y_r\,(T - T_r)
+\end{aligned}
+```
+
+Here $G_r$, $S_r$, $a_{1-4}$, $c_{1,2}$ and $\omega_r$ are the species parameters, $\varepsilon$ is the dielectric constant of water, and $1/\varepsilon_r - 1 = -0.9872563$ and $Y_r = -5.79865\times10^{-5}$ K⁻¹ are the reference values.
+
+The Born coefficient $\omega$ is constant ($\omega = \omega_r$) for neutral species. For charged species it varies with $P$ and $T$ through the solvent function $g$:
+
+```math
+\omega = \eta\left(\frac{z^2}{r_e} - \frac{z}{r_{H^+} + g}\right), \qquad
+r_e = \frac{z^2}{\omega_r/\eta + z/r_{H^+}} + |z|\,g
+```
+
+with $\eta = 694657$ J Å mol⁻¹ and $r_{H^+} = 3.082$ Å.
+
+The result is converted from the SUPCRT convention (Gibbs energy of formation from the elements) to the convention of the Holland & Powell dataset (apparent Gibbs energy, as used for all other phases):
+
+```math
+G_i^{0,\,\mathrm{HP}} = G_i^{0,\,\mathrm{SUPCRT}} - T_r \sum_j c_{ij}\, S^{\mathrm{el}}_j
+```
+
+where $S^{\mathrm{el}}_j$ is the entropy of the elements of oxide $j$ at $T_r$. By convention $G^0_{\mathrm{H^+}} = 0$ (and $G^0_{\mathrm{H_2}} = 0$).
+
+#### Properties of the solvent
+
+The standard-state Gibbs energy of water $G_w^0$ and its density $\rho_w$ (g cm⁻³) are taken from the H₂O endmember of the selected thermodynamic dataset (Pitzer & Sterner, 1994 equation of state), so that the solvent is consistent with the other phases of the database.
+
+The dielectric constant blends the Johnson & Norton (1991) model, used at low pressure, with the Sverjensky et al. (2014) model, used at high pressure. The two are weighted around 5 kbar:
+
+```math
+\varepsilon = w\,\varepsilon_{\mathrm{S14}} + (1-w)\,\varepsilon_{\mathrm{JN91}}, \qquad
+w = \tfrac{1}{2} + \tfrac{1}{2}\tanh\!\left(\frac{P - 5000}{1000}\right)
+```
+
+with
+
+```math
+\varepsilon_{\mathrm{JN91}} = \sum_{k=0}^{4} k_k(\hat{T})\,\rho_w^{\,k}, \quad \hat{T} = T/298.15, \qquad
+\varepsilon_{\mathrm{S14}} = \exp\!\left(b_1 t + b_2\sqrt{t} + b_3\right)\,\rho_w^{\,a_1 t + a_2\sqrt{t} + a_3}
+```
+
+where $t$ is the temperature in °C. A weight below 0.001 is set to zero.
+
+The solvent function $g$ of Shock et al. (1992) enters the Born coefficient. It is zero for $\rho_w \geq 1$ g cm⁻³ and otherwise
+
+```math
+g = a_g\,(1 - \rho_w)^{b_g} - f(P,t), \qquad a_g, b_g = \text{quadratic functions of } t
+```
+
+where the correction $f$ only applies for $P \leq 1$ kbar and $155 \leq t \leq 355$ °C.
+
+The Debye-Hückel parameters are
+
+```math
+A_\gamma = \frac{1.824829238\times10^{6}\,\rho_w^{1/2}}{(\varepsilon T)^{3/2}}, \qquad
+B_\gamma = \frac{50.29158649\,\rho_w^{1/2}}{(\varepsilon T)^{1/2}}
+```
+
+#### Activity model
+
+The ionic strength and total solute molality are
+
+```math
+I = \frac{1}{2}\sum_i z_i^2\, m_i, \qquad \Sigma_m = \sum_i m_i
+```
+
+The activity coefficients follow the extended Debye-Hückel (B-dot) equation of Helgeson (1969), with the same ion size $\mathring{a} = 3.72$ Å and $b_\gamma = 0.03$ kg mol⁻¹ for every species. The term $\Gamma_\gamma$ converts from the mole-fraction to the molality scale:
+
+```math
+\log_{10}\gamma_i = -\frac{A_\gamma\, z_i^2\sqrt{I}}{\Lambda} + \Gamma_\gamma + b_\gamma I, \qquad
+\Lambda = 1 + \mathring{a}B_\gamma\sqrt{I}, \qquad
+\Gamma_\gamma = -\log_{10}\!\left(1 + M_w\Sigma_m\right)
+```
+
+where $M_w = 0.01801528$ kg mol⁻¹. $\gamma_i$ therefore only depends on $|z_i|$, and neutral species have $\log_{10}\gamma_i = \Gamma_\gamma + b_\gamma I$.
+
+The activity of water follows from the Gibbs-Duhem relation (osmotic coefficient) of the same model:
+
+```math
+\ln a_w = \ln(10)\left[\Gamma_\gamma - \frac{M_w\, b_\gamma\, I\,\Sigma_m}{2} + \frac{2}{3}M_w A_\gamma\, I^{3/2}\sqrt{\sigma}\right], \qquad
+\sigma = \frac{3}{(\Lambda-1)^3}\left[\Lambda - \frac{1}{\Lambda} - 2\ln\Lambda\right]
+```
+
+The chemical potentials are then
+
+```math
+\mu_i = G_i^0 + RT\ln(\gamma_i m_i), \qquad \mu_w = G_w^0 + RT\ln a_w
+```
+
+#### Equilibrium speciation
+
+Let $\Gamma_j$ be the chemical potentials of the oxide components, given by the current G-hyperplane of the minimization. At equilibrium, the chemical potential of each species equals that of its formation reaction:
+
+```math
+\mu_i = \sum_{j \neq \mathrm{H_2O}} \nu_{ij}\,\Gamma_j + \nu_{i,w}\,\mu_w + \nu_{i,\mathrm{H^+}}\,\mu_{\mathrm{H^+}}
+```
+
+which gives the molality of each species (mass action):
+
+```math
+m_i = \frac{1}{\gamma_i}\exp\!\left[\frac{\sum_{j \neq \mathrm{H_2O}}\nu_{ij}\Gamma_j + \nu_{i,w}\mu_w + \nu_{i,\mathrm{H^+}}\mu_{\mathrm{H^+}} - G_i^0}{RT}\right]
+```
+
+The chemical potential of `H+` is not fixed by the oxide components. It is the extra unknown set by electroneutrality:
+
+```math
+\sum_i z_i\, m_i = 0
+```
+
+Because $\gamma_i$ and $a_w$ depend on all the molalities (through $I$ and $\Sigma_m$), these $n+1$ equations are non-linear and are solved iteratively (see [Speciation solver](#Speciation-solver)). The pH is $-\log_{10}(\gamma_{\mathrm{H^+}} m_{\mathrm{H^+}})$.
+
+#### Gibbs energy of the fluid phase
+
+The speciation is converted to mole fractions, water included, with $\Omega = 1/M_w = 55.508$ mol kg⁻¹:
+
+```math
+x_i = \frac{m_i}{\Omega + \Sigma_m}, \qquad x_w = \frac{\Omega}{\Omega + \Sigma_m}
+```
+
+The molar Gibbs energy of the fluid and its composition in oxide components are
+
+```math
+G_{\mathrm{DEW}} = \sum_i x_i\,\mu_i + x_w\,\mu_w, \qquad
+C_j = \sum_i x_i\, c_{ij} + x_w\, c_{w,j}
+```
+
+In the minimization, the fluid is handled like a solution phase whose endmembers are the species and water. Its driving force is $G_{\mathrm{DEW}}$ evaluated with the standard states shifted by the G-hyperplane, $G_i^0 - \sum_j c_{ij}\Gamma_j$. Unlike other solution phases, its composition is not found by a local optimization (NLopt): at each iteration of the minimization it is given directly by the speciation above for the current $\Gamma_j$. If the speciation does not converge, the phase is set to pure water and rejected for that iteration. A converged speciation is also rejected if its charge residual $|\sum_i z_i x_i|$ exceeds $10^{-3}$.
+
+### Speciation solver
+
+The speciation equations can have several self-consistent solutions. MAGEMin therefore solves them from several initial values of $\mu_{\mathrm{H^+}} = RT\ln\epsilon_{\mathrm{H^+}}$ and keeps the converged solution with the lowest $G_{\mathrm{DEW}}$. The inner solver is selected with `--DEW_solve_algorithm` (C command line only, see [MAGEMin command-line reference](MAGEMin/tutorials.md)):
+
+| Value | Method |
+|:---:|---|
+| `4` (default) | Newton method on $y_i = \ln m_i$ and $\mu_{\mathrm{H^+}}$ (see below). Starts from $\epsilon_{\mathrm{H^+}} = 10^{-6}$, then $10^{-4}$; if neither converges, falls back to algorithm `2` |
+| `2` | Fixed-point (Picard) iteration: $\gamma_i$ and $a_w$ are updated from the current molalities, then the charge balance is solved for $\mu_{\mathrm{H^+}}$ by a Newton step safeguarded by bisection, and the molalities are recomputed by mass action. Eight starts, $\epsilon_{\mathrm{H^+}} \in \{10^{-3}, 10^{-4}, 10^{-5}, 10^{-6}, 10^{-7}, 10^{-8}, 10^{-10}, 10^{-12}\}$ |
+| `1` | As `0`, with the new molalities mixed with the previous ones, $m^{k+1} = \beta\, m^{\mathrm{new}} + (1-\beta)\, m^{k}$. $\beta$ is halved when the charge residual does not decrease and relaxed back otherwise; this targets high ionic strength (high P-T), where plain Picard iteration oscillates |
+| `0` | As `2`, with plain bracketed bisection for $\mu_{\mathrm{H^+}}$ (original solver) |
+
+The Picard variants stop when $|\sum_i z_i m_i| \leq 10^{-12}$, or after 1000 iterations or 100 iterations without improvement.
+
+The Newton method (algorithm `4`) solves the residuals
+
+```math
+r_i = y_i + \ln\gamma_i - \frac{\sum_{j \neq \mathrm{H_2O}}\nu_{ij}\Gamma_j + \nu_{i,w}\mu_w + \nu_{i,\mathrm{H^+}}\mu_{\mathrm{H^+}} - G_i^0}{RT}, \qquad
+r_q = \frac{\sum_i z_i m_i}{\sum_i |z_i|\, m_i}
+```
+
+with the activity coefficients and $\mu_w$ included in the residual. Since $\gamma_i$ and $a_w$ only depend on the molalities through $I$ and $\Sigma_m$, the Jacobian is the identity plus a rank-2 correction. The Newton step is therefore obtained in $O(n)$ operations with the Sherman-Morrison-Woodbury formula; the derivatives with respect to $I$ and $\Sigma_m$ are evaluated by finite differences. A backtracking line search on $\phi = \tfrac{1}{2}\left(\sum_i r_i^2 + r_q^2\right)$ is used, with steps limited to $|\Delta y_i| \leq 2$ and $m_i \leq 10^4$. The solve has converged when $\max_i|r_i| < 10^{-9}$ and $|r_q| < 10^{-9}$ (at most 50 iterations).
+
+All algorithms converge to the same equilibrium conditions; they differ in robustness and cost.
+
+During the minimization, the speciation of a given P-T point is solved many times with slowly changing $\Gamma_j$. After the first full multi-start solve of a point, later iterations first try a single solve started from the previous solution (*warm start*). The warm-started result is only accepted if its $G_{\mathrm{DEW}}$ is not higher than that of the full multi-start solution; otherwise the full multi-start is run again. Warm starting is reset at every new point and can be disabled with `--warm_start=0`.
+
+!!! note "Output"
+    In `MAGEMin_C.jl`, the DEW entry of `out.SS_vec` gives, besides the usual fields, the molality (`molality`) and activity (`activity`) of every species, the fluid's `pH`, the charge residual (`chargeResidual`), the total solute molality (`sumMolality`) and the chemical potential of water (`G_water`).
+
+### Controlling DEW species in MAGEMin_C.jl
+
+Individual species can be removed from the calculation with `exclude_DEW_species`. It raises the reference Gibbs energy of the named species by a large penalty (default `1.0e6` kJ/mol), so they are never stable. It returns a `gbase` override to pass to the minimization functions. `filter_DEW_species = true` only trims the output: species with a negligible fraction (≤ 1e-40) are dropped from the DEW phase's endmember list.
+
+```julia
+using MAGEMin_C
+Xoxides = ["SiO2"; "Al2O3"; "CaO"; "MgO"; "FeO"; "K2O"; "Na2O"; "TiO2"; "O"; "MnO"; "Cr2O3"; "H2O"; "CO2"; "S"];
+X       = [0.62212, 0.1122, 0.0, 0.03486, 0.05557, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.17525, 0.0, 0.0];
+
+excl    = exclude_DEW_species("all", ["H6Si2O7"])
+data    = Initialize_MAGEMin("all", verbose=false, solver=0)
+out     = single_point_minimization(10.0, 400.0, data; X=X, Xoxides=Xoxides, sys_in="mol",
+                                    gbase=excl, filter_DEW_species=true)
+Finalize_MAGEMin(data)
+```
+
+Here the `DEW_S24` phase of the result lists 19 species instead of 107, and `H6Si2O7` is absent.
+
+!!! note
+    - `exclude_DEW_species` only works for databases that contain a DEW phase (`mbe`, `ume`, `mpe`, `all`).
+    - Species indices are resolved from the database's full oxide list. When the minimization uses a reduced set of oxides, check the result (`out.SS_vec[i].emNames`) to make sure the right species was excluded.
 
 ### References
 
@@ -734,14 +961,13 @@ phase list, exactly like any other phase, and can be excluded the same way (`rem
 - Huang, F., & Sverjensky, D. A. (2019). Extended Deep Earth Water Model for predicting major
   element mantle metasomatism. *Geochimica et Cosmochimica Acta*, 254, 192–230.
   [doi: 10.1016/j.gca.2019.03.036](https://doi.org/10.1016/j.gca.2019.03.036) - the "DEW2019"
-  species-parameter update this 107-species subset is drawn from.
+  species-parameter update the species table is drawn from.
 - [dewcommunity.org](http://www.dewcommunity.org) - the DEW community's reference site
   (spreadsheet releases, documentation).
 
 ### Species list
 
-107 species (of the 229 in the full DEW2019 release - MAGEMin currently includes those whose
-formula is expressible in its tracked oxide set):
+The 107 species of `DEW_S24` in the `all` database (the `mbe`, `ume` and `mpe` databases use the subset compatible with their oxides):
 
 ::: details Show all 107 DEW_S24 species
 
