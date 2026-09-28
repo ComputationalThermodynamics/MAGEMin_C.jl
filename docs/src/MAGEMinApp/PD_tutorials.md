@@ -24,6 +24,7 @@ Here we provide a set of tutorials to generate various kind of phase diagrams, c
     - [14. Draw a P-T path on the diagram](#14.-Draw-a-P-T-path-on-the-diagram)
     - [15. Quantitative isopleth thermobarometry with IntersecT](#15.-Quantitative-isopleth-thermobarometry-with-IntersecT)
     - [16. μ-μ (chemical potential) diagram](#16.-μ-μ-chemical-potential-diagram)
+    - [17. Monte Carlo bulk-rock uncertainty](#17.-Monte-Carlo-bulk-rock-uncertainty)
 
 ### 1. First phase diagram 
 
@@ -845,3 +846,132 @@ Click `Compute phase diagram` as usual. The resulting diagram (`Diagram` sub-tab
 
 !!! note
     Every other option demonstrated in the previous sections - displayed field and colormaps ([3. Displayed field and colormap options](#3.-Displayed-field-and-colormap-options)), reaction lines and isopleths ([2. Reaction lines and isopleths](#2.-Reaction-lines-and-isopleths)), refinement, grid-point information, and exporting `svg` layers ([4. Export figures](#4.-Export-figures)) - works exactly the same way on a μ-μ diagram, simply with μ(oxide 1)/μ(oxide 2) taking the place of the usual P-T or P-X/T-X axes.
+
+### 17. Monte Carlo bulk-rock uncertainty
+
+Available from MAGEMinApp v1.7.1.
+
+A bulk-rock composition is never known exactly: analytical uncertainty, sample heterogeneity and estimated components such as H₂O or Fe³⁺ all shift the phase boundaries. The `Uncertainty` panel of the `Diagram` sub-tab measures this effect with a Monte Carlo approach. It recomputes the current P-T phase diagram for many randomly perturbed bulk-rock compositions and shows how far each phase boundary moves.
+
+!!! info "How it works"
+    - `N` perturbed bulk-rock compositions (*realizations*) are drawn around the reference bulk. Each oxide $i$ is perturbed in log space, $x_i' = x_i \exp(\varepsilon_i)$ with $\varepsilon_i \sim \mathcal{N}(-\sigma_i^2/2,\ \sigma_i)$ and $\sigma_i$ the relative 1σ uncertainty, so perturbed values stay positive. Every realization is then renormalized to the sum of the reference bulk. Oxides absent from the reference bulk stay absent.
+    - For every realization, a complete P-T phase diagram is computed with the same adaptive mesh refinement as the reference diagram: same P-T range, same initial grid subdivision and same total number of refinement levels (including any `Refine phase boundaries`/`Refine uniformly` passes applied afterwards). Each realization therefore finds its own phase boundaries wherever they fall.
+    - The boundaries of all realizations are overlaid on the reference ones (*spaghetti diagram*) and can be turned into a probability map for a given phase assemblage.
+
+!!! warning
+    - Monte Carlo runs only on a **P-T diagram** that has already been computed, with a fixed bulk-rock composition (`Solidus H₂O-saturated = false`). Otherwise the red alert *"Monte Carlo needs a P-T phase diagram computed first"* is shown.
+    - A run costs roughly `N` times the reference diagram. Start with a small number of realizations (e.g. 32–64) and moderate refinement.
+
+#### Step 1 - Compute the reference phase diagram
+
+Here we use the default `Igneous` database (Holland et al., 2018) with the pre-defined `KLB1 Peridotite - Anhydrous` composition, `Diagram type = P-T diagram`, a temperature range of 800–1400 °C, a pressure range of 0.01–20 kbar, `Initial grid subdivision = 4` and `Refinement levels = 3`. Click `Compute phase diagram`.
+
+#### Step 2 - Set the bulk-rock uncertainty
+
+In the `Diagram` sub-tab, select the `Uncertainty` panel of the right sidebar. On first opening, the `Bulk uncertainty` table is filled with the current bulk-rock composition and a default 1σ per oxide:
+
+```@raw html
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MC_menu.png?raw=true" alt="MAGEMinApp Monte Carlo menu" style="max-width: 30%; height: auto; display: block; margin: 0 auto;">
+```
+
+The `σ` column is editable. The options above the table are:
+
+| Option | Description |
+|---|---|
+| `relative %` / `absolute [mol%]` | Whether `σ` is a percentage of each oxide's own value or an absolute 1σ in the unit of the table |
+| `Reset` | Restore the default relative σ |
+| `Apply to all oxides` | Set every `σ` to the value in the box on the left (default 5) |
+| `Load WDS from bulk` | Fill `σ` from the `<oxide>_wds` columns of the selected bulk-rock composition (see below) and switch to `absolute` mode |
+| `Unit` | Display the table in `mol%` or `wt%`. A relative σ is unchanged; an absolute σ is converted |
+
+The default relative σ (in %) are:
+
+| SiO₂ | Al₂O₃ | CaO | MgO | FeO | K₂O | Na₂O | TiO₂ | O | MnO | Cr₂O₃ | H₂O | CO₂ | S |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1.0 | 1.0 | 2.5 | 2.5 | 2.5 | 3.0 | 3.0 | 7.5 | 25.0 | 7.5 | 7.5 | 25.0 | 10.0 | 10.0 |
+
+Oxides not listed here default to 5 %.
+
+!!! tip
+    - Measured analytical uncertainties can be provided in the bulk-rock input file (see [Bulk-rock input file](@ref)) by adding one `<oxide>_wds` column per oxide (e.g. `SiO2_wds`, `Al2O3_wds`) holding the absolute 1σ. After loading the file and selecting the composition, click `Load WDS from bulk`. Oxides without a `_wds` value keep their current σ.
+    - The default H₂O σ is large (25 %) because water content is usually estimated rather than measured. For a water-oversaturated bulk, H₂O is only a placeholder that guarantees a free fluid phase, so set its σ close to 0: perturbing it mostly changes the fluid fraction, not the solid assemblage.
+
+#### Step 3 - Run the Monte Carlo analysis
+
+In the `Run` card below the table:
+
+- `Realizations`: number of perturbed compositions `N` (1–1000, default 100). Here we use 64.
+- `Seed`: leave empty for a random draw, or give an integer to make the run reproducible.
+
+Click `Run Monte Carlo`. The progress bar in the top-right corner of the App shows the current realization and refinement level, and the Julia terminal reports the adaptive mesh refinement of each realization in turn:
+
+```@raw html
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MC_Julia_terminal_running.png?raw=true" alt="MAGEMinApp Monte Carlo terminal" style="max-width: 90%; height: auto; display: block; margin: 0 auto;">
+```
+
+Here each realization takes about 4 seconds (289 initial points and 3 refinement levels), so the 64 realizations take about 4 minutes.
+
+#### Step 4 - Boundary uncertainty diagram
+
+When the run is complete, the `Monte Carlo boundary uncertainty` panel opens at the top of the window. You can close it and reopen it at any time with `Display results`, which does not recompute anything.
+
+```@raw html
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MC_results_raw.png?raw=true" alt="MAGEMinApp Monte Carlo raw results" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+```
+
+Each colored line is the boundary of one phase's stability field in one realization, drawn in that phase's color (see legend). The black lines are the phase boundaries of the reference diagram, drawn in the same style as its reaction lines. The wider a bundle of colored lines, the more sensitive that boundary is to the bulk-rock uncertainty. In this example the garnet (`g`) boundary stays tightly grouped, whereas the ilmenite (`ilm`) boundary, which depends on the small TiO₂ content, spreads widely.
+
+The `Diagram options` card controls the display:
+
+- `Show phase labels`: overlay the field labels of the reference diagram.
+- `Display phase boundaries`: show or hide the reference boundaries (black lines).
+- `Smooth lines`: remove the grid steps of each realization's boundary (Gaussian smoothing followed by corner cutting).
+
+Using `Show phase labels = true` and `Smooth lines = true` gives:
+
+```@raw html
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MC_results_smooth.png?raw=true" alt="MAGEMinApp Monte Carlo smoothed results" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+```
+
+The `Filter` card limits what is drawn:
+
+- `Max lines`: number of realizations drawn (default 64). Drawing more lines may take a while.
+- `Phases shown`: unfold the list to select which phases have their boundaries drawn (`Select all`/`Unselect all`).
+
+Changes to the `Filter` card only take effect after clicking `Apply`.
+
+`Export SVG` saves the diagram in the output directory as `<diagram title>_MC.svg`. As with `Export all layers` ([4. Export figures](#4.-Export-figures)), the file is split into layers for `Inkscape` or `Illustrator`: one layer per phase (one path per realization), the reference boundaries, the labels, the axes and the legend.
+
+#### Step 5 - Probability map of a phase assemblage
+
+The right part of the panel computes, for a target assemblage, the probability that each P-T point lies inside its stability field. Enter the phases in `Target phases`, separated by spaces (e.g. `ol cpx spl opx pl`), and choose the `Match` mode:
+
+- `loose (contains)`: a field counts if it contains all target phases; other phases may also be stable.
+- `strict (exact)`: a field counts only if its assemblage is exactly the target.
+
+Then click `Compute`:
+
+```@raw html
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MC_probability_example.png?raw=true" alt="MAGEMinApp Monte Carlo probability map" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+```
+
+The map shows:
+
+- `P(field)` (heatmap): the fraction of realizations in which the point lies inside the target field. In each realization only the largest polygon of each matching assemblage is used, so small fragments caused by grid resolution are ignored.
+- `P(phase)` (colored lines): for each target phase, the contours where it is stable in 2.5 % (dotted), 50 % (solid, heavy) and 97.5 % (dashed) of the realizations. The band between the dotted and dashed lines is the 95 % confidence interval of that phase's boundary.
+- The phase boundaries of the target phases in the reference diagram (thin black lines).
+
+The status line below `Compute` gives the number of realizations in which the target field exists and the fraction of the grid where `P(field) > 0`. If the target phases are almost never stable together, the heatmap stays nearly empty; try fewer phases or `Match = loose (contains)`.
+
+The spider diagram below the probability card shows each sampled composition as its difference from the reference bulk (`Δ bulk [mol%]`, one blue line per realization, reference in black). Use it to check that the perturbation matches the σ you entered. Here, the absolute spread is largest for SiO₂ and MgO, the most abundant oxides.
+
+`Export SVG` saves the probability map in the output directory as `<diagram title>_Probability.svg`. It uses the same canvas as the `_MC.svg` file so the two figures line up.
+
+!!! note
+    - A new Monte Carlo run replaces the previous results. After changing the reference diagram, run Monte Carlo again so that the results match it.
+    - A probability map computed from an earlier run cannot be exported. Click `Compute` again first.

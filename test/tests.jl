@@ -17,14 +17,14 @@ function norm(vec :: Vector{Float64})
 end
 
 @testset verbose=true "single point minimization" begin
-    # data        =   Initialize_MAGEMin("sb24", verbose=-1);
-    # test        =   1         #Pyrolite
-    # data        =   use_predefined_bulk_rock(data, test);
-    # P           =   60.0
-    # T           =   1000.0
-    # out         =   point_wise_minimization(P,T, data);
-    # @test sort(out.ph) == sort(["opx", "cpx", "gtmj", "ol"])
-    # Finalize_MAGEMin(data)
+    data        =   Initialize_MAGEMin("sb24", verbose=-1);
+    test        =   1         #Pyrolite
+    data        =   use_predefined_bulk_rock(data, test);
+    P           =   60.0
+    T           =   1000.0
+    out         =   point_wise_minimization(P,T, data);
+    @test sort(out.ph) == sort(["opx", "cpx", "gtmj", "ol"])
+    Finalize_MAGEMin(data)
 
     data        =   Initialize_MAGEMin("ig", verbose=-1);
     test        =   0         #KLB1
@@ -38,6 +38,7 @@ end
     @test sort(out.ph) == sort(["spl", "cpx",  "opx", "ol"])
     @test abs(out.s_cp[1] - 1208.466551730128) < 2.0
 end
+
 @testset verbose=true "test external routines" begin
     ox              = ["SiO2", "TiO2", "Al2O3", "FeO", "MnO", "MgO", "CaO", "Na2O", "K2O", "P2O5", "H2O"]
     mol_percents    = [62.38, 0.41, 11.79, 0.03, 0.02, 4.80, 9.73, 3.41, 0.59, 0.05, 6.80]

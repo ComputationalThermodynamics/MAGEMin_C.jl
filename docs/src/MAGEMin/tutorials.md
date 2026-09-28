@@ -28,7 +28,8 @@ MAGEMin is run using command line arguments when executing the binary file.
 | `--mpIlm=x`    |  Metapelite database Ilm, 0; Ilmm, 1           |
 | `--buffer=""`  |  Oxygen buffer, "qfm", "mw", "qif", "nno", "hm", "iw", "cco", "aH2O", "aO2", "aMgO", "aFeO", "aAl2O3", "aTiO2          |
 | `--buffer_n=x` |  Buffer offset in the RTlog scale             |
-| `--DEW_solve_algorithm=x` | Inner solver for the DEW aqueous fluid model's charge-balance root-find: 0 = plain Picard + bisection (default), 1 = damped/mixed Picard + bisection, 2 = plain Picard + Newton safeguarded by bisection. C-CLI only - not yet exposed through `Initialize_MAGEMin` in `MAGEMin_C.jl`. See the [DEW aqueous fluid model](../database.md#Deep-Earth-Water-DEW-aqueous-fluid-model) section. |
+| `--DEW_solve_algorithm=x` | Inner solver of the DEW aqueous fluid speciation: 4 = Newton on all species molalities and μ(H+), falling back to 2 if it does not converge (default); 2 = Picard iteration + Newton/bisection charge balance; 1 = damped Picard + bisection; 0 = plain Picard + bisection. C command line only, not exposed through `Initialize_MAGEMin` in `MAGEMin_C.jl`. See the [DEW aqueous fluid model](../database.md#Deep-Earth-Water-DEW-aqueous-fluid-model) section. |
+| `--warm_start=x` | DEW warm start during the outer minimization loop: 1 = active (default), 0 = always re-run the full multi-start speciation solve. C command line only. |
 
 where *x* is an `integer`, *y* a `float`/`double`, *""* is a `string` and *[]* a comma-separated list of size *number of oxides*.
 

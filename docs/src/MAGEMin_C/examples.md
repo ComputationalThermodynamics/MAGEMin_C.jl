@@ -530,7 +530,7 @@ passing only one leaves the other phase category untouched. Combining `rm_list=`
 ### E.11 The "all" master database and the DEW aqueous fluid
 
 The `all` database unifies every unique solution-phase model across the mp/mb/mbe/ig/igd/igad/
-um/ume/mpe databases into one, plus the DEW aqueous fluid model (`DEW_S14`, 107 ionic aqueous
+um/ume/mpe databases into one, plus the DEW aqueous fluid model (`DEW_S24`, 107 ionic aqueous
 species - see [Databases information](../database.md#Deep-Earth-Water-DEW-aqueous-fluid-model)).
 There is no separate flag to turn DEW on - like any other phase, it simply enters the stable
 assemblage whenever it lowers the system's Gibbs energy:
@@ -549,24 +549,24 @@ which gives:
 Pressure          : 10.0      [kbar]
 Temperature       : 400.0    [Celsius]
      Stable phase | Fraction (mol fraction)
-          chl_W14   0.04649
-          ctd_W14   0.29635
-          DEW_S14   0.05689
-                q   0.41324
-              prl   0.18704
+          chl_W14   0.0466
+          ctd_W14   0.29707
+          DEW_S24   0.0546
+                q   0.41424
+              prl   0.18749
      Stable phase | Fraction (wt fraction)
-          chl_W14   0.03831
-          ctd_W14   0.31417
-          DEW_S14   0.01796
-                q   0.43347
-              prl   0.19609
+          chl_W14   0.03834
+          ctd_W14   0.31441
+          DEW_S24   0.01721
+                q   0.4338
+              prl   0.19624
      Stable phase | Fraction (vol fraction)
-          chl_W14   0.03916
-          ctd_W14   0.25637
-          DEW_S14   0.04829
-                q   0.45984
-              prl   0.19633
-Gibbs free energy : -865.766899  (5 iterations; 63.23 ms)
+          chl_W14   0.03924
+          ctd_W14   0.2569
+          DEW_S24   0.04634
+                q   0.46079
+              prl   0.19673
+Gibbs free energy : -865.766899  (5 iterations; 23.11 ms)
 Oxygen fugacity          : 11.124522284678017
 Delta QFM                : 38.537682224019605
 ```
