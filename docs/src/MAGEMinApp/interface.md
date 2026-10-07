@@ -465,7 +465,7 @@ Computes and displays TAS and AFM classification diagrams for the melt compositi
 This sub-tab is only shown when `Diagram type = P-T-X 3D diagram` is selected in the [Setup panel](#2.1.-Setup-panel). Clicking `Compute phase diagram` then computes a regular three-dimensional grid and switches to this sub-tab when the calculation is complete:
 
 - **P** and **T** span the pressure and temperature ranges of the Setup panel;
-- **X** is the linear mixing between the two bulk-rock compositions of the [Bulk-rock composition panel](#2.2.-Bulk-rock-composition-panel), from `X = 0` (left composition) to `X = 1` (right composition), as for P-X and T-X diagrams. Varying only the H₂O content between the two compositions, for instance, gives a P-T-H₂O diagram;
+- **X** is the linear mixing between the two bulk-rock compositions of the [Bulk-rock composition panel](#2.2.-Bulk-rock-composition-panel), labelled `X = 0` (left) and `X = 1` (right) when this diagram type is selected, as for P-X and T-X diagrams. A message below the tables states what X represents, and warns when both compositions are identical (nothing would vary along X). When only one oxide differs between the two compositions (the others keeping their proportions), e.g. the H₂O content, the X axis of the figure is labelled with that oxide and its content in mol% (a P-T-H₂O diagram);
 - the number of points along each axis is set by `3D grid [points per axis]` (no adaptive refinement). The progress bar reports the calculation one X plane at a time.
 
 ```@raw html
@@ -496,8 +496,8 @@ The sub-tab has the figure on the left and, on the right, an always-visible **Di
             <li><b>Composition bar</b> - shows the bulk composition of the last clicked grid node (system acronym and mol% values), with a copy button</li>
             <li><b>3D view</b> - rotate (left click), zoom (scroll) and pan (right click); hovering displays P, T, X and the value of the displayed quantity. The camera icon of the toolbar saves a PNG image</li>
             <li><b>Caption</b> - top left, next to the MAGEMin logo: definition of the coloured surface and of its contour lines when this layer is displayed</li>
-            <li><b>Colorbars</b> - one for the field layer and one for the coloured surface (stacked when both are displayed); <b>legend</b> - phase-in/out surfaces</li>
-            <li><b>Information block</b> - below the figure, as for 2D diagrams: MAGEMin, MAGEMin_C and GUI versions, number of grid points, date and time, database and dataset, solution models, diagram type, solver, oxide list, buffer (if any), X0 and X1 compositions [mol%], pressure and temperature ranges, and computation time</li>
+            <li><b>Colorbars</b> - one for the field layer and one for the coloured surface (stacked when both are displayed); <b>legend</b> - phase-in/out surfaces, click an entry to hide/show that surface (double-click to isolate it)</li>
+            <li><b>Information block</b> - below the figure, as for 2D diagrams: MAGEMin, MAGEMin_C and GUI versions, number of grid points, date and time, database and dataset, solution models, diagram type, meaning of the X axis, solver, oxide list, buffer (if any), X0 and X1 compositions [mol%], pressure and temperature ranges, and computation time</li>
         </ul>
       </td>
     </tr>
@@ -521,7 +521,7 @@ The sub-tab has the figure on the left and, on the right, an always-visible **Di
       <td></td>
       <td>
         <ul>
-            <li><b>Layers</b> - any combination of: <i>Field isosurfaces / volume</i> (§4.4), <i>Coloured surface (+ contours)</i> (§4.5), <i>Phase-in/out surfaces</i> and <i>Grid points (assemblage)</i> (§4.7)</li>
+            <li><b>Layers</b> - any combination of: <i>Field isosurfaces / volume</i> (§4.4), <i>Coloured surface (+ contours)</i> (§4.5), <i>Phase-in/out surfaces</i> and <i>Grid points (assemblage)</i> (§4.7). Ticking a layer opens the tab holding its settings</li>
             <li><b>Reverse T axis</b> - reverse the temperature axis (default false)</li>
             <li><b>Reverse P axis</b> - reverse the pressure axis (default true)</li>
             <li><b>Camera</b> - 3D (perspective), or orthographic views along one axis: P-T (along X), P-X (along T), T-X (along P)</li>
@@ -549,8 +549,9 @@ The sub-tab has the figure on the left and, on the right, an always-visible **Di
       <td></td>
       <td>
         <ul>
+            <li><b>Clicked point</b> - <i>Nearest grid node</i> (instant, default) or <i>Exact point (computed)</i>: a single MAGEMin calculation at the exact P-T-X of the click, with the same database, options and bulk-rock compositions as the diagram (about 1 s). The selected location is marked by a red diamond in the figure and summarized in a status line</li>
             <li><b>Pie unit</b> - mol%, wt% or vol%</li>
-            <li><b>Pie chart</b> - modal fractions of the stable phases at the grid node closest to the clicked point (any surface or grid point of the figure); clicking the figure opens this panel automatically</li>
+            <li><b>Pie chart</b> - modal fractions of the stable phases at the selected point (click any surface or grid point of the figure); clicking the figure opens this panel automatically</li>
             <li><b>Mineral composition</b> - click a slice of the pie chart to display the composition of that phase (oxide, mol%, wt%, apfu), with a copy button</li>
         </ul>
       </td>
@@ -594,7 +595,7 @@ The sub-tab has the figure on the left and, on the right, an always-visible **Di
 
 ### 4.5. Surface panel
 
-The coloured surface reproduces a classic 3D representation: the surface on which a quantity **A** takes a given value, coloured by a second quantity **B**, with labelled contour lines of a third quantity **C** drawn on it (e.g. the surface of melt Mg# = 0.7, coloured by the melt fraction, with garnet modal contours).
+The coloured surface reproduces a classic 3D representation: the surface on which a first quantity takes a given value, coloured by a second quantity, with labelled contour lines of a third quantity drawn on it (e.g. the surface of melt Mg# = 0.7, coloured by the melt fraction, with garnet modal contours). Colours and contour values are interpolated on the surface from the surrounding grid nodes where the quantity is defined, so that a surface lying on a phase boundary (e.g. garnet-in) can be coloured by a composition of that phase.
 
 ```@raw html
 
@@ -608,9 +609,10 @@ The coloured surface reproduces a classic 3D representation: the surface on whic
       <td></td>
       <td>
         <ul>
-            <li><b>Surface: A = value</b> - quantity selector for A (default <i>Solution phase → liq → Mg#</i>), <b>Value of A</b> and the range of A over the diagram</li>
-            <li><b>Colour: B</b> - quantity selector for B (default melt mode, vol), colormap, reverse colormap and opacity</li>
-            <li><b>Contour lines: C</b> - show contours (true/false), quantity selector for C (default garnet mode, vol), number of levels (evenly spaced over the range of C on the surface), line width and label size</li>
+            <li><b>Preset</b> (optional) - fills the three blocks below in one go: <i>Melt Mg# = 0.7</i> (colour: melt fraction, lines: garnet mode), <i>Solidus (melt-in)</i> (colour: H₂O activity, lines: garnet mode), <i>Garnet-in</i> (colour: pyrope in garnet, lines: melt fraction), <i>Density = 3000 kg/m³</i> (colour: melt fraction, lines: Vp). Every setting can then be modified</li>
+            <li><b>Surface</b> - the quantity defining the surface (default <i>Solution phase → liq → Mg#</i>), its <b>Value</b>, and the range of that quantity over the diagram</li>
+            <li><b>Colour of the surface</b> - the quantity used to colour the surface (default melt mode, vol), colormap, reverse colormap and opacity</li>
+            <li><b>Contour lines on the surface</b> - show contours (true/false), the contoured quantity (default garnet mode, vol), number of levels (evenly spaced over its range on the surface), line width and label size</li>
         </ul>
       </td>
     </tr>

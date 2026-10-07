@@ -990,7 +990,7 @@ In the `Setup` sub-tab:
 - select `Thermodynamic database = Igneous (Green et al., 2025, after H18)` and `Diagram type = P-T-X 3D diagram`. The `3D diagram` sub-tab appears and the options that do not apply to 3D diagrams (fixed P/T, refinement, solidus H₂O saturation, trace elements, ...) are hidden;
 - set `Pressure [kbar]` from `4` to `20` and `Temperature [°C]` from `700` to `1100`;
 - set `3D grid [points per axis]` to `13` (P), `13` (T) and `9` (X). The line below gives an estimate of the number of points, computation time and memory;
-- in the `Bulk-rock composition` panel, select `Wet Basalt` for both the left and the right composition, then edit `H2O` to `1.0` in the left table and to `20.0` in the right table, so that `X` becomes the H₂O content.
+- in the `Bulk-rock composition` panel, select `Wet Basalt` for both the `X = 0` (left) and `X = 1` (right) compositions, then edit `H2O` to `1.0` in the left table and to `20.0` in the right table. The message below the tables confirms that the X axis is now the H₂O content (in normalized mol%), and the X axis of the figure will be labelled accordingly.
 
 Click `Compute phase diagram`. The progress bar (top right) reports the calculation one `X` plane at a time; once finished, the app switches to the `3D diagram` sub-tab. With the default display, melt-fraction isosurfaces are shown.
 
@@ -1005,11 +1005,13 @@ In the always-visible `Display` panel, `Camera` gives orthographic views along e
 
 #### Step 3 - Coloured surface with contour lines
 
-In the `Display` panel, tick `Coloured surface (+ contours)` (and untick `Field isosurfaces / volume` for clarity). The `Surface` tab defines:
+In the `Display` panel, tick `Coloured surface (+ contours)` (and untick `Field isosurfaces / volume` for clarity); the `Surface` tab opens. It defines:
 
-- `Surface: A = value` - by default the Mg# of the melt (`Solution phase`, `liq`, `Mg#`) with `Value of A = 0.7`; the range of A over the diagram is given below the value;
-- `Colour: B` - by default the melt mode (`liq`, `Mode`, `vol`);
-- `Contour lines: C` - by default the garnet mode (`g`, `Mode`, `vol`), with the number of levels, line width and label size.
+- `Surface` - the quantity defining the surface, by default the Mg# of the melt (`Solution phase`, `liq`, `Mg#`) with `Value = 0.7`; the range of that quantity over the diagram is given below the value;
+- `Colour of the surface` - by default the melt mode (`liq`, `Mode`, `vol`);
+- `Contour lines on the surface` - by default the garnet mode (`g`, `Mode`, `vol`), with the number of levels, line width and label size.
+
+The `Preset` menu at the top of the tab sets all three at once (e.g. `Solidus (melt-in)` or `Garnet-in`).
 
 Then, in the `Phases & grid` tab, select `g` and `pl` to add their stability boundaries (phase-in/out surfaces). The figure should look like:
 
@@ -1021,7 +1023,7 @@ The melt Mg# is only defined where melt is stable, so the coloured surface stops
 
 #### Step 4 - Inspect a grid node
 
-Click anywhere on a surface: the `Informations` tab opens with the pie chart of the stable phases at the closest grid node (`mol%`, `wt%` or `vol%`), and the composition bar above the figure gives the bulk composition of that node, ready to be copied. Click a slice of the pie chart to display the composition of that phase. The `Grid points (assemblage)` layer shows every grid node (or every n-th node), coloured by variance, with the stable assemblage on hover.
+Click anywhere on a surface: a red diamond marks the selected location and the `Informations` tab opens with the pie chart of the stable phases (`mol%`, `wt%` or `vol%`); the composition bar above the figure gives the bulk composition, ready to be copied. By default the closest grid node is used; set `Clicked point = Exact point (computed)` to run a MAGEMin calculation at the exact clicked P-T-X (about 1 s). Click a slice of the pie chart to display the composition of that phase. The `Grid points (assemblage)` layer shows every grid node (or every n-th node), coloured by variance, with the stable assemblage on hover.
 
 #### Step 5 - Export and share
 
