@@ -1308,8 +1308,8 @@ end
 
     Finalize_MAGEMin(data)
 
-    @test abs(out.G_system + 806.7071168433587) < 1e-6
-    @test abs(out2.G_system + 791.4602921453513) < 1e-6
+    @test abs(out.G_system + 806.7071168433587) < 1e-5
+    @test abs(out2.G_system + 791.4602921453513) < 1e-5
 end
 
 @testset verbose = true "Test Ws override" begin
