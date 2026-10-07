@@ -20,24 +20,32 @@
         - [3.3 Isopleths panel](#3.3.-Isopleths-panel)
         - [3.4 Draw path panel](#3.4.-Draw-path-panel)
         - [3.5 Classifications panel](#3.5.-Classifications-panel)
-    - [4. IntersecT sub-tab](#4.-IntersecT-sub-tab)
-        - [4.1 Setup panel](#4.1.-Setup-panel)
-        - [4.2 Results panel](#4.2.-Results-panel)
-        - [4.3 Options panel](#4.3.-Options-panel)
-    - [5. Trace-elements sub-tab](#5.-Trace-elements-sub-tab)
-        - [5.1 REE spectrum panel](#5.1.-REE-spectrum-panel)
-        - [5.2 General options panel](#5.2.-General-options-panel)
-        - [5.3 Display options](#5.3.-Display-options)
-        - [5.4 TE Isopleths](#5.4.-TE-Isopleths)
-        - [5.5 Export figure and Phase assemblages panels](#5.5.-Export-figure-and-Phase-assemblages-panels)
-    - [6. PTX path tab](#6.-PTX-path-tab)
-        - [6.1 Configuration panel](#6.1.-Configuration-panel)
-        - [6.2 Bulk-rock composition panel](#6.2.-Bulk-rock-composition-panel)
-        - [6.3 Trace Elements panel](#6.3.-Trace-Elements-panel)
-        - [6.4 Path definition panel](#6.4.-Path-definition-panel)
-        - [6.5 Path options panel](#6.5.-Path-options-panel)
-        - [6.6 PTX save and export](#6.6.-PTX-save-and-export)
-    - [7. General information tab](#7.-General-information-tab)
+    - [4. 3D diagram sub-tab](#4.-3D-diagram-sub-tab)
+        - [4.1 Figure and composition bar](#4.1.-Figure-and-composition-bar)
+        - [4.2 Display panel](#4.2.-Display-panel)
+        - [4.3 Informations panel](#4.3.-Informations-panel)
+        - [4.4 Field panel](#4.4.-Field-panel)
+        - [4.5 Surface panel](#4.5.-Surface-panel)
+        - [4.6 Export panel](#4.6.-Export-panel)
+        - [4.7 Phases and grid panel](#4.7.-Phases-and-grid-panel)
+    - [5. IntersecT sub-tab](#5.-IntersecT-sub-tab)
+        - [5.1 Setup panel](#5.1.-Setup-panel)
+        - [5.2 Results panel](#5.2.-Results-panel)
+        - [5.3 Options panel](#5.3.-Options-panel)
+    - [6. Trace-elements sub-tab](#6.-Trace-elements-sub-tab)
+        - [6.1 REE spectrum panel](#6.1.-REE-spectrum-panel)
+        - [6.2 General options panel](#6.2.-General-options-panel)
+        - [6.3 Display options](#6.3.-Display-options)
+        - [6.4 TE Isopleths](#6.4.-TE-Isopleths)
+        - [6.5 Export figure and Phase assemblages panels](#6.5.-Export-figure-and-Phase-assemblages-panels)
+    - [7. PTX path tab](#7.-PTX-path-tab)
+        - [7.1 Configuration panel](#7.1.-Configuration-panel)
+        - [7.2 Bulk-rock composition panel](#7.2.-Bulk-rock-composition-panel)
+        - [7.3 Trace Elements panel](#7.3.-Trace-Elements-panel)
+        - [7.4 Path definition panel](#7.4.-Path-definition-panel)
+        - [7.5 Path options panel](#7.5.-Path-options-panel)
+        - [7.6 PTX save and export](#7.6.-PTX-save-and-export)
+    - [8. General information tab](#8.-General-information-tab)
     - [Trace-element Kd models](@ref thermodynamic_database)
 
 ## MAGEMinApp.jl Tips
@@ -59,7 +67,7 @@ App-wide settings that apply across every other tab: mineral naming convention, 
 
 == Phase diagrams
 
-This tab contains four sub-tabs: `Setup` (configuration), `Diagram` (visualization and post-processing), `Trace-elements` (trace-element partitioning and accessory phase saturation) and `IntersecT` (quantitative isopleth thermobarometry). It allows you to generate and post-process `P-T`, `T-X`, `P-X`, `PT-X` and `T-T` polymetamorphic phase diagrams.
+This tab contains five sub-tabs: `Setup` (configuration), `Diagram` (visualization and post-processing), `3D diagram` (P-T-X 3D diagrams; only shown when that diagram type is selected), `Trace-elements` (trace-element partitioning and accessory phase saturation) and `IntersecT` (quantitative isopleth thermobarometry). It allows you to generate and post-process `P-T`, `T-X`, `P-X`, `PT-X` and `T-T` polymetamorphic phase diagrams, as well as `P-T-X` 3D diagrams.
 
 == PTX path
 
@@ -107,7 +115,7 @@ App-wide settings that apply across every other tab.
 ```
 
 !!! warning
-    `IntersecT` (§4) matches phases between a measurement file and the computed grid using the Warr (2021) symbols. Set `Mineral names = Warr (2021)` here before using it, otherwise no phase will be found in common.
+    `IntersecT` (§5) matches phases between a measurement file and the computed grid using the Warr (2021) symbols. Set `Mineral names = Warr (2021)` here before using it, otherwise no phase will be found in common.
 
 ### 1.2. Contributors panel
 
@@ -146,7 +154,7 @@ Links for documentation, reporting issues on GitHub, the GitHub repository, and 
             <li><b>Dataset</b> - select among available thermodynamic datasets for the chosen database</li>
             <li><b>Preset</b> (Global TC dataset only) - quickly restrict the solution-phase selection to match one of the standalone databases (none, Metapelite, Metabasite, Igneous, Igneous alkali-dry, Ultramafic) instead of deselecting phases manually</li>
             <li><b>Phase selection</b> - expand to activate or deactivate individual solution and pure phase models</li>
-            <li><b>Diagram type</b> - P-T, P-X, T-X, PT-X, or T-T (polymetamorphic)</li>
+            <li><b>Diagram type</b> - P-T, P-X, T-X, PT-X, T-T (polymetamorphic), or P-T-X 3D diagram (pressure × temperature × linear mixing between the two bulk-rock compositions, displayed in the <a href="#4.-3D-diagram-sub-tab">3D diagram sub-tab</a>)</li>
             <li><b>P-T path (PT-X diagram)</b> - table of pressure-temperature points defining the path when Diagram type = PT-X diagram; add rows with "Add new point" or drag-and-drop a <code>P;T</code> CSV file onto "Drag and drop path" to replace the whole path (pressure always given in kbar in the file; see the "Bulk-rock input file" section on the General information tab for the general CSV convention)</li>
             <li><b>Solidus H₂O-saturated</b> - saturate the first melt in water at the solidus (true/false)</li>
             <li><b>Additional H₂O [mol%]</b> - amount of extra H₂O added when solidus saturation is active (0–100)</li>
@@ -164,6 +172,7 @@ Links for documentation, reporting issues on GitHub, the GitHub repository, and 
             <li><b>Temperature [°C]</b> - minimum and maximum temperature range for the diagram</li>
             <li><b>Fixed pressure / temperature</b> - single pressure or temperature value for P-X and T-X diagram types</li>
             <li><b>Initial grid subdivision</b> - sets the starting grid resolution (2–9; default 4, yielding a 16×16 grid)</li>
+            <li><b>3D grid [points per axis]</b> (P-T-X 3D diagram only) - number of grid points along P, T and X (default 17 × 17 × 9), with a live estimate of the number of points, computation time and memory. It replaces <b>Initial grid subdivision</b> and the refinement options: 3D diagrams use a regular grid without adaptive refinement. Options that do not apply to 3D diagrams (fixed pressure/temperature, P-T path, solidus H₂O saturation, T-T events, μ-μ and trace-element options) are hidden.</li>
             <li><b>Refinement type</b> - refine on phase boundaries (ph) or dominant end-members (em)</li>
             <li><b>Refinement levels</b> - number of adaptive mesh refinement levels applied (default 3)</li>
             <li><b>Boost mode</b> - use the previous refinement level as an initial guess for the next (true/false)</li>
@@ -344,7 +353,7 @@ The Diagram sub-tab has a right-hand sidebar with five tabs: **Informations**, *
 ```
 
 !!! note
-    Per-phase stable-color customization ("Modify phase colors") is configured from the `PTX path` tab (§6) and applies app-wide, not from this panel.
+    Per-phase stable-color customization ("Modify phase colors") is configured from the `PTX path` tab (§7) and applies app-wide, not from this panel.
 
 ### 3.3. Isopleths panel
 
@@ -408,7 +417,7 @@ This panel allows you to manually trace a P-T path directly on the phase diagram
             <li><b>System unit</b> - unit for the generated path data: mol, wt, or vol (Phase fractions mode)</li>
             <li><b>Generate</b> - compute the phase fractions/field values and compositions along the recorded P-T path</li>
             <li><b>Path table</b> - read-only table showing the recorded path points (#, P [kbar], T [°C])</li>
-            <li><b>Export to PTX path</b> - send the recorded points as the starting path definition of the <code>PTX path</code> tab (§6.4)</li>
+            <li><b>Export to PTX path</b> - send the recorded points as the starting path definition of the <code>PTX path</code> tab (§7.4)</li>
             <li><b>Phase fractions / field profile plot</b> - chart along the generated path (expandable canvas)</li>
         </ul>
       </td>
@@ -451,7 +460,226 @@ Computes and displays TAS and AFM classification diagrams for the melt compositi
 
 ---
 
-## 4. IntersecT sub-tab
+## 4. 3D diagram sub-tab
+
+This sub-tab is only shown when `Diagram type = P-T-X 3D diagram` is selected in the [Setup panel](#2.1.-Setup-panel). Clicking `Compute phase diagram` then computes a regular three-dimensional grid and switches to this sub-tab when the calculation is complete:
+
+- **P** and **T** span the pressure and temperature ranges of the Setup panel;
+- **X** is the linear mixing between the two bulk-rock compositions of the [Bulk-rock composition panel](#2.2.-Bulk-rock-composition-panel), labelled `X = 0` (left) and `X = 1` (right) when this diagram type is selected, as for P-X and T-X diagrams. A message below the tables states what X represents, and warns when both compositions are identical (nothing would vary along X). When only one oxide differs between the two compositions (the others keeping their proportions), e.g. the H₂O content, the X axis of the figure is labelled with that oxide and its content in mol% (a P-T-H₂O diagram);
+- the number of points along each axis is set by `3D grid [points per axis]` (no adaptive refinement). The progress bar reports the calculation one X plane at a time.
+
+```@raw html
+<img src="../assets/MAGEMinApp_3D_tab.png" alt="MAGEMinApp 3D diagram sub-tab" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
+```
+
+The sub-tab has the figure on the left and, on the right, an always-visible **Display** panel followed by five tabs: **Informations**, **Field**, **Surface**, **Export** and **Phases & grid**.
+
+!!! tip
+    - The quantity selectors of the Field and Surface panels follow the same structure as the [Isopleths panel](#3.3.-Isopleths-panel) of the Diagram sub-tab: `Type` (Pure phase, Solution phase or Other), `Phase`, `Field` (Mode, Oxide composition, Endmember mode, Mg#, Calculator oxides, Calculator apfu, Calculator site fractions; or a system field for `Other`), and only the options required by the selected field (`Unit`, `Remove excess fluid`, `Oxide`, `Endmember`, or the calculator expression, with the available site fractions listed for the site-fraction calculator).
+    - Phase compositions (Mg#, oxides, end-members, calculators) are undefined where the phase is not stable, so the corresponding surfaces stop at the phase stability boundary. Phase modes are zero where the phase is absent.
+    - The computational cost grows with the number of grid points (roughly 4 ms per point on 12 threads, and ~30 kB of memory per point): 17 × 17 × 9 points take ~10-20 s, 33 × 33 × 33 points a few minutes and ~1 GB of memory.
+
+### 4.1. Figure and composition bar
+
+```@raw html
+
+<table>
+  <tbody>
+    <tr>
+      <th>Figure</th>
+      <th>Caption</th>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <ul>
+            <li><b>Composition bar</b> - shows the bulk composition of the last clicked grid node (system acronym and mol% values), with a copy button</li>
+            <li><b>3D view</b> - rotate (left click), zoom (scroll) and pan (right click); hovering displays P, T, X and the value of the displayed quantity. The camera icon of the toolbar saves a PNG image</li>
+            <li><b>Caption</b> - top left, next to the MAGEMin logo: definition of the coloured surface and of its contour lines when this layer is displayed</li>
+            <li><b>Colorbars</b> - one for the field layer and one for the coloured surface (stacked when both are displayed); <b>legend</b> - phase-in/out surfaces, click an entry to hide/show that surface (double-click to isolate it)</li>
+            <li><b>Information block</b> - below the figure, as for 2D diagrams: MAGEMin, MAGEMin_C and GUI versions, number of grid points, date and time, database and dataset, solution models, diagram type, meaning of the X axis, solver, oxide list, buffer (if any), X0 and X1 compositions [mol%], pressure and temperature ranges, and computation time</li>
+        </ul>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+```
+
+### 4.2. Display panel
+
+```@raw html
+
+<table>
+  <tbody>
+    <tr>
+      <th>Display</th>
+      <th>Caption</th>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <ul>
+            <li><b>Layers</b> - any combination of: <i>Field isosurfaces / volume</i> (§4.4), <i>Coloured surface (+ contours)</i> (§4.5), <i>Phase-in/out surfaces</i> and <i>Grid points (assemblage)</i> (§4.7). Ticking a layer opens the tab holding its settings</li>
+            <li><b>Reverse T axis</b> - reverse the temperature axis (default false)</li>
+            <li><b>Reverse P axis</b> - reverse the pressure axis (default true)</li>
+            <li><b>Camera</b> - 3D (perspective), or orthographic views along one axis: P-T (along X), P-X (along T), T-X (along P)</li>
+            <li><b>Reset view</b> - restore the selected camera after rotating or zooming. Changing any other display option keeps the current view</li>
+        </ul>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+```
+
+### 4.3. Informations panel
+
+```@raw html
+
+<table>
+  <tbody>
+    <tr>
+      <th>Informations</th>
+      <th>Caption</th>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <ul>
+            <li><b>Clicked point</b> - <i>Nearest grid node</i> (instant, default) or <i>Exact point (computed)</i>: a single MAGEMin calculation at the exact P-T-X of the click, with the same database, options and bulk-rock compositions as the diagram (about 1 s). The selected location is marked by a red diamond in the figure and summarized in a status line</li>
+            <li><b>Pie unit</b> - mol%, wt% or vol%</li>
+            <li><b>Pie chart</b> - modal fractions of the stable phases at the selected point (click any surface or grid point of the figure); clicking the figure opens this panel automatically</li>
+            <li><b>Mineral composition</b> - click a slice of the pie chart to display the composition of that phase (oxide, mol%, wt%, apfu), with a copy button</li>
+        </ul>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+```
+
+### 4.4. Field panel
+
+```@raw html
+
+<table>
+  <tbody>
+    <tr>
+      <th>Field</th>
+      <th>Caption</th>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <ul>
+            <li><b>Quantity</b> - Type / Phase / Field / ... selector (see the tip above), e.g. <i>Other → Melt vol fraction</i> (default), <i>Solution phase → g → Endmember mode → alm</i>, or <i>Solution phase → cpx → Calculator site fractions → xNaM2 / (xNaM2 + xCaM2)</i></li>
+            <li><b>Rendering</b> - Isosurfaces or Volume</li>
+            <li><b>Min value / Max value / Number of surfaces</b> - isosurfaces are drawn at evenly spaced values between min and max. They are reset to the data range when a new quantity is selected; for Variance and number of phases, surfaces are placed at half-integer values with a discrete colour scale</li>
+            <li><b>Opacity</b> and <b>Show caps</b> (closes the isosurfaces at the box faces)</li>
+            <li><b>Colormap</b> and <b>Reverse colormap</b> - same colour scales as the Diagram sub-tab</li>
+        </ul>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+```
+
+!!! note
+    A message is shown above the figure instead of the field when the selected quantity is undefined everywhere (e.g. invalid calculator expression) or constant over the whole diagram (e.g. a pure phase that is never stable).
+
+### 4.5. Surface panel
+
+The coloured surface reproduces a classic 3D representation: the surface on which a first quantity takes a given value, coloured by a second quantity, with labelled contour lines of a third quantity drawn on it (e.g. the surface of melt Mg# = 0.7, coloured by the melt fraction, with garnet modal contours). Colours and contour values are interpolated on the surface from the surrounding grid nodes where the quantity is defined, so that a surface lying on a phase boundary (e.g. garnet-in) can be coloured by a composition of that phase.
+
+```@raw html
+
+<table>
+  <tbody>
+    <tr>
+      <th>Surface</th>
+      <th>Caption</th>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <ul>
+            <li><b>Preset</b> (optional) - fills the three blocks below in one go: <i>Melt Mg# = 0.7</i> (colour: melt fraction, lines: garnet mode), <i>Solidus (melt-in)</i> (colour: H₂O activity, lines: garnet mode), <i>Garnet-in</i> (colour: pyrope in garnet, lines: melt fraction), <i>Density = 3000 kg/m³</i> (colour: melt fraction, lines: Vp). Every setting can then be modified</li>
+            <li><b>Surface</b> - the quantity defining the surface (default <i>Solution phase → liq → Mg#</i>), its <b>Value</b>, and the range of that quantity over the diagram</li>
+            <li><b>Colour of the surface</b> - the quantity used to colour the surface (default melt mode, vol), colormap, reverse colormap and opacity</li>
+            <li><b>Contour lines on the surface</b> - show contours (true/false), the contoured quantity (default garnet mode, vol), number of levels (evenly spaced over its range on the surface), line width and label size</li>
+        </ul>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+```
+
+### 4.6. Export panel
+
+```@raw html
+
+<table>
+  <tbody>
+    <tr>
+      <th>Export</th>
+      <th>Caption</th>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <ul>
+            <li><b>File name</b> - base name of the exported files, saved in the output directory (shown at the bottom of the panel)</li>
+            <li><b>Interactive HTML (shareable, one file)</b> - the current view as a single self-contained HTML file (plotly.js and the logo are embedded, ~5 MB). It opens in any web browser, without MAGEMinApp or an internet connection, and keeps rotation, zoom, hover values, legend, colorbars and information block. Convenient to share a diagram by email or as supplementary material</li>
+            <li><b>Surfaces: PLY (colour) + STL</b> - one PLY and one STL file per displayed surface (field isosurfaces at the selected levels, coloured surface, phase-in/out surfaces) in a <code>&lt;name&gt;_meshes</code> folder, with a README listing the surfaces. PLY files keep the colours (vertex colours) and open in e.g. Blender, MeshLab or ParaView; STL files contain the geometry only (e.g. for 3D printing)</li>
+            <li><b>Full grid for ParaView (VTK)</b> - the whole computed grid as a VTK file with ~60 quantities at every node: P [kbar], T [°C] and X, all system fields (density, melt fraction, seismic velocities, activities, ...), the volume mode of every phase, and the quantities currently selected in the Field and Surface panels. In <a href="https://www.paraview.org">ParaView</a> any isosurface, slice, threshold or volume rendering can then be explored interactively</li>
+        </ul>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+```
+
+!!! note
+    Mesh and VTK coordinates are normalized to a 0-100 cube in data orientation (x = P, y = T, z = X, all increasing; the axis reversals of the view are not applied), so that the physical units do not distort the shapes and the meshes overlay the VTK grid exactly. The README of the mesh folder and the VTK header give the corresponding P, T and X ranges.
+
+### 4.7. Phases and grid panel
+
+```@raw html
+
+<table>
+  <tbody>
+    <tr>
+      <th>Phases &amp; grid</th>
+      <th>Caption</th>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <ul>
+            <li><b>Phase-in/out surfaces</b> - select the phases whose stability boundary is drawn (isosurface of the phase volume fraction at <b>Threshold</b>, default 0.001), in the phase colour used throughout the app; <b>Opacity</b></li>
+            <li><b>Grid points</b> - display every n-th grid node, coloured by variance; hovering shows the stable assemblage. <b>Marker size</b></li>
+        </ul>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+```
+
+---
+
+## 5. IntersecT sub-tab
 
 Implements quantitative isopleth thermobarometry (Nerone et al., 2025, doi:[10.1016/j.cageo.2025.105949](https://doi.org/10.1016/j.cageo.2025.105949)): for every grid point of a previously computed phase diagram, the modelled a.p.f.u. composition of one or several mineral phases is compared to a measured (e.g. EPMA) composition, returning a goodness-of-fit map.
 
@@ -460,7 +688,7 @@ Implements quantitative isopleth thermobarometry (Nerone et al., 2025, doi:[10.1
 
 The sub-tab is organized in three columns: **Setup**, **Results** (Diagrams / Log), and **Options**.
 
-### 4.1. Setup panel
+### 5.1. Setup panel
 
 ```@raw html
 
@@ -488,7 +716,7 @@ The sub-tab is organized in three columns: **Setup**, **Results** (Diagrams / Lo
 
 ```
 
-### 4.2. Results panel
+### 5.2. Results panel
 
 ```@raw html
 
@@ -513,7 +741,7 @@ The sub-tab is organized in three columns: **Setup**, **Results** (Diagrams / Lo
 
 ```
 
-### 4.3. Options panel
+### 5.3. Options panel
 
 ```@raw html
 
@@ -543,11 +771,11 @@ The sub-tab is organized in three columns: **Setup**, **Results** (Diagrams / Lo
 
 ---
 
-## 5. Trace-elements sub-tab
+## 6. Trace-elements sub-tab
 
 The `Trace-elements` sub-tab becomes active after a phase diagram has been computed with `TE predictive model = true`. It displays element distributions and saturation fields across the phase diagram.
 
-### 5.1. REE spectrum panel
+### 6.1. REE spectrum panel
 
 Open by default, above the main diagram.
 
@@ -575,7 +803,7 @@ Open by default, above the main diagram.
 
 ```
 
-### 5.2. General options panel
+### 6.2. General options panel
 
 ```@raw html
 
@@ -602,7 +830,7 @@ Open by default, above the main diagram.
 
 ```
 
-### 5.3. Display options
+### 6.3. Display options
 
 ```@raw html
 
@@ -640,11 +868,11 @@ Open by default, above the main diagram.
 
 ```
 
-### 5.4. TE Isopleths
+### 6.4. TE Isopleths
 
 The Isopleths panel in the Trace-elements sub-tab works identically to the one in the Diagram sub-tab but operates on TE and saturation fields (Zircon, Sulfide, Fluorapatite, CO₂ saturation, Trace element) instead of thermodynamic fields; for the Trace element type it exposes a Calculator expression plus a normalization setting (bulk, chondrite, none) and a custom field name.
 
-### 5.5. Export figure and Phase assemblages panels
+### 6.5. Export figure and Phase assemblages panels
 
 ```@raw html
 
@@ -671,11 +899,11 @@ The Isopleths panel in the Trace-elements sub-tab works identically to the one i
 
 ---
 
-## 6. PTX path tab
+## 7. PTX path tab
 
 The PTX path tab is divided into a left configuration panel and a central results area. It supports all P-T-X path modes from the same interface, including isentropic paths (previously a separate tab; merged in v1.2.1).
 
-### 6.1. Configuration panel
+### 7.1. Configuration panel
 
 ```@raw html
 
@@ -713,11 +941,11 @@ The PTX path tab is divided into a left configuration panel and a central result
 
 ```
 
-### 6.2. Bulk-rock composition panel
+### 7.2. Bulk-rock composition panel
 
 Same controls as the phase diagram bulk-rock panel (§2.2). When `Assimilation = true`, a second bulk-rock composition panel appears for the assimilated end-member.
 
-### 6.3. Trace Elements panel
+### 7.3. Trace Elements panel
 
 Appears when `TE predictive model = true` in Path options.
 
@@ -750,7 +978,7 @@ Appears when `TE predictive model = true` in Path options.
 
 ```
 
-### 6.4. Path definition panel
+### 7.4. Path definition panel
 
 ```@raw html
 
@@ -764,7 +992,7 @@ Appears when `TE predictive model = true` in Path options.
       <td></td>
       <td>
         <ul>
-            <li><b>P-T path table</b> - pressure-temperature points defining the path (P in kbar or GPa depending on the pressure-unit setting, T in °C); an <b>Add [%]</b> column appears when Assimilation is enabled and a <b>Buffer</b> column when Variable buffer is enabled (§6.5 Path options panel)</li>
+            <li><b>P-T path table</b> - pressure-temperature points defining the path (P in kbar or GPa depending on the pressure-unit setting, T in °C); an <b>Add [%]</b> column appears when Assimilation is enabled and a <b>Buffer</b> column when Variable buffer is enabled (§7.5 Path options panel)</li>
             <li><b>Add new point</b> - append a new row to the path table</li>
             <li><b>Drag and drop path</b> - upload a CSV file to replace the whole path table at once; header <code>P;T</code> (required) plus optional <code>Assim;Buffer</code> columns (default 0.0 if omitted) - pressure always given in kbar in the file, converted to the current display unit</li>
             <li><b>Find solidus / Find liquidus</b> - bisection search for the solidus/liquidus temperature at a given pressure, for the current bulk-rock composition</li>
@@ -779,7 +1007,7 @@ Appears when `TE predictive model = true` in Path options.
 
 ```
 
-### 6.5. Path options panel
+### 7.5. Path options panel
 
 ```@raw html
 
@@ -813,7 +1041,7 @@ Appears when `TE predictive model = true` in Path options.
 
 ```
 
-### 6.6. PTX save and export
+### 7.6. PTX save and export
 
 All export options are located in the Path options panel:
 
@@ -832,7 +1060,7 @@ All export options are located in the Path options panel:
 
 ---
 
-## 7. General information tab
+## 8. General information tab
 
 Provides static reference data across three sections:
 

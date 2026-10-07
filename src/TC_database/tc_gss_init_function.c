@@ -49,6 +49,8 @@ SS_ref G_SS_DEW_init_function(SS_ref SS_ref_db,  global_variable gv){
     SS_ref_db.n_sf      = n_active+1;   /* +1 water */
     SS_ref_db.n_em      = n_active+1;
     SS_ref_db.n_xeos    = n_active+1;
+    SS_ref_db.n_w       = 0;
+    SS_ref_db.n_v       = 0;
 
     return SS_ref_db;
 }
@@ -2905,6 +2907,8 @@ void TC_SS_init_all(	            SS_init_type 		*SS_init,
 			SS_init[iss]  = G_SS_mp_mt_init_function; 		}
 		else if (strcmp( gv.SS_list[iss], "ilmm_W14")  == 0){
 			SS_init[iss]  = G_SS_mb_ilmm_init_function; 		}
+		else if (strcmp( gv.SS_list[iss], "ilmmn_W14") == 0){
+			SS_init[iss]  = G_SS_mpe_ilmm_init_function; 		}
 		else if (strcmp( gv.SS_list[iss], "amp_G16")   == 0){
 			SS_init[iss]  = G_SS_mb_amp_init_function; 		}
 		else if (strcmp( gv.SS_list[iss], "dio_G16")   == 0){

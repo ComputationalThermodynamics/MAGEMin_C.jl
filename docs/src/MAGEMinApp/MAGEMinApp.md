@@ -13,6 +13,7 @@
 <ul>
     <li>Pressure-Temperature iso-chemical phase diagrams (P-T phase diagrams)</li>
     <li>Pressure and/or Temperature versus variable composition diagrams (P-X, T-X, PT-X, T-T polymetamorphic phase diagrams)</li>
+    <li>P-T-X 3D phase diagrams: isosurfaces of any field, composition surfaces coloured by a second quantity with contour lines, phase-in/out surfaces, and export as shareable interactive HTML, PLY/STL meshes or VTK grids (ParaView)</li>
     <li>Trace-element partitioning at suprasolidus conditions (including models of Zr saturation)</li>
     <li>Display iso-contour of phase fractions, densities, seismic velocities etc.</li>
     <li>Automatic labeling of the phase fields including listing the stable phase assemblage when the field is too small.</li>

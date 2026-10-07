@@ -19,7 +19,7 @@ using DataFrames, Dates, CSV, SpecialFunctions
 const VecOrMat          = Union{Nothing, AbstractVector{Float64}, AbstractVector{<:AbstractVector{Float64}}}
 const available_TC_ds   = [62,633,634,635,636]
 
-export  anhydrous_renormalization, retrieve_solution_phase_information, print_phase_info, remove_phases, select_phases, exclude_DEW_species, get_ss_from_mineral, mineral_classification,
+export  anhydrous_renormalization, retrieve_solution_phase_information, print_phase_info, remove_phases, select_phases, ds62_placeholder_phases, ds62_placeholder_warning, DS62_PLACEHOLDER_SS, exclude_DEW_species, get_ss_from_mineral, mineral_classification,
         init_MAGEMin, allocate_output,finalize_MAGEMin, point_wise_minimization, 
         get_all_stable_phases, convertBulk4MAGEMin, use_predefined_bulk_rock, define_bulk_rock, create_output,
         print_info, create_gmin_struct, pwm_init, pwm_run, p2x_convert, pc_convert, lm_convert,
@@ -800,8 +800,8 @@ function harvest_db_infos(dtb :: String)
     gv, z_b, DB, splx_data = pwm_init(8.0, 800.0, gv, z_b, DB, splx_data)
 
     ss_struct   = unsafe_wrap(Vector{LibMAGEMin.SS_ref}, DB.SS_ref_db, gv.len_ss)
-    ss_names    = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, gv.SS_list, gv.len_ss))
-    pp_names    = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, gv.PP_list, gv.len_pp))
+    ss_names    = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, gv.SS_list, gv.len_ss))
+    pp_names    = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, gv.PP_list, gv.len_pp))
 
     ss = Vector{ss_infos}(undef, gv.len_ss)
     for i = 1:gv.len_ss
@@ -809,9 +809,9 @@ function harvest_db_infos(dtb :: String)
         n_xeos  = ss_struct[i].n_xeos
         n_sf    = ss_struct[i].n_sf
 
-        em_names    = vcat("none", unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, ss_struct[i].EM_list, n_em)))
-        xeos_names  = vcat("none", unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, ss_struct[i].CV_list, n_xeos)))
-        sf_names    = vcat("none", unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, ss_struct[i].SF_list, n_sf)))
+        em_names    = vcat("none", unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, ss_struct[i].EM_list, n_em)))
+        xeos_names  = vcat("none", unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, ss_struct[i].CV_list, n_xeos)))
+        sf_names    = vcat("none", unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, ss_struct[i].SF_list, n_sf)))
 
         ss[i] = ss_infos(unsafe_string(ss_struct[i].fName), ss_names[i],
                          Int64(n_em), Int64(n_xeos), Int64(n_sf),
@@ -832,7 +832,7 @@ end
 """
 function harvest_oxide_list(dtb :: String)
     gv, z_b, DB, splx_data = init_MAGEMin(dtb)
-    ox = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, gv.ox, gv.len_ox))
+    ox = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, gv.ox, gv.len_ox))
     finalize_MAGEMin(gv, DB, z_b, splx_data)
     return ox
 end
@@ -922,7 +922,7 @@ function harvest_em_compositions(dtb :: String)
     comps = Dict{String,Vector{Float64}}()
     for i in 1:gv.len_ss
         ss      = unsafe_load(DB.SS_ref_db, i)
-        em      = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, ss.EM_list, ss.n_em))
+        em      = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, ss.EM_list, ss.n_em))
         em_ptrs = unsafe_wrap(Vector{Ptr{Cdouble}}, ss.Comp, ss.n_em)
         for k in 1:ss.n_em
             c = unsafe_wrap(Vector{Cdouble}, em_ptrs[k], n_ox)
@@ -931,7 +931,7 @@ function harvest_em_compositions(dtb :: String)
             comps[em[k]] = v
         end
     end
-    pp_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, gv.PP_list, gv.len_pp))
+    pp_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, gv.PP_list, gv.len_pp))
     for i in 1:gv.len_pp
         pp = unsafe_load(DB.PP_ref_db, i)
         v  = zeros(length(EM_COMP_BASIS))
@@ -963,8 +963,8 @@ function harvest_phase_oxide_support(dtb :: String; eps :: Float64 = 1e-8)
     gv = define_bulk_rock(gv, fill(1.0, n_ox), ox_list, "mol", dtb)
     gv, z_b, DB, splx_data = pwm_init(10.0, 900.0, gv, z_b, DB, splx_data)
 
-    ss_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, gv.SS_list, gv.len_ss))
-    pp_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, gv.PP_list, gv.len_pp))
+    ss_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, gv.SS_list, gv.len_ss))
+    pp_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, gv.PP_list, gv.len_pp))
 
     support = Dict{String,Set{String}}()
 
@@ -1173,6 +1173,67 @@ function print_phase_info(db_inf::db_infos; level::Int64=0)
 end
 
 print_phase_info(dtb::String; level::Int64=0) = print_phase_info(retrieve_solution_phase_information(dtb); level=level)
+
+const DS62_PLACEHOLDER_SS = ["liq_S26", "liq_G25w", "fl_G25"]
+
+"""
+    ds62_placeholder_phases(dtb, dataset, active_ss)
+
+    Solution phases of `active_ss` that are calibrated for ds633+ and, under the "all"
+    database with dataset ds62, run on ds633 placeholder values for the liquid end-members
+    `eskL`, `hemL` and `ruL` that ds62 lacks. Returns an empty vector for any other
+    database/dataset combination.
+
+    Parameters
+    ----------
+    dtb : String
+        Database acronym.
+    dataset : Integer
+        End-member dataset (62, 633, 634, 635, 636).
+    active_ss : AbstractVector{<:AbstractString}
+        Names of the active solution phases.
+
+    Returns
+    -------
+    phases : Vector{String}
+        Active phases whose results are not thermodynamically consistent with ds62.
+"""
+function ds62_placeholder_phases(   dtb         :: String,
+                                    dataset     :: Integer,
+                                    active_ss   :: AbstractVector{<:AbstractString})
+    (dtb == "all" && dataset == 62) || return String[]
+    return [ph for ph in DS62_PLACEHOLDER_SS if ph in active_ss]
+end
+
+"""
+    ds62_placeholder_warning(phases)
+
+    Warning message for the phases returned by `ds62_placeholder_phases`.
+"""
+ds62_placeholder_warning(phases::AbstractVector{<:AbstractString}) =
+    "Solution phase(s) $(join(phases, ", ")) active with the \"all\" database and dataset ds62. " *
+    "These models are calibrated for ds633+ and rely on liquid end-members (eskL, hemL, ruL) absent from ds62; " *
+    "ds633 placeholder values are used for them, so results involving these phases are not thermodynamically consistent. " *
+    "Deactivate them, or use dataset ds633 or newer."
+
+const _ds62_placeholder_warned = Set{Vector{String}}()
+const _ds62_placeholder_lock   = ReentrantLock()
+
+function warn_ds62_placeholder_phases(gv, rm_list)
+    (gv.EM_database == 8 && gv.EM_dataset == 62) || return nothing
+    ss_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, gv.SS_list, gv.len_ss))
+    removed  = isnothing(rm_list) ? Int64[] : filter(>(0), rm_list)
+    active   = [ss_names[i] for i in eachindex(ss_names) if !(i in removed)]
+    phases   = ds62_placeholder_phases("all", 62, active)
+    isempty(phases) && return nothing
+    first_time = lock(_ds62_placeholder_lock) do
+        phases in _ds62_placeholder_warned && return false
+        push!(_ds62_placeholder_warned, phases)
+        return true
+    end
+    first_time && @warn ds62_placeholder_warning(phases)
+    return nothing
+end
 
 """
     remove_phases(list, dtb)
@@ -1473,26 +1534,11 @@ function Initialize_MAGEMin(db = "ig";  verbose     ::Union{Int64,Bool} = 0,
                                         seismicScheme :: String         = "VRH",
                                         seismicWeightFactor :: Float64    = 0.5)
 
-    gv, z_b, DB, splx_data = init_MAGEMin(db;   verbose     = verbose,
-                                                dataset     = dataset,
-                                                mbCpx       = mbCpx,
-                                                mbIlm       = mbIlm,
-                                                mpSp        = mpSp,
-                                                mpIlm       = mpIlm,
-                                                ig_ed       = ig_ed,
-                                                limitCaOpx  = limitCaOpx,
-                                                CaOpxLim    = CaOpxLim,
-                                                buffer      = buffer,
-                                                mu_fix_idx  = mu_fix_idx,
-                                                solver      = solver,
-                                                seismicScheme = seismicScheme,
-                                                seismicWeightFactor = seismicWeightFactor );
-
     nt              = Threads.maxthreadid()
-    list_gv         = Vector{typeof(gv)}(undef, nt)
-    list_z_b        = Vector{typeof(z_b)}(undef, nt)
-    list_DB         = Vector{typeof(DB)}(undef, nt)
-    list_splx_data  = Vector{typeof(splx_data)}(undef, nt)
+    list_gv         = Vector{LibMAGEMin.global_variables}(undef, nt)
+    list_z_b        = Vector{LibMAGEMin.bulk_infos}(undef, nt)
+    list_DB         = Vector{LibMAGEMin.Database}(undef, nt)
+    list_splx_data  = Vector{LibMAGEMin.simplex_datas}(undef, nt)
 
     if isa(verbose,Bool)
         if verbose
@@ -2184,7 +2230,7 @@ function multi_point_minimization(P           ::  T2,
         out         = point_wise_minimization(  P[i], T[i], gv, z_b, DB, splx_data;
                                                 light=light, light_ig=light_ig, buffer_n=buffer, mu_fix_val=mu_val_i, name_solvus=name_solvus, fixed_bulk=fixed_bulk, calibration=calibration, Gi=Gi, W=W, gbase=gbase, scp=scp, dT=dT, iguess=ig, rm_list=rm_list, seismic_cor=seismic_cor, aspect_ratio=aspect_ratio, seismic_water=seismic_water, shallow_correction=shallow_correction, fluid_as_melt=fluid_as_melt, anelastic_cor=anelastic_cor, filter_DEW_species=filter_DEW_species)
 
-        Out_PT[i]   = deepcopy(out)
+        Out_PT[i]   = out
 
         if progressbar
             next!(progr)
@@ -3104,8 +3150,8 @@ function point_wise_minimization(   P       ::Float64,
 
         # here we manage a special case for igneous database
         if gv.EM_database == 2
-            ss_names    = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, gv.SS_list, gv.len_ss))
-            pp_names    = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, gv.PP_list, gv.len_pp))
+            ss_names    = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, gv.SS_list, gv.len_ss))
+            pp_names    = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, gv.PP_list, gv.len_pp))
             id_fl       = findfirst(ss_names .== "fl")
             if id_fl in rm_list
                 id_H2O      = findfirst(pp_names .== "H2O")
@@ -3125,6 +3171,8 @@ function point_wise_minimization(   P       ::Float64,
             end
         end
     end
+
+    warn_ds62_placeholder_phases(gv, rm_list)
 
     if iguess == true && Gi !== nothing
         SS_ref_db   = unsafe_wrap(Vector{LibMAGEMin.SS_ref},DB.SS_ref_db,gv.len_ss);
@@ -3658,7 +3706,7 @@ end
     ```
 """
 function p2x_convert(gv, DB, ph_name::String, p::Dict{String,Float64})
-    ss_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, gv.SS_list, gv.len_ss))
+    ss_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, gv.SS_list, gv.len_ss))
     ph_id0   = findfirst(==(ph_name), ss_names)
     isnothing(ph_id0) && error("p2x_convert: solution phase \"$ph_name\" not found in gv.SS_list ($ss_names)")
     ph_id    = ph_id0 - 1   # C is 0-indexed
@@ -3666,7 +3714,7 @@ function p2x_convert(gv, DB, ph_name::String, p::Dict{String,Float64})
     SS_ref_vec = unsafe_wrap(Vector{LibMAGEMin.SS_ref}, DB.SS_ref_db, gv.len_ss)
     SS_ref_db  = SS_ref_vec[ph_id0]
 
-    em_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, SS_ref_db.EM_list, SS_ref_db.n_em))
+    em_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, SS_ref_db.EM_list, SS_ref_db.n_em))
     extra    = setdiff(keys(p), em_names)
     isempty(extra) || error("p2x_convert: unknown endmember name(s) $extra for phase \"$ph_name\" (has endmembers $em_names)")
 
@@ -3740,7 +3788,7 @@ end
     ```
 """
 function pc_convert(gv, z_b, DB, ph_name::String, SS_ref_db)
-    ss_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, gv.SS_list, gv.len_ss))
+    ss_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, gv.SS_list, gv.len_ss))
     ph_id0   = findfirst(==(ph_name), ss_names)
     isnothing(ph_id0) && error("pc_convert: solution phase \"$ph_name\" not found in gv.SS_list ($ss_names)")
     ph_id    = ph_id0 - 1   # C is 0-indexed
@@ -3817,7 +3865,7 @@ end
     ```
 """
 function lm_convert(gv, z_b, DB, ph_name::String, gamma::Vector{Float64}, xeos::Vector{Float64})
-    ss_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, gv.SS_list, gv.len_ss))
+    ss_names = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, gv.SS_list, gv.len_ss))
     ph_id0   = findfirst(==(ph_name), ss_names)
     isnothing(ph_id0) && error("lm_convert: solution phase \"$ph_name\" not found in gv.SS_list ($ss_names)")
     ph_id    = ph_id0 - 1   # C is 0-indexed
@@ -4009,8 +4057,8 @@ function create_gmin_struct(DB, gv, time; name_solvus = false, seismic_cor = fal
     ph_id_db    =  unsafe_wrap(Vector{Cint},   stb.ph_id_db ,       n_ph)
 
     # println("ph_frac $ph_frac ph_frac_wt $ph_frac_wt")
-    ph          =  unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, stb.ph, n_ph)) # stable phases
-    sol_name    =  unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, stb.sol_name, n_ph)) # stable phases
+    ph          =  unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, stb.ph, n_ph)) # stable phases
+    sol_name    =  unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, stb.sol_name, n_ph)) # stable phases
 
     # extract info about compositional variables of the solution models:
     SS_vec  = convert.(LibMAGEMin.SS_data, unsafe_wrap(Vector{LibMAGEMin.stb_SS_phase},stb.SS,n_SS))
@@ -4045,8 +4093,8 @@ function create_gmin_struct(DB, gv, time; name_solvus = false, seismic_cor = fal
     )
 
     # Names of oxides:
-    oxides   = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, stb.oxides, gv.len_ox))
-    elements = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, stb.elements, gv.len_ox))
+    oxides   = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, stb.oxides, gv.len_ox))
+    elements = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, stb.elements, gv.len_ox))
 
     # Numerics
     bulk_res_norm   =  gv.BR_norm
@@ -4146,7 +4194,7 @@ function create_light_gmin_struct(DB,gv; name_solvus = true)
     rho_F       = Float32.(stb.rho_F)
     rho_M       = Float32.(stb.rho_M)
 
-    oxides      = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, stb.oxides, gv.len_ox))
+    oxides      = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, stb.oxides, gv.len_ox))
     bulk_M      = unsafe_wrap(Vector{Cdouble}, stb.bulk_M_wt, gv.len_ox)
     frac_M      = stb.frac_M_wt
 
@@ -4160,7 +4208,7 @@ function create_light_gmin_struct(DB,gv; name_solvus = true)
     # alpha       = Float32.([stb.alpha])
 
     # println("ph_frac $ph_frac ph_frac_wt $ph_frac_wt")
-    ph          =  unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, stb.ph, n_ph)) # stable phases
+    ph          =  unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, stb.ph, n_ph)) # stable phases
 
     # extract info about compositional variables of the solution models:
     SS_vec  = convert.(LibMAGEMin.SS_data, unsafe_wrap(Vector{LibMAGEMin.stb_SS_phase},stb.SS,n_SS))
@@ -4232,7 +4280,7 @@ function create_light_gmin_struct_ig(DB,gv; name_solvus = true)
     rho_F       = Float32.(stb.rho_F)
     rho_M       = Float32.(stb.rho_M)
 
-    oxides      = unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, stb.oxides, gv.len_ox))
+    oxides      = unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, stb.oxides, gv.len_ox))
     bulk_M      = unsafe_wrap(Vector{Cdouble}, stb.bulk_M_wt, gv.len_ox)
     frac_M      = stb.frac_M_wt
 
@@ -4246,7 +4294,7 @@ function create_light_gmin_struct_ig(DB,gv; name_solvus = true)
     # alpha       = Float32.([stb.alpha])
 
     # println("ph_frac $ph_frac ph_frac_wt $ph_frac_wt")
-    ph          =  unsafe_string.(unsafe_wrap(Vector{Ptr{Int8}}, stb.ph, n_ph)) # stable phases
+    ph          =  unsafe_string.(unsafe_wrap(Vector{Ptr{Cchar}}, stb.ph, n_ph)) # stable phases
 
     # extract info about compositional variables of the solution models:
     SS_vec  = convert.(LibMAGEMin.SS_data, unsafe_wrap(Vector{LibMAGEMin.stb_SS_phase},stb.SS,n_SS))

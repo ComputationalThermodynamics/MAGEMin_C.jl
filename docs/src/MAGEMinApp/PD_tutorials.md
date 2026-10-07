@@ -25,6 +25,7 @@ Here we provide a set of tutorials to generate various kind of phase diagrams, c
     - [15. Quantitative isopleth thermobarometry with IntersecT](#15.-Quantitative-isopleth-thermobarometry-with-IntersecT)
     - [16. μ-μ (chemical potential) diagram](#16.-μ-μ-chemical-potential-diagram)
     - [17. Monte Carlo bulk-rock uncertainty](#17.-Monte-Carlo-bulk-rock-uncertainty)
+    - [18. P-T-X 3D diagram](#18.-P-T-X-3D-diagram)
 
 ### 1. First phase diagram 
 
@@ -975,3 +976,64 @@ The spider diagram below the probability card shows each sampled composition as 
 !!! note
     - A new Monte Carlo run replaces the previous results. After changing the reference diagram, run Monte Carlo again so that the results match it.
     - A probability map computed from an earlier run cannot be exported. Click `Compute` again first.
+
+### 18. P-T-X 3D diagram
+
+A P-T-X 3D diagram computes the stable assemblage on a regular grid in pressure, temperature and composition, where the composition axis `X` is the linear mixing between the two bulk-rock compositions (`X = 0`: left composition, `X = 1`: right composition). The result is explored in the `3D diagram` sub-tab as isosurfaces, coloured composition surfaces with contour lines and phase-in/out surfaces. All options are described in the [interface documentation](interface.md#4.-3D-diagram-sub-tab).
+
+In this tutorial we compute a pressure-temperature-H₂O diagram for a basalt and display the surface on which the melt Mg# equals 0.7, coloured by the melt fraction, with the garnet mode as contour lines.
+
+#### Step 1 - Set up and compute the diagram
+
+In the `Setup` sub-tab:
+
+- select `Thermodynamic database = Igneous (Green et al., 2025, after H18)` and `Diagram type = P-T-X 3D diagram`. The `3D diagram` sub-tab appears and the options that do not apply to 3D diagrams (fixed P/T, refinement, solidus H₂O saturation, trace elements, ...) are hidden;
+- set `Pressure [kbar]` from `4` to `20` and `Temperature [°C]` from `700` to `1100`;
+- set `3D grid [points per axis]` to `13` (P), `13` (T) and `9` (X). The line below gives an estimate of the number of points, computation time and memory;
+- in the `Bulk-rock composition` panel, select `Wet Basalt` for both the `X = 0` (left) and `X = 1` (right) compositions, then edit `H2O` to `1.0` in the left table and to `20.0` in the right table. The message below the tables confirms that the X axis is now the H₂O content (in normalized mol%), and the X axis of the figure will be labelled accordingly.
+
+Click `Compute phase diagram`. The progress bar (top right) reports the calculation one `X` plane at a time; once finished, the app switches to the `3D diagram` sub-tab. With the default display, melt-fraction isosurfaces are shown.
+
+!!! tip
+    The cost grows with the number of grid points: 13 × 13 × 9 points take about ten seconds, 33 × 33 × 33 points a few minutes and about 1 GB of memory. Start coarse to set up the display, then increase the number of points.
+
+#### Step 2 - Explore a field
+
+The `Field` tab selects the quantity shown as isosurfaces (or as a volume rendering, `Rendering = Volume`). The selector follows the structure of the isopleths of 2D diagrams: for instance `Type = Other` and `Field = Variance` displays the variance (one surface between each pair of consecutive integer values), and `Type = Solution phase`, `Phase = g`, `Field = Endmember mode`, `Endmember = alm` displays the almandine fraction in garnet. `Min value`, `Max value` and `Number of surfaces` are reset to the data range whenever the quantity changes.
+
+In the always-visible `Display` panel, `Camera` gives orthographic views along each axis (e.g. `P-T (along X)`), `Reverse T axis` / `Reverse P axis` flip the axes, and `Reset view` restores the selected camera.
+
+#### Step 3 - Coloured surface with contour lines
+
+In the `Display` panel, tick `Coloured surface (+ contours)` (and untick `Field isosurfaces / volume` for clarity); the `Surface` tab opens. It defines:
+
+- `Surface` - the quantity defining the surface, by default the Mg# of the melt (`Solution phase`, `liq`, `Mg#`) with `Value = 0.7`; the range of that quantity over the diagram is given below the value;
+- `Colour of the surface` - by default the melt mode (`liq`, `Mode`, `vol`);
+- `Contour lines on the surface` - by default the garnet mode (`g`, `Mode`, `vol`), with the number of levels, line width and label size.
+
+The `Preset` menu at the top of the tab sets all three at once (e.g. `Solidus (melt-in)` or `Garnet-in`).
+
+Then, in the `Phases & grid` tab, select `g` and `pl` to add their stability boundaries (phase-in/out surfaces). The figure should look like:
+
+```@raw html
+<img src="../assets/MAGEMinApp_3D_surface.png" alt="MAGEMinApp P-T-X 3D diagram" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+```
+
+The melt Mg# is only defined where melt is stable, so the coloured surface stops at the solidus. The information block below the figure summarizes the calculation (versions, grid, database, compositions, ranges and computation time).
+
+#### Step 4 - Inspect a grid node
+
+Click anywhere on a surface: a red diamond marks the selected location and the `Informations` tab opens with the pie chart of the stable phases (`mol%`, `wt%` or `vol%`); the composition bar above the figure gives the bulk composition, ready to be copied. By default the closest grid node is used; set `Clicked point = Exact point (computed)` to run a MAGEMin calculation at the exact clicked P-T-X (about 1 s). Click a slice of the pie chart to display the composition of that phase. The `Grid points (assemblage)` layer shows every grid node (or every n-th node), coloured by variance, with the stable assemblage on hover.
+
+#### Step 5 - Export and share
+
+The `Export` tab saves the current diagram in the output directory:
+
+- `Interactive HTML (shareable, one file)` - a single self-contained file (~5 MB) that anyone can open in a web browser, without MAGEMinApp or an internet connection, with full rotation, zoom and hover information;
+- `Surfaces: PLY (colour) + STL` - the displayed surfaces as meshes, e.g. for Blender, MeshLab or 3D printing;
+- `Full grid for ParaView (VTK)` - the whole grid with ~60 quantities at every node. In [ParaView](https://www.paraview.org), open the `.vtk` file, then use e.g. `Filters → Contour` on any array (such as `sys_frac_M_vol` or `mode_vol_g`) or `Filters → Slice` to explore the diagram interactively. The PLY/STL meshes overlay the VTK grid exactly.
+
+!!! note
+    - 3D diagrams use a regular grid without adaptive refinement.
+    - The computed 3D diagram and the 3D grid resolution are not included in saved states (`Save state`); use the exports above to keep the results.
+
