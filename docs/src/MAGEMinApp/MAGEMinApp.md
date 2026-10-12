@@ -17,8 +17,7 @@
     <li>Trace-element partitioning at suprasolidus conditions (including models of Zr saturation)</li>
     <li>Display iso-contour of phase fractions, densities, seismic velocities etc.</li>
     <li>Automatic labeling of the phase fields including listing the stable phase assemblage when the field is too small.</li>
-    <li>Pressure-Temperature-Composition paths e.g., fractional melting and crystallization (with assimilation and extraction threshold).</li>
-    <li>Isentropic paths</li>
+    <li>Pressure-Temperature-Composition paths e.g., fractional melting and crystallization (with assimilation and extraction threshold), including isentropic paths.</li>
     <li>Save generated diagrams/figures as vector files (svg format).</li>
     <li>Export single point and whole grid information as `csv` files</li>
 </ul>

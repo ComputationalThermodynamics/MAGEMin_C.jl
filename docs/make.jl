@@ -25,7 +25,6 @@ makedocs(;
                         "Partition coeficient file" => "MAGEMinApp/partition_coef.md",
                         "Phase diagrams"            => "MAGEMinApp/PD_tutorials.md",
                         "P-T-X paths"               => "MAGEMinApp/PTX_tutorials.md",
-                        # "Isentropic paths"          => "MAGEMinApp/isoS_tutorials.md",
                         "Citations"                 => "MAGEMinApp/citation.md",
                 ],
         ],
@@ -51,6 +50,9 @@ makedocs(;
                         "Isentropic path"                      => "MAGEMin_C/isentropic_path.md",
                         "Initial guess"                        => "MAGEMin_C/initial_guess.md",
                 ],
+        ],
+        "MAGEMin_py" => [
+                "Introduction"           => "MAGEMin_py/MAGEMin_py.md",
         ],
         "MAGEMin" => [
                 "Introduction"           => "MAGEMin/MAGEMin.md",

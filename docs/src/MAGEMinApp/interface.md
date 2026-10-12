@@ -727,6 +727,7 @@ The sub-tab is organized in three columns: **Setup**, **Results** (Diagrams / Lo
       <td>
         <ul>
             <li><b>Run IntersecT</b> - launch the calculation for the currently loaded measurement file and selected phases</li>
+            <li><b>Keep (accumulate runs for comparison)</b> - when on, every run is stored (up to 8) instead of replacing the previous one; kept runs are listed in the <b>Kept runs</b> tab of the Results panel</li>
             <li><b>Measurement file</b> - drag-and-drop a CSV file with measured mineral compositions; the status line reports the loaded file name once parsed</li>
             <li><b>Stable phases</b> - checklist automatically populated with the phases found both in the measurement file and on the computed grid; uncheck a phase to exclude it</li>
             <li><b>Analysis type</b> - WDS spot, WDS map, or EDS; used to auto-estimate analytical uncertainty when the measurement file does not already provide one</li>
@@ -755,6 +756,7 @@ The sub-tab is organized in three columns: **Setup**, **Results** (Diagrams / Lo
       <td>
         <ul>
             <li><b>Diagrams tab</b> - main "Display" dropdown (populated after Run IntersecT: Qcmp weighted/unweighted, redchi2 total, per-phase and per-element Qcmp/redchi2 fields) and diagram; two smaller "Display" dropdown + diagram pairs below let you compare two more fields side by side</li>
+            <li><b>Kept runs tab</b> - select one of the stored runs to display its summary, its diagram and its log; <b>Remove selected</b> and <b>Remove all</b> delete stored runs. A warning is shown when the diagram setup of a kept run (database, diagram type, bulk composition, buffer or axes range) differs from that of the previous kept run, since the two runs are then not directly comparable</li>
             <li><b>Log tab</b> - full text report: for each selected phase and measured element, the (P,T) location and value of the maximum Qcmp and minimum reduced-χ², the overall weighted/unweighted optimum, and any warnings</li>
         </ul>
       </td>
@@ -925,7 +927,7 @@ The Isopleths panel in the Trace-elements sub-tab works identically to the one i
 
 ## 7. PTX path tab
 
-The PTX path tab is divided into a left configuration panel and a central results area. It supports all P-T-X path modes from the same interface, including isentropic paths (previously a separate tab; merged in v1.2.1).
+The PTX path tab is divided into a left configuration panel and a central results area. It supports all P-T-X path modes from the same interface, including isentropic paths, which combine with every other mode (fractional melting/crystallization, assimilation, trace elements).
 
 ### 7.1. Configuration panel
 
@@ -1052,8 +1054,9 @@ Appears when `TE predictive model = true` in Path options.
             <li><b>TE predictive model</b> - enable trace-element partitioning along the path (true/false)</li>
             <li><b>Cumulate/Connectivity unit</b> - basis (mol, wt, or vol) used for the assimilation blend and the melt/solid extraction mass balance; only shown in fractional melting/crystallization mode</li>
             <li><b>Connectivity threshold [mol%]</b> - melt fraction above which melt is extracted during fractional melting (0–100; default 7); only visible in fractional melting mode</li>
+            <li><b>Residual Threshold [mol%]</b> - melt fraction left in the rock after an extraction event (0 to the connectivity threshold; default 7, i.e. melt is brought back to the connectivity threshold). A lower value drains the melt further each time the connectivity threshold is exceeded; the value is clamped to the connectivity threshold. Only visible in fractional melting mode</li>
             <li><b>Residual rock fraction [mol%]</b> - fraction of solid entrained by the fractionating melt during fractional crystallization (0–100; default 0); only visible in fractional crystallization mode</li>
-            <li><b>Isentropic</b> - compute an isentropic (constant-entropy) path using bisection on temperature (true/false)</li>
+            <li><b>Isentropic</b> - compute an isentropic (constant-entropy) path (true/false). The path table then only holds the pressures (plus <b>Add [mol%]</b> when Assimilation is on); the temperature is a single <b>Starting Temp. [°C]</b> field above the table, and the temperature at each following pressure is found by bisection (<b>Tolerance [K]</b>) so that the entropy of the system equals the starting entropy. The <b>Path preview</b> panel shows the resulting P-T path and the <b>Starting entropy [kJ/K]</b></li>
             <li><b>Solidus H₂O-saturated</b> - saturate the first melt in water at the solidus (true/false)</li>
             <li><b>Additional H₂O [mol%]</b> - extra H₂O added at water saturation (visible when Solidus H₂O-saturated = true)</li>
             <li><b>Compute path</b> - launch the P-T-X path calculation (green button)</li>
