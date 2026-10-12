@@ -4,7 +4,7 @@
 
 ## Partition coefficients input file
 
-When modelling trace-element, you have the option to provide custom sets of partition coefficients. In the `Setup` tab navigate to the `Phase diagram parameters` panel and set `TE predictive model = true`. This displays several new fields right below:
+When modelling trace-element, you have the option to provide custom sets of partition coefficients. In the `Setup` sub-tab of the `Phase diagrams` tab, open the `Trace elements` sub-tab of the `Phase diagram parameters` panel and set `TE predictive model = true`. This displays several new fields right below, including `Upload Kd's` and the built-in `Kd's database` selector:
 
 
 ```@raw html

@@ -17,6 +17,7 @@ MAGEMin is run using command line arguments when executing the binary file.
 | `--Bulk=[y]`   | Bulk rock composition in molar amount          |
 | `--Gam=[y]`    | Gamma, when a guess of gamma is known          |
 | `--solver=x`   | Legacy, 0; PGE, 1; 2 Hybrid (default)          |
+| `--ss_solver=x` | Local minimizer of the solution phases, legacy solver (`--solver=0`) only: 0 = NLopt (default); 1 = nullspace minimizer with NLopt fallback; 2 = both, keeping the lower Gibbs energy. With 1 or 2, oxides set exactly to 0 are removed from the system (see [Reduced chemical systems](../MAGEMin_C/options.md#Reduced-chemical-systems)). Same as `optimizer` in `MAGEMin_C.jl` (which offers 0 and 1) |
 | `--rg=""`      | Research group / thermodynamic framework: "tc" (default, ThermoCalc-family), "sb" (Stixrude & Lithgow-Bertelloni), "gh" (xMELTS/pMELTS/rMELTS), or "br" (Berman/Pourteau, `po`) |
 | `--db=""`      | Database, e.g. "ig", "mp", or "all" (union of mp/mb/mbe/ig/igd/igad/um/ume/mpe), default is "ig" - see [Databases information](../database.md) for the full list |
 | `--ds=x`       | Dataset selection: 62, 633, 634, 635 or 636    |

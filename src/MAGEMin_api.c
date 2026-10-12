@@ -32,10 +32,36 @@
 
 #include "MAGEMin_api.h"
 
-MAGEMin_Handle *MAGEMin_Init(	const char *database,
-								int         verbose			){
+/* research group (CLI --rg) a database acronym belongs to */
+static const char *research_group_of(	const char *database		){
+	if (database == NULL){ return "tc"; }
+	if (	strcmp(database,"sb11") == 0 ||
+			strcmp(database,"sb21") == 0 ||
+			strcmp(database,"sb24") == 0		){ return "sb"; }
+	if (	strcmp(database,"xMELTS") == 0 ||
+			strcmp(database,"pMELTS") == 0 ||
+			strcmp(database,"rMELTS") == 0		){ return "gh"; }
+	if (	strcmp(database,"po") == 0			){ return "br"; }
+	return "tc";
+}
 
-	if (database != NULL && strlen(database) > 4){
+/* index of name in list[0..n-1], or -1 */
+static int find_name(			const char     *name,
+								char          **list,
+								int             n				){
+	for (int i = 0; i < n; i++){
+		if (strcmp(name,list[i]) == 0){ return i; }
+	}
+	return -1;
+}
+
+/* MAGEMin_Init body; n_mu_fix must be known before SetupDatabase, which sizes
+   gv.len_pp/PP_list with one fictive pure phase per fixed oxide */
+static MAGEMin_Handle *init_handle(	const char *database,
+									int         verbose,
+									int         n_mu_fix		){
+
+	if (database != NULL && strlen(database) >= len_gv_db){
 		printf(" MAGEMin_Init error: database acronym '%s' is too long\n",database);
 		return NULL;
 	}
@@ -44,10 +70,12 @@ MAGEMin_Handle *MAGEMin_Init(	const char *database,
 
 	h->gv = global_variable_alloc(		&h->z_b					);
 
-	h->gv.verbose = verbose;
+	h->gv.verbose  = verbose;
+	h->gv.n_mu_fix = n_mu_fix;
 	if (database != NULL){
 		snprintf(h->gv.db, len_gv_db, "%s", database);
 	}
+	snprintf(h->gv.research_group, len_gv_research_group, "%s", research_group_of(database));
 
 	h->gv = SetupDatabase(				h->gv,
 									   &h->z_b					);
@@ -63,7 +91,98 @@ MAGEMin_Handle *MAGEMin_Init(	const char *database,
 	init_simplex_B_em(					&h->splx_data,
 										 h->gv					);
 
+	h->ss_suppressed = calloc(h->gv.len_ss, sizeof(int));
+	h->pp_suppressed = calloc(h->gv.len_pp, sizeof(int));
+	h->n_suppressed  = 0;
+	if (	(h->gv.len_ss > 0 && h->ss_suppressed == NULL) ||
+			(h->gv.len_pp > 0 && h->pp_suppressed == NULL)		){
+		printf(" MAGEMin_Init error: out of memory\n");
+		MAGEMin_Free(h);
+		return NULL;
+	}
+
 	return h;
+}
+
+MAGEMin_Handle *MAGEMin_Init(	const char *database,
+								int         verbose			){
+	return init_handle(database, verbose, 0);
+}
+
+MAGEMin_Handle *MAGEMin_InitMuFix(	const char  *database,
+									int          verbose,
+									const char **mu_fix_oxides,
+									int          n				){
+
+	if (mu_fix_oxides == NULL || n < 1){
+		printf(" MAGEMin_InitMuFix error: at least one oxide is required\n");
+		return NULL;
+	}
+	for (int k = 0; k < n; k++){
+		if (mu_fix_oxides[k] == NULL){
+			printf(" MAGEMin_InitMuFix error: oxide name %d is NULL\n",k);
+			return NULL;
+		}
+		for (int l = 0; l < k; l++){
+			if (strcmp(mu_fix_oxides[k],mu_fix_oxides[l]) == 0){
+				printf(" MAGEMin_InitMuFix error: oxide '%s' is given twice\n",mu_fix_oxides[k]);
+				return NULL;
+			}
+		}
+	}
+
+	MAGEMin_Handle *h = init_handle(database, verbose, n);
+	if (h == NULL){ return NULL; }
+
+	/* gv.ox only exists now, so the fictive phases were initialized with
+	   mu_fix_idx = -1 ("mu<k>"): resolve the names and rename them "m<oxide>".
+	   mu_fix_idx is only read at compute time (pp_min_function.c) */
+	if (n > h->gv.len_ox){
+		printf(" MAGEMin_InitMuFix error: %d oxides given, database '%s' has only %d\n",n,h->gv.db,h->gv.len_ox);
+		MAGEMin_Free(h);
+		return NULL;
+	}
+	for (int k = 0; k < n; k++){
+		int idx = find_name(mu_fix_oxides[k], h->gv.ox, h->gv.len_ox);
+		if (idx < 0){
+			printf(" MAGEMin_InitMuFix error: unknown oxide '%s' for database '%s'\n",mu_fix_oxides[k],h->gv.db);
+			MAGEMin_Free(h);
+			return NULL;
+		}
+		h->gv.mu_fix_idx[k] = idx;
+		snprintf(h->gv.PP_list[h->gv.len_pp - n + k], 20, "m%s", h->gv.ox[idx]);
+	}
+
+	return h;
+}
+
+int MAGEMin_NMuFix(				MAGEMin_Handle *h				){
+	return h->gv.n_mu_fix;
+}
+
+int MAGEMin_SetMuFix(			MAGEMin_Handle *h,
+								const double   *mu_fix_val,
+								int             n				){
+
+	if (h == NULL || n != h->gv.n_mu_fix || (n > 0 && mu_fix_val == NULL)){
+		printf(" MAGEMin_SetMuFix error: expected %d values\n", h == NULL ? 0 : h->gv.n_mu_fix);
+		return -1;
+	}
+	for (int k = 0; k < n; k++){ h->gv.mu_fix_val[k] = mu_fix_val[k]; }
+	return 0;
+}
+
+int MAGEMin_SetSeismicScheme(	MAGEMin_Handle *h,
+								int             scheme,
+								double          weight			){
+
+	if (h == NULL || scheme < 0 || scheme > 1 || !(weight >= 0.0 && weight <= 1.0)){
+		printf(" MAGEMin_SetSeismicScheme error: scheme must be 0 or 1 and weight in [0,1]\n");
+		return -1;
+	}
+	h->gv.seismicScheme       = scheme;
+	h->gv.seismicWeightFactor = weight;
+	return 0;
 }
 
 int MAGEMin_NOxides(			MAGEMin_Handle *h				){
@@ -72,6 +191,165 @@ int MAGEMin_NOxides(			MAGEMin_Handle *h				){
 
 char **MAGEMin_OxideNames(		MAGEMin_Handle *h				){
 	return h->gv.ox;
+}
+
+int MAGEMin_SetSolver(			MAGEMin_Handle *h,
+								int             solver			){
+
+	if (h == NULL || solver < 0 || solver > 3){
+		printf(" MAGEMin_SetSolver error: solver must be 0, 1, 2 or 3\n");
+		return -1;
+	}
+
+	/* SetupDatabase forces the legacy solver for these research groups */
+	if (strcmp(h->gv.research_group,"tc") != 0){
+		return solver == 0 ? 0 : 1;
+	}
+
+	h->gv.solver = solver;
+	return 0;
+}
+
+int MAGEMin_SetSSSolver(		MAGEMin_Handle *h,
+								int             ss_solver		){
+
+	if (h == NULL || ss_solver < 0 || ss_solver > 2){
+		printf(" MAGEMin_SetSSSolver error: ss_solver must be 0, 1 or 2\n");
+		return -1;
+	}
+
+	h->gv.ss_solver = ss_solver;
+
+	if (strcmp(h->gv.research_group,"tc") != 0 && strcmp(h->gv.research_group,"sb") != 0){
+		return ss_solver == 0 ? 0 : 1;
+	}
+	return 0;
+}
+
+int MAGEMin_SetFinalNewtonStep(	MAGEMin_Handle *h,
+								int             final_Newton_step	){
+
+	if (h == NULL || final_Newton_step < 0 || final_Newton_step > 1){
+		printf(" MAGEMin_SetFinalNewtonStep error: final_Newton_step must be 0 or 1\n");
+		return -1;
+	}
+
+	h->gv.final_Newton_step = final_Newton_step;
+
+	if (strcmp(h->gv.research_group,"tc") != 0 && strcmp(h->gv.research_group,"sb") != 0){
+		return final_Newton_step == 0 ? 0 : 1;
+	}
+	return 0;
+}
+
+int MAGEMin_SetStoreKKT(		MAGEMin_Handle *h,
+								int             fn_store_kkt		){
+
+	if (h == NULL || fn_store_kkt < 0 || fn_store_kkt > 1){
+		printf(" MAGEMin_SetStoreKKT error: fn_store_kkt must be 0 or 1\n");
+		return -1;
+	}
+
+	h->gv.fn_store_kkt = fn_store_kkt;
+	return 0;
+}
+
+const fn_kkt *MAGEMin_GetFinalNewtonSystem(	MAGEMin_Handle *h			){
+
+	if (h == NULL || h->gv.fn_sys == NULL || h->gv.fn_sys->stored != 1){
+		return NULL;
+	}
+	return h->gv.fn_sys;
+}
+
+int MAGEMin_SetBuffer(			MAGEMin_Handle *h,
+								const char     *buffer,
+								double          buffer_n		){
+
+	if (h == NULL){ return -1; }
+
+	if (buffer == NULL || strcmp(buffer,"none") == 0){
+		snprintf(h->gv.buffer, len_gv_buffer, "%s", "none");
+		h->gv.buffer_n = 0.0;
+		return 0;
+	}
+
+	/* the CLI --buffer options (toolkit.c) plus "iw"; any other pure-phase
+	   name would be accepted by MAGEMin but silently ignored */
+	static const char *buffers[] = {	"O2","qfm","mw","qif","nno","hm","iw","cco",
+										"aH2O","aO2","aMgO","aFeO","aAl2O3","aTiO2"	};
+	int n_buffers = sizeof(buffers) / sizeof(buffers[0]);
+
+	int found = 0;
+	for (int k = 0; k < n_buffers; k++){
+		if (strcmp(buffer,buffers[k]) == 0){ found = 1; break; }
+	}
+	if (found == 1){
+		found = 0;
+		for (int i = 0; i < h->gv.len_pp; i++){
+			if (strcmp(buffer,h->gv.PP_list[i]) == 0){ found = 1; break; }
+		}
+	}
+	if (found == 0 || strlen(buffer) >= len_gv_buffer){
+		printf(" MAGEMin_SetBuffer error: buffer '%s' is not available for database '%s'\n",buffer,h->gv.db);
+		return -1;
+	}
+
+	snprintf(h->gv.buffer, len_gv_buffer, "%s", buffer);
+	h->gv.buffer_n = buffer_n;
+	return 0;
+}
+
+int MAGEMin_SetSuppressedPhases(	MAGEMin_Handle  *h,
+									const char     **names,
+									int              n				){
+
+	if (h == NULL){ return -1; }
+	if (names == NULL){ n = 0; }
+
+	/* validate everything first, so a bad name leaves the previous set intact;
+	   the fictive mu-fix phases (last n_mu_fix of PP_list) are not suppressible,
+	   that would silently drop the constraint */
+	int n_pp_real = h->gv.len_pp - h->gv.n_mu_fix;
+	for (int k = 0; k < n; k++){
+		if (	names[k] == NULL ||
+				(	find_name(names[k], h->gv.SS_list, h->gv.len_ss) < 0 &&
+					find_name(names[k], h->gv.PP_list, n_pp_real) < 0	)	){
+			printf(" MAGEMin_SetSuppressedPhases error: unknown phase '%s' for database '%s'\n",
+					names[k] == NULL ? "(null)" : names[k], h->gv.db);
+			return -1;
+		}
+	}
+
+	for (int i = 0; i < h->gv.len_ss; i++){ h->ss_suppressed[i] = 0; }
+	for (int i = 0; i < h->gv.len_pp; i++){ h->pp_suppressed[i] = 0; }
+	h->n_suppressed = 0;
+
+	for (int k = 0; k < n; k++){
+		int i = find_name(names[k], h->gv.SS_list, h->gv.len_ss);
+		if (i >= 0){ h->ss_suppressed[i] = 1; }
+		else       { h->pp_suppressed[find_name(names[k], h->gv.PP_list, n_pp_real)] = 1; }
+	}
+	for (int i = 0; i < h->gv.len_ss; i++){ h->n_suppressed += h->ss_suppressed[i]; }
+	for (int i = 0; i < h->gv.len_pp; i++){ h->n_suppressed += h->pp_suppressed[i]; }
+
+	return 0;
+}
+
+int MAGEMin_NSolutionPhases(	MAGEMin_Handle *h				){
+	return h->gv.len_ss;
+}
+
+char **MAGEMin_SolutionPhaseNames(	MAGEMin_Handle *h			){
+	return h->gv.SS_list;
+}
+
+int MAGEMin_NPurePhases(		MAGEMin_Handle *h				){
+	return h->gv.len_pp;
+}
+
+char **MAGEMin_PurePhaseNames(	MAGEMin_Handle *h				){
+	return h->gv.PP_list;
 }
 
 stb_system *MAGEMin_ComputeEquilibrium(	MAGEMin_Handle *h,
@@ -128,11 +406,35 @@ stb_system *MAGEMin_ComputeEquilibrium(	MAGEMin_Handle *h,
 	reset_sp(							h->gv,
 										h->DB.sp				);
 
+	/* mbCpx/mbIlm/mpSp/mpIlm select which variant of a near-degenerate model
+	   pair gets pseudocompounds at all; 2 generates both, so suppressing one
+	   variant leaves the other reachable. Assigned on every call so a reused
+	   handle never carries it over from an earlier suppressing call. */
+	int both_variants = h->n_suppressed > 0 ? 2 : 0;
+	h->gv.mbCpx = both_variants;
+	h->gv.mbIlm = both_variants;
+	h->gv.mpSp  = both_variants;
+	h->gv.mpIlm = both_variants;
+
 	h->gv = ComputeG0_point(			h->gv.EM_database,
 										h->z_b,
 										h->gv,
 										h->DB.PP_ref_db,
 										h->DB.SS_ref_db			);
+
+	/* phase suppression: reset_gv cleared the flags and ComputeG0_point just
+	   re-activated them, so this is the only place where it takes effect
+	   before ComputeEquilibrium_Point reads them */
+	for (int i = 0; i < h->gv.len_ss; i++){
+		if (h->ss_suppressed[i] == 1){
+			for (int f = 0; f < h->gv.n_flags; f++){ h->DB.SS_ref_db[i].ss_flags[f] = 0; }
+		}
+	}
+	for (int i = 0; i < h->gv.len_pp; i++){
+		if (h->pp_suppressed[i] == 1){
+			for (int f = 0; f < h->gv.n_flags; f++){ h->gv.pp_flags[i][f] = 0; }
+		}
+	}
 
 	io_data dummy_point;
 	memset(&dummy_point,0,sizeof(dummy_point));
@@ -167,6 +469,9 @@ stb_system *MAGEMin_ComputeEquilibrium(	MAGEMin_Handle *h,
 
 void MAGEMin_Free(				MAGEMin_Handle *h				){
 	if (h == NULL) return;
+
+	free(h->ss_suppressed);
+	free(h->pp_suppressed);
 
 	FreeDatabases(						h->gv,
 										h->DB,

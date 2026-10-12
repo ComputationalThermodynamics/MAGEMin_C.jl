@@ -67,6 +67,15 @@ The Gibbs minimization approach employed in MAGEMin combines discretization of t
 
 ```  
 
+### Local minimization of solution phases
+
+During the linear-programming stage of the legacy solver, each solution phase is minimized locally for the current chemical potentials (finding the composition with the lowest driving force). Two minimizers are available (`optimizer` in `MAGEMin_C.jl`, `--ss_solver` on the command line):
+
+- **NLopt** (default): SLSQP in the compositional variables of the phase, with the site-fraction positivity and end-member sum written as constraints.
+- **Nullspace minimizer**: BFGS restricted to the space of compositions that satisfy the linear constraints exactly. Directions are taken in the nullspace of those constraints, so they never need to be enforced during the search. Coordinates are site fractions for the THERMOCALC databases and end-member proportions for the Stixrude & Lithgow-Bertelloni databases (there, Σp = 1 holds by construction). It allocates no memory after initialization, and falls back to NLopt for any phase it cannot handle.
+
+With the nullspace minimizer, end-members containing an oxide that is absent from the bulk are removed before the minimization. This is what allows chemical systems with absent core oxides (see [Reduced chemical systems](MAGEMin_C/options.md#Reduced-chemical-systems)).
+
 ## Algorithm Demonstration
 
 A simplified example of the Gibbs energy minimization approach used in MAGEMin is provided at:

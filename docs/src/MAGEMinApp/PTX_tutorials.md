@@ -2,13 +2,15 @@
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_tabs_PTX.png?raw=true" alt="MAGEMinApp tabs" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
 ```
 
-## P-T-X paths tutorials (MAGEMinApp v1.2.1)
+## P-T-X paths tutorials
 
-Here we provide a set of tutorials to generate various kind of pressure-temperature-composition paths: including batch melting, fractional melting and fractional crystallization.
+Here we provide a set of tutorials to generate various kind of pressure-temperature-composition paths: including batch melting, fractional melting, fractional crystallization, assimilation, variable oxygen buffer and isentropic paths. All of them are set up from the same `PTX path` tab and can be combined (e.g., isentropic fractional crystallization with assimilation, see [E.8](#E.8.-Isentropic-fractional-crystallization-with-assimilation))
+
+The default solver of the `PTX path` tab is the `Legacy` solver and the default local minimizer is `Nullspace` (see the `Solver` sub-tab of the `General setup` tab).
 
 ### E.1. Quick start - first P-T-X path
 
-For the first P-T-X path, simply launch `MAGEMinApp` and navigate to the `PTX path` tab. Change default setting for the thermodynamic database (`Igneous`)(Green et al., 2025 after Holland et al., 2018) and default bulk-rock composition (`KLB1 Peridotite anhydrous`). In the `Path definition` panel click on `Find solidus` and `Find liquidus` and define the P-T points accordingly:
+For the first P-T-X path, simply launch `MAGEMinApp` and navigate to the `PTX path` tab. Keep the default thermodynamic database (`Igneous`, Green et al., 2025 after Holland et al., 2018) and the default bulk-rock composition (`KLB1 Peridotite anhydrous`). In the `Path definition` panel click on `Find solidus` and `Find liquidus` and define the P-T points accordingly:
 
 ```@raw html
 
@@ -19,7 +21,7 @@ For the first P-T-X path, simply launch `MAGEMinApp` and navigate to the `PTX pa
     - New points for the P-T-X path can be added by clicking on `Add new point`.
     - To delete a point simply click on the cross icon on the left of point.
 
-#### Load a P-T-X path from file (MAGEMinApp v1.6.3)
+#### Load a P-T-X path from file
 
 As an alternative to adding points one by one, drag and drop a CSV file onto the `Drag and drop path` box below the path table to define (and replace) the whole path at once. The file needs a header line `P;T` (or `P,T`; pressure always in kbar regardless of the app's current pressure-unit setting), and comment lines start with `#`:
 
@@ -84,14 +86,14 @@ When `liq` is selected you can access the `TAS diagram` which displays the evolu
 
 ### E.2. Fractional melting
 
-In this example, we are going to perform fractional melting using `SM89 oxidized average MORB` composition using the `Metabasite` thermodynamic database (Green et al., 2016). First make sure you select `Aug` in the clinopyroxene selection, then define the P-T points of the path as follow:
+In this example, we are going to perform fractional melting using the `SM89 oxidised average MORB composition` bulk using the `Metabasite` thermodynamic database (Green et al., 2016). First make sure you select `Aug` in the clinopyroxene selection, then define the P-T points of the path as follow:
 
 ```@raw html
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_PTX_FM_path.png?raw=true" alt="PTX FM path" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 ```
 
-In the `Path options` panel, choose a resolution of 32, and select `P-T-X mode = fractional melting`, keep `Assimiliation = false` and `Connectivity threshold [%] = 7`:
+In the `Path options` panel, choose a resolution of 32, and select `P-T-X mode = fractional melting`, keep `Assimilation = false`, `Cumulate/Connectivity unit = mol`, `Connectivity threshold [mol%] = 7` and `Residual Threshold [mol%] = 7`:
 
 ```@raw html
 
@@ -99,8 +101,9 @@ In the `Path options` panel, choose a resolution of 32, and select `P-T-X mode =
 ```
 
 !!! note
-    - The connectivity threshold is the value above which melt is extracted
-    - Presently, only the melt above this value is extracted to keep the melt fraction at the connectivity threshold.
+    - The connectivity threshold is the melt fraction above which melt is extracted.
+    - The residual threshold is the melt fraction left in the rock after an extraction event. It cannot exceed the connectivity threshold (it is clamped to it). With both set to 7, only the melt above 7 mol% is extracted, so the melt fraction is brought back to the connectivity threshold. Lowering the residual threshold (e.g., to 2) drains the melt further each time the connectivity threshold is exceeded, mimicking extraction events that leave less melt in the source.
+    - `Cumulate/Connectivity unit` (`mol`, `wt` or `vol`) is the basis on which both thresholds, the extraction and the assimilation blend are expressed.
     - When computing a fractional melting path using a connectivity threshold, the displayed fraction of melt can be slightly above the threshold as the removed fraction of melt is only applied to the subsequent calculation step. This effect can however be minimized by increasing the resolution.
 
 
@@ -118,14 +121,14 @@ Process with the P-T-X path calculation, which should yield:
 
 ### E.3. Fractional crystallization
 
-Let us the same database and bulk rock composition as for the fractional melting example. Simply change the path definition as follow:
+Let us use the same database and bulk rock composition as for the fractional melting example. Simply change the path definition as follow:
 
 ```@raw html
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_PTX_FC_path.png?raw=true" alt="PTX FC path" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 ```
 
-In the `Path options` panel, choose a resolution of 32, and select `P-T-X mode = fractional crystallization`, keep `Assimiliation = false` and `Remaining fraction [%] = 1`:
+In the `Path options` panel, choose a resolution of 32, and select `P-T-X mode = fractional crystallization`, keep `Assimilation = false`, `Cumulate/Connectivity unit = mol` and `Residual rock fraction [mol%] = 1`:
 
 ```@raw html
 
@@ -133,7 +136,7 @@ In the `Path options` panel, choose a resolution of 32, and select `P-T-X mode =
 ```
 
 !!! note
-    - `Remaining fraction [%]` can be thought as a small fraction of the solid rock carried by the fractionating melt.
+    - `Residual rock fraction [mol%]` can be thought as a small fraction of the solid rock carried by the fractionating melt.
 
 
 Process with the P-T-X path calculation, which should yield:
@@ -155,7 +158,7 @@ and `TAS diagram` (Total Alkali Silica):
 
 ### E.4. Assimilation
 
-In this example we are going to compute an equilibrium batch crystallization path of a wet basalt, and, progressive assimilation of tonalitic composition. Let's first select the `Igneous` database (Green et al., 2025, after Holland et al., 2018) and define the P-T path as follow:
+In this example we are going to compute an equilibrium batch crystallization path of a wet basalt, and, progressive assimilation of tonalitic composition. Keep the `Igneous` database (Green et al., 2025, after Holland et al., 2018) and define the P-T path as follow:
 
 ```@raw html
 
@@ -166,7 +169,7 @@ In this example we are going to compute an equilibrium batch crystallization pat
     - Notice the new column in the P-T path definition `Add [mol%]`. Here you can define how much of the assimilated composition will be added for each P-T step.
 
 
-In `Path options`, set `Resolution = 32`, `P-T-X mode = Equilibrium` and `Assimilatiom = true`. When `Assimilatiom = true` a second bulk-rock composition is available for selection in the `Bulk-rock composition`left panel. Choose `Wet basalt` for the left (starting) composition and `Tonalite 101` for the right (assimilated) composition:
+In `Path options`, set `Resolution = 32`, `P-T-X Mode = Equilibrium` and `Assimilation = true`. When `Assimilation = true` a second bulk-rock composition is available for selection in the `Bulk-rock composition`left panel. Choose `Wet Basalt` for the left (starting) composition and `Tonalite 101` for the right (assimilated) composition:
 
 ```@raw html
 
@@ -189,7 +192,7 @@ and the following TAS diagram:
 
 ### E.5. Variable buffer
 
-To simulate a change in oxydation/reduction state of the system you can also provide variable buffer offsets. Let's start from previous assimilation example 4, and select `Buffer = QFM` and `Variable buffer = true` in the `Configuration` panel. 
+To simulate a change in oxydation/reduction state of the system you can also provide variable buffer offsets. Let's start from previous assimilation example 4, and select `Buffer = QFM` and `Variable buffer = true` in the `Configuration` panel.
 
 ```@raw html
 
@@ -221,25 +224,18 @@ and the following TAS diagram:
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_PTX_var_buffer_TAS.png?raw=true" alt="PTX variable buffer TAS" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 ```
 
-## Isentropic path (MAGEMinApp v1.2.1)
+### E.6. Isentropic path
 
+An isentropic path represents a process where a rock undergoes changes in pressure and temperature without any exchange of heat with its surroundings (adiabatic) and without entropy production (reversible), e.g., mantle convection or adiabatic decompression melting. Isentropic paths are part of the `PTX path` tab: the `Isentropic` option can be combined with the other options of the `Path options` panel (fractional crystallization, fractional melting, assimilation, trace elements).
 
-Isentropic path typically represent a process where a rock or material undergoes changes in pressure and temperature without any exchange of heat with its surroundings (adiabatic process) and without any entropy production (reversible process). This type of path is often used to model processes like mantle convection or adiabatic decompression melting, where material moves through the Earth's interior under conditions that approximate constant entropy.
-
-!!! note
-    The isentropic tab was removed in `MAGEMinApp@1.2.1` and merged with PTX path tab. This allowed to use the PTX functionality such as fractional crystallization and assimilation
-
-### E.6. Isentropic path - constant bulk
-
-
-Isentropic paths are easy to setup. Simply launch `MAGEMinApp` and navigate to the `PTX path` tab. Change to thermodynamic database (`Metapelite`)(White et al., 2014) and default bulk-rock composition. In the `Path options` panel, select `Isentropic = true` and keep all other parameters by default:
+Launch `MAGEMinApp`, navigate to the `PTX path` tab and keep the default database (`Igneous`) and bulk-rock composition. In the `Path options` panel, select `Isentropic = true` and keep all other parameters by default:
 
 ```@raw html
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_isoS_path_opt.png?raw=true" alt="isoS path setup" style="max-width: 44%; height: auto; display: block; margin: 0 auto;">
 ```
 
-Notice here that for isentropic path only the starting temperature and pressure can be changed. Then simply click `Compute path`:
+With `Isentropic = true`, the `Path definition` panel changes: temperature is no longer a column of the table, only the **starting temperature** (`Starting Temp. [°C]`) is defined, together with the pressures of the path. Set `Starting Temp. = 800` and define a path from 10 to 2 kbar, then click `Compute path`:
 
 ```@raw html
 
@@ -247,53 +243,50 @@ Notice here that for isentropic path only the starting temperature and pressure 
 ```
 
 !!! note
-    - Here we use a bisection method to ensure constant entropy within a temperature tolerance
-    - In the top-right panel (`Path preview` ) you can retrieve information about the entropy value in `J/K` and the isentropic pressure-temperature path.
+    - The entropy of the system is computed at the starting P-T point. For every following pressure, the temperature is found by bisection so that the entropy of the system matches the starting entropy within the temperature `Tolerance [K]` of the `Path definition` panel.
+    - In the `Path preview` panel (top right) you can retrieve the `Starting entropy [kJ/K]` and the isentropic pressure-temperature path:
 
     ```@raw html
 
     <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_isoS_path_preview.png?raw=true" alt="isoS path info" style="max-width: 75%; height: auto; display: block; margin: 0 auto;">
     ```
 
+### E.7. Isentropic fractional crystallization
 
-### E.7. isentropic fractional crystallization
-
-Building upon previous example, you can use the fractional crystallization mode along with the isentropic option:
+Building upon the previous example, select `P-T-X Mode = Fractional crystallization` together with the isentropic option:
 
 ```@raw html
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_isoS_path_opt_FC.png?raw=true" alt="isoS path setup FC" style="max-width: 44%; height: auto; display: block; margin: 0 auto;">
 ```
 
-Computing the path will generate two diagrams: the stable phase fractions and fractionated phases.
+Computing the path generates two diagrams: the stable phase fractions and the fractionated phases.
 
 ```@raw html
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_isoS_path_opt_FC_res.png?raw=true" alt="isoS path diagram" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 ```
 
-
-### E.8. isentropic fractional crystallization with assimilation
+### E.8. Isentropic fractional crystallization with assimilation
 
 One can also compute isentropic crystallization paths with assimilation of a secondary bulk-rock composition (host-rock, second magma etc.)
 
-First activate the `Assimilation` option. Then, in the `Path definition` panel, you can see that next to pressure a new column appears which allows you to add fraction of the second bulk-rock composition in mol%. Modify the entry for the second point to 50%:
+First set `Assimilation = true`. Then, in the `Path definition` panel, a new column `Add [mol%]` appears next to pressure, which defines the fraction of the second bulk-rock composition added in mol%. Modify the entry of the second point to 50%:
 
 ```@raw html
 
-<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_isoS_path_opt_FCA.png?raw=true" alt="isoS path setup FC" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_isoS_path_opt_FCA.png?raw=true" alt="isoS path setup FCA" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
 ```
 
 !!! note
     - If you put a non zero value for the first row of the `Add [mol%]` column this will change the starting bulk-rock composition accordingly
     - When changing any other rows, the `Add [mol%]` will be added progressively from the previous point
 
-
-You can now change the second bulk-rock compositon available in the left `Bulk-rock composition` panel. For instance:
+You can now select the second bulk-rock composition in the left `Bulk-rock composition` panel. For instance:
 
 ```@raw html
 
-<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_isoS_path_opt_FCA_bulk.png?raw=true" alt="isoS path setup FC bulk" style="max-width: 44%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_isoS_path_opt_FCA_bulk.png?raw=true" alt="isoS path setup FCA bulk" style="max-width: 44%; height: auto; display: block; margin: 0 auto;">
 ```
 
 Compute the path:
@@ -303,9 +296,9 @@ Compute the path:
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/v1.2.1_MAGEMinApp_isoS_path_opt_FCA_res.png?raw=true" alt="isoS path diagram with assimilation" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 ```
 
-## Modify colormap (MAGEMinApp v1.2.1)
+## Modify colormap
 
-Since version 1.2.0 it is possible to adjust the colormap of the area plots. In the `Display options` panel on the right, click on `Modify phase colors`:
+It is possible to adjust the colormap of the area plots. In the `Display options` panel on the right, click on `Modify phase colors`:
 
 ```@raw html
 
@@ -332,7 +325,7 @@ To modify a color, click the corresponding cell in the Change column, then chang
     - Once your happy with the updated colors, to apply the changes, you need to redo the PTX path calculation
     - You can save your changes by clicking on the green button `Save colors/styles`. The changes are saved even when restarting the App.
 
-## Trace-element partitioning (MAGEMinApp v1.5.1)
+## Trace-element partitioning
 
 Trace-element (TE) partitioning can be computed simultaneously with any P-T-X path (batch melting, fractional melting, fractional crystallization, isentropic). The module uses lattice-strain parameterized Kd databases and optionally applies mineral or volatile saturation models (Zr, S, P₂O₅, CO₂).
 

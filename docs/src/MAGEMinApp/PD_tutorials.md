@@ -2,7 +2,7 @@
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_tabs_PD.png?raw=true" alt="MAGEMinApp tabs" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
 ```
 
-## Phase diagrams tutorials (MAGEMinApp v0.8.6)
+## Phase diagrams tutorials (MAGEMinApp v1.7.3)
 
 Here we provide a set of tutorials to generate various kind of phase diagrams, compute trace-element partitioning and Zr saturation, post-process the results, display various fields, reaction lines and iso-contours, and, export data and save the diagrams as `svg` graphic vector files.
 
@@ -24,12 +24,13 @@ Here we provide a set of tutorials to generate various kind of phase diagrams, c
     - [14. Draw a P-T path on the diagram](#14.-Draw-a-P-T-path-on-the-diagram)
     - [15. Quantitative isopleth thermobarometry with IntersecT](#15.-Quantitative-isopleth-thermobarometry-with-IntersecT)
     - [16. μ-μ (chemical potential) diagram](#16.-μ-μ-chemical-potential-diagram)
-    - [17. Monte Carlo bulk-rock uncertainty](#17.-Monte-Carlo-bulk-rock-uncertainty)
+    - [17. Bulk-rock uncertainty (Monte Carlo and linear variation)](#17.-Bulk-rock-uncertainty-Monte-Carlo-and-linear-variation)
     - [18. P-T-X 3D diagram](#18.-P-T-X-3D-diagram)
+    - [19. Reduced chemical systems (Nullspace optimizer)](#19.-Reduced-chemical-systems-Nullspace-optimizer)
 
 ### 1. First phase diagram 
 
-For the first diagram, simply launch `MAGEMinApp` and navigate to the `Setup` sub-tab of the `Phase diagram` tab. Then click on `Compute phase diagram`.
+For the first diagram, simply launch `MAGEMinApp` and navigate to the `Setup` sub-tab of the `Phase diagrams` tab. Then click on `Compute phase diagram` in the `General parameters` panel.
 
 ```@raw html
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_compute.png?raw=true" alt="MAGEMinApp compute" style="max-width: 25%; height: auto; display: block; margin: 0 auto;">
@@ -42,7 +43,7 @@ In less than one minute you should get the following result (tab `Diagram`):
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_first_diagram_result.png?raw=true" alt="MAGEMinApp first diagram" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
 ```
 
-The default field to be displayed is `variance`. Superimposed on it are the reactions lines (in black) and the phase assemblage labels with a list of labels shown on the right in the event the field size are too small. If you scroll down below the figure you can see the informations about the computation:
+The default field to be displayed is `variance`. Superimposed on it are the reactions lines (in black) and the phase assemblage labels; fields too small to be labelled are numbered and listed in the `Phase assemblages` panel on the right of the figure. If you scroll down below the figure you can see the informations about the computation:
 
 ```@raw html
 
@@ -60,7 +61,7 @@ The caption lists useful information such as the version of `MAGEMin` backend, `
     ```
 
 !!! note
-    The list of mineral assemblage that cannot be directly labeled on the figure is provided in a text area on the right side of the diagram. The list can be copied by clicking on the `Copy` button at the top of the list.
+    The mineral assemblages that cannot be directly labelled on the figure are listed in the `Phase assemblages` panel, on the right side of the diagram. The list can be copied with the copy button at the top of the panel. Selecting rows of the table highlights the corresponding fields on the diagram; `Clear` removes the highlight.
 
     ```@raw html
 
@@ -70,7 +71,7 @@ The caption lists useful information such as the version of `MAGEMin` backend, `
 
 #### Grid point information
 
-Stable phase mineral fractions and composition can be accessed for any point of the grid by simply clicking on the figure. Doing so will load a pie chart on the right panel in the `informations` tab:
+Stable phase mineral fractions and composition can be accessed for any point of the grid by simply clicking on the figure. Doing so will load a pie chart on the right panel in the `Informations` tab (phase names include the tag of their solution model, e.g. `ol_H18`):
 
 ```@raw html
 
@@ -88,7 +89,7 @@ clicking on a mineral of the pie chart will display it's composition:
 
 #### Refine diagram
 
-In the top-right corner of the figure, there is two buttons allowing you to refine the phase diagram (increase its resolution) using adaptive mesh refinement. 
+Above the figure, on the right, two buttons allow you to refine the phase diagram (increase its resolution) using adaptive mesh refinement. 
 
 ```@raw html
 
@@ -136,10 +137,10 @@ There is two main phase equilibrium data that can be exported: point wise (when 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_save_data.png?raw=true" alt="MAGEMinApp save data" style="max-width: 25%; height: auto; display: block; margin: 0 auto;">
 ```
 
-To export single point data, first click on any point of the grid, then modify the name the file and click on the `Table` or `Text` button right next to `Save point`. For saving all point information, simply provide a filename next to `Save all` and click on `csv file`.
+To export single point data, first click on any point of the grid, then modify the name the file and click on the `csv file` or `Text` button right next to `Save point`. For saving all point information, simply provide a filename next to `Save all` and click on `csv file`.
 
 !!! note
-    - `Table` saves the whole output of the stable phase equilibrium while `Text` saves general information.
+    - `csv file` saves the whole output of the stable phase equilibrium while `Text` saves general information.
     - Single point data are downloaded through the web-browser and are likely to end up in your `Downloads` directory.
     - Save all points data will end up in the directory indicated in the `Setup` tab and `General parameters` panel.
     - Mind that when saving all points, the size of file can quickly becomes large (> Go) if the total number of the phase diagram is also large!
@@ -172,7 +173,7 @@ which should update the phase diagram as follow:
 
 #### Isopleths
 
-To add isopleths (isocontour), first change the selected right panel from `Display options` to `Isopleths`, then choose `Isopleth type = solution phase`, `Phase = liq`, `Field = mode` and `Unit = wt`. Use the default `Range`values and set `Line style = dash` and color to red. Finally click on the `Add` button:
+To add isopleths (isocontour), first change the selected right panel from `Display options` to `Isopleths`, then choose `Isopleth type = solution phase`, `Phase = liq`, `Field = mode` and `Unit = wt`. Keep the `Range` values, which are filled automatically from the range of the selected field, and set `Line style = Dash` and color to red. Finally click on the `Add` button:
 
 ```@raw html
 
@@ -232,46 +233,52 @@ which results in
 
 ### 4. Export figures
 
-Pseudosections, including isopleths and reaction lines can be exported to `svg` by clicking on the little Camera at the top-right of the diagram:
+Pseudosections, including isopleths and reaction lines, can be saved as a picture by clicking on the little camera (`Download plot`) at the top-right of the diagram:
 
 ```@raw html
 
-<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_Fig.png?raw=true" alt="MAGEMinApp export figure" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_Fig.png?raw=true" alt="MAGEMinApp download plot" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 ```
 
-However, this option merges all the layers together making it difficult to post-process the figures efficiently in any graphic vector software such as `Inkscape` or `Illustrator`. 
-
-A alternative way to export all layers individually is to use the `Export all layers` option:
+However, this option merges all the layers together, making it difficult to post-process the figure in a vector graphics software such as `Inkscape` or `Illustrator`. Instead, use `Export svg` in the `Export figure` panel, next to the diagram:
 
 ```@raw html
 
-<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_button.png?raw=true" alt="MAGEMinApp export button" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_button.png?raw=true" alt="MAGEMinApp export svg" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
 ```
 
-Using the `Export all layers` option will generate a list of `svg` files in the `output` directory of MAGEMinApp:
+`Export svg` writes one clean, layered `svg` file to the figure directory shown below the button, named after the diagram title and the displayed field (here `KLB1_Peridotite_-_Anhydrous_Variance.svg`), together with a text file listing the numbered phase assemblages. The status line gives the full path and size of the file:
 
 ```@raw html
 
-<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_all.png?raw=true" alt="MAGEMinApp export button" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_all.png?raw=true" alt="MAGEMinApp exported svg" style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
 ```
 
-This includes the displayed field (heatmap), the reactions lines, the labels of the phase equilibria (vector and text), a vector file per iso-contour and the iso-contour legends.
+Each element of the figure is a separate, named layer when the file is opened in `Illustrator` or `Inkscape`, in paint order:
 
-Which gives for instance:
+- `Field`: the colored field (an embedded image covering the plot area, with the colormap, range and smoothing used on screen);
+- `Mesh`: the adaptive refinement grid, when `Show grid = true`;
+- `Reaction_lines`: one path per phase, with the style set in the reaction-line options;
+- `Isopleth_<name>` and `Isopleth_labels_<name>`: one layer per displayed isopleth and its value labels;
+- `Labels`: the field labels and leader lines;
+- `Layout`, `Colorbar` and `Isopleth_legend`: frame, ticks, axis titles, title, colorbar and isopleth legend;
+- `Info` and `Assemblage_list`: the computation information and the numbered assemblage list shown below the diagram.
+
+For instance, the `Field`, `Reaction_lines` and isopleth layers alone (each with the `Layout` layer):
 
 ```@raw html
 
-<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_field.png?raw=true" alt="MAGEMinApp export field" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_field.png?raw=true" alt="MAGEMinApp exported field layer" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
 ```
 
 ```@raw html
 
-<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_reaction.png?raw=true" alt="MAGEMinApp export reaction" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_reaction.png?raw=true" alt="MAGEMinApp exported reaction lines layer" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
 ```
 
 ```@raw html
 
-<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_iso.png?raw=true" alt="MAGEMinApp export iso" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_iso.png?raw=true" alt="MAGEMinApp exported isopleth layers" style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
 ```
 
 ### 5. Deactivate solution and pure phases
@@ -286,7 +293,7 @@ Let's first select the thermodynamic database to be `Metapelite` (White et al., 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_phase_selection.png?raw=true" alt="MAGEMinApp phase selection" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
 ```
 
-Once the `Phase selection` panels are unfolded you can provide your custom selection of phases. For instance let's unselect `liq`, `mt` and `ilmm`, and then perform the calculation. Refining the phase diagram twice gives:
+Once the `Phase selection` panels are unfolded you can provide your custom selection of phases. Phases are listed with the tag of their solution model (e.g. `liq_W14`). For instance let's unselect `liq` (`liq_W14`), `mt` (`mt_W00`) and `ilmm` (`ilmm_W14`), and then perform the calculation. Refining the phase diagram twice gives:
 
 ```@raw html
 
@@ -294,7 +301,7 @@ Once the `Phase selection` panels are unfolded you can provide your custom selec
 ```
 
 !!! note
-    - Here, the solution models `liq`, `mt` and `ilmm` are deactivated. However, you can see the phase `mt` appearing for instance in the large LP-HT (`cd`+`pl`+`afs`+`ilm`+`mt`+`q`+`H2O`) field. This is because the `sp` model can also produce `mt` compositions.
+    - Here, the solution models `liq`, `mt` and `ilmm` are deactivated. However, you can see a magnetite-dominated spinel (`smt`) appearing for instance in the large LP-HT (`pl`+`smt`+`cd`+`afs`+`ilm`+`q`+`H2O`) field. This is because the `sp` model can also produce magnetite compositions, which are then named `smt` (see the solvus naming in [Methods](../problem.md)).
 
 !!! warning
     - When all `Solution phase` are selected, the default combination of phases for the activity-composition set will be applied. In the case of the `Metapelite` thermodynamic database the default combination fir spinel and ilmenite is `sp` and `ilm`.
@@ -319,7 +326,7 @@ Similarly activity can be fixed for the following oxides
 - `aTiO2` -> using rutile as reference phase
 - `aSiO2` -> using quartz/coesite as reference phase
 
-Let's compute a P-T diagram using the `qfm` buffer. For instance, select the thermodynamic database to be `Metabasite` (Green et al., 2016). Choose the pressure-temperature range of your choice. Select `SQA synthethic amphibolitic composition` in the middle `Bulk-rock composition` panel, then in the `Phase diagram parameters` left panel, select `Buffer = QFM`. Finally, make sure you saturate the bulk-rock in `O` by changing the value to 3.0:
+Let's compute a P-T diagram using the `qfm` buffer. For instance, select the thermodynamic database to be `Metabasite` (Green et al., 2016). Choose the pressure-temperature range of your choice. Select `SQA Synthetic amphibolite composition` in the middle `Bulk-rock composition` panel, then in the `General` sub-tab of the `Phase diagram parameters` left panel, select `Buffer = QFM`. Finally, make sure you saturate the bulk-rock in `O` by changing the value to 3.0:
 
 ```@raw html
 
@@ -352,20 +359,20 @@ Heat capacity is computed as a second order derivative of the Gibbs energy with 
 \$C_p = -T \\frac{\\partial ^2G}{\\partial T^2}\$
 
 **There is however two ways to retrieve the second order derivative:**
-  1. Default option `Specific Cp = G0` - no latent heat of reaction: Fixing the phase assemblage (phase proportions and compositions) and computing the Gibbs energy of the assemblage at T, T+eps and T-eps.
-  2. Full differentiation option `Specific Cp = G_system` - latent heat of reaction: Computing three stable phase equilibrium at T, T+eps and T-eps.
+  1. Default option `Latent heat = G0 (no latent heat)` - no latent heat of reaction: Fixing the phase assemblage (phase proportions and compositions) and computing the Gibbs energy of the assemblage at T, T+eps and T-eps.
+  2. Full differentiation option `Latent heat = G_system (with latent heat)` - latent heat of reaction: Computing three stable phase equilibrium at T, T+eps and T-eps.
 
 !!! note
     - While the first method is computationally more efficient, it does not account for the latent heat of reaction. When having correct heat budget is important it is therefore recommanded to employ the second approach.
 
-To compute a phase diagram that takes into account latent heat reaction simply choose `Specific Cp = G_system` in the `Phase diagram parameters` panel:
+To compute a phase diagram that takes into account latent heat reaction simply choose `Latent heat = G_system (with latent heat)` in the `General` sub-tab of the `Phase diagram parameters` panel (the `Solver` is then automatically set to `Legacy`):
 
 ```@raw html
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_LH_setup.png?raw=true" alt="MAGEMinApp LH setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
 ```
 
-Using the metapelite database and the `FPWorldMedian pelite - oversaturated` composition and 4 levels of refinement, together with displaying s_cp (and capping max value to 4000 for the colormap) gives:
+Using the metapelite database and the `FPWorldMedian pelite - oversaturated` composition and 4 levels of refinement, together with displaying `Specific cp` (`s_cp`, with the `RdBu` colormap reversed, `Colormap range` 1-9 and the `Value range` set to 500-4000) gives:
 
 ```@raw html
 
@@ -373,7 +380,7 @@ Using the metapelite database and the `FPWorldMedian pelite - oversaturated` com
 ```
 
 !!! note
-    - Without accounting for latent heat of reaction (`Specific Cp = G0`), the values of the specific heat capacity are drastically different:
+    - Without accounting for latent heat of reaction (`Latent heat = G0 (no latent heat)`), the values of the specific heat capacity are drastically different:
 
     ```@raw html
 
@@ -389,7 +396,7 @@ Let's predict trace-element partitioning together with a new phase diagram using
 
 - Thermodynamic database -> Metapelite
 - Diagram type -> P-T diagram
-- TE predictive model -> true
+- TE predictive model -> true (`Trace elements` sub-tab of the `Phase diagram parameters` panel)
 - Pressure -> 0.01 to 10.0 kbar
 - Temperature -> 300.0 to 1000.0 °C
 - Initial grid subdivision -> 4
@@ -410,7 +417,7 @@ Which after performing the calculation should result in:
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_TE_diagram_raw.png?raw=true" alt="MAGEMinApp TE diagram raw" style="max-width: 90%; height: auto; display: block; margin: 0 auto;">
 ```
 
-Now move to the `Trace-elements` sub-tab, and to load the trace-element prediction, click on the button `Load/Reload trace-elements`. Doing so will display the default field `Sat_zr_liq`, which is the computation saturation level of liquid for zirconium in `ug/g`. To change the displayed field navigate to the `Display options` panel on the right side and choose `Field type = Trace element` ansd click `Compute and display`.
+Now move to the `Trace-elements` sub-tab, and to load the trace-element prediction, click on the button `Load/Reload trace-elements`. Doing so will display the default field `Sat_Zr_liq`, which is the computation saturation level of liquid for zirconium in `ug/g`. To change the displayed field navigate to the `Display options` panel on the right side and choose `Field type = Trace element` ansd click `Compute and display`.
 
 ```@raw html
 
@@ -455,21 +462,21 @@ In order to display trace-element spectrum from any suprasolids point of the com
 
 ### 9. Solidus H2O saturated phase diagram
 
-To compute solidus H₂O-saturated phase diagram, let's (for instance) change the thermodynamic database to Metabasite (Green et al., 2016), choose `Solidus H₂O-saturated = true`, select `clinopyroxene = aug`:
+To compute solidus H₂O-saturated phase diagram, let's (for instance) change the thermodynamic database to Metabasite (Green et al., 2016), choose `Solidus H₂O-saturated = true` and select `clinopyroxene = Augite` (all in the `General` sub-tab of the `Phase diagram parameters` panel):
 
 ```@raw html
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_H2O_solidus_sat_setup.png?raw=true" alt="MAGEMinApp H₂O solidus sat setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
 ```
 
-in the middle `Bulk-rock conmposition` panel, select `SM89 oxidised average MORB composition` and change the water-content from 20.0 to 40.0 to ensure water-saturation
+in the middle `Bulk-rock conmposition` panel, select `SM89 oxidised average MORB composition` and change the water-content to 40.0 to ensure water-saturation
 
 ```@raw html
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_H2O_solidus_sat_setup_bulk.png?raw=true" alt="MAGEMinApp H₂O solidus sat setup bulk" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
 ```
 
-Computing the diagram and displaying the system H₂O-activity should gives:
+Computing the diagram and displaying the system `H2O activity` (`aH2O`) in the `Display options` panel should gives:
 
 ```@raw html
 
@@ -484,7 +491,7 @@ Computing the diagram and displaying the system H₂O-activity should gives:
 
 The objective of T-X diagram is to fix the pressure while having in the vertical axis a range of temperature and on the horizontal axis a varying bulk-rock composition. Variation in the bulk-rock composition can be applied to any oxides and the two end-member bulk-rock composition added to bulk-rock input file (see [Bulk-rock input file](@ref)).
 
-To compute a T-X with fixed pressure diagram, simply select in the `Setup` sub-tab `Diagram = T-X diagram`. For instance, choose the `Igneous alkaline dry` thermodynamic database (Weller et al., 2024) and change the temperature range to 600 - 1200 °C. Keep the default fixed pressure at 10.0 kbar:
+To compute a T-X with fixed pressure diagram, simply select in the `Setup` sub-tab `Diagram type = T-X diagram (fixed pressure)`. For instance, choose the `Igneous alkaline dry` thermodynamic database (Weller et al., 2024) and change the temperature range to 600 - 1200 °C. Keep the default fixed pressure at 10.01 kbar:
 
 ```@raw html
 
@@ -507,7 +514,7 @@ Compute the diagram with `Initial grid subdivision = 5` and `Refinement levels =
 
 !!! note
     - Some of the reaction lines in the high temperature part of the diagram are not perfectly clean. This problem is related to the use of the `Boost mode` which uses the results of the previous refinement level as an initial guess for the next level. 
-    - In this case, performing the calculation with `Boost mode = false` fixed the problem:
+    - In this case, performing the calculation with `Boost mode = false` (in the `Solver` sub-tab) fixed the problem:
 
     ```@raw html
 
@@ -521,7 +528,7 @@ Compute the diagram with `Initial grid subdivision = 5` and `Refinement levels =
 
 Previously we changed the composition from `Ijolite` to `Ne-Syenite`. Let's instead vary the `qfm` buffer offset for `Ijolite` composition from -5 to 5.
 
-In the `Phase diagram parameters` left panel, select `Buffer = QFM`, then in the middle `Bulk-rock composition` panel, select `Ijolite` for both left and right composition. Then change `Buffer offset` to -5 for the left entry, and to 5 for the right entry. Don't forget to increase the `O` content, for isntance to 3.0:
+In the `General` sub-tab of the `Phase diagram parameters` left panel, select `Buffer = QFM`, then in the middle `Bulk-rock composition` panel, select `Ijolite` for both left and right composition. Then change `Buffer offset` to -5 for the left entry, and to 5 for the right entry. Don't forget to increase the `O` content, for isntance to 3.0:
 
 ```@raw html
 
@@ -538,7 +545,7 @@ Which after 4 levels of refinements results in:
 !!! warning 
     - Here, you can see that we did not provide enough `O` as `qfm` phase does not appear on the right side of the diagram. You can easely fix that by change the `O` value to 10 and relaunch the calculation
 
-Fixing the `O` content and contouring $\Delta_{QFM}$ gives the desired result:
+Fixing the `O` content and contouring $\Delta_{QFM}$ (`Isopleth type = Other`, `Field = log10(dQFM)`) gives the desired result:
 
 ```@raw html
 
@@ -549,7 +556,7 @@ Fixing the `O` content and contouring $\Delta_{QFM}$ gives the desired result:
 
 PT-X diagrams differ from P-X and T-X diagrams in the sense that both pressure and temperature can be varied along a pressure-temperature path. This option can be particularily useful when modelling subduction geotherm for instance.
 
-To perform a PT-X diagram, let's first select the `Metapelite` database (White et al., 2014) and set `Diagram type = PT-X diagram`. When `PT-X diagram` is selected, a new panel with a list of pressure-temperature points becomes available. Let us define a few point as to roughly simulate a subduction pressure-temperature path:
+To perform a PT-X diagram, let's first select the `Metapelite` database (White et al., 2014) and set `Diagram type = PT-X diagram`. Edit the first two rows of the table that appears, and add the third point with `Add new point`. When `PT-X diagram` is selected, a new panel with a list of pressure-temperature points becomes available. Let us define a few point as to roughly simulate a subduction pressure-temperature path:
 
 | Pressure | Temperature |
 |----------|-------------|
@@ -557,7 +564,7 @@ To perform a PT-X diagram, let's first select the `Metapelite` database (White e
 |10.0| 400.0|
 |20.0| 550.0 |
 
-Your `Phase diagram parameter` left panel should look like:
+Your `Phase diagram parameters` left panel should look like:
 
 
 ```@raw html
@@ -565,7 +572,7 @@ Your `Phase diagram parameter` left panel should look like:
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_PTX_setup.png?raw=true" alt="MAGEMinAppPTX setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
 ``` 
 
-Then in the `Bulk-rock composition` middle panel, select the pre-defined bulk `FPWorldMedian pelite undersaturated` for the left table and `FPWorldMedian pelite oversaturated` for the right table. Select `Refinement levels = 4` then compute the diagram:
+Then in the `Bulk-rock composition` middle panel, select the pre-defined bulk `FPWorldMedian pelite - water undersaturated` for the left table and `FPWorldMedian pelite - water oversaturated` for the right table. Select `Refinement levels = 4` then compute the diagram:
 
 ```@raw html
 
@@ -596,11 +603,13 @@ During the first metamorphic event, the starting bulk-rock composition is used t
 - `Liq extract threshold [vol%]` which is the threshold in `vol%` over which `liq` will extracted.
 - `Remaining liq fraction [vol%]` which the volume of `liq` left after extraction.
 
+When free water is removed after each calculation, `Remaing water [mol%]` sets the amount of water left in the rock (0.1 mol% by default); it can be set separately for each event.
+
 !!! note
     - `Liq extract threshold [vol%]` and `Remaining liq fraction [vol%]` can both be set for metamorphic event 1 and 2.
     - Make sure your starting bulk-rock composition is water oversaturated.
 
-Let's try it out! First, select the `Metabasite` database (Green et al., 2016) and the `FWorldMedian metabasite oversaturated` pre-defined composition. Then `Diagram type = T-T (poly-metamorphic)`, and `clinopyroxene = Augite`. You can keep the default values for the fixed pressure (10.0 kbar) and the temperature range of metamorphic events 1 and 2 (400 - 1000 and 400 - 1000 °C):
+Let's try it out! First, select the `Metabasite` database (Green et al., 2016) and the `FWorldMedian metabasite oversaturated` pre-defined composition. Then `Diagram type = T-T diagram (poly-metamorphic)`, and `clinopyroxene = Augite`. You can keep the default values for the fixed pressure (10.0 kbar) and the temperature range of metamorphic events 1 and 2 (400 - 1000 and 400 - 1000 °C):
 
 ```@raw html
 
@@ -631,7 +640,7 @@ When computing a density diagram for `LaMEM` geodynamic modelling code, the init
 
 ```
 
-which when displaying the grid and the system density gives:
+which when displaying the grid (`Show grid = true`) and the system density (`Field = ρ_system`) gives:
 
 ```@raw html
 
@@ -648,14 +657,14 @@ To export the diagram in the format used in LaMEM (`*.in`), simply click on the 
 
 #### Upper mantle density diagram
 
-When modeling plate-tectonics dynamics, one generally wants to account for phase change in the mantle. To produce a density diagram for the upper mantle you can use the Mantle database (Holland et al., 2012) or `mtl` acronym and the pre-defined `pyrolite` composition. A possible set of pressure-temperature valid for the lithosphere and the asthenosphere is for instance, from 1 to 300 kbar (0.1 to 30 GPa) and from 400 to 2000 °C.
+When modeling plate-tectonics dynamics, one generally wants to account for phase change in the mantle. To produce a density diagram for the upper mantle you can use the Mantle database (Holland et al., 2013) or `mtl` acronym and the pre-defined `pyrolite` composition. A possible set of pressure-temperature valid for the lithosphere and the asthenosphere is for instance, from 1 to 300 kbar (0.1 to 30 GPa) and from 400 to 2000 °C.
 
 ```@raw html
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_pyrolite_setup.png?raw=true" alt="MAGEMinApp pyrolite setup" style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
 ```
 
-This results in the following upper mantle density diagram that can be exported for `LaMEM`
+With `Initial grid subdivision = 6` and `Refinement levels = 0`, this results in the following upper mantle density diagram (`Field = ρ_system`, `Colormap = jet`) that can be exported for `LaMEM`:
 
 ```@raw html
 
@@ -707,7 +716,7 @@ Select the system unit for the phase fractions plot:
 | `wt%` | Weight fractions |
 | `vol%` | Volume fractions |
 
-Click `Generate`. MAGEMinApp computes the stable phase equilibrium at each recorded point and displays a stacked area chart titled **Phase fractions along path** in the expandable canvas below the controls.
+Click `Generate`. MAGEMinApp computes the stable phase equilibrium at each recorded point and displays a stacked area chart titled **Phase fractions along path** in the expandable canvas below the controls (with `Display = Field profile` it instead plots one field of the `Display options` catalog along the path).
 
 
 ```@raw html
@@ -717,7 +726,7 @@ Click `Generate`. MAGEMinApp computes the stable phase equilibrium at each recor
 ```
 
 
-The x-axis reports the path coordinates (`T [°C]; P [kbar]` for a P-T diagram) and the y-axis shows the phase fraction in the selected unit. The chart can be exported as an `svg` file using the camera icon in the top-right corner of the plot.
+The x-axis reports the path coordinates (`T [°C]; P [kbar]` for a P-T diagram) and the y-axis shows the phase fraction in the selected unit. The chart can be exported as an `svg` file using the camera icon in the top-right corner of the plot. `Export to PTX path` sends the recorded points to the `PTX path` tab as the path definition.
 
 ### 15. Quantitative isopleth thermobarometry with IntersecT
 
@@ -739,14 +748,14 @@ This tutorial reuses the two example files shipped in `examples/IntersecT/` of `
 `BAR38A` is a peraluminous, water-bearing pelite intended for the `Metapelite extended` (White et al., 2014; Green et al., 2016; Evans & Frost, 2021) thermodynamic database, acronym `mpe`.
 
 !!! warning
-    Before doing anything else, open the `Setup` tab, `General parameters` panel, and set `Mineral names = Warr (2021)`. `IntersecT` matches phases between the measurement file (column headers such as `Grt_Mg`) and the computed grid using the IMA-CNMNC symbols of Warr (2021). With the default `Legacy` naming (MAGEMin's internal codes, e.g. `g`, `ctd`, `mu`) no phase will be found in common and the `Stable phases` checklist will stay empty.
+    Before doing anything else, open the `General setup` tab, `General parameters` panel, and set `Mineral names = Warr (2021)`. This tutorial also uses `Pressure unit = GPa` (the `kbar` default works as well, with pressures multiplied by 10). `IntersecT` matches phases between the measurement file (column headers such as `Grt_Mg`) and the computed grid using the IMA-CNMNC symbols of Warr (2021). With the default `Legacy` naming (MAGEMin's internal codes, e.g. `g`, `ctd`, `mu`) no phase will be found in common and the `Stable phases` checklist will stay empty.
 
 In the `Phase diagram` tab, `Setup` sub-tab:
 
 1. In `Phase diagram parameters`, set `Database = Metapelite extended (White et al., 2014, Green et al., 2016, Evans & Frost., 2021)`.
 2. In `Bulk-rock composition`, drag and drop `Petroccia_et_al_2025_bulk_Magemin.csv` onto the upload field. A `Bulk-rock(s) composition(s) successfully loaded` alert confirms the import.
 3. Still in `Bulk-rock composition`, select `BAR38A` in the dropdown above the composition table (it is appended at the end of the list for the `mpe` database).
-4. Since `BAR38A` is a peak-pressure, chloritoid-and-garnet-bearing pelite, lower the default temperature range to something like 400 – 700 °C (the default 800 – 1400 °C window is too hot for `Cld` to be stable). Change pressure range (15 - 35 kbar).
+4. Since `BAR38A` is a peak-pressure, chloritoid-and-garnet-bearing pelite, lower the default temperature range to something like 400 – 700 °C (the default 800 – 1400 °C window is too hot for `Cld` to be stable). Change the pressure range to 1.5 - 3.5 GPa.
 5. Set `Initial grid subdivision = 4` and `Refinement levels = 3`, then click `Compute phase diagram`.
 
 !!! note
@@ -788,10 +797,13 @@ The `Display` dropdown above the main diagram (`Diagrams` sub-tab) is populated 
 | `Qcmp <phase>` / `redchi2 <phase>` | Quality factor / reduced-$\chi^2$ for one phase only, e.g. `Qcmp Grt` |
 | `Qcmp <Phase_Element>` | Quality factor for a single measured a.p.f.u. column, e.g. `Qcmp Grt_Mg` |
 
-The two smaller diagrams below let you compare two more fields side by side (e.g. `Qcmp Grt` against `Qcmp Cld`) to see whether all phases agree on the same pressure-temperature region.
+The two smaller diagrams below let you compare two more fields side by side (e.g. `Qcmp Grt` against `Qcmp Ms`, as in the figure below) to see whether all phases agree on the same pressure-temperature region.
 
 !!! note
     Switching the displayed field automatically rescales `Min`/`Max` in the `Color options` panel to that field's range, since `Qcmp` and `redchi²` fields have very different scales.
+
+!!! tip
+    To compare several runs (e.g. with different phase selections), switch on `Keep (accumulate runs for comparison, up to 8)` below `Run IntersecT` before running. Each kept run can then be reviewed in the `Kept runs` sub-tab of the `Results` column.
 
 
 ```@raw html
@@ -803,7 +815,7 @@ The two smaller diagrams below let you compare two more fields side by side (e.g
 
 #### Step 4 - Read the Log
 
-Open the `Log` sub-tab to get the full text report: for each selected phase and for each measured element, the (P,T) location and value of the maximum Q$_{cmp}$ and the minimum reduced-$\chi^2$, together with the overall weighted and unweighted optimum and any warnings (for instance if a phase is not stable everywhere on the grid). This is the same information used to build the diagrams, in a form convenient to copy into a report or table.
+Open the `Log` sub-tab of the `Results` column to get the full text report: for each selected phase and for each measured element, the (P,T) location and value of the maximum Q$_{cmp}$ and the minimum reduced-$\chi^2$, together with the overall weighted and unweighted optimum and any warnings (for instance if a phase is not stable everywhere on the grid). This is the same information used to build the diagrams, in a form convenient to copy into a report or table.
 
 #### Step 5 - Overlay isocontours (optional)
 
@@ -848,11 +860,14 @@ Click `Compute phase diagram` as usual. The resulting diagram (`Diagram` sub-tab
 !!! note
     Every other option demonstrated in the previous sections - displayed field and colormaps ([3. Displayed field and colormap options](#3.-Displayed-field-and-colormap-options)), reaction lines and isopleths ([2. Reaction lines and isopleths](#2.-Reaction-lines-and-isopleths)), refinement, grid-point information, and exporting `svg` layers ([4. Export figures](#4.-Export-figures)) - works exactly the same way on a μ-μ diagram, simply with μ(oxide 1)/μ(oxide 2) taking the place of the usual P-T or P-X/T-X axes.
 
-### 17. Monte Carlo bulk-rock uncertainty
+### 17. Bulk-rock uncertainty (Monte Carlo and linear variation)
 
-Available from MAGEMinApp v1.7.1.
+Monte Carlo available from MAGEMinApp v1.7.1, linear variation from v1.7.3.
 
-A bulk-rock composition is never known exactly: analytical uncertainty, sample heterogeneity and estimated components such as H₂O or Fe³⁺ all shift the phase boundaries. The `Uncertainty` panel of the `Diagram` sub-tab measures this effect with a Monte Carlo approach. It recomputes the current P-T phase diagram for many randomly perturbed bulk-rock compositions and shows how far each phase boundary moves.
+A bulk-rock composition is never known exactly: analytical uncertainty, sample heterogeneity and estimated components such as H₂O or Fe³⁺ all shift the phase boundaries. The `Uncertainty` panel of the `Diagram` sub-tab measures this effect by recomputing the current P-T phase diagram for many bulk-rock compositions and showing how far each phase boundary moves. The `Mode` selector at the top of the panel chooses how these compositions are generated:
+
+- `Monte Carlo (random sampling)` (default): compositions drawn randomly around the reference bulk from a 1σ per oxide (Steps 1–5 below).
+- `Linear between two bulks`: compositions on the straight line between the reference bulk and a second bulk ([Linear variation between two bulks](#Linear-variation-between-two-bulks) below).
 
 !!! info "How it works"
     - `N` perturbed bulk-rock compositions (*realizations*) are drawn around the reference bulk. Each oxide $i$ is perturbed in log space, $x_i' = x_i \exp(\varepsilon_i)$ with $\varepsilon_i \sim \mathcal{N}(-\sigma_i^2/2,\ \sigma_i)$ and $\sigma_i$ the relative 1σ uncertainty, so perturbed values stay positive. Every realization is then renormalized to the sum of the reference bulk. Oxides absent from the reference bulk stay absent.
@@ -869,11 +884,11 @@ Here we use the default `Igneous` database (Holland et al., 2018) with the pre-d
 
 #### Step 2 - Set the bulk-rock uncertainty
 
-In the `Diagram` sub-tab, select the `Uncertainty` panel of the right sidebar. On first opening, the `Bulk uncertainty` table is filled with the current bulk-rock composition and a default 1σ per oxide:
+In the `Diagram` sub-tab, select the `Uncertainty` panel of the right sidebar and keep `Mode = Monte Carlo (random sampling)`. On first opening, the `Bulk uncertainty` table is filled with the current bulk-rock composition and a default 1σ per oxide:
 
 ```@raw html
 
-<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MC_menu.png?raw=true" alt="MAGEMinApp Monte Carlo menu" style="max-width: 30%; height: auto; display: block; margin: 0 auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MC_menu_mode.png?raw=true" alt="MAGEMinApp Monte Carlo menu" style="max-width: 30%; height: auto; display: block; margin: 0 auto;">
 ```
 
 The `σ` column is editable. The options above the table are:
@@ -925,13 +940,13 @@ When the run is complete, the `Monte Carlo boundary uncertainty` panel opens at 
 
 Each colored line is the boundary of one phase's stability field in one realization, drawn in that phase's color (see legend). The black lines are the phase boundaries of the reference diagram, drawn in the same style as its reaction lines. The wider a bundle of colored lines, the more sensitive that boundary is to the bulk-rock uncertainty. In this example the garnet (`g`) boundary stays tightly grouped, whereas the ilmenite (`ilm`) boundary, which depends on the small TiO₂ content, spreads widely.
 
-The `Diagram options` card controls the display:
+The `Diagram options` card controls the display (from v1.7.3 all three options are on by default; the figure above was drawn with `Show phase labels` and `Smooth lines` off):
 
 - `Show phase labels`: overlay the field labels of the reference diagram.
 - `Display phase boundaries`: show or hide the reference boundaries (black lines).
 - `Smooth lines`: remove the grid steps of each realization's boundary (Gaussian smoothing followed by corner cutting).
 
-Using `Show phase labels = true` and `Smooth lines = true` gives:
+With `Show phase labels = true` and `Smooth lines = true`:
 
 ```@raw html
 
@@ -976,6 +991,55 @@ The spider diagram below the probability card shows each sampled composition as 
 !!! note
     - A new Monte Carlo run replaces the previous results. After changing the reference diagram, run Monte Carlo again so that the results match it.
     - A probability map computed from an earlier run cannot be exported. Click `Compute` again first.
+
+#### Linear variation between two bulks
+
+Instead of random perturbations, the reference diagram can be recomputed along a straight line in composition space, from the reference bulk (X = 0) to a second bulk (X = 1). This shows, deterministically, in which direction and how far each boundary moves when the composition shifts towards another rock, e.g. a peridotite progressively refertilized by a pyroxenite melt.
+
+For each step x = 0, 1/(N−1), …, 1, the bulk is
+
+```math
+\mathrm{bulk}(x) = (1-x)\,\mathrm{bulk}_{X=0} + x\,\mathrm{bulk}_{X=1},
+```
+
+the same linear mixing used for the X axis of P-X and T-X diagrams, and a complete P-T phase diagram is computed exactly as for one Monte Carlo realization (same range, grid and refinement). Step X = 0 therefore reproduces the reference diagram.
+
+Select `Mode = Linear between two bulks`. The `Bulk uncertainty` card is replaced by the `Bulk variation` card:
+
+```@raw html
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MC_linear_menu.png?raw=true" alt="MAGEMinApp linear variation menu" style="max-width: 30%; height: auto; display: block; margin: 0 auto;">
+```
+
+- `X = 1`: the bulk at the end of the line, picked from the same list of pre-defined (or loaded) bulk-rock compositions as in the `Setup` tab.
+- The table lists `X = 0`, the reference bulk of the `Setup` tab (read-only), and `X = 1`, which can be edited. Both are in the bulk unit of the `Setup` tab (`mol%` or `wt%`).
+- In the `Run` card, `Realizations` becomes `Steps` (at least 2), the `Seed` is hidden, and the button reads `Run linear sweep`.
+
+Here we keep the reference diagram of Step 1 (`KLB1 Peridotite - Anhydrous`), select `X = 1 = MIX1-G - Pyroxenite` and `Steps = 5`, and click `Run linear sweep` (about 12 s for the 5 steps). The result panel opens as for Monte Carlo:
+
+```@raw html
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MC_linear_results.png?raw=true" alt="MAGEMinApp linear variation results" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+```
+
+Each phase keeps its own color, shaded from a light tint at X = 0 to a dark shade at X = 1 (the grey `X` key in the bottom right shows the scale). Hovering over a line gives its phase and X value, and clicking a phase in the legend hides or shows all its steps. In this example, the garnet (`g`) boundary moves by several kbar between X = 0 and X = 1.
+
+The other tools work as for Monte Carlo, with these differences:
+
+- `Max lines` draws evenly spaced steps, so X = 0 and X = 1 are always drawn.
+- The probability map becomes a `fraction of steps` map: the fraction of steps in which a point lies inside the target field, and contours where each target phase is stable in 2.5 %, 50 % and 97.5 % of the steps.
+- The spider diagram shows each step as its difference from the X = 0 bulk, on the same grey gradient:
+
+```@raw html
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MC_linear_spider.png?raw=true" alt="MAGEMinApp linear variation spider diagram" style="max-width: 20%; height: auto; display: block; margin: 0 auto;">
+```
+
+- `Export SVG` saves the diagram as `<diagram title>_Linear.svg`, with one path per step colored along the gradient and the `X` key in the legend.
+
+!!! note
+    - Switching `Mode` back to `Monte Carlo (random sampling)` restores the `Bulk uncertainty` card. The X = 1 table keeps its edits as long as the oxide list does not change; changing the database, the bulk unit or the `X = 1` selection reloads it.
+    - The run fails with a red alert if the `X = 1` composition is empty or zero (*"Select or enter the bulk-rock composition at X = 1 first."*) or if `Steps` is below 2.
 
 ### 18. P-T-X 3D diagram
 
@@ -1037,3 +1101,27 @@ The `Export` tab saves the current diagram in the output directory:
     - 3D diagrams use a regular grid without adaptive refinement.
     - The computed 3D diagram and the 3D grid resolution are not included in saved states (`Save state`); use the exports above to keep the results.
 
+### 19. Reduced chemical systems (Nullspace optimizer)
+
+Available from MAGEMinApp v1.7.3.
+
+The legacy solver can minimize the solution phases with two optimizers: `NLopt` or a nullspace minimizer (see [Methods](../problem.md#Local-minimization-of-solution-phases)). With `NLopt`, every core oxide of the database (`SiO2`, `Al2O3`, `MgO`, `FeO`) must be present, so an entry of 0 in the bulk-rock table is silently raised to 1e-4 mol fraction. With the nullspace optimizer, an oxide set to exactly 0 is removed from the system: chemical systems below FMAS, such as CMAS or MAS, are computed as such, and the absent oxide stays exactly 0 in every phase.
+
+The optimizer is chosen in the `Setup` sub-tab, `Phase diagram parameters` panel, `Solver` tab:
+
+```@raw html
+
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_optimizer_setup.png?raw=true" alt="MAGEMinApp optimizer selection" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
+```
+
+- `Optimizer` is only shown when `Solver = Legacy` and the database supports it (THERMOCALC and Stixrude & Lithgow-Bertelloni databases). Its default is `Nullspace`.
+- The same choice exists in the `PTX path` tab, and applies to 3D diagrams and to the [Uncertainty](#17.-Bulk-rock-uncertainty-Monte-Carlo-and-linear-variation) runs of a diagram.
+- When it is active, the information block of the diagram reports `LP (legacy), nullspace optimizer`.
+
+To compute a CMAS diagram with the `Igneous` database, keep `Solver = Legacy` and `Optimizer = Nullspace`, then set `FeO`, `K2O`, `Na2O`, `TiO2`, `O`, `Cr2O3` and `H2O` to `0` in the `Bulk-rock composition` table, and click `Compute phase diagram`.
+
+!!! note
+    - Only exact zeros remove an oxide; a small non-zero amount (below 1e-4 mol fraction) is still raised to 1e-4.
+    - `O` stands for ferric iron. If `FeO` is 0, `O` is set to 0 as well, since no phase could host it.
+    - The reduced system must still contain at least one phase able to host the remaining oxides.
+    - On ordinary bulk-rock compositions, both optimizers give the same diagrams, apart from rare differences in the last digits of the Gibbs energy. Details are given in [MAGEMin_C.jl: options](../MAGEMin_C/options.md#Reduced-chemical-systems).

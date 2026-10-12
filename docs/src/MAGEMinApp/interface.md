@@ -19,7 +19,8 @@
         - [3.2 Display options panel](#3.2.-Display-options-panel)
         - [3.3 Isopleths panel](#3.3.-Isopleths-panel)
         - [3.4 Draw path panel](#3.4.-Draw-path-panel)
-        - [3.5 Classifications panel](#3.5.-Classifications-panel)
+        - [3.5 Uncertainty panel](#3.5.-Uncertainty-panel)
+        - [3.6 Classifications panel](#3.6.-Classifications-panel)
     - [4. 3D diagram sub-tab](#4.-3D-diagram-sub-tab)
         - [4.1 Figure and composition bar](#4.1.-Figure-and-composition-bar)
         - [4.2 Display panel](#4.2.-Display-panel)
@@ -144,44 +145,63 @@ Links for documentation, reporting issues on GitHub, the GitHub repository, and 
       <th>Caption</th>
     </tr>
     <tr>
-      <td><img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_setup.png?raw=true" alt="MAGEMinApp setup" style="width: 80%; height: auto; display: block; margin: 0 auto;"></td>
+      <td><img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_setup.png?raw=true" alt="MAGEMinApp setup" style="width: 100%; height: auto; display: block; margin: 0 auto;"></td>
       <td>
         <ul>
-            <li><b>Thermodynamic database</b> - select among available thermodynamic databases, grouped as:<br>
+            <li><b>General sub-tab</b>
+                <ul>
+                    <li><b>Thermodynamic database</b> - select among available thermodynamic databases, grouped as:<br>
                 <i>Published:</i> mp (Metapelite, White et al., 2014), mb (Metabasite, Green et al., 2016), ig (Igneous, Green et al., 2025, after Holland et al., 2018), igd (Igneous, Su et al., 2026, after Tomlinson &amp; Holland, 2021), igad (Igneous alkaline dry, Weller et al., 2024), um (Ultramafic, Evans &amp; Frost, 2021)<br>
                 <i>Mantle:</i> mtl (Mantle, Holland et al., 2013), sb11/sb21/sb24 (Stixrude &amp; Lithgow-Bertelloni, 2011/2021/2024)<br>
                 <i>Custom:</i> ume (Ultramafic extended), mpe (Metapelite extended), mbe (Metabasite extended), all (Global TC dataset - combines every database's oxide set; use <b>Preset</b> below to quickly restrict phases to one database's default set)</li>
-            <li><b>Dataset</b> - select among available thermodynamic datasets for the chosen database</li>
-            <li><b>Preset</b> (Global TC dataset only) - quickly restrict the solution-phase selection to match one of the standalone databases (none, Metapelite, Metabasite, Igneous, Igneous alkali-dry, Ultramafic) instead of deselecting phases manually</li>
-            <li><b>Phase selection</b> - expand to activate or deactivate individual solution and pure phase models</li>
-            <li><b>Diagram type</b> - P-T, P-X, T-X, PT-X, T-T (polymetamorphic), or P-T-X 3D diagram (pressure × temperature × linear mixing between the two bulk-rock compositions, displayed in the <a href="#4.-3D-diagram-sub-tab">3D diagram sub-tab</a>)</li>
-            <li><b>P-T path (PT-X diagram)</b> - table of pressure-temperature points defining the path when Diagram type = PT-X diagram; add rows with "Add new point" or drag-and-drop a <code>P;T</code> CSV file onto "Drag and drop path" to replace the whole path (pressure always given in kbar in the file; see the "Bulk-rock input file" section on the General information tab for the general CSV convention)</li>
-            <li><b>Solidus H₂O-saturated</b> - saturate the first melt in water at the solidus (true/false)</li>
-            <li><b>Additional H₂O [mol%]</b> - amount of extra H₂O added when solidus saturation is active (0–100)</li>
-            <li><b>Clinopyroxene</b> - switch between Omphacite (Omph) and Augite (Aug) for the metabasite database</li>
-            <li><b>Limit Ca-opx</b> - enforce a maximum Ca content in orthopyroxene (0–1; default 0.5)</li>
-            <li><b>TE predictive model</b> - enable trace-element partitioning at suprasolidus conditions (true/false)</li>
-            <li><b>KD model</b> - lattice-strain Kd database: OL (O. Laurent, 2012) or CO (J. Cornet, 2019)</li>
-            <li><b>Zr saturation</b> - zircon saturation model: none, WH (Watson &amp; Harrison, 1983), B (Boehnke et al., 2013), CB (Crisp &amp; Berry, 2022)</li>
-            <li><b>P₂O₅ saturation</b> - fluorapatite saturation model: none, Klein26, Tollari06, HWBea92</li>
-            <li><b>S saturation</b> - sulfide saturation model: none, Liu07, Oneill21</li>
-            <li><b>CO₂ saturation</b> - CO₂ fluid saturation model: none, SY26 (Sun &amp; Yao, 2026)</li>
-            <li><b>EODC</b> - empirical oxide–distribution coefficient model: KP, IL, B, AV; with an associated ratio field (0–1)</li>
-            <li><b>Upload Kd's</b> - drag-and-drop zone to load a custom Kd database file</li>
-            <li><b>Pressure [kbar]</b> - minimum and maximum pressure range for the diagram</li>
-            <li><b>Temperature [°C]</b> - minimum and maximum temperature range for the diagram</li>
-            <li><b>Fixed pressure / temperature</b> - single pressure or temperature value for P-X and T-X diagram types</li>
-            <li><b>Initial grid subdivision</b> - sets the starting grid resolution (2–9; default 4, yielding a 16×16 grid)</li>
-            <li><b>3D grid [points per axis]</b> (P-T-X 3D diagram only) - number of grid points along P, T and X (default 17 × 17 × 9), with a live estimate of the number of points, computation time and memory. It replaces <b>Initial grid subdivision</b> and the refinement options: 3D diagrams use a regular grid without adaptive refinement. Options that do not apply to 3D diagrams (fixed pressure/temperature, P-T path, solidus H₂O saturation, T-T events, μ-μ and trace-element options) are hidden.</li>
-            <li><b>Refinement type</b> - refine on phase boundaries (ph) or dominant end-members (em)</li>
-            <li><b>Refinement levels</b> - number of adaptive mesh refinement levels applied (default 3)</li>
-            <li><b>Boost mode</b> - use the previous refinement level as an initial guess for the next (true/false)</li>
-            <li><b>Buffer</b> - oxygen fugacity buffer or fixed oxide activity: none, QFM, MW, IW, QIF, CCO, HM, NNO, aH₂O, aO₂, aFeO, aMgO, aAl₂O₃, aTiO₂</li>
-            <li><b>Solver</b> - Gibbs energy minimization algorithm: pge (projected gradient), lp (linear programming/Legacy), hyb (hybrid)</li>
-            <li><b>Verbose</b> - level of output in the Julia terminal: -1 (none), 0 (light), 1 (full)</li>
-            <li><b>Seismic averaging</b> - averaging scheme for seismic velocities: 0 (VRH – Voigt-Reuss-Hill), 1 (HS – Hashin-Shtrikman)</li>
-            <li><b>Weight factor</b> - mixing weight between Voigt and Reuss bounds (0–1; default 0.5)</li>
-            <li><b>Specific Cp</b> - 0: G₀ (no latent heat); 1: G_system (includes latent heat of reaction); selecting G_system forces <b>Solver</b> to Legacy (see "Latent heat of reaction" in the Phase diagrams tutorials)</li>
+                    <li><b>Dataset</b> - select among available thermodynamic datasets for the chosen database</li>
+                    <li><b>Preset</b> (Global TC dataset only) - quickly restrict the solution-phase selection to match one of the standalone databases (none, Metapelite, Metabasite, Igneous, Igneous alkali-dry, Ultramafic) instead of deselecting phases manually</li>
+                    <li><b>Phase selection</b> - expand to activate or deactivate individual solution and pure phase models</li>
+                    <li><b>Diagram type</b> - P-T, P-X, T-X, PT-X, T-T (polymetamorphic), or P-T-X 3D diagram (pressure × temperature × linear mixing between the two bulk-rock compositions, displayed in the <a href="#4.-3D-diagram-sub-tab">3D diagram sub-tab</a>)</li>
+                    <li><b>P-T path (PT-X diagram)</b> - table of pressure-temperature points defining the path when Diagram type = PT-X diagram; add rows with "Add new point" or drag-and-drop a <code>P;T</code> CSV file onto "Drag and drop path" to replace the whole path (pressure always given in kbar in the file; see the "Bulk-rock input file" section on the General information tab for the general CSV convention)</li>
+                    <li><b>Solidus H₂O-saturated</b> - saturate the first melt in water at the solidus (true/false)</li>
+                    <li><b>Additional H₂O [mol%]</b> - amount of extra H₂O added when solidus saturation is active (0–100)</li>
+                    <li><b>Buffer</b> - oxygen fugacity buffer or fixed oxide activity: none, QFM, MW, IW, QIF, CCO, HM, NNO, aH₂O, aO₂, aFeO, aMgO, aAl₂O₃, aTiO₂</li>
+                    <li><b>Latent heat</b> - G0 (no latent heat, default) or G_system (includes the latent heat of reaction); selecting G_system forces <b>Solver</b> to Legacy (see "Latent heat of reaction" in the Phase diagrams tutorials)</li>
+                    <li><b>Clinopyroxene</b> - switch between Omphacite (Omph) and Augite (Aug) for the metabasite database</li>
+                    <li><b>Limit Ca-opx</b> - enforce a maximum Ca content in orthopyroxene (0–1; default 0.5)</li>
+                    <li><b>Pressure [kbar]</b> - minimum and maximum pressure range for the diagram</li>
+                    <li><b>Temperature [°C]</b> - minimum and maximum temperature range for the diagram</li>
+                    <li><b>Fixed pressure / temperature</b> - single pressure or temperature value for P-X and T-X diagram types</li>
+                    <li><b>Initial grid subdivision</b> - sets the starting grid resolution (2–9; default 4, yielding a 16×16 grid)</li>
+                    <li><b>3D grid [points per axis]</b> (P-T-X 3D diagram only) - number of grid points along P, T and X (default 17 × 17 × 9), with a live estimate of the number of points, computation time and memory. It replaces <b>Initial grid subdivision</b> and the refinement options: 3D diagrams use a regular grid without adaptive refinement. Options that do not apply to 3D diagrams (fixed pressure/temperature, P-T path, solidus H₂O saturation, T-T events, μ-μ and trace-element options) are hidden.</li>
+                    <li><b>Refinement type</b> - refine on phase boundaries (ph) or dominant end-members (em)</li>
+                    <li><b>Refinement levels</b> - number of adaptive mesh refinement levels applied (default 3)</li>
+                </ul>
+            </li>
+            <li><b>Trace elements sub-tab</b>
+                <ul>
+                    <li><b>TE predictive model</b> - enable trace-element partitioning at suprasolidus conditions (true/false)</li>
+                    <li><b>Upload Kd's</b> - drag-and-drop zone (or file selection) to load a custom Kd database from an XLSX file</li>
+                    <li><b>Kd's database</b> - Kd database: O. Laurent (2012), J. Cornet (2019, lattice strain) or Yakymchuk et al. (2025)</li>
+                    <li><b>Zr saturation</b> - zircon saturation model: none, Watson &amp; Harrison (1983), Boehnke et al. (2013), Crisp &amp; Berry (2022)</li>
+                    <li><b>P₂O₅ saturation</b> - fluorapatite saturation model: none, Klein et al. (2026), Tollari et al. (2006), Bea et al. (1992, after Harrison &amp; Watson, 1984)</li>
+                    <li><b>S saturation</b> - sulfide saturation model: none, Liu et al. (2007), O'Neill (2021)</li>
+                    <li><b>CO₂ saturation</b> - CO₂ fluid saturation model: none, SY26 (Sun &amp; Yao, 2026)</li>
+                    <li><b>Monazite saturation</b> - monazite saturation model: none, Stepanov et al. (2012), Montel (1993), Maimaiti et al. (2019)</li>
+                    <li><b>EODC</b> - empirical oxide–distribution coefficient model: KP, IL, B, AV; with an associated ratio field (0–1)</li>
+                </ul>
+            </li>
+            <li><b>Seismic properties sub-tab</b>
+                <ul>
+                    <li><b>Seismic averaging scheme</b> - averaging scheme for seismic velocities: VRH (Voigt-Reuss-Hill) or HS (Hashin-Shtrikman)</li>
+                    <li><b>Weight factor</b> - mixing weight between Voigt and Reuss bounds (0–1; default 0.5)</li>
+                    <li><b>Seismic correction</b> - apply the melt-content velocity correction (Clark et al., 2017, after Takei, 1997) (true/false). When true, <b>Aspect ratio</b> (melt-pocket aspect ratio), <b>Anelastic correction</b> with its <b>Anelastic model</b> (dry, damp or wet mantle), <b>Shallow correction</b> and <b>Fluid as melt</b> become available</li>
+                </ul>
+            </li>
+            <li><b>Solver sub-tab</b>
+                <ul>
+                    <li><b>Solver</b> - Gibbs energy minimization algorithm: Legacy (linear programming, default), PGE (projected gradient) or Hybrid</li>
+                    <li><b>Optimizer</b> - local minimizer of the solution phases, shown only with <b>Solver</b> = Legacy on the THERMOCALC and Stixrude &amp; Lithgow-Bertelloni databases: NLopt or Nullspace (default). With Nullspace, oxides set to exactly 0 in the bulk-rock table are removed from the system, so reduced systems (e.g. CMAS, FeO-free) can be computed; with NLopt they are raised to 1e-4 mol fraction. Also used by the 3D diagram and by the Uncertainty runs (see "Reduced chemical systems" in the Phase diagrams tutorials and "MAGEMin_C.jl: options")</li>
+                    <li><b>Boost mode</b> - use the previous refinement level as an initial guess for the next (true/false)</li>
+                    <li><b>Verbose</b> - level of output in the Julia terminal: none, light or full</li>
+                </ul>
+            </li>
         </ul>
       </td>
     </tr>
@@ -283,7 +303,7 @@ When `TE predictive model = true`, a third collapsible panel appears below the b
 
 ## 3. Diagram sub-tab
 
-The Diagram sub-tab has a right-hand sidebar with five tabs: **Informations**, **Display options**, **Isopleths**, **Draw path**, and **Classifications**.
+The Diagram sub-tab has a right-hand sidebar with six tabs: **Informations**, **Display options**, **Isopleths**, **Draw path**, **Uncertainty**, and **Classifications**.
 
 ### 3.1. Informations panel
 
@@ -428,7 +448,11 @@ This panel allows you to manually trace a P-T path directly on the phase diagram
 
 ```
 
-### 3.5. Classifications panel
+### 3.5. Uncertainty panel
+
+Recomputes the current P-T phase diagram for many bulk-rock compositions to show how far each phase boundary moves. Two modes are available: **Monte Carlo (random sampling)**, which perturbs the bulk with a 1σ per oxide (`Bulk uncertainty` table), and **Linear between two bulks**, which steps along the straight line from the reference bulk to a second bulk (`Bulk variation` card). The `Run` card sets the number of realizations (or steps) and launches the run; `Display results` reopens the result panel (boundary diagram, probability map, bulk spider diagram, SVG export). The status message at the top is shown until a P-T diagram with a fixed bulk composition has been computed. See [17. Bulk-rock uncertainty](PD_tutorials.md#17.-Bulk-rock-uncertainty-Monte-Carlo-and-linear-variation) for a complete walkthrough.
+
+### 3.6. Classifications panel
 
 !!! note
     Marked "Work in progress" in the app.
@@ -703,6 +727,7 @@ The sub-tab is organized in three columns: **Setup**, **Results** (Diagrams / Lo
       <td>
         <ul>
             <li><b>Run IntersecT</b> - launch the calculation for the currently loaded measurement file and selected phases</li>
+            <li><b>Keep (accumulate runs for comparison)</b> - when on, every run is stored (up to 8) instead of replacing the previous one; kept runs are listed in the <b>Kept runs</b> tab of the Results panel</li>
             <li><b>Measurement file</b> - drag-and-drop a CSV file with measured mineral compositions; the status line reports the loaded file name once parsed</li>
             <li><b>Stable phases</b> - checklist automatically populated with the phases found both in the measurement file and on the computed grid; uncheck a phase to exclude it</li>
             <li><b>Analysis type</b> - WDS spot, WDS map, or EDS; used to auto-estimate analytical uncertainty when the measurement file does not already provide one</li>
@@ -731,6 +756,7 @@ The sub-tab is organized in three columns: **Setup**, **Results** (Diagrams / Lo
       <td>
         <ul>
             <li><b>Diagrams tab</b> - main "Display" dropdown (populated after Run IntersecT: Qcmp weighted/unweighted, redchi2 total, per-phase and per-element Qcmp/redchi2 fields) and diagram; two smaller "Display" dropdown + diagram pairs below let you compare two more fields side by side</li>
+            <li><b>Kept runs tab</b> - select one of the stored runs to display its summary, its diagram and its log; <b>Remove selected</b> and <b>Remove all</b> delete stored runs. A warning is shown when the diagram setup of a kept run (database, diagram type, bulk composition, buffer or axes range) differs from that of the previous kept run, since the two runs are then not directly comparable</li>
             <li><b>Log tab</b> - full text report: for each selected phase and measured element, the (P,T) location and value of the maximum Qcmp and minimum reduced-χ², the overall weighted/unweighted optimum, and any warnings</li>
         </ul>
       </td>
@@ -901,7 +927,7 @@ The Isopleths panel in the Trace-elements sub-tab works identically to the one i
 
 ## 7. PTX path tab
 
-The PTX path tab is divided into a left configuration panel and a central results area. It supports all P-T-X path modes from the same interface, including isentropic paths (previously a separate tab; merged in v1.2.1).
+The PTX path tab is divided into a left configuration panel and a central results area. It supports all P-T-X path modes from the same interface, including isentropic paths, which combine with every other mode (fractional melting/crystallization, assimilation, trace elements).
 
 ### 7.1. Configuration panel
 
@@ -921,7 +947,8 @@ The PTX path tab is divided into a left configuration panel and a central result
             <li><b>Clinopyroxene / Limit Ca-opx</b> - same as the phase diagram Setup panel</li>
             <li><b>Buffer</b> - same oxygen fugacity buffer / fixed oxide activity list as the phase diagram Setup panel</li>
             <li><b>Variable buffer</b> - allow the buffer offset to vary per path point via a <code>Buffer</code> column in the <a href="#6.4.-Path-definition-panel">Path definition table</a> (true/false)</li>
-            <li><b>Solver</b> - pge (projected gradient), lp (Legacy), or hyb (Hybrid); default Hybrid</li>
+            <li><b>Solver</b> - pge (projected gradient), lp (Legacy), or hyb (Hybrid); default Legacy</li>
+            <li><b>Optimizer</b> - NLopt or Nullspace (default); shown only with <b>Solver</b> = Legacy on databases that support it, same as the phase diagram Setup panel</li>
             <li><b>Specific Cp</b> - 0: G0 (no latent heat), 1: G_system (with latent heat); selecting G_system forces <b>Solver</b> to Legacy</li>
             <li><b>Verbose</b> - none, light, or full Julia terminal output</li>
             <li><b>Seismic averaging scheme</b> - VRH (Voigt-Reuss-Hill) or HS (Hashin-Shtrikman)</li>
@@ -1027,8 +1054,9 @@ Appears when `TE predictive model = true` in Path options.
             <li><b>TE predictive model</b> - enable trace-element partitioning along the path (true/false)</li>
             <li><b>Cumulate/Connectivity unit</b> - basis (mol, wt, or vol) used for the assimilation blend and the melt/solid extraction mass balance; only shown in fractional melting/crystallization mode</li>
             <li><b>Connectivity threshold [mol%]</b> - melt fraction above which melt is extracted during fractional melting (0–100; default 7); only visible in fractional melting mode</li>
+            <li><b>Residual Threshold [mol%]</b> - melt fraction left in the rock after an extraction event (0 to the connectivity threshold; default 7, i.e. melt is brought back to the connectivity threshold). A lower value drains the melt further each time the connectivity threshold is exceeded; the value is clamped to the connectivity threshold. Only visible in fractional melting mode</li>
             <li><b>Residual rock fraction [mol%]</b> - fraction of solid entrained by the fractionating melt during fractional crystallization (0–100; default 0); only visible in fractional crystallization mode</li>
-            <li><b>Isentropic</b> - compute an isentropic (constant-entropy) path using bisection on temperature (true/false)</li>
+            <li><b>Isentropic</b> - compute an isentropic (constant-entropy) path (true/false). The path table then only holds the pressures (plus <b>Add [mol%]</b> when Assimilation is on); the temperature is a single <b>Starting Temp. [°C]</b> field above the table, and the temperature at each following pressure is found by bisection (<b>Tolerance [K]</b>) so that the entropy of the system equals the starting entropy. The <b>Path preview</b> panel shows the resulting P-T path and the <b>Starting entropy [kJ/K]</b></li>
             <li><b>Solidus H₂O-saturated</b> - saturate the first melt in water at the solidus (true/false)</li>
             <li><b>Additional H₂O [mol%]</b> - extra H₂O added at water saturation (visible when Solidus H₂O-saturated = true)</li>
             <li><b>Compute path</b> - launch the P-T-X path calculation (green button)</li>
