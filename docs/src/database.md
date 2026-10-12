@@ -184,7 +184,7 @@ The metapelitic model (extended with MnO, White et al., 2014) allows to compute 
 ```@raw html
 <ul>
     <li><strong>Ultramafic Extended (ume)</strong>: Combines Evans & Frost, 2021 (Ultramafic) and Green et al., 2016 (Metabasite) for extended applicability across ultramafic compositions.</li>
-    <li><strong>Extended Metapelite (mpe)</strong>: Combines White et al., 2014 (Metapelite) with Green et al., 2016 (Metabasite), Franzolin et al., 2011, and Diener et al., 2007 for broader coverage of metamorphic compositions.</li>
+    <li><strong>Extended Metapelite (mpe)</strong>: Combines White et al., 2014 (Metapelite) with Green et al., 2016 (Metabasite), Franzolin et al., 2011, and Diener et al., 2007 for broader coverage of metamorphic compositions. It also includes a Na–Ca carbonate scapolite (<code>scp</code>, see the Phase and End-member Listing).</li>
     <li><strong>Extended Metabasite (mbe)</strong>: Combines Green et al., 2016 (Metabasite) with Diener et al., 2007 and Rebay et al., 2022 for extended metabasic system coverage.</li>
 </ul>
 ```
@@ -258,6 +258,8 @@ The metapelitic model (extended with MnO, White et al., 2014) allows to compute 
 
 - Berman, R.G. (1988). Internally-consistent thermodynamic data for minerals in the system Na2O-K2O-CaO-MgO-FeO-Fe2O3-Al2O3-SiO2-TiO2-H2O-CO2. Journal of Petrology, 29(2), 445-522. [doi: 10.1093/petrology/29.2.445](https://doi.org/10.1093/petrology/29.2.445)
 
+- Connolly, J.A.D. Perple_X thermodynamic data file `hp02ver.dat`, solution model `Scap` (2013), after an unpublished THERMOCALC scapolite model by B. Kuhn (source of the `scp`/`scp_K04` model).
+
 - Warr, L.N. (2021). IMA-CNMNC approved mineral symbols. Mineralogical Magazine, 85, 291-320. [doi: 10.1180/mgm.2021.43](https://doi.org/10.1180/mgm.2021.43)
 
 ---
@@ -294,7 +296,7 @@ Complete list of solution phases, end-members and pure phases for each supported
 | `sp` | Spl | sp_W02 | 4 | herc · sp · mt · usp |
 | `mt` | Mag | mt_W00 | 3 | imt · dmt · usp |
 | `ilm` | Ilm | ilm_W00 | 3 | oilm · dilm · dhem |
-| `ilmm` | Ilm | ilmm_W14 | 5 | oilm · dilm · dhem · geik · pnt |
+| `ilmm` | Ilm | ilmmn_W14 | 5 | oilm · dilm · dhem · geik · pnt |
 
 **Pure phases:** q · crst · trd · coe · stv · ky · sill · and · ru · sph · O2 · H2O · zo · cor
 
@@ -514,7 +516,7 @@ Extends `mp` with phases from Green et al. (2016), Evans & Frost (2021), and Die
 | `sp` | Spl | sp_W02 | 4 | herc · sp · mt · usp |
 | `mt` | Mag | mt_W00 | 3 | imt · dmt · usp |
 | `ilm` | Ilm | ilm_W00 | 3 | oilm · dilm · dhem |
-| `ilmm` | Ilm | ilmm_W14 | 5 | oilm · dilm · dhem · geik · pnt |
+| `ilmm` | Ilm | ilmmn_W14 | 5 | oilm · dilm · dhem · geik · pnt |
 | `occm` | occm | occm_F11 | 5 | cc · odo · mag · sid · oank |
 | `fl` | fl | fl_H03 | 2 | H2O · CO2 |
 | `po` | Po | po_E10 | 2 | trov · trot |
@@ -524,11 +526,26 @@ Extends `mp` with phases from Green et al. (2016), Evans & Frost (2021), and Die
 | `oamp` | oamp | oamp_D07 | 9 | anth · ged · ompa · omgl · otr · fanth · omrb · amoa · amob |
 | `carp` | Cph | carp_W14 | 2 | mcar · fcar |
 | `plc` | Pl | plc_B05 | 3 | ab · an · san |
+| `scp` | Scp | scp_K04 | 3 | me · coma · mizz |
 | `DEW` | DEW | DEW_S24 | 102 | *102 aqueous species — see the DEW section below* |
 
 **Pure phases:** q · crst · trd · coe · stv · ky · sill · and · ru · sph · O2 · pyr · gph · law · zo · prl · mpm · pre · cor · H2O
 
 **Buffers:** qfm · mw · qif · nno · hm · iw · cco &nbsp;&nbsp; **Activities:** aH2O · aO2 · aMgO · aFeO · aAl2O3 · aTiO2
+
+**Scapolite (`scp`, `scp_K04`).**
+- **Model:** Na–Ca carbonate scapolite in the system Na₂O–CaO–Al₂O₃–SiO₂–CO₂.
+  - End-members: meionite (`me`), a Na-carbonate end-member (`coma` = 3 ab + cc + 25 kJ), and the ordered intermediate `mizz` (= ⅔ me + ⅓ coma − 29 kJ).
+  - Symmetric interaction energies: W(me–coma) = 20, W(me–mizz) = 20, W(coma–mizz) = 30 kJ.
+  - Variables: the Na fraction on the M site and the Al–Si order parameter Q (0 ≤ Q ≤ 1).
+  - The disordering is first order (Q drops from ≈ 0.7 to 0 over ~50 °C at about 1000 °C and 10 kbar).
+- **Source:** transcribed from the Perple_X solution model `Scap` (`hp02ver.dat`, 2013), itself based on an unpublished THERMOCALC model by B. Kuhn.
+- **Active only** when CaO, CO₂, Al₂O₃ and SiO₂ are present; without Na₂O it reduces to pure meionite.
+
+!!! warning
+    `scp` has no Cl end-member (no marialite). Its two energy offsets were tuned against older (HP02-era) end-member data, whereas `mpe` uses ds62 (and `all` ds636). The stability field of scapolite is therefore shifted, and the model should be recalibrated before quantitative use.
+
+**Ilmenite (`ilmm`, `ilmmn_W14`).** The W14 ilmenite-hematite with the Mn end-member pyrophanite (`pnt`) is labelled `ilmmn_W14`. Its short name in `mp`/`mpe` remains `ilmm`, so `remove_phases(["ilmm"], "mpe")` is unchanged; only the model name reported in the outputs differs.
 
 == HP/LT Metapelite (po)
 
@@ -697,10 +714,14 @@ Stixrude & Lithgow-Bertelloni (2024). Expanded solid solutions throughout; new i
 | `occm_F11` | occm | occm_F11 | 5 | cc · odo · mag · sid · oank |
 | `carp_W14` | Cph | carp_W14 | 2 | mcar · fcar |
 | `plc_B05` | Pl | plc_B05 | 3 | ab · an · san |
+| `ilmmn_W14` | Ilm | ilmmn_W14 | 5 | oilm · dilm · dhem · geik · pnt |
+| `scp_K04` | Scp | scp_K04 | 3 | me · coma · mizz |
 
 **Pure phases:** q · crst · trd · coe · stv · law · ky · sill · and · ru · sph · O2 · H2O · ab · zo · cor · pyr · hem · gph · ne · prl · mpm · pre
 
 **Buffers:** qfm · mw · qif · nno · hm · iw · cco &nbsp;&nbsp; **Activities:** aH2O · aO2 · aMgO · aFeO · aAl2O3 · aTiO2
+
+`all` contains both W14 ilmenite-hematite variants: `ilmm_W14` (4 end-members, from `mb`) and `ilmmn_W14` (with the Mn end-member `pnt`, from `mp`/`mpe`). With MnO = 0 they are equivalent.
 
 \* The two `fsp_H22` rows share the same internal citation tag despite differing endmember
 counts (a known, pre-existing data labelling quirk carried over from the source databases, not
