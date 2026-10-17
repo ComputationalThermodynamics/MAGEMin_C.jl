@@ -15,7 +15,9 @@
     <li>Pressure and/or Temperature versus variable composition diagrams (P-X, T-X, PT-X, T-T polymetamorphic phase diagrams)</li>
     <li>P-T-X 3D phase diagrams: isosurfaces of any field, composition surfaces coloured by a second quantity with contour lines, phase-in/out surfaces, and export as shareable interactive HTML, PLY/STL meshes or VTK grids (ParaView)</li>
     <li>Trace-element partitioning at suprasolidus conditions (including models of Zr saturation)</li>
-    <li>Display iso-contour of phase fractions, densities, seismic velocities etc.</li>
+    <li>Display iso-contour of phase fractions, densities, seismic velocities etc., with automatic ranges, non-overlapping labels and composition isopleths that stop at the phase boundary</li>
+    <li>Clean phase boundaries: reaction lines and field outlines smoothed from the adaptive grid, with filled phase fields for Variance and #Phases (on screen and in the SVG export)</li>
+    <li>Slab geotherm overlay on P-T diagrams and on P-T-X 3D diagrams, for one or several convergence velocities</li>
     <li>Automatic labeling of the phase fields including listing the stable phase assemblage when the field is too small.</li>
     <li>Pressure-Temperature-Composition paths e.g., fractional melting and crystallization (with assimilation and extraction threshold), including isentropic paths.</li>
     <li>Save generated diagrams/figures as vector files (svg format).</li>

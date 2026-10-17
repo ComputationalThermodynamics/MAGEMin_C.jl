@@ -2,7 +2,7 @@
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_tabs_PD.png?raw=true" alt="MAGEMinApp tabs" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
 ```
 
-## Phase diagrams tutorials (MAGEMinApp v1.7.3)
+## Phase diagrams tutorials (MAGEMinApp v1.7.4)
 
 Here we provide a set of tutorials to generate various kind of phase diagrams, compute trace-element partitioning and Zr saturation, post-process the results, display various fields, reaction lines and iso-contours, and, export data and save the diagrams as `svg` graphic vector files.
 
@@ -27,6 +27,7 @@ Here we provide a set of tutorials to generate various kind of phase diagrams, c
     - [17. Bulk-rock uncertainty (Monte Carlo and linear variation)](#17.-Bulk-rock-uncertainty-Monte-Carlo-and-linear-variation)
     - [18. P-T-X 3D diagram](#18.-P-T-X-3D-diagram)
     - [19. Reduced chemical systems (Nullspace optimizer)](#19.-Reduced-chemical-systems-Nullspace-optimizer)
+    - [20. Slab geotherms on a P-T diagram](#20.-Slab-geotherms-on-a-P-T-diagram)
 
 ### 1. First phase diagram 
 
@@ -188,6 +189,12 @@ which gives:
 
 Let's now add isocontour for the `Mg#` of the `liq`. Change `Field = mode` to `Field = Calculator apfu` which allow you to generate custom atom per formule unit isocontours. In the newly displayed option `Calculator (apfu)` keep the default value `Mg / (Mg + Fe)`. Then change the `Range` `Step`to 0.01 and the line style and color to your liking:
 
+!!! note
+    Composition isopleths (Mg#, calculator fields, end-member and oxide fractions) are only defined where the phase is stable. Where the phase is absent the isopleth therefore stops at the phase boundary instead of stacking up along it, and its range is computed from the stable points only. Value labels that would overlap are moved along their line or skipped; `White background` in the `Isopleths` panel puts a white box behind each label.
+
+
+
+
 ```@raw html
 
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_apfu_setup.png?raw=true" alt="MAGEMinApp isopleth setup" style="max-width: 30%; height: auto; display: block; margin: 0 auto;">
@@ -254,13 +261,21 @@ However, this option merges all the layers together, making it difficult to post
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_export_all.png?raw=true" alt="MAGEMinApp exported svg" style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
 ```
 
+With **Clean boundaries** on (default; switch in the `Export figure` panel), the reaction lines and the field outlines are smoothed from the grid steps. The `Smoothing (cells)` slider (0 to 5, default 2.5) sets the strength. For `Variance` and `#Phases` the fields are also written as filled vector polygons, so the layers match the figure on screen. Compare the two exports below (smoothing off, then on):
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_clean_boundaries_off.png?raw=true" alt="MAGEMinApp clean boundaries off" style="max-width: 45%; height: auto;"> <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_clean_boundaries_on.png?raw=true" alt="MAGEMinApp clean boundaries on" style="max-width: 45%; height: auto;">
+</div>
+
 Each element of the figure is a separate, named layer when the file is opened in `Illustrator` or `Inkscape`, in paint order:
 
-- `Field`: the colored field (an embedded image covering the plot area, with the colormap, range and smoothing used on screen);
+- `Field`: the colored field (an embedded image covering the plot area, with the colormap, range and smoothing used on screen; hidden when `Field_polygons` is present);
+- `Field_polygons`: the smoothed fills of each phase field, when `Clean boundaries` is on and the field is `Variance` or `#Phases`;
 - `Mesh`: the adaptive refinement grid, when `Show grid = true`;
 - `Reaction_lines`: one path per phase, with the style set in the reaction-line options;
 - `Isopleth_<name>` and `Isopleth_labels_<name>`: one layer per displayed isopleth and its value labels;
 - `Labels`: the field labels and leader lines;
+- `Subduction_geotherms`: the slab geotherms, when displayed (P-T diagrams only);
 - `Layout`, `Colorbar` and `Isopleth_legend`: frame, ticks, axis titles, title, colorbar and isopleth legend;
 - `Info` and `Assemblage_list`: the computation information and the numbered assemblage list shown below the diagram.
 
@@ -397,6 +412,7 @@ Let's predict trace-element partitioning together with a new phase diagram using
 - Thermodynamic database -> Metapelite
 - Diagram type -> P-T diagram
 - TE predictive model -> true (`Trace elements` sub-tab of the `Phase diagram parameters` panel)
+- Zr saturation -> `Crisp and Berry (2022)` (same sub-tab; with `none`, the zircon saturation fields are zero)
 - Pressure -> 0.01 to 10.0 kbar
 - Temperature -> 300.0 to 1000.0 °C
 - Initial grid subdivision -> 4
@@ -417,7 +433,7 @@ Which after performing the calculation should result in:
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_TE_diagram_raw.png?raw=true" alt="MAGEMinApp TE diagram raw" style="max-width: 90%; height: auto; display: block; margin: 0 auto;">
 ```
 
-Now move to the `Trace-elements` sub-tab, and to load the trace-element prediction, click on the button `Load/Reload trace-elements`. Doing so will display the default field `Sat_Zr_liq`, which is the computation saturation level of liquid for zirconium in `ug/g`. To change the displayed field navigate to the `Display options` panel on the right side and choose `Field type = Trace element` ansd click `Compute and display`.
+Now move to the `Trace-elements` sub-tab, and to load the trace-element prediction, click on the button `Load/Reload trace-elements`. Doing so will display the default field `Sat_Zr_liq`, which is the zircon saturation level of the liquid computed with the `Zr saturation` model selected above (here `Crisp and Berry (2022)`), in `ug/g`. To change the displayed field navigate to the `Display options` panel on the right side and choose `Field type = Trace element` ansd click `Compute and display`.
 
 ```@raw html
 
@@ -432,7 +448,7 @@ which will display (using default options) the ratio $Dy_melt / Yb_melt$:
 <img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_TE_DyYb.png?raw=true" alt="MAGEMinApp TE DyYb" style="max-width: 50%; height: auto; display: block; margin: 0 auto;">
 ```
 
-To make the melt-free transparent in colormap, you can change in the `Color options` section of the `Display options` panel `Set min to white = true` which yields:
+To make the melt-free points transparent, set `Set min to white = true` in the `Color options` section of the `Display options` panel. Only the minimum of the colour range is then white; the rest of the colormap is unchanged. The colour range starts at the lowest melt-bearing value, so the melt-free points do not pull it down to 0. This yields:
 
 
 ```@raw html
@@ -1101,6 +1117,10 @@ The `Export` tab saves the current diagram in the output directory:
     - 3D diagrams use a regular grid without adaptive refinement.
     - The computed 3D diagram and the 3D grid resolution are not included in saved states (`Save state`); use the exports above to keep the results.
 
+#### Step 6 - Isocontour lines and slab geotherms (optional)
+
+In the `P-T-X lines` tab, choose what the lines are drawn on (`Coloured surface`, `Field isosurfaces`, `Phase-in/out surfaces`), the rendering (`tubes (visible from both sides)` or `flat lines`) and the levels of pressure, temperature or composition, given as a range (min / max / step) or as comma-separated values. The `Slab geotherms` tab adds, for the chosen convergence velocities, the path followed by a point of the downgoing slab. In 3D a geotherm does not depend on X, so it is drawn as a translucent wall spanning X (default) or as curves at the X values you enter. See [3.7](interface.md#3.7.-Export-figure-and-Slab-geotherms-panels) and [4.8](interface.md#4.8.-P-T-X-lines-panel) of the interface description.
+
 ### 19. Reduced chemical systems (Nullspace optimizer)
 
 Available from MAGEMinApp v1.7.3.
@@ -1125,3 +1145,38 @@ To compute a CMAS diagram with the `Igneous` database, keep `Solver = Legacy` an
     - `O` stands for ferric iron. If `FeO` is 0, `O` is set to 0 as well, since no phase could host it.
     - The reduced system must still contain at least one phase able to host the remaining oxides.
     - On ordinary bulk-rock compositions, both optimizers give the same diagrams, apart from rare differences in the last digits of the Gibbs energy. Details are given in [MAGEMin_C.jl: options](../MAGEMin_C/options.md#Reduced-chemical-systems).
+
+### 20. Slab geotherms on a P-T diagram
+
+The slab geotherm overlay draws the pressure-temperature path followed by a point of the downgoing slab, for one or several convergence velocities. It is a P-T diagram feature (the 2D version is only drawn for `Diagram type = P-T diagram`); in 3D it is described in [18. P-T-X 3D diagram](#18.-P-T-X-3D-diagram).
+
+#### Step 1 - Choose a window that contains the geotherms
+
+The geotherm is drawn only where its temperature lies inside the diagram window. A slab geotherm is cool near the surface and reaches the mantle temperature only at depth, so the default KLB-1 window (800 to 1400 °C, up to 20 kbar) contains no geotherm point. Use a colder window:
+
+- `Temperature [°C]` from `400` to `1200`;
+- `Pressure [kbar]` from `0.01` to `30`.
+
+Keep the `KLB1 Peridotite - Anhydrous` composition and click `Compute phase diagram`.
+
+#### Step 2 - Enable the geotherms
+
+In the sidebar of the `Diagram` sub-tab, open the `Slab geotherms` tab and set:
+
+- `Show geotherms = true`;
+- `Velocities [cm/yr] = 1, 2, 5, 10` (default);
+- `Slab dip [°] = 30` (default) and `Depth into slab [km] = 0` (the slab top).
+
+Each velocity gives one curve, labelled with its value. The `Advanced` card holds the surface and mantle temperatures, the thickness of the upper plate and of the slab, the thermal diffusivity and the density; the model is described in the [General information](interface.md#8.-General-information-tab) tab, card *Slab geotherms*.
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_slab_geotherms_diagram.png?raw=true" alt="MAGEMinApp slab geotherms diagram" style="max-width: 50%; height: auto;">
+</div>
+
+#### Step 3 - Export
+
+The geotherms are included in the `Export svg` of the figure (layer `Subduction_geotherms`, see [4. Export figures](#4.-Export-figures)).
+
+!!! note
+    - The curves are only drawn where the temperature lies between the temperature limits of the window: a narrower window clips them.
+    - The model is purely conductive with constant thermal diffusivity (no shear heating, no mantle-wedge corner flow, no radiogenic or latent heat).

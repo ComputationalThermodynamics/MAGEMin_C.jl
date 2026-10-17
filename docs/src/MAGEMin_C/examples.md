@@ -266,6 +266,22 @@ The output structure can also be saved as `inlined` i.e., that every line of the
 MAGEMin_data2dataframe_inlined(out,dtb,"filename")
 ```
 
+The columns use the following units (system row: per mol of bulk oxides; phase rows: per mol of oxides of the phase, so that `mode[mol%]`-weighted phase values of volume, entropy and enthalpy, and `mode[wt%]`-weighted phase heat capacities, sum to the system value):
+
+| Column | Unit | Description |
+|---|---|---|
+| `mode[mol%]`, `mode[wt%]`, `mode[vol%]` | % | phase proportion on oxide-mole, weight and volume basis |
+| `density[kg/m3]` | kg/m³ | density |
+| `volume[cm3/mol]` | cm³/mol | molar volume (system: `out.V`; phase: `V`) |
+| `heatCapacity[J/kg/K]` | J/kg/K | specific isobaric heat capacity (system: `out.s_cp`; phase: `cp*1e9/(rho*V)`) |
+| `alpha[1/K]` | 1/K | isobaric thermal expansivity |
+| `Entropy[kJ/K/mol]` | kJ/K/mol | entropy |
+| `Enthalpy[kJ/mol]` | kJ/mol | enthalpy |
+| `BulkMod[GPa]`, `ShearMod[GPa]` | GPa | adiabatic bulk modulus, shear modulus |
+| `Vp[km/s]`, `Vs[km/s]` | km/s | seismic velocities |
+
+The inlined file uses the same units, with `sys_` and `<phase>_` column prefixes.
+
 !!! note
     * You don't have to add the file extension `.csv`
     * The output path (MAGEMin_C directory) is displayed in the Julia terminal
