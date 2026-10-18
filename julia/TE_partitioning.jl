@@ -1207,8 +1207,8 @@ end
     the saturation phase (zircon, sulfide, apatite, monazite) or to a CO₂ fluid. Saturation phases are stoichiometric for
     their own element(s) and use their KDs (when present in `KDs_database`) for every other element. Monazite and apatite
     share the P₂O₅ budget (monazite first, apatite takes what is left). The saturation phase masses and the monazite LREE
-    fraction are iterated to a fixed point. Without melt, the KDs still set the relative distribution between minerals and
-    every saturation-controlled element is fully stored in its saturation phase.
+    fraction are iterated to a fixed point. Without melt the KDs (defined relative to the melt) are not evaluated: trace
+    elements are assigned to the bulk solid and every saturation-controlled element is fully stored in its saturation phase.
 
     The result always satisfies `liq_wt_norm*Cliq + sol_wt_norm*Csol + fl_wt_norm*Cfl == C0` and
     `liq_wt_norm*Cliq + Σ ph_wt_norm .* Cmin == C0` (when Cmin is a matrix).
@@ -1292,7 +1292,7 @@ function TE_prediction( out, C0, KDs_database, dtb;
     # phases with KDs (melt excluded), their system weight fractions and KD rows
     ph, ph_wt   = mineral_classification(out, dtb)
     kd_row(p)   = (i = findfirst(==(p), KDs_database.phase_name);
-                   isnothing(i) ? nothing : Float64[Base.invokelatest(KDs_database.KDs_expr[i, j], out) for j in 1:n_el])
+                   (isnothing(i) || !melt) ? nothing : Float64[Base.invokelatest(KDs_database.KDs_expr[i, j], out) for j in 1:n_el])
     part_ph     = String[]
     part_x      = Float64[]
     part_kd     = Vector{Vector{Float64}}()

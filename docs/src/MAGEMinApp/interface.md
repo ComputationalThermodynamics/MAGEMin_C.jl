@@ -42,7 +42,7 @@
     - [7. PTX path tab](#7.-PTX-path-tab)
         - [7.1 Configuration panel](#7.1.-Configuration-panel)
         - [7.2 Bulk-rock composition panel](#7.2.-Bulk-rock-composition-panel)
-        - [7.3 Trace Elements panel](#7.3.-Trace-Elements-panel)
+        - [7.3 Trace-element composition panel](#7.3.-Trace-element-composition-panel)
         - [7.4 Path definition panel](#7.4.-Path-definition-panel)
         - [7.5 Path options panel](#7.5.-Path-options-panel)
         - [7.6 PTX save and export](#7.6.-PTX-save-and-export)
@@ -965,6 +965,8 @@ The PTX path tab is divided into a left configuration panel and a central result
 
 ### 7.1. Configuration panel
 
+The Configuration panel is organised in four sub-tabs, in the same order as the phase diagram Setup panel: `General`, `Trace elements`, `Seismic properties` and `Solver`.
+
 ```@raw html
 
 <table>
@@ -974,17 +976,35 @@ The PTX path tab is divided into a left configuration panel and a central result
       <th>Caption</th>
     </tr>
     <tr>
-      <td></td>
+      <td><b>General</b></td>
       <td>
         <ul>
             <li><b>Thermodynamic database / Dataset / Preset / Phase selection</b> - same options as the phase diagram <a href="#2.1.-Setup-panel">Setup panel</a></li>
             <li><b>Clinopyroxene / Limit Ca-opx</b> - same as the phase diagram Setup panel</li>
             <li><b>Buffer</b> - same oxygen fugacity buffer / fixed oxide activity list as the phase diagram Setup panel</li>
-            <li><b>Variable buffer</b> - allow the buffer offset to vary per path point via a <code>Buffer</code> column in the <a href="#6.4.-Path-definition-panel">Path definition table</a> (true/false)</li>
-            <li><b>Solver</b> - pge (projected gradient), lp (Legacy), or hyb (Hybrid); default Legacy</li>
-            <li><b>Optimizer</b> - NLopt or Nullspace (default); shown only with <b>Solver</b> = Legacy on databases that support it, same as the phase diagram Setup panel</li>
-            <li><b>Specific Cp</b> - 0: G0 (no latent heat), 1: G_system (with latent heat); selecting G_system forces <b>Solver</b> to Legacy</li>
-            <li><b>Verbose</b> - none, light, or full Julia terminal output</li>
+            <li><b>Variable buffer</b> - allow the buffer offset to vary per path point via a <code>Buffer</code> column in the <a href="#7.4.-Path-definition-panel">Path definition table</a> (true/false)</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><b>Trace elements</b></td>
+      <td>
+        <ul>
+            <li><b>TE predictive model</b> - enable trace-element partitioning along the path (true/false). When true, the options below and the <a href="#7.3.-Trace-element-composition-panel">Trace-element composition panel</a> are shown</li>
+            <li><b>Kd's database</b> - OL (O. Laurent, 2012), CO (J. Cornet, 2019) or Yak25 (Yakymchuk et al., 2025)</li>
+            <li><b>Zr saturation</b> - none, Watson &amp; Harrison (1983), Boehnke et al. (2013) or Crisp and Berry (2022)</li>
+            <li><b>S saturation</b> - none, Liu et al. (2007) or O'Neill (2021)</li>
+            <li><b>P₂O₅ saturation</b> - none, Klein et al. (2026), Tollari et al. (2006) or Bea et al. (1992, after HW84)</li>
+            <li><b>CO₂ saturation</b> - none or Sun &amp; Yao (2026)</li>
+            <li><b>Monazite saturation</b> - none, Stepanov et al. (2012), Montel (1993) or Maimaiti et al. (2019)</li>
+            <li>All saturation models default to <code>none</code>. Saturation phases stay with the solid (residue in fractional melting, cumulate in fractional crystallization) and exsolved CO₂ leaves with the fluid, so trace elements are mass balanced along the path</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><b>Seismic properties</b></td>
+      <td>
+        <ul>
             <li><b>Seismic averaging scheme</b> - VRH (Voigt-Reuss-Hill) or HS (Hashin-Shtrikman)</li>
             <li><b>Weight factor</b> - mixing weight between Voigt and Reuss bounds (0–1; default 0.5)</li>
             <li><b>Seismic correction</b> - apply melt-content velocity correction (Clark et al., 2017 after Takei, 1997) (true/false)</li>
@@ -993,6 +1013,17 @@ The PTX path tab is divided into a left configuration panel and a central result
             <li><b>Anelastic model</b> - Dry mantle, Damp mantle, or Wet mantle (saturated) attenuation strength (visible when Anelastic correction = true)</li>
             <li><b>Shallow correction</b> - fixed-aspect-ratio (0.25), depth-dependent porosity correction for shallow conditions (true/false; visible when Seismic correction = true)</li>
             <li><b>Fluid as melt</b> - treat any free fluid phase as melt for the seismic corrections (true/false; visible when Seismic correction = true)</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><b>Solver</b></td>
+      <td>
+        <ul>
+            <li><b>Solver</b> - pge (projected gradient), lp (Legacy), or hyb (Hybrid); default Legacy</li>
+            <li><b>Optimizer</b> - NLopt or Nullspace (default); shown only with <b>Solver</b> = Legacy on databases that support it, same as the phase diagram Setup panel</li>
+            <li><b>Specific Cp</b> - 0: G0 (no latent heat), 1: G_system (with latent heat); selecting G_system forces <b>Solver</b> to Legacy</li>
+            <li><b>Verbose</b> - none, light, or full Julia terminal output</li>
         </ul>
       </td>
     </tr>
@@ -1006,29 +1037,24 @@ The PTX path tab is divided into a left configuration panel and a central result
 
 Same controls as the phase diagram bulk-rock panel (§2.2). When `Assimilation = true`, a second bulk-rock composition panel appears for the assimilated end-member.
 
-### 7.3. Trace Elements panel
+### 7.3. Trace-element composition panel
 
-Appears when `TE predictive model = true` in Path options.
+Appears when `TE predictive model = true` (Configuration › Trace elements).
 
 ```@raw html
 
 <table>
   <tbody>
     <tr>
-      <th>Trace Elements (PTX)</th>
+      <th>Trace-element composition (PTX)</th>
       <th>Caption</th>
     </tr>
     <tr>
       <td></td>
       <td>
         <ul>
-            <li><b>KD model</b> - lattice-strain Kd database: OL (O. Laurent, 2012) or CO (J. Cornet, 2019)</li>
-            <li><b>Zr saturation</b> - none, Watson 1979 (WH), or Blundy 2022 (CB)</li>
-            <li><b>S saturation</b> - none or Liu 2021 (Liu07)</li>
-            <li><b>P₂O₅ saturation</b> - none or Tollari 2006</li>
-            <li><b>CO₂ saturation</b> - none or SY26 (Sun &amp; Yao, 2026)</li>
             <li><b>Upload trace-element file</b> - drag-and-drop a CSV file with element concentrations</li>
-            <li><b>Initial TE bulk composition [μg/g]</b> - editable table with element concentrations; pre-populate from built-in database dropdown</li>
+            <li><b>Initial TE bulk composition [μg/g]</b> - editable table with element concentrations; pre-populate from the built-in database dropdown</li>
             <li><b>Assimilant TE bulk composition [μg/g]</b> - second TE table for the assimilated end-member (visible when Assimilation = true)</li>
         </ul>
       </td>
@@ -1083,9 +1109,8 @@ Appears when `TE predictive model = true` in Path options.
       <td>
         <ul>
             <li><b>Resolution</b> - number of calculation steps between two consecutive path points (1–1024; default 32)</li>
-            <li><b>P-T-X mode</b> - Equilibrium, Fractional melting, or Fractional crystallization</li>
+            <li><b>P-T-X mode</b> - Equilibrium, Fractional melting, or Fractional crystallization. In both fractional modes, any free fluid present at an extraction step is removed together with the extracted material (melt or cumulate) and counted in <code>removed %</code></li>
             <li><b>Assimilation</b> - enable progressive addition of a second bulk-rock composition (true/false)</li>
-            <li><b>TE predictive model</b> - enable trace-element partitioning along the path (true/false)</li>
             <li><b>Cumulate/Connectivity unit</b> - basis (mol, wt, or vol) used for the assimilation blend and the melt/solid extraction mass balance; only shown in fractional melting/crystallization mode</li>
             <li><b>Connectivity threshold [mol%]</b> - melt fraction above which melt is extracted during fractional melting (0–100; default 7); only visible in fractional melting mode</li>
             <li><b>Residual Threshold [mol%]</b> - melt fraction left in the rock after an extraction event (0 to the connectivity threshold; default 7, i.e. melt is brought back to the connectivity threshold). A lower value drains the melt further each time the connectivity threshold is exceeded; the value is clamped to the connectivity threshold. Only visible in fractional melting mode</li>
