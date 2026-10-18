@@ -6,7 +6,7 @@
 
 Here we provide a set of tutorials to generate various kind of pressure-temperature-composition paths: including batch melting, fractional melting, fractional crystallization, assimilation, variable oxygen buffer and isentropic paths. All of them are set up from the same `PTX path` tab and can be combined (e.g., isentropic fractional crystallization with assimilation, see [E.8](#E.8.-Isentropic-fractional-crystallization-with-assimilation))
 
-The default solver of the `PTX path` tab is the `Legacy` solver and the default local minimizer is `Nullspace` (see the `Solver` sub-tab of the `General setup` tab).
+The default solver of the `PTX path` tab is the `Legacy` solver and the default local minimizer is `Nullspace` (see the `Solver` sub-tab of the PTX `Configuration` panel). The `Configuration` panel (left sidebar) is organised in four sub-tabs: `General` (database, dataset, preset, phase selection, clinopyroxene, buffer), `Trace elements` (TE predictive model, Kd database and saturation models), `Seismic properties` and `Solver`.
 
 ### E.1. Quick start - first P-T-X path
 
@@ -105,6 +105,7 @@ In the `Path options` panel, choose a resolution of 32, and select `P-T-X mode =
     - The residual threshold is the melt fraction left in the rock after an extraction event. It cannot exceed the connectivity threshold (it is clamped to it). With both set to 7, only the melt above 7 mol% is extracted, so the melt fraction is brought back to the connectivity threshold. Lowering the residual threshold (e.g., to 2) drains the melt further each time the connectivity threshold is exceeded, mimicking extraction events that leave less melt in the source.
     - `Cumulate/Connectivity unit` (`mol`, `wt` or `vol`) is the basis on which both thresholds, the extraction and the assimilation blend are expressed.
     - When computing a fractional melting path using a connectivity threshold, the displayed fraction of melt can be slightly above the threshold as the removed fraction of melt is only applied to the subsequent calculation step. This effect can however be minimized by increasing the resolution.
+    - Any free fluid (e.g., `H2O`) present when melt is extracted leaves together with the melt and is counted in `removed %`. With a water-saturated starting rock this shows as a step in `removed %` at the first extraction (here at the solidus).
 
 
 Process with the P-T-X path calculation, which should yield:
@@ -192,7 +193,7 @@ and the following TAS diagram:
 
 ### E.5. Variable buffer
 
-To simulate a change in oxydation/reduction state of the system you can also provide variable buffer offsets. Let's start from previous assimilation example 4, and select `Buffer = QFM` and `Variable buffer = true` in the `Configuration` panel.
+To simulate a change in oxydation/reduction state of the system you can also provide variable buffer offsets. Let's start from previous assimilation example 4, and select `Buffer = QFM` and `Variable buffer = true` in the `General` sub-tab of the `Configuration` panel.
 
 ```@raw html
 
@@ -327,25 +328,26 @@ To modify a color, click the corresponding cell in the Change column, then chang
 
 ## Trace-element partitioning
 
-Trace-element (TE) partitioning can be computed simultaneously with any P-T-X path (batch melting, fractional melting, fractional crystallization, isentropic). The module uses lattice-strain parameterized Kd databases and optionally applies mineral or volatile saturation models (Zr, S, P₂O₅, CO₂).
+Trace-element (TE) partitioning can be computed simultaneously with any P-T-X path (batch melting, fractional melting, fractional crystallization, isentropic). The module uses lattice-strain parameterized Kd databases and optionally applies mineral or volatile saturation models (Zr, S, P₂O₅, CO₂, monazite). Trace elements are mass balanced along the path: saturation phases (zircon, sulfide, apatite, monazite) stay with the solid (residue in fractional melting, cumulate in fractional crystallization), exsolved CO₂ leaves with the fluid, and assimilation adds trace elements with the same mass fraction as the major elements.
 
 ### E.9. Trace-element partitioning setup
 
 #### Step 1 - Activate the TE predictive model
 
-In the `Path options` panel, set `TE predictive model = true`. This reveals the `Trace Elements` panel in the left sidebar.
+In the `Configuration` panel, open the `Trace elements` sub-tab and set `TE predictive model = true`. This reveals the Kd database and saturation-model options below it, and the `Trace-element composition` panel in the left sidebar.
 
 #### Step 2 - Configure KD model and saturation options
 
-In the `Trace Elements` panel, the following options are available:
+In the `Trace elements` sub-tab, the following options are available (all saturation models default to `none`):
 
 | Option | Description | Available values |
 |---|---|---|
-| **KD model** | Lattice-strain Kd database | `OL` - O. Laurent (2012) ; `CO` - J. Cornet (2019) |
-| **Zr saturation** | Zircon saturation model | `none` ; `Watson 1979` (WH) ; `Blundy 2022` (CB) |
-| **S saturation** | Sulfide saturation model | `none` ; `Liu 2021` (Liu07) |
-| **P₂O₅ saturation** | Fluorapatite saturation model | `none` ; `Tollari 2006` |
-| **CO₂ saturation** | CO₂ fluid saturation model | `none` ; `SY26` - Sun & Yao (2026) |
+| **Kd's database** | Lattice-strain Kd database | `OL` - O. Laurent (2012) ; `CO` - J. Cornet (2019) ; `Yak25` - Yakymchuk et al. (2025) |
+| **Zr saturation** | Zircon saturation model | `none` ; Watson & Harrison (1983) ; Boehnke et al. (2013) ; Crisp and Berry (2022) |
+| **S saturation** | Sulfide saturation model | `none` ; Liu et al. (2007) ; O'Neill (2021) |
+| **P₂O₅ saturation** | Fluorapatite saturation model | `none` ; Klein et al. (2026) ; Tollari et al. (2006) ; Bea et al. (1992, after HW84) |
+| **CO₂ saturation** | CO₂ fluid saturation model | `none` ; Sun & Yao (2026) |
+| **Monazite saturation** | Monazite (ΣLREE) saturation model | `none` ; Stepanov et al. (2012) ; Montel (1993) ; Maimaiti et al. (2019) |
 
 !!! note
     - Saturation models only activate when the corresponding element is present in the TE bulk composition.
@@ -353,8 +355,9 @@ In the `Trace Elements` panel, the following options are available:
 
 #### Step 3 - Load the trace-element bulk composition
 
-Two options are available:
-- **Built-in database**: use the dropdown below the saturation options to select a predefined TE composition; the `Initial TE bulk composition [μg/g]` table updates automatically.
+The trace-element bulk composition is set in the `Trace-element composition` panel of the left sidebar. Two options are available:
+
+- **Built-in database**: use the dropdown above the `Initial TE bulk composition [μg/g]` table to select a predefined TE composition; the table updates automatically.
 - **Custom file**: drag and drop a CSV file onto the upload area. The file must contain `element` and `μg/g` columns.
 
 Values in the table are editable directly in the interface.

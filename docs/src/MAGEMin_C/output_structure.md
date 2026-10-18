@@ -165,8 +165,8 @@ The main structure stores the properties of the system.
 ├─ database :: String           # [-]       Acronym of the thermodynamic database
 ├─ buffer :: String             # [-]       Used oxygen/activity buffer
 ├─ buffer_n :: Float64          # [RTlog]   oxygen fugacity offset
-├─ G_system :: Float64          # [kJ]      Gibbs energy of the system    
-├─ Gamma :: Vector{Float64}     # [kJ]      Chemical potential of system components (oxides e.g, SiO2, Al2O3 etc.)
+├─ G_system :: Float64          # [kJ/mol]  Gibbs energy of the system (per mol of bulk oxides)
+├─ Gamma :: Vector{Float64}     # [kJ/mol]  Chemical potential of system components (oxides e.g, SiO2, Al2O3 etc.)
 ├─ P_kbar :: Float64            # [kbar]    pressure
 ├─ T_C :: Float64               # [°C]      temperature
 ├─ X :: Vector{Float64}         # 0 -> 1    x coordinate used when computing T-X, P-X or PT-X diagrams
@@ -188,10 +188,11 @@ The main structure stores the properties of the system.
 ├─ frac_M_vol :: Float64        # [vol_i]   melt volume fraction
 ├─ frac_S_vol :: Float64        # [vol_i]   solid volume fraction
 ├─ frac_F_vol :: Float64        # [vol_i]   fluid volume fraction
-├─ alpha :: Vector{Float64}     # [1/K]     thermal expansivity
-├─ V :: Float64                 # [cm^3/mol]system volume
-├─ V_cm3 :: Float64             # [cm^3]system volume (for 1 kg)
-├─ s_cp :: Vector{Float64}      # [kJ/K/kg] specific heat capacity
+├─ alpha :: Vector{Float64}     # [1/K]     isobaric thermal expansivity of the system
+├─ beta :: Float64              # [1/GPa]   isothermal compressibility of the system
+├─ V :: Float64                 # [cm^3/mol] system volume (per mol of bulk oxides); dG/dP in kJ/kbar = V/10
+├─ V_cm3 :: Float64             # [cm^3/kg] specific volume of the system (1/rho)
+├─ s_cp :: Vector{Float64}      # [J/K/kg]  specific isobaric heat capacity
 ├─ rho :: Float64               # [kg/m^3]  system density
 ├─ rho_M :: Float64             # [kg/m^3]  melt density
 ├─ rho_S :: Float64             # [kg/m^3]  solid density
@@ -232,21 +233,27 @@ The main structure stores the properties of the system.
 ├─ Vs_S :: Float64              # [km/s]    S-wave solid velocity
 ├─ Vp_cor :: Float64            # [km/s]    corrected P-wave solid velocity (shalow porosity, anelasticity and melt/fluid connectivity)
 ├─ Vs_cor :: Float64            # [km/s]    corrected S-wave solid velocity (shalow porosity, anelasticity and melt/fluid connectivity)
-├─ bulkMod :: Float64           # [GPa]     system bulk modulus
+├─ bulkMod :: Float64           # [GPa]     system adiabatic bulk modulus
 ├─ shearMod :: Float64          # [GPa]     system shear modulus
 ├─ bulkModulus_M :: Float64     # [GPa]     melt bulk modulus
 ├─ bulkModulus_S :: Float64     # [GPa]     solid bulk modulus
 ├─ shearModulus_S :: Float64    # [GPa]     solid shear modulus
-├─ entropy :: Float64           # [kJ/K]    system entropy
-├─ entropy_F :: Float64         # [kJ/K]    fluid entropy
-├─ entropy_M :: Float64         # [kJ/K]    melt entropy
-├─ entropy_S :: Float64         # [kJ/K]    solid entropy
-├─ enthalpy :: Float64          # [kJ/mol]  system enthalpy
+├─ entropy :: Vector{Float64}   # [kJ/K/mol] system entropy (per mol of bulk oxides)
+├─ entropy_F :: Float64         # [kJ/K/mol] fluid entropy (per mol of bulk oxides)
+├─ entropy_M :: Float64         # [kJ/K/mol] melt entropy (per mol of bulk oxides)
+├─ entropy_S :: Float64         # [kJ/K/mol] solid entropy (per mol of bulk oxides)
+├─ enthalpy :: Vector{Float64}  # [kJ/mol]  system enthalpy (per mol of bulk oxides)
 ├─ iter :: Int64                # [-]       number of iterations to reach convergence
 ├─ bulk_res_norm :: Float64     # [-]       bulk rock composition residual
 ├─ time_ms :: Float64           # [ms]      solution time
 ├─ status :: Int64              # [-]       status of the minimization (Success,Relaxed1,Relaxed2,Failure)
 ```
+
+!!! note "Units and normalisation"
+    * Extensive system properties (`G_system`, `entropy`, `enthalpy`, `V`, `entropy_M/S/F`) are given per mol of bulk oxides, the bulk-rock composition being normalised to 1 mol. They are the exact derivatives of the system Gibbs energy: `V/10` = ∂G/∂P [kJ/kbar] and `entropy` = −∂G/∂T [kJ/K].
+    * Extensive phase properties (`G`, `entropy`, `enthalpy`, `cp`, `V` in `SS_vec` and `PP_vec`) are given per mol of oxides of the phase, so that the system value is the `ph_frac`-weighted sum of the phase values (e.g. `out.V ≈ sum(out.ph_frac .* V_phase)`). `V_fu` gives the phase volume per mol of formula unit.
+    * Phase `alpha`, `beta`, `cp` and `bulkMod` are computed at fixed phase composition from the full Gibbs energy of the phase, including excess (mixing) terms. `bulkMod` is the adiabatic bulk modulus, `K_S = K_T·Cp/Cv` with `K_T = 1/beta`. System `alpha` and `beta` are the volume-weighted means of the phase values.
+    * System `s_cp` and `alpha` are by default computed at fixed phase compositions and amounts; with `scp = 1` they are computed from finite differences of full equilibria and include the latent heat of reactions.
 
 ### SS_vec
 
@@ -255,18 +262,24 @@ This sub-structure stores the properties of the stable solution phases.
 ```julia
 ├─ SS_vec :: Vector{MAGEMin_C.LibMAGEMin.SS_data}
     ├─ f :: Float64             # [-]       normalization factor to convert from mole to mole on 1 atom basis
-    ├─ G :: Float64             # [kJ/f]    Gibbs energy, has to be multiplied by f (normalization factor) to be in [kJ]
+    ├─ G :: Float64             # [kJ/mol]  Gibbs energy per mol of oxides of the phase (= Σ Comp·Gamma)
     ├─ deltaG :: Float64        # [kJ]      driving force (distance from the Gibbs hyperplane)
-    ├─ V :: Float64             # [cm^3/mol]volume
-    ├─ alpha :: Float64         # [1/K]     thermal expansivity
-    ├─ entropy :: Float64       # [kJ/K]    entropy
-    ├─ enthalpy :: Float64      # [kJ/mol]  enthalpy
-    ├─ cp :: Float64            # [kJ/K/Kg] specific heat capacity
+    ├─ V :: Float64             # [cm^3/mol] volume per mol of oxides of the phase
+    ├─ V_fu :: Float64          # [cm^3/mol] volume per mol of formula unit
+    ├─ alpha :: Float64         # [1/K]     isobaric thermal expansivity
+    ├─ beta :: Float64          # [1/GPa]   isothermal compressibility
+    ├─ entropy :: Float64       # [kJ/K/mol] entropy per mol of oxides of the phase
+    ├─ enthalpy :: Float64      # [kJ/mol]  enthalpy per mol of oxides of the phase
+    ├─ cp :: Float64            # [kJ/K/mol] isobaric heat capacity per mol of oxides of the phase (J/K/kg: cp*1e9/(rho*V))
     ├─ rho :: Float64           # [kg/m^3]  density
-    ├─ bulkMod :: Float64       # [GPa]     bulk modulus
-    ├─ shearMod :: Float64      # [GPa]     bulk modulus
-    ├─ Vp :: Float64            # [km/s]    P-wave system velocity
-    ├─ Vs :: Float64            # [km/s]    S-wave system velocity
+    ├─ bulkMod :: Float64       # [GPa]     adiabatic bulk modulus
+    ├─ shearMod :: Float64      # [GPa]     shear modulus
+    ├─ Vp :: Float64            # [km/s]    P-wave velocity of the phase
+    ├─ Vs :: Float64            # [km/s]    S-wave velocity of the phase
+    ├─ pH :: Float64            # [-]       pH of the aqueous fluid (DEW only, NaN otherwise)
+    ├─ chargeResidual :: Float64    # [mol/kg]  charge balance residual of the aqueous fluid (DEW only, NaN otherwise)
+    ├─ sumMolality :: Float64   # [mol/kg]  total solute molality (DEW only, NaN otherwise)
+    ├─ G_water :: Float64       # [kJ/mol]  chemical potential of water (DEW only, NaN otherwise)
     ├─ Comp :: Vector{Float64}          # [mol_i]    composition in mole fracton
     ├─ Comp_wt :: Vector{Float64}       # [wt_i]     composition in weight fraction
     ├─ Comp_apfu :: Vector{Float64}     # [apfu]     composition in atim per formula unit
@@ -275,9 +288,11 @@ This sub-structure stores the properties of the stable solution phases.
     ├─ siteFractions :: Vector{Float64}         # [-]       site fractions
     ├─ siteFractionsNames :: Vector{String}     # [-]       site fractions names
     ├─ emNames :: Vector{String}                # [-]       names of the end-members
+    ├─ molality :: Vector{Float64}              # [mol/kg]  species molalities (DEW only)
+    ├─ activity :: Vector{Float64}              # [-]       species activities (DEW only)
     ├─ emFrac :: Vector{Float64}                # [mol_i]   end-members fraction in mole
     ├─ emFrac_wt :: Vector{Float64}             # [wt_i]    end-members fraction in weight
-    ├─ emChemPot :: Vector{Float64}             # [kJ]      driving force (distance from the Gibbs hyperplane)
+    ├─ emChemPot :: Vector{Float64}             # [kJ/mol·f] chemical potentials of the end-members per mol of end-member, multiplied by f (divide by f for kJ/mol)
     ├─ emComp :: Vector{Vector{Float64}}        # [mol_i]   composition of the endmembers in mole fracton
     ├─ emComp_wt :: Vector{Vector{Float64}}     # [wt_i]    composition of the endmembers in weight fracton
     ├─ emComp_apfu :: Vector{Vector{Float64}}   # [-]       composition of the endmembers in atom per formula unit
@@ -290,18 +305,20 @@ This sub-structure stores the properties of the stable pure phases.
 ```julia
 ├─ PP_vec :: Vector{MAGEMin_C.LibMAGEMin.PP_data}
     ├─ f :: Float64         # [-]       normalization factor to convert from mole to mole on 1 atom basis
-    ├─ G :: Float64         # [kJ/f]    Gibbs energy, has to be multiplied by f (normalization factor) to be in [kJ]
+    ├─ G :: Float64         # [kJ/mol]  Gibbs energy per mol of oxides of the phase (= Σ Comp·Gamma)
     ├─ deltaG :: Float64    # [kJ]      distance from the Gibbs hyperplane
-    ├─ V :: Float64         # [cm^3/mol]volume
-    ├─ alpha :: Float64     # [1/K]     thermal expansivity
-    ├─ entropy :: Float64   # [kJ/K]    entropy
-    ├─ enthalpy :: Float64  # [kJ/mol]  enthalpy
-    ├─ cp :: Float64        # [kJ/K/Kg] specific heat capacity
+    ├─ V :: Float64         # [cm^3/mol] volume per mol of oxides of the phase
+    ├─ V_fu :: Float64      # [cm^3/mol] volume per mol of formula unit
+    ├─ alpha :: Float64     # [1/K]     isobaric thermal expansivity
+    ├─ beta :: Float64      # [1/GPa]   isothermal compressibility
+    ├─ entropy :: Float64   # [kJ/K/mol] entropy per mol of oxides of the phase
+    ├─ enthalpy :: Float64  # [kJ/mol]  enthalpy per mol of oxides of the phase
+    ├─ cp :: Float64        # [kJ/K/mol] isobaric heat capacity per mol of oxides of the phase (J/K/kg: cp*1e9/(rho*V))
     ├─ rho :: Float64       # [kg/m^3]  density
-    ├─ bulkMod :: Float64   # [GPa]     bulk modulus
-    ├─ shearMod :: Float64  # [GPa]     bulk modulus
-    ├─ Vp :: Float64        # [km/s]    P-wave system velocity
-    ├─ Vs :: Float64        # [km/s]    S-wave system velocity
+    ├─ bulkMod :: Float64   # [GPa]     adiabatic bulk modulus
+    ├─ shearMod :: Float64  # [GPa]     shear modulus
+    ├─ Vp :: Float64        # [km/s]    P-wave velocity of the phase
+    ├─ Vs :: Float64        # [km/s]    S-wave velocity of the phase
     ├─ Comp :: Vector{Float64}          # [mol_i]    composition in mole fracton
     ├─ Comp_wt :: Vector{Float64}       # [wt_i]     composition in weight fraction
     ├─ Comp_apfu :: Vector{Float64}     # [apfu]     composition in atim per formula unit

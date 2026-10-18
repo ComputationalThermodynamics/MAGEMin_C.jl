@@ -47,6 +47,8 @@ features:
 
 While `MAGEMin` is the engine for the prediction of the stable phases, it is best used with the `Julia` interface [MAGEMin_C](https://github.com/ComputationalThermodynamics/MAGEMin_C.jl) and/or the web-browser julia [MAGEMinApp](https://github.com/ComputationalThermodynamics/MAGEMinApp.jl).  
 
+A `Python` wrapper, [MAGEMin_py](MAGEMin_py/MAGEMin_py.md), is developed by [Ondrej Lexa](https://natur.cuni.cz/en/geology/institutes-and-work-places/ipsg) (Institute of Petrology and Structural Geology, Faculty of Science, Charles University).
+
 
 ```@raw html
 

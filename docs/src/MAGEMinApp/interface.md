@@ -42,7 +42,7 @@
     - [7. PTX path tab](#7.-PTX-path-tab)
         - [7.1 Configuration panel](#7.1.-Configuration-panel)
         - [7.2 Bulk-rock composition panel](#7.2.-Bulk-rock-composition-panel)
-        - [7.3 Trace Elements panel](#7.3.-Trace-Elements-panel)
+        - [7.3 Trace-element composition panel](#7.3.-Trace-element-composition-panel)
         - [7.4 Path definition panel](#7.4.-Path-definition-panel)
         - [7.5 Path options panel](#7.5.-Path-options-panel)
         - [7.6 PTX save and export](#7.6.-PTX-save-and-export)
@@ -171,7 +171,7 @@ Links for documentation, reporting issues on GitHub, the GitHub repository, and 
                     <li><b>Initial grid subdivision</b> - sets the starting grid resolution (2–9; default 4, yielding a 16×16 grid)</li>
                     <li><b>3D grid [points per axis]</b> (P-T-X 3D diagram only) - number of grid points along P, T and X (default 17 × 17 × 9), with a live estimate of the number of points, computation time and memory. It replaces <b>Initial grid subdivision</b> and the refinement options: 3D diagrams use a regular grid without adaptive refinement. Options that do not apply to 3D diagrams (fixed pressure/temperature, P-T path, solidus H₂O saturation, T-T events, μ-μ and trace-element options) are hidden.</li>
                     <li><b>Refinement type</b> - refine on phase boundaries (ph) or dominant end-members (em)</li>
-                    <li><b>Refinement levels</b> - number of adaptive mesh refinement levels applied (default 3)</li>
+                    <li><b>Refinement levels</b> - number of adaptive mesh refinement levels applied (default 4)</li>
                 </ul>
             </li>
             <li><b>Trace elements sub-tab</b>
@@ -303,7 +303,7 @@ When `TE predictive model = true`, a third collapsible panel appears below the b
 
 ## 3. Diagram sub-tab
 
-The Diagram sub-tab has a right-hand sidebar with six tabs: **Informations**, **Display options**, **Isopleths**, **Draw path**, **Uncertainty**, and **Classifications**.
+The Diagram sub-tab has a right-hand sidebar with seven tabs: **Informations**, **Display options**, **Isopleths**, **Slab geotherms**, **Draw path**, **Uncertainty**, and **Classifications**.
 
 ### 3.1. Informations panel
 
@@ -355,12 +355,13 @@ The Diagram sub-tab has a right-hand sidebar with six tabs: **Informations**, **
             <li><b>Show grid</b> - display the adaptive mesh refinement grid (true/false)</li>
             <li><b>Minimum field size</b> - minimum number of cells for a field to receive a phase label (0–1024; default 16)</li>
             <li><b>Show phase label</b> - show or hide phase assemblage labels</li>
+            <li><b>White label background</b> - draw the phase labels on a white box</li>
             <li><b>Show reaction lines</b> - show or hide phase boundary lines</li>
             <li><b>Reaction line style editor</b> - select a solution phase, then set its reaction line style (solid, dot, dash, longdash, dashdot, longdashdot), width (0–10 px, default 0.75), color and label size; <b>Save</b>/<b>Reset</b>/<b>Update</b> apply the changes for that phase</li>
             <li><b>Colormap</b> - choose among: blackbody, Blues (default), cividis, Greens, Greys, hot, jet, RdBu, Reds, viridis, YlGnBu, YlOrRd, plus the R.J. Tamblyn set: Pink, Sunset, Dawn, Almeria, Almeria Extended, Almeria Red, Almeria Blue</li>
             <li><b>Value range</b> - manual min/max for the color scale</li>
             <li><b>Colormap range</b> - slider restricting which portion of the colormap is used (1–9)</li>
-            <li><b>Set min to white</b> - set the minimum value of the field to white (incompatible with Colormap range)</li>
+            <li><b>Set min to white</b> - colour only the minimum value of the field white; all other values keep their colour. For integer fields (Variance, #Phases) only the lowest class is white</li>
             <li><b>Reverse colormap</b> - invert the colormap direction</li>
             <li><b>Smooth colormap</b> - interpolation quality: fast, best, or none</li>
         </ul>
@@ -395,15 +396,16 @@ The Diagram sub-tab has a right-hand sidebar with six tabs: **Informations**, **
             <li><b>Remove excess fluid</b> - exclude fluid from the normalization when computing fractions (true/false)</li>
             <li><b>Unit</b> - mol, wt, or vol</li>
             <li><b>Custom calculator</b> - enter an expression (e.g., <code>Mg / (Mg + Fe)</code> for apfu, <code>MgO / (MgO + FeO)</code> for oxides) using oxide names, end-member names, or site fractions (available sites are listed above the input for the site-fraction calculator), plus a custom name for the field</li>
-            <li><b>Range: min / step / max</b> - define the isocontour interval</li>
+            <li><b>Range: min / step / max</b> - define the isocontour interval. It is filled automatically from the selected field, using only the points where the phase is stable</li>
             <li><b>Line style</b> - solid, dot, dash, longdash, dashdot, longdashdot</li>
             <li><b>Line width</b> - line thickness in pixels (0–10)</li>
             <li><b>Color</b> - color picker for the isocontour lines</li>
             <li><b>Label size</b> - font size for isocontour labels (6–20)</li>
-            <li><b>Add</b> - add the configured isocontour to the diagram</li>
+            <li><b>White background</b> - draw the isocontour value labels on a white box (kept for each isopleth; also used in the SVG export)</li>
+            <li><b>Add</b> - add the configured isocontour to the diagram. Labels that would overlap a label already placed are moved along their line or skipped</li>
             <li><b>Displayed / Hidden lists</b> - manage which isopleths are currently shown or hidden</li>
             <li><b>Hide / Hide all / Show / Show all / Remove / Remove all</b> - batch management buttons</li>
-            <li><b>Export isocontour(s)</b> - export the currently displayed isopleths (requires at least one to be displayed)</li>
+            <li><b>Export isocontour(s)</b> - export the currently displayed isopleths (requires at least one to be displayed) as text files in the figure directory</li>
         </ul>
       </td>
     </tr>
@@ -484,6 +486,22 @@ Computes and displays TAS and AFM classification diagrams for the melt compositi
 
 ---
 
+### 3.7. Export figure and Slab geotherms panels
+
+**Export figure** (next to the diagram):
+
+- **Clean boundaries** - smooths the reaction lines and the field outlines, and draws the fields as filled polygons for Variance and #Phases (default: on). The same smoothing applies to the isopleths, to the highlighted phase assemblage and to the SVG export.
+- **Smoothing (cells)** - strength of the smoothing, from 0 to 5 grid cells (default 2.5).
+- **Export svg** - writes the figure as one layered SVG file in the figure directory shown on the panel, together with the numbered phase assemblages (`_phase_equilibria.txt`). The layers are listed in [4. Export figures](PD_tutorials.md#4.-Export-figures) of the Phase diagram tutorials.
+
+**Slab geotherms** (sidebar tab; only drawn on P-T diagrams):
+
+- **Show geotherms** - show or hide the slab geotherms (`true` / `false`).
+- **Velocities [cm/yr]** - comma-separated convergence velocities, one curve per value, labelled with its velocity (default `1, 2, 5, 10`).
+- **Slab dip [°]** - dip of the slab (default 30).
+- **Depth into slab [km]** - depth below the slab top of the point followed by the curve (default 0, the slab top).
+- **Advanced** - surface temperature T₀ (0 °C), mantle temperature T₁ (1300 °C), upper-plate thickness h (20 km), slab thickness d (80 km), thermal diffusivity κ (1e-6 m²/s) and density ρ (3300 kg/m³). The model is described in the [General information](#8.-General-information-tab) tab, card *Slab geotherms*.
+
 ## 4. 3D diagram sub-tab
 
 This sub-tab is only shown when `Diagram type = P-T-X 3D diagram` is selected in the [Setup panel](#2.1.-Setup-panel). Clicking `Compute phase diagram` then computes a regular three-dimensional grid and switches to this sub-tab when the calculation is complete:
@@ -496,7 +514,7 @@ This sub-tab is only shown when `Diagram type = P-T-X 3D diagram` is selected in
 <img src="../assets/MAGEMinApp_3D_tab.png" alt="MAGEMinApp 3D diagram sub-tab" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
 ```
 
-The sub-tab has the figure on the left and, on the right, an always-visible **Display** panel followed by five tabs: **Informations**, **Field**, **Surface**, **Export** and **Phases & grid**.
+The sub-tab has the figure on the left and, on the right, an always-visible **Display** panel followed by seven tabs: **Informations**, **Field**, **Surface**, **P-T-X lines**, **Slab geotherms**, **Export** and **Phases & grid**.
 
 !!! tip
     - The quantity selectors of the Field and Surface panels follow the same structure as the [Isopleths panel](#3.3.-Isopleths-panel) of the Diagram sub-tab: `Type` (Pure phase, Solution phase or Other), `Phase`, `Field` (Mode, Oxide composition, Endmember mode, Mg#, Calculator oxides, Calculator apfu, Calculator site fractions; or a system field for `Other`), and only the options required by the selected field (`Unit`, `Remove excess fluid`, `Oxide`, `Endmember`, or the calculator expression, with the available site fractions listed for the site-fraction calculator).
@@ -703,6 +721,19 @@ The coloured surface reproduces a classic 3D representation: the surface on whic
 
 ---
 
+### 4.8. P-T-X lines panel
+
+Lines of constant pressure, temperature or composition drawn on the 3D surfaces. The tab lists what the lines are drawn on and how they look:
+
+- **Draw on** - any of *Coloured surface*, *Field isosurfaces* and *Phase-in/out surfaces* (all on by default).
+- **Render as** - *tubes (visible from both sides)* (default) or *flat lines*. **Tube radius [% of axis]** (default 0.3) applies to tubes, **Line width (flat)** (default 3 px) to flat lines, and **Line style** is solid, dash or dot.
+- **Show labels** and **Label size** (default 10).
+- **Pressure**, **Temperature [°C]** and **Composition X (0 - 1)** - each with its own set of levels, given as a range (min / max / step), as single values separated by commas, or both.
+
+### 4.9. Slab geotherms panel
+
+The same controls as in [3.7](#3.7.-Export-figure-and-Slab-geotherms-panels), plus the 3D options. A geotherm does not depend on X, so it is drawn either as a translucent wall spanning the X axis (**Render as = wall across X**, default) or as curves at the X values entered in **X values** (empty: both ends of X). **Wall opacity** sets the transparency of the wall (default 0.25). The geotherms are included in the interactive HTML, the PLY/STL surfaces (walls, or tubes for line rendering) and, as a companion `_geotherms.vtk` file, in the VTK export.
+
 ## 5. IntersecT sub-tab
 
 Implements quantitative isopleth thermobarometry (Nerone et al., 2025, doi:[10.1016/j.cageo.2025.105949](https://doi.org/10.1016/j.cageo.2025.105949)): for every grid point of a previously computed phase diagram, the modelled a.p.f.u. composition of one or several mineral phases is compared to a measured (e.g. EPMA) composition, returning a goodness-of-fit map.
@@ -881,6 +912,7 @@ Open by default, above the main diagram.
             <li><b>Field builder</b> (Trace element only) - enter a custom expression using <code>[M_X]</code> for element X in the melt (e.g., <code>[M_Dy] / [M_Yb]</code>); set normalization (none, bulk, chondrite) and click Compute and display</li>
             <li><b>Available phases</b> - list of phases for which TE concentrations are available</li>
             <li><b>Show reaction lines / Show grid / Show phase label</b> - same diagnostic overlays as the phase-diagram Display options</li>
+            <li><b>White label background</b> - same as in the phase-diagram Display options</li>
             <li><b>Colormap</b> - same list as <a href="#3.2.-Display-options-panel">3.2 Display options panel</a> (no RdYlGn); default RdBu</li>
             <li><b>Value range</b> - manual color scale min/max</li>
             <li><b>Colormap range</b> - slider restricting the colormap portion used</li>
@@ -898,6 +930,8 @@ Open by default, above the main diagram.
 
 The Isopleths panel in the Trace-elements sub-tab works identically to the one in the Diagram sub-tab but operates on TE and saturation fields (Zircon, Sulfide, Fluorapatite, CO₂ saturation, Trace element) instead of thermodynamic fields; for the Trace element type it exposes a Calculator expression plus a normalization setting (bulk, chondrite, none) and a custom field name.
 
+Trace-element and saturation isopleths are computed only at the points where the field is defined. Where there is no melt, a melt-based quantity (for example a melt trace-element ratio) is undefined, so the isopleth stops at the solidus instead of being drawn with zeros, and its range is computed from the defined points only.
+
 ### 6.5. Export figure and Phase assemblages panels
 
 ```@raw html
@@ -912,7 +946,7 @@ The Isopleths panel in the Trace-elements sub-tab works identically to the one i
       <td></td>
       <td>
         <ul>
-            <li><b>Export figure</b> - "Export all layers" saves each TE field layer as a separate image file in the output directory</li>
+            <li><b>Export figure</b> - the same panel as in the Diagram sub-tab: <b>Clean boundaries</b> and <b>Smoothing (cells)</b> (applied to the reaction lines, the isopleths and the highlighted assemblage), then <b>Export svg</b> writes one layered <code>&lt;title&gt;_TE.svg</code> file, with the phase-equilibria text file, in the figure directory</li>
             <li><b>Phase assemblages</b> - table of stable phase assemblages on the grid, with a clipboard button and a "Clear" button to reset any highlighted assemblage</li>
         </ul>
       </td>
@@ -931,6 +965,8 @@ The PTX path tab is divided into a left configuration panel and a central result
 
 ### 7.1. Configuration panel
 
+The Configuration panel is organised in four sub-tabs, in the same order as the phase diagram Setup panel: `General`, `Trace elements`, `Seismic properties` and `Solver`.
+
 ```@raw html
 
 <table>
@@ -940,17 +976,35 @@ The PTX path tab is divided into a left configuration panel and a central result
       <th>Caption</th>
     </tr>
     <tr>
-      <td></td>
+      <td><b>General</b></td>
       <td>
         <ul>
             <li><b>Thermodynamic database / Dataset / Preset / Phase selection</b> - same options as the phase diagram <a href="#2.1.-Setup-panel">Setup panel</a></li>
             <li><b>Clinopyroxene / Limit Ca-opx</b> - same as the phase diagram Setup panel</li>
             <li><b>Buffer</b> - same oxygen fugacity buffer / fixed oxide activity list as the phase diagram Setup panel</li>
-            <li><b>Variable buffer</b> - allow the buffer offset to vary per path point via a <code>Buffer</code> column in the <a href="#6.4.-Path-definition-panel">Path definition table</a> (true/false)</li>
-            <li><b>Solver</b> - pge (projected gradient), lp (Legacy), or hyb (Hybrid); default Legacy</li>
-            <li><b>Optimizer</b> - NLopt or Nullspace (default); shown only with <b>Solver</b> = Legacy on databases that support it, same as the phase diagram Setup panel</li>
-            <li><b>Specific Cp</b> - 0: G0 (no latent heat), 1: G_system (with latent heat); selecting G_system forces <b>Solver</b> to Legacy</li>
-            <li><b>Verbose</b> - none, light, or full Julia terminal output</li>
+            <li><b>Variable buffer</b> - allow the buffer offset to vary per path point via a <code>Buffer</code> column in the <a href="#7.4.-Path-definition-panel">Path definition table</a> (true/false)</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><b>Trace elements</b></td>
+      <td>
+        <ul>
+            <li><b>TE predictive model</b> - enable trace-element partitioning along the path (true/false). When true, the options below and the <a href="#7.3.-Trace-element-composition-panel">Trace-element composition panel</a> are shown</li>
+            <li><b>Kd's database</b> - OL (O. Laurent, 2012), CO (J. Cornet, 2019) or Yak25 (Yakymchuk et al., 2025)</li>
+            <li><b>Zr saturation</b> - none, Watson &amp; Harrison (1983), Boehnke et al. (2013) or Crisp and Berry (2022)</li>
+            <li><b>S saturation</b> - none, Liu et al. (2007) or O'Neill (2021)</li>
+            <li><b>P₂O₅ saturation</b> - none, Klein et al. (2026), Tollari et al. (2006) or Bea et al. (1992, after HW84)</li>
+            <li><b>CO₂ saturation</b> - none or Sun &amp; Yao (2026)</li>
+            <li><b>Monazite saturation</b> - none, Stepanov et al. (2012), Montel (1993) or Maimaiti et al. (2019)</li>
+            <li>All saturation models default to <code>none</code>. Saturation phases stay with the solid (residue in fractional melting, cumulate in fractional crystallization) and exsolved CO₂ leaves with the fluid, so trace elements are mass balanced along the path</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><b>Seismic properties</b></td>
+      <td>
+        <ul>
             <li><b>Seismic averaging scheme</b> - VRH (Voigt-Reuss-Hill) or HS (Hashin-Shtrikman)</li>
             <li><b>Weight factor</b> - mixing weight between Voigt and Reuss bounds (0–1; default 0.5)</li>
             <li><b>Seismic correction</b> - apply melt-content velocity correction (Clark et al., 2017 after Takei, 1997) (true/false)</li>
@@ -959,6 +1013,17 @@ The PTX path tab is divided into a left configuration panel and a central result
             <li><b>Anelastic model</b> - Dry mantle, Damp mantle, or Wet mantle (saturated) attenuation strength (visible when Anelastic correction = true)</li>
             <li><b>Shallow correction</b> - fixed-aspect-ratio (0.25), depth-dependent porosity correction for shallow conditions (true/false; visible when Seismic correction = true)</li>
             <li><b>Fluid as melt</b> - treat any free fluid phase as melt for the seismic corrections (true/false; visible when Seismic correction = true)</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><b>Solver</b></td>
+      <td>
+        <ul>
+            <li><b>Solver</b> - pge (projected gradient), lp (Legacy), or hyb (Hybrid); default Legacy</li>
+            <li><b>Optimizer</b> - NLopt or Nullspace (default); shown only with <b>Solver</b> = Legacy on databases that support it, same as the phase diagram Setup panel</li>
+            <li><b>Specific Cp</b> - 0: G0 (no latent heat), 1: G_system (with latent heat); selecting G_system forces <b>Solver</b> to Legacy</li>
+            <li><b>Verbose</b> - none, light, or full Julia terminal output</li>
         </ul>
       </td>
     </tr>
@@ -972,29 +1037,24 @@ The PTX path tab is divided into a left configuration panel and a central result
 
 Same controls as the phase diagram bulk-rock panel (§2.2). When `Assimilation = true`, a second bulk-rock composition panel appears for the assimilated end-member.
 
-### 7.3. Trace Elements panel
+### 7.3. Trace-element composition panel
 
-Appears when `TE predictive model = true` in Path options.
+Appears when `TE predictive model = true` (Configuration › Trace elements).
 
 ```@raw html
 
 <table>
   <tbody>
     <tr>
-      <th>Trace Elements (PTX)</th>
+      <th>Trace-element composition (PTX)</th>
       <th>Caption</th>
     </tr>
     <tr>
       <td></td>
       <td>
         <ul>
-            <li><b>KD model</b> - lattice-strain Kd database: OL (O. Laurent, 2012) or CO (J. Cornet, 2019)</li>
-            <li><b>Zr saturation</b> - none, Watson 1979 (WH), or Blundy 2022 (CB)</li>
-            <li><b>S saturation</b> - none or Liu 2021 (Liu07)</li>
-            <li><b>P₂O₅ saturation</b> - none or Tollari 2006</li>
-            <li><b>CO₂ saturation</b> - none or SY26 (Sun &amp; Yao, 2026)</li>
             <li><b>Upload trace-element file</b> - drag-and-drop a CSV file with element concentrations</li>
-            <li><b>Initial TE bulk composition [μg/g]</b> - editable table with element concentrations; pre-populate from built-in database dropdown</li>
+            <li><b>Initial TE bulk composition [μg/g]</b> - editable table with element concentrations; pre-populate from the built-in database dropdown</li>
             <li><b>Assimilant TE bulk composition [μg/g]</b> - second TE table for the assimilated end-member (visible when Assimilation = true)</li>
         </ul>
       </td>
@@ -1049,9 +1109,8 @@ Appears when `TE predictive model = true` in Path options.
       <td>
         <ul>
             <li><b>Resolution</b> - number of calculation steps between two consecutive path points (1–1024; default 32)</li>
-            <li><b>P-T-X mode</b> - Equilibrium, Fractional melting, or Fractional crystallization</li>
+            <li><b>P-T-X mode</b> - Equilibrium, Fractional melting, or Fractional crystallization. In both fractional modes, any free fluid present at an extraction step is removed together with the extracted material (melt or cumulate) and counted in <code>removed %</code></li>
             <li><b>Assimilation</b> - enable progressive addition of a second bulk-rock composition (true/false)</li>
-            <li><b>TE predictive model</b> - enable trace-element partitioning along the path (true/false)</li>
             <li><b>Cumulate/Connectivity unit</b> - basis (mol, wt, or vol) used for the assimilation blend and the melt/solid extraction mass balance; only shown in fractional melting/crystallization mode</li>
             <li><b>Connectivity threshold [mol%]</b> - melt fraction above which melt is extracted during fractional melting (0–100; default 7); only visible in fractional melting mode</li>
             <li><b>Residual Threshold [mol%]</b> - melt fraction left in the rock after an extraction event (0 to the connectivity threshold; default 7, i.e. melt is brought back to the connectivity threshold). A lower value drains the melt further each time the connectivity threshold is exceeded; the value is clamped to the connectivity threshold. Only visible in fractional melting mode</li>
@@ -1096,6 +1155,8 @@ Provides static reference data across three sections:
 - **End-members table** - full mineral name, abbreviation, Warr (2021) symbol and composition in the 15-oxide basis of the global database, sorted alphabetically (filterable, 16 rows per page)
 - **CSV bulk-rock format** - example table showing the required column structure for bulk-rock input files (title, comments, db, sysUnit, oxide columns, optional _frac2 variants), followed by the full field documentation including the thermodynamic dataset acronym table (mtl, mp, mb, ig, igd, igad, um, sb11, sb21, sb24, ume, mpe, mbe, all)
 - **Trace-element Kd tables** - three tabs subdivided by SiO₂ content of the melt (`SiO2 < 52 wt%`, `52 wt% <= SiO2 < 63 wt%`, `63 wt% <= SiO2`); each shows the element × mineral Kd matrix (filterable, 32 rows per page)
+- **Seismic velocities** - how the melt- and anelastic-corrected P- and S-wave velocities are computed when *Seismic correction* is on
+- **Slab geotherms** - the thermal model, geometry, pressure and default parameters of the slab geotherm overlay
 - **Calculation details** - static reference cards describing phase deactivation logic, oxide activity formulation, water saturation methodology, specific heat capacity calculation, the site fraction calculator, and seismic velocity corrections (melt/anelastic/shallow, cross-referencing the PTX path [Configuration panel](#6.1.-Configuration-panel) controls)
 
 ---
