@@ -2912,11 +2912,16 @@ end
         Oxide names in the order expected by MAGEMin for the given database.
 """
 function convertBulk4MAGEMin(   bulk_in     :: T1,
-                                bulk_in_ox  :: Vector{String},
-                                sys_in      :: String,
-                                db          :: String;
+                                bulk_in_ox  :: AbstractVector{<:AbstractString},
+                                sys_in      :: AbstractString,
+                                db          :: AbstractString;
                                 oxMinGuard  ::  Bool = true,
-                                ns_reduced  ::  Bool = false ) where {T1 <: AbstractVector{Float64}}
+                                ns_reduced  ::  Bool = false,
+                                ns          ::  Bool = false ) where {T1 <: AbstractVector{Float64}}
+
+    bulk_in_ox  = String.(bulk_in_ox)
+    sys_in      = String(sys_in)
+    db          = String(db)
 
     bulk_in = normalize(bulk_in);
 
@@ -3022,8 +3027,13 @@ function convertBulk4MAGEMin(   bulk_in     :: T1,
         d       = findall(in(config.optional).(MAGEMin_ox))
     end
 
+    if ns
+        c       = findall(isequal("SiO2"), MAGEMin_ox)
+        d       = setdiff(eachindex(MAGEMin_ox), c)
+    end
+
     # Set core oxides to minimum 1e-4 if below threshold (exact zeros are kept when the nullspace optimizer reduces the system)
-    if ns_reduced
+    if ns_reduced && !ns
         if oxMinGuard
             idz = findall(MAGEMin_bulk[c] .< 2e-5)
             MAGEMin_bulk[c[idz]] .= 0.0
