@@ -28,6 +28,8 @@ Here we provide a set of tutorials to generate various kind of phase diagrams, c
     - [18. P-T-X 3D diagram](#18.-P-T-X-3D-diagram)
     - [19. Reduced chemical systems (Nullspace optimizer)](#19.-Reduced-chemical-systems-Nullspace-optimizer)
     - [20. Slab geotherms on a P-T diagram](#20.-Slab-geotherms-on-a-P-T-diagram)
+    - [21. Oxygen isotopes (δ18O)](#21.-Oxygen-isotopes-δ18O)
+    - [22. Mini pie charts on the diagram](#22.-Mini-pie-charts-on-the-diagram)
 
 ### 1. First phase diagram 
 
@@ -1180,3 +1182,122 @@ The geotherms are included in the `Export svg` of the figure (layer `Subduction_
 !!! note
     - The curves are only drawn where the temperature lies between the temperature limits of the window: a narrower window clips them.
     - The model is purely conductive with constant thermal diffusivity (no shear heating, no mantle-wedge corner flow, no radiogenic or latent heat).
+
+### 21. Oxygen isotopes (δ18O)
+
+The δ18O model partitions the oxygen isotopes of the system among the stable phases of every point of the diagram. It is a post-processing step: no extra minimization is performed and the cost is negligible.
+
+!!! info "How it works"
+    - Each phase ``i`` is fractionated against quartz with the DBOxygen 2.0.3 coefficients (Vho et al., 2019): ``1000 \ln \alpha_{Qz-i} = A_i \, 10^6/T^2 + B_i \, 10^3/T``.
+    - The coefficients of a solid solution are the end-member coefficients weighted by the share of oxygen carried by each end-member.
+    - The melt is treated as its CIPW norm (default, after Bindeman, 2008), or with the oxide-index method of Zhao & Zheng (2003).
+    - The δ18O of the phases follows from the oxygen mass balance ``\sum_i f_{O,i} \, \delta^{18}O_i = \delta^{18}O_{sys}``, where ``f_{O,i}`` is the fraction of the system oxygen held by phase ``i``.
+    - Above `1/T² above [°C]` (900 °C by default, the upper limit of the DBOxygen calibration) the fractionations are continued as ``1/T^2``.
+    - More details and references are given in the `General information` tab, card *δ18O*.
+
+#### Step 1 - Activate the δ18O model
+
+Select `Metapelite (White et al., 2014)` and the default `FPWorldMedian pelite - water oversaturated` composition, and set `Pressure [kbar]` from `2` to `12` and `Temperature [°C]` from `500` to `750`. Then open the `Oxygen isotopes` sub-tab of the `Phase diagram parameters` panel and set `δ18O model = true`. A `δ18O [‰]` input appears below the bulk-rock table; set it to `12`.
+
+```@raw html
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_O18_setup.png?raw=true" alt="MAGEMinApp δ18O setup" style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+```
+
+- `Anchor phase`: leave empty to use the bulk δ18O. Give a phase name (e.g. `g`) together with `Anchor δ18O [‰]` to fix the δ18O of that phase instead; the bulk δ18O then becomes an output. Points where the anchor phase is not stable are left undefined.
+- `Melt model`: `CIPW norm (Bindeman, 2008)` (default), `Oxide index (Zhao & Zheng, 2003)` or `Melt end-members`.
+- `Unmapped phases`: phases without a DBOxygen analogue are either excluded from the oxygen budget (`exclude`, default) or given oxide-index parameters (`oxide index (Zhao & Zheng, 2003)`).
+- For X diagrams (`P-X`, `T-X`, ...) a second `δ18O [‰]` input appears below the second bulk-rock table, and the bulk δ18O is mixed along X.
+
+Click `Compute phase diagram`.
+
+#### Step 2 - Display a δ18O field
+
+In the `Diagram` tab, open the `Display options` sidebar tab and set `Field = δ18O`. Two selectors appear:
+
+- `Quantity`: `δ18O of phase`, `Δ18O phase 1 - phase 2`, `δ18O melt`, `δ18O fluid`, `δ18O solid`, `δ18O system`, `δ18O virtual quartz` or `Oxygen fraction of phase`;
+- `Phase 1` (and `Phase 2` for `Δ18O`): the phases to display.
+
+With `Quantity = δ18O of phase` and `Phase 1 = g`:
+
+```@raw html
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_O18_diagram.png?raw=true" alt="MAGEMinApp δ18O garnet" style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+```
+
+Fields where the selected phase is absent are left blank. The colormap and the value range are set in the `Color options` card as for any other field.
+
+#### Step 3 - Δ18O isopleths
+
+The fractionation between two phases, ``\Delta^{18}O_{1-2}``, does not depend on the bulk δ18O and can be used as a thermometer. In the `Isopleths` sidebar tab set `Isopleth type = δ18O`, `Quantity = Δ18O phase 1 - phase 2`, `Phase 1 = q` and `Phase 2 = g`. The `Range` is filled automatically from the computed values; click `Add`.
+
+```@raw html
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_O18_isopleth_menu.png?raw=true" alt="MAGEMinApp δ18O isopleth menu" style="max-width: 30%; height: auto; display: block; margin: 0 auto;">
+```
+
+```@raw html
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_O18_isopleths.png?raw=true" alt="MAGEMinApp Δ18O quartz-garnet isopleths" style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+```
+
+The quartz-garnet isopleths are almost vertical: Δ18O(q-g) decreases from about 4.6 ‰ at 520 °C to 3.4 ‰ at 710 °C, nearly independently of pressure.
+
+#### Step 4 - δ18O of a point
+
+Click on a point of the diagram. Below the phase proportions, the `Informations` sidebar tab shows a `δ18O` panel: the δ18O of each stable phase (the marker size scales with the oxygen fraction of the phase, the dashed line is the bulk δ18O) and a table with the δ18O and oxygen fraction `f_O` of each phase, the melt, fluid, solid and system values, and the warnings of the model.
+
+```@raw html
+<div style="display: flex; justify-content: center; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_O18_point.png?raw=true" alt="MAGEMinApp δ18O point" style="max-width: 45%; height: auto;">
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_O18_point_table.png?raw=true" alt="MAGEMinApp δ18O point table" style="max-width: 30%; height: auto;">
+</div>
+```
+
+At 8.5 kbar and 620 °C, with a bulk δ18O of 12 ‰, quartz carries 36 % of the oxygen at 13.65 ‰ and garnet is at 9.76 ‰.
+
+#### Step 5 - Export
+
+- `Save point` and `Save all` (csv) also write a `<filename>_O18.csv` table with the δ18O of every phase.
+- δ18O fields and isopleths are exported with `Export svg` like any other field (see [4. Export figures](#4.-Export-figures)).
+
+!!! note
+    - The pressure effect on the fractionation is neglected (< 0.2 ‰ at 1 GPa, Vho et al., 2019).
+    - The warnings listed in the point table flag, for instance, end-members with a negative oxygen fraction (used linearly), temperatures above the `1/T² above [°C]` limit, and the fraction of unmapped oxygen.
+    - δ18O is also available along P-T-X paths, see [E.12. δ18O along a P-T-X path](PTX_tutorials.md#E.12.-δ18O-along-a-P-T-X-path).
+
+#### References
+
+When using the δ18O model, please cite the DBOxygen database (Vho et al., 2019), and, depending on the `Melt model`, Bindeman (2008) or Zhao & Zheng (2003):
+
+- Vho, A., Lanari, P. & Rubatto, D. (2019). An internally-consistent database for oxygen isotope fractionation between minerals. *Journal of Petrology* 60(11), 2101–2129. doi:[10.1093/petrology/egaa001](https://doi.org/10.1093/petrology/egaa001)
+- Vho, A., Lanari, P., Rubatto, D. & Hermann, J. (2020). Tracing fluid transfers in subduction zones: an integrated thermodynamic and δ18O fractionation modelling approach. *Solid Earth* 11, 307–328. doi:[10.5194/se-11-307-2020](https://doi.org/10.5194/se-11-307-2020)
+- Bindeman, I. (2008). Oxygen isotopes in mantle and crustal magmas as revealed by single crystal analysis. *Reviews in Mineralogy and Geochemistry* 69, 445–478. doi:[10.2138/rmg.2008.69.12](https://doi.org/10.2138/rmg.2008.69.12)
+- Zhao, Z.-F. & Zheng, Y.-F. (2003). Calculation of oxygen isotope fractionation in magmatic rocks. *Chemical Geology* 193, 59–80. doi:[10.1016/S0009-2541(02)00226-7](https://doi.org/10.1016/S0009-2541(02)00226-7)
+
+### 22. Mini pie charts on the diagram
+
+Mini pie charts show the phase proportions at selected points directly on a 2D diagram. They are set in the `Figure options` panel of the `Diagram` tab.
+
+```@raw html
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_minipie_menu.png?raw=true" alt="MAGEMinApp mini pie menu" style="max-width: 25%; height: auto; display: block; margin: 0 auto;">
+```
+
+#### Step 1 - Record pie charts
+
+Compute a phase diagram (here the metapelite diagram of [21. Oxygen isotopes (δ18O)](#21.-Oxygen-isotopes-δ18O)), then click `Record pie chart`: the button turns red. Every click on the diagram now adds a pie at the clicked point. Click `Stop record` to go back to the normal click behaviour, and `Delete all` to remove all pies.
+
+#### Step 2 - Size, unit and colors
+
+- `Pie radius (px)`: 10 to 40 px. The radius is in screen pixels, so the pies keep their size when zooming.
+- `Unit`: `mol%`, `wt%` (default) or `vol%`. The proportions of the three units are stored at click time, so the unit can be changed afterwards.
+- The wedge colors follow the mineral colors (`Modify phase colors`); the pies are updated when the color panel is closed. A legend of the phases shown in the pies is drawn below the diagram.
+
+```@raw html
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_minipie_diagram.png?raw=true" alt="MAGEMinApp mini pie diagram" style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+```
+
+#### Step 3 - Export
+
+The pies and their legend are included in the `Export svg` of the figure (layers `Mini_pie_charts` and `Mini_pie_legend`, see [4. Export figures](#4.-Export-figures)), with the selected radius and unit.
+
+!!! note
+    - The phase proportions are taken when the point is clicked; refining the diagram does not change them.
+    - Clicking twice in a row in the same grid cell adds only one pie.
+    - The pies are removed when a new diagram is computed or a state is loaded.

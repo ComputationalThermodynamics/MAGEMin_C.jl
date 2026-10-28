@@ -412,3 +412,47 @@ When `TE predictive model = true`, additional export buttons appear in the `Path
 
 !!! tip
     Use the `Export references → bibtex file` button to export a BibTeX file listing all references for the active KD model, saturation models and thermodynamic database.
+
+## Oxygen isotopes (δ18O)
+
+### E.12. δ18O along a P-T-X path
+
+The δ18O model described in the [phase-diagram tutorial](PD_tutorials.md#21.-Oxygen-isotopes-δ18O) can also be followed along a P-T-X path. The system is then open: the material extracted at each step leaves with its own δ18O and the δ18O of the remaining system is updated by mass balance, following the approach of Vho et al. (2020, doi:[10.5194/se-11-307-2020](https://doi.org/10.5194/se-11-307-2020)).
+#### Step 1 - Setup
+
+In the `General` sub-tab of the `Configuration` panel select the `Igneous` database and the `N_MORB - Basalt` composition. Open the `Oxygen isotopes` sub-tab and set `δ18O model = true`; the `Melt model`, `Unmapped phases` and `1/T² above [°C]` options are the same as for phase diagrams. Set the `δ18O [‰]` of the starting bulk, shown below the bulk-rock table, to `5.7`.
+
+```@raw html
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_PTX_O18_setup.png?raw=true" alt="MAGEMinApp PTX δ18O setup" style="max-width: 30%; height: auto; display: block; margin: 0 auto;">
+```
+
+In the `Path options` panel select `P-T-X Mode = Fractional crystallization` and keep the `Residual rock fraction [mol%] = 0`. Define a path at `5 kbar` from `1250 °C` to `900 °C` and click `Compute path`.
+
+!!! note
+    With `Assimilation = true`, a `δ18O assimilant [‰]` input appears below the assimilant composition; the assimilant is mixed into the system weighted by oxygen.
+
+#### Step 2 - δ18O evolution
+
+The `δ18O` results tab shows the evolution along the path of the δ18O of the selected quantities: `system`, `melt`, `fluid`, `solid`, the extracted material (`extracted (step)` and `extracted (cumulative)`) and every phase stable along the path. Here `system`, `solid`, `cpx`, `liq`, `opx` and `pl` are selected:
+
+```@raw html
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_PTX_O18_evolution.png?raw=true" alt="MAGEMinApp PTX δ18O evolution" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+```
+
+Clinopyroxene and orthopyroxene crystallize at a lower δ18O than the melt, and plagioclase at a higher one. From step 15 on the extracted solid is lighter than the melt, so the δ18O of the melt, and of the remaining system, increases from 5.7 ‰ to about 6.25 ‰ at the end of crystallization.
+
+#### Step 3 - δ18O at a given step
+
+Enter a step number in `Step` or click a point of the evolution plot to display the δ18O of the phases at that step, with the same chart and table as for a phase-diagram point. The table also gives the δ18O of the material extracted at that step and its share of the initial oxygen.
+
+```@raw html
+<img src="https://raw.githubusercontent.com/ComputationalThermodynamics/repositories_pictures/main/MAGEMin_doc/MAGEMinApp_PTX_O18_step.png?raw=true" alt="MAGEMinApp PTX δ18O step" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+```
+
+#### Step 4 - Export
+
+`Save δ18O table` → `csv file` writes `<filename>_<database>_PTX_O18.csv` in the output directory.
+
+!!! note
+    - Extracted melt, solids and fluid (fractional melting or crystallization, per-phase extraction thresholds) leave the system with their own oxygen-weighted δ18O.
+    - Water added to reach H2O saturation and activity buffers are assumed to carry the δ18O of the system.

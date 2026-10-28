@@ -38,6 +38,10 @@ end
     include(joinpath(@__DIR__, "test_O_isotopes.jl"))
 end
 
+@testset "sections" begin
+    include(joinpath(@__DIR__, "test_sections.jl"))
+end
+
 @testset "threaded" begin
     # Do a dummy `@test true`:
     # If the process errors out the testset would error out as well
