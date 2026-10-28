@@ -45,7 +45,8 @@ struct db_registry
     dataset_opt     :: NTuple{5,Int64}
 end
 
-const GH_ENABLED = false
+const GH_ENABLED   = false
+const IGAW_ENABLED = false
 
 """
     MAGEMIN_DATABASES
@@ -62,11 +63,12 @@ const GH_ENABLED = false
 
     The row order is significant: `db_infos_generated.jl` is emitted in this order.
 """
-const MAGEMIN_DATABASES = filter(d -> GH_ENABLED || d.research_group != "gh", db_registry[
+const MAGEMIN_DATABASES = filter(d -> (GH_ENABLED || d.research_group != "gh") && (IGAW_ENABLED || d.db_name != "igaw"), db_registry[
     db_registry("mp",     "tc",  0, "Metapelite (White et al., 2014)",                                                                              62, (62, 633, 634, 635, 636)),
     db_registry("mb",     "tc",  1, "Metabasite (Green et al., 2016)",                                                                              62, (62, 633, 634, 635, 636)),
     db_registry("mbe",    "tc", 11, "Metabasite extended (Green et al., 2016 with oamp from Diener et al., 2007 and ta from Rebay et al., 2022)",   62, (62, 633, 634, 635, 636)),
     db_registry("ig",     "tc",  2, "Igneous (Green et al., 2025, corrected after Holland et al., 2018)",                                          636, (62, 633, 634, 635, 636)),
+    db_registry("igaw",   "tc", 10, "Igneous alkaline wet (Holland et al., 2026, in progress)",                636, (62, 633, 634, 635, 636)),
     db_registry("igad",   "tc",  3, "Igneous alkaline dry (Weller et al., 2024)",                                                                  636, (62, 633, 634, 635, 636)),
     db_registry("igd",    "tc", 22, "Igneous dry (Su et al., 2026, corrected after Tomlinson & Holland, 2021)",                                    634, (62, 633, 634, 635, 636)),
     db_registry("um",     "tc",  4, "Ultramafic (Evans & Frost., 2021)",                                                                           633, (62, 633, 634, 635, 636)),
