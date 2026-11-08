@@ -1159,7 +1159,7 @@ end
     T           =   400.0
     out         =   point_wise_minimization(P,T, data);
     Finalize_MAGEMin(data)
-    @test sort(out.ph) == sort(["DEW", "amp", "atg", "chl", "hem", "pyr", "ta"])
+    @test sort(out.ph) == sort(["amp", "atg", "chl", "fl", "hem", "pyr", "spi", "ta"])
 end
 
 
