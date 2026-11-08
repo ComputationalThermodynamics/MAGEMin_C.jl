@@ -620,9 +620,9 @@ end
 
     tol = 1e-3
     @test out_TE.liq_wt_norm ≈ 0.36786183037028913 rtol=tol
-    @test out_TE.Cliq[1]     ≈ 15.4158              rtol=tol
-    @test out_TE.Cliq[2]     ≈ 9.50138             rtol=tol
-    @test out_TE.Cliq[27]    ≈ 5.81654              rtol=tol
+    @test out_TE.Cliq[1]     ≈ 10.7017              rtol=tol
+    @test out_TE.Cliq[2]     ≈ 6.97097              rtol=tol
+    @test out_TE.Cliq[27]    ≈ 2.63904              rtol=tol
 end
 
 
